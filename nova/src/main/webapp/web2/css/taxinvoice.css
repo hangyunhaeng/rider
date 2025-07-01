@@ -1,0 +1,82 @@
+
+p, table, th, tr, td{border-collapse:collapse; font-size:12px; font-family:Dotum,"����"; color:#40464f;}
+
+.tax_to tbody th{border-bottom:1px solid #bdc4d3; text-align:center; border-right:1px solid #bdc4d4; background-color:#f4f5f9; height:25px;}
+.tax_to tbody td{border-bottom:1px solid #bdc4d3; text-align:center; border-left:1px solid #4f628a; border-right:1px solid #bdc4d4;}
+.tax_to {width:645px;border-top:2px solid #4f628a; border-left:1px solid #bdc4d3; border-right:1px solid #bdc4d3; border-bottom:1px solid #4f628a;}
+.tax_to th {font-weight:bold; letter-spacing:-1px; line-height:25px; vertical-align:middle;}
+
+.marTop10{margin-top:10px;}
+.ml2{margin-left:2px;}
+
+.fbo{font-weight:bold;}
+.f14{font-size:14px; letter-spacing:-1px; line-height:20px;}
+.f20{font-size:20px; letter-spacing:0px; line-height:22px;}
+.c3{color:#333;}
+
+
+.tax_tb02 .l{text-align:left;}
+.tax_tb02 .r{text-align:right;}
+.tax_tb02 .c{text-align:center;}
+
+.tax_col02 {width:645px;border-collapse:separate;}
+.tax_col02 caption{display:none;}
+.tax_col02 th{padding:4px 3px 4px 3px; text-align:center;}
+.tax_col02 td{padding:3px 3px 3px 3px;}
+.tax_col02 td a{line-height:11px;}
+.tax_col02 th.t_red, .tax_col02 td.t_red{border-top:3px solid #ea5555; border-right:1px solid #f7c2c2; border-bottom:1px solid #f7c2c2;}
+.tax_col02 tbody th.t_red{background-color:#fff2f2; text-align:center;}
+.tax_col02 tbody th.b_red{border-bottom:2px solid #ea5555; border-right:1px solid #f7c2c2;}
+.tax_col02 tbody td.b_red{border-bottom:2px solid #ea5555; border-right:1px solid #f7c2c2;}
+.tax_col02 tbody th.b_red{background-color:#fff2f2; text-align:center;}
+.tax_col02 tbody th.red{background-color:#ffd9d9; text-align:center; border-top:3px solid #ea5555; border-bottom:2px solid #ea5555; border-right:1px solid #f7c2c2; border-left:1px solid #f7c2c2;}
+.tax_col02 tbody th.red a, .tax_col02 tbody th.red label{color:#e10d0d; letter-spacing:2px; font-size:12px; text-decoration:none;}
+.tax_col02 tbody th.reds{background-color:#fff2f2; text-align:center; color:#af5f5f; font-size:11px; letter-spacing:-1px; line-height:12px; font-weight:bold; text-decoration:none; border-bottom:1px solid #f7c2c2; border-right:1px solid #f7c2c2;}
+.tax_col02 tbody th.reds a, .tax_col02 tbody th.reds label, .tax_col02 tbody th.t_red a, .tax_col02 tbody th.b_reda a, .tax_col02 tbody th.t_red label, .tax_col02 tbody th.b_red a, .tax_col02 tbody th.b_red label{color:#af5f5f; font-size:11px; letter-spacing:-1px; line-height:11px; font-weight:bold; text-decoration:none;}
+.tax_col02 tbody td.reds{border-bottom:1px solid #f7c2c2; border-right:1px solid #f7c2c2;}
+.tax_col02 tbody th.redo{background-color:#ffd9d9; text-align:center; border-top:3px solid #ea5555; border-bottom:1px solid #f7c2c2 ;border-right:1px solid #f7c2c2; border-left:1px solid #f7c2c2;}
+.tax_col02 tbody th.redo a{color:#e10d0d; letter-spacing:0px; font-size:12px; text-decoration:none;}
+
+.tax_col02 tbody th.b_reda{border-bottom:2px solid #ea5555; border-right:1px solid #f7c2c2; border-left:1px solid #f7c2c2;}
+.tax_col02 tbody th.b_reda{background-color:#fff2f2; text-align:center;}
+
+
+.tax_col02 tbody th.t_blue, .tax_col02 tbody td.t_blue{border-top:3px solid #5396da; border-bottom:1px solid #bdc4d3; border-right:1px solid #bdc4d3;}
+.tax_col02 tbody th.t_blue{background-color:#f2f5ff; text-align:center;}
+.tax_col02 tbody th.b_blue, .tax_col02 tbody td.b_blue{border-bottom:2px solid #5396da; border-right:1px solid #bdc4d3;}
+.tax_col02 tbody th.b_blue{background-color:#f2f5ff; text-align:center;}
+.tax_col02 tbody th.t_blue a, .tax_col02 tbody th.t_blue label, .tax_col02 tbody th.blues a, .tax_col02 tbody th.blues label, .tax_col02 tbody th.b_blue a, .tax_col02 tbody th.b_blue label{color:#3a77a2; font-size:11px; letter-spacing:-1px; line-height:11px; font-weight:bold; text-decoration:none;}
+.tax_col02 tbody th.blue{background-color:#c2d9f2; text-align:center; border-top:3px solid #5396da; border-bottom:2px solid #5396da; border-right:1px solid #bdc4d3;}
+.tax_col02 tbody th.blue a{color:#0a57cb; letter-spacing:2px; font-size:12px; text-decoration:none;}
+.tax_col02 tbody th.blues{background-color:#f2f5ff; text-align:center; border-right:1px solid #bdc4d3;  border-bottom:1px solid #bdc4d3;}
+.tax_col02 tbody td.blues{border-bottom:1px solid #bdc4d3; border-right:1px solid #bdc4d3;}
+
+.tax_col02, .tax_tb02{border-collapse:collapse;}
+.tax_col02 .t_red2{background-color:#fff2f2; text-align:center;border-top:3px solid #ea5555; border-right:1px solid #f7c2c2; border-bottom:1px solid #f7c2c2;color:#af5f5f; font-size:11px; letter-spacing:-1px; line-height:11px; font-weight:bold; text-decoration:none;}
+.tax_col02 .red2{color:#e10d0d; letter-spacing:2px; font-size:12px; text-decoration:none;background-color:#ffd9d9; text-align:center; border-top:3px solid #ea5555; border-bottom:2px solid #ea5555; border-right:1px solid #f7c2c2; border-left:1px solid #f7c2c2;}
+.tax_col02 .blue2{color:#0a57cb; letter-spacing:2px; font-size:12px; text-decoration:none;background-color:#c2d9f2; text-align:center; border-top:3px solid #5396da; border-bottom:2px solid #5396da; border-right:1px solid #bdc4d3;}
+.tax_col02 .t_blue2{border-top:3px solid #5396da; border-bottom:1px solid #bdc4d3; border-right:1px solid #bdc4d3;background-color:#f2f5ff; text-align:center;color:#3a77a2; font-size:11px; letter-spacing:-1px; line-height:11px; font-weight:bold; text-decoration:none;}
+.tax_col02 .blues2{color:#3a77a2; font-size:11px; letter-spacing:-1px; line-height:11px; font-weight:bold; text-decoration:none;background-color:#f2f5ff; text-align:center; border-right:1px solid #bdc4d3;  border-bottom:1px solid #bdc4d3;border-bottom:1px solid #bdc4d3; border-right:1px solid #bdc4d3;}
+.tax_col02 .b_red2{background-color:#fff2f2; text-align:center; color:#af5f5f; font-size:11px; letter-spacing:-1px; line-height:12px; font-weight:bold; text-decoration:none;border-bottom:2px solid #ea5555; border-right:1px solid #f7c2c2;}
+.tax_col02 .b_blue2{color:#3a77a2; font-size:11px; letter-spacing:-1px; line-height:11px; font-weight:bold; text-decoration:none;border-bottom:2px solid #5396da; border-right:1px solid #bdc4d3;background-color:#f2f5ff; text-align:center;}
+
+
+.borderNone {border-right:none !important;}
+
+.tax_tb02 th{border-bottom:1px solid #4f628a; text-align:center; border-left:1px solid #bdc4d4; height:22px; border-right:1px solid #bdc4d4; background-color:#f4f5f9;}
+.tax_tb02 td{padding:3px 3px 2px 3px; text-align:center; border:1px solid #bdc4d4; height:18px; letter-spacing:0px;}
+.tax_tb02 td a, .tax_tb02 td label{font-size:11px; font-weight:normal; letter-spacing:0px; line-height:16px; color:#555; text-decoration:none;}
+.tax_tb02 td table tr td{border:none; padding:0; margin:0;}
+.tax_tb02 tr.r td{text-align:right;}
+.tax_tb02 tr.l td{text-align:left;}
+.tax_tb02 tr.l350 td{text-align:left; padding-left:350px;}
+.tax_tb02 th.red{background-color:#ffecec; text-align:center;}
+.tax_tb02 th.red a{color:#e10d0d; letter-spacing:0px; font-size:12px;}
+.tax_tb02 th.blue{background-color:#ddedfe; text-align:center;}
+.tax_tb02 th.blue a{color:#0a57cb; letter-spacing:0px; font-size:12px;}
+.tax_tb02 {width:645px;border-top:2px solid #4f628a; border-bottom:1px solid #4f628a;}
+
+.tax_tb02 .padTop15{padding-top:15px;}
+.tax_tb02 .th_line{border-bottom:1px solid #bdc4d4}
+
+.custom-table {    width: 100%;    border: 0;    border-spacing: 0;    padding: 0;}

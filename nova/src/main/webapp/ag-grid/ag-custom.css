@@ -1,0 +1,85 @@
+.custom-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 10px;
+    cursor: pointer;
+    text-align: center;
+}
+
+.custom-header-container {
+    display: flex;
+    align-items: center;
+}
+
+.custom-header-label {
+    display: flex;
+    align-items: center;
+}
+
+.custom-header-sort-icons {
+    display: flex;
+    align-items: center;
+    margin-left: 5px; /* 텍스트와 아이콘 사이의 간격 조절 */
+}
+
+.asc-icon, .desc-icon {
+    margin-left: 2px;
+}
+
+.ag-cell {
+  display: inline-block;
+  position: absolute;
+  white-space: nowrap;
+  height: 100%;
+  font-size: 12px; /* 데이터 셀 폰트 사이즈 설정 */
+  text-align:center;
+}
+.ag-header-cell {
+  display: inline-flex;
+  align-items: center;
+  position: absolute;
+  height: 100%;
+  color: black; /* 각 헤더 셀 텍스트 색상 설정 */
+  font-size: 12px; /* 데이터 셀 폰트 사이즈 설정 */
+}
+.ag-header-cell-label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  justify-content: center;
+  align-items: center;
+}
+.ag-header-cell-comp-wrapper {
+  width: 100%;
+  justify-content: center;
+}
+.ag-header-group-cell {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  position: absolute;
+}
+/* custom-ag-grid.css */
+.tall-cell {
+    line-height: 100px; /* 셀 높이를 조정 */
+    padding-top: 10px; /* 필요한 경우 패딩을 추가 */
+    padding-bottom: 10px;
+}
+.ag-cell-right {
+    text-align: right;
+}
+.ag-cell-left {
+    text-align: left;
+}
+.input_readonly_right {background-color:#e4e4e4; border:1x SOLID #cbcbcb; height:20px; color: #777777; font-size: 12px; line-height:16px; font-family:"돋움"; text-align:right;}
+.cell-span {    vertical-align: top;    line-height: 32px;}
+.ag-sticky-bottom {    display: none !important;  }
+
+.task-link {
+    text-decoration: none;
+}
+
+.task-link:hover {
+    text-decoration: underline;
+}

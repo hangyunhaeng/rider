@@ -1,0 +1,429 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="dtyDAO">
+	<insert id="insertDeliveryInfo" parameterType="egovframework.com.rd.usr.service.vo.DeliveryInfoVO">
+
+			INSERT INTO RD_DELIVERY_INFO
+			(COOPERATOR_ID, COOPERATOR_NM,REGISTRATION_SN,REGISTRATION_NM,RUN_DE,DELIVERY_SN,DELIVERY_STATE,
+			SERVICE_TYPE,DELIVERY_TYPE,RIDER_ID,MBER_ID,RIDER_NM,DELIVERY_METHOD,SHOP_SN,SHOP_NM,GOODS_PRICE,
+			PICKUP_ADDR,DESTINATION_ADDR,ORDER_DT,OPERATE_RIDER_DT,SHOP_COMEIN_DT,PICKUP_FINIST_DT,DELIVERY_FINIST_DT,
+			DISTANCE,ADD_DELIVERY_REASON,ADD_DELIVERY_DESC,PICKUP_LAW_DONG,BASIC_PRICE,WEATHER_PRIMAGE,ADD_PRIMAGE,
+			PEAK_PRIMAGE_ETC,DELIVERY_PRICE,RIDER_CAUSE_YN,ADD_PRIMAGE_DESC,NOTE,ATCH_FILE_ID,CREAT_DT,CREAT_ID)
+			SELECT
+			#{cooperatorId},#{cooperatorNm},#{registrationSn},#{registrationNm},#{runDe},#{deliverySn},#{deliveryState},
+			#{serviceType},#{deliveryType},#{riderId},#{mberId},#{riderNm},#{deliveryMethod},#{shopSn},#{shopNm},#{goodsPrice},
+			#{pickupAddr},#{destinationAddr},#{orderDt},#{operateRiderDt},#{shopComeinDt},#{pickupFinistDt},#{deliveryFinistDt},
+			#{distance},#{addDeliveryReason},#{addDeliveryDesc},#{pickupLawDong},#{basicPrice},#{weatherPrimage},#{addPrimage},
+			#{peakPrimageEtc},#{deliveryPrice},#{riderCauseYn},#{addPrimageDesc},#{note},#{atchFileId},SYSDATE(),#{creatId}
+
+			<if test="schAuthorCode == 'ROLE_USER'">
+			/* 협력사 조건 */
+			FROM 	RD_COOPERATOR a
+			WHERE a.REGISTRATION_SN = #{schIhidNum} AND use_at ='Y'
+			AND a.COOPERATOR_ID = #{cooperatorId}
+			LIMIT 1
+			</if>
+
+	</insert>
+	<select id="selectDeliveryInfoByAtchFileId" parameterType="egovframework.com.rd.usr.service.vo.DeliveryInfoVO" resultType="egovframework.com.rd.usr.service.vo.DeliveryInfoVO">
+		SELECT
+			COOPERATOR_ID, COOPERATOR_NM,REGISTRATION_SN,REGISTRATION_NM,RUN_DE,DELIVERY_SN,DELIVERY_STATE,
+			SERVICE_TYPE,DELIVERY_TYPE,RIDER_ID,a.MBER_ID,RIDER_NM,DELIVERY_METHOD,SHOP_SN,SHOP_NM,GOODS_PRICE,
+			PICKUP_ADDR,DESTINATION_ADDR,ORDER_DT,OPERATE_RIDER_DT,SHOP_COMEIN_DT,PICKUP_FINIST_DT,DELIVERY_FINIST_DT,
+			DISTANCE,ADD_DELIVERY_REASON,ADD_DELIVERY_DESC,PICKUP_LAW_DONG,BASIC_PRICE,WEATHER_PRIMAGE,ADD_PRIMAGE,
+			PEAK_PRIMAGE_ETC,DELIVERY_PRICE,RIDER_CAUSE_YN,ADD_PRIMAGE_DESC,NOTE,ATCH_FILE_ID,CREAT_DT,CREAT_ID
+		FROM RD_DELIVERY_INFO a
+		LEFT JOIN COMTNGNRLMBER b ON a.mber_id = b.mber_id
+		WHERE 1=1
+			<if test="searchGubun == 'FILE'">
+				AND ATCH_FILE_ID = #{searchId}
+			</if>
+			<if test="searchMberId != null and searchMberId != ''">
+				AND a.MBER_ID = #{searchMberId}
+			</if>
+			<if test="searchRunDeDate != null and searchRunDeDate != ''">
+				AND a.RUN_DE like '%' #{searchRunDeDate} '%'
+			</if>
+
+			<if test="searchGubun == 'DAY'">
+				<if test='searchCooperatorId != null and searchCooperatorId != "all"'>
+				AND COOPERATOR_ID = #{searchCooperatorId}
+				</if>
+				<if test="searchNm != null and searchNm != ''">
+				AND MBER_NM like '%' #{searchNm} '%'
+				</if>
+				AND RUN_DE BETWEEN #{searchFromDate} AND #{searchToDate}
+				<if test="searchRegistrationSn != null and searchRegistrationSn != ''">
+				AND COOPERATOR_ID IN (
+					SELECT COOPERATOR_ID from RD_COOPERATOR
+					WHERE REGISTRATION_SN = #{searchRegistrationSn}
+				)
+				</if>
+
+			</if>
+			<if test="schAuthorCode == 'ROLE_USER'">
+			/* 협력사 조건 *//* COOPERATOR_ID로 조건을 만든건 ★정산 파일을 올릴때 권한이 있는 협력사ID 데이터만 올릴수 있음!!★ - 나머지는 오류 처리할꺼임  */
+			AND COOPERATOR_ID IN (
+				SELECT COOPERATOR_ID FROM RD_COOPERATOR a
+				WHERE a.REGISTRATION_SN = #{schIhidNum} AND use_at ='Y'
+			)
+			</if>
+	</select>
+
+	<insert id="insertDeliveryError" parameterType="egovframework.com.rd.usr.service.vo.DeliveryErrorVO">
+		INSERT INTO RD_DELIVERY_ERROR
+		(LONGTXT, ATCH_FILE_ID, CREAT_DT, CREAT_ID, USE_AT)
+		VALUES
+		(#{longtxt},#{atchFileId},SYSDATE(),#{creatId}, #{useAt})
+	</insert>
+
+	<select id="selectDeliveryErrorByAtchFileId" parameterType="egovframework.com.rd.usr.service.vo.DeliveryErrorVO" resultType="egovframework.com.rd.usr.service.vo.DeliveryErrorVO">
+		SELECT LONGTXT, ATCH_FILE_ID, CREAT_DT, CREAT_ID, USE_AT
+		FROM RD_DELIVERY_ERROR
+		WHERE ATCH_FILE_ID = #{searchId}
+			AND USE_AT = 'Y'
+
+	</select>
+
+	<insert id="insertWeekInfo" parameterType="egovframework.com.rd.usr.service.vo.WeekInfoVO">
+			INSERT INTO RD_WEEK_INFO
+			(WEEK_ID,COOPERATOR_ID,ACCOUNTS_ST_DT,ACCOUNTS_ED_DT ,DELIVERY_COST ,ADD_ACCOUNTS ,OPERATING_COST,MANAGEMENT_COST
+			,OPERATING_FEE,ETC_COST,TIME_INSURANCE,OWNER_EMPLOYMENT_INSURANCE,RIDER_EMPLOYMENT_INSURANCE,OWNER_INDUSTRIAL_INSURANCE
+			,RIDER_INDUSTRIAL_INSURANCE,WITHHOLDING_TAX_INSURANCE_SUM,EMPLOYMENT_INSURANCE_ACCOUNTS,INDUSTRIAL_INSURANCE_ACCOUNTS
+			,G,ACCOUNTS_SCHEDULE_COST,TAX_BILL_SUPPLY,TAX_BILL_ADD ,TAX_BILL_SUM ,NOTE,ATCH_FILE_ID,CREAT_DT,CREAT_ID)
+			VALUES
+			(#{weekId},#{cooperatorId},#{accountsStDt},#{accountsEdDt},#{deliveryCost},#{addAccounts},#{operatingCost},#{managementCost}
+			,#{operatingFee},#{etcCost},#{timeInsurance},#{ownerEmploymentInsurance},#{riderEmploymentInsurance},#{ownerIndustrialInsurance}
+			,#{riderIndustrialInsurance},#{withholdingTaxInsuranceSum},#{employmentInsuranceAccounts},#{industrialInsuranceAccounts}
+			,#{g},#{accountsScheduleCost},#{taxBillSupply},#{taxBillAdd},#{taxBillSum},#{note},#{atchFileId},SYSDATE(),#{creatId})
+	</insert>
+
+	<insert id="insertWeekRiderInfo" parameterType="egovframework.com.rd.usr.service.vo.WeekRiderInfoVO">
+			INSERT INTO RD_WEEK_RIDER_INFO
+			(WEEK_ID,NO,MBER_ID,MBER_NM,CNT,DELIVERY_COST,ADD_COST,SUM_COST,TIME_INSURANCE,NECESSARY_EXPENSES,PAY,OWNER_EMPLOYMENT_INSURANCE
+			,RIDER_EMPLOYMENT_INSURANCE,OWNER_INDUSTRIAL_INSURANCE,RIDER_INDUSTRIAL_INSURANCE,WITHHOLDING_TAX_INSURANCE_SUM
+			,OWNER_EMPLOYMENT_INSURANCE_ACCOUNTS,RIDER_EMPLOYMENT_INSURANCE_ACCOUNTS,SUM_EMPLOYMENT_INSURANCE_ACCOUNTS
+			,OWNER_INDUSTRIAL_INSURANCE_ACCOUNTS,RIDER_INDUSTRIAL_INSURANCE_ACCOUNTS,SUM_INDUSTRIAL_INSURANCE_ACCOUNTS
+			,OPERATING_COST,ACCOUNTS_COST,INCOME_TAX,RESIDENCE_TAX,WITHHOLDING_TAX,GIVE_PAY,CREAT_DT,CREAT_ID)
+			VALUES
+			(#{weekId},#{no},#{mberId},#{mberNm},#{cnt},#{deliveryCost},#{addCost},#{sumCost},#{timeInsurance},#{necessaryExpenses},#{pay},#{ownerEmploymentInsurance}
+			,#{riderEmploymentInsurance},#{ownerIndustrialInsurance},#{riderIndustrialInsurance},#{withholdingTaxInsuranceSum}
+			,#{ownerEmploymentInsuranceAccounts},#{riderEmploymentInsuranceAccounts},#{sumEmploymentInsuranceAccounts}
+			,#{ownerIndustrialInsuranceAccounts},#{riderIndustrialInsuranceAccounts},#{sumIndustrialInsuranceAccounts}
+			,#{operatingCost},#{accountsCost},#{incomeTax},#{residenceTax},#{withholdingTax},#{givePay},SYSDATE(),#{creatId})
+	</insert>
+
+
+	<select id="selectWeekInfoByAtchFileId" parameterType="egovframework.com.rd.usr.service.vo.WeekInfoVO" resultType="egovframework.com.rd.usr.service.vo.WeekInfoVO">
+		SELECT
+			WEEK_ID,COOPERATOR_ID,ACCOUNTS_ST_DT,ACCOUNTS_ED_DT ,DELIVERY_COST ,ADD_ACCOUNTS ,OPERATING_COST,MANAGEMENT_COST
+			,OPERATING_FEE,ETC_COST,TIME_INSURANCE,OWNER_EMPLOYMENT_INSURANCE,RIDER_EMPLOYMENT_INSURANCE,OWNER_INDUSTRIAL_INSURANCE
+			,RIDER_INDUSTRIAL_INSURANCE,WITHHOLDING_TAX_INSURANCE_SUM,EMPLOYMENT_INSURANCE_ACCOUNTS,INDUSTRIAL_INSURANCE_ACCOUNTS
+			,G,ACCOUNTS_SCHEDULE_COST,TAX_BILL_SUPPLY,TAX_BILL_ADD ,TAX_BILL_SUM ,NOTE,ATCH_FILE_ID,CREAT_DT,CREAT_ID
+		FROM RD_WEEK_INFO
+		WHERE ATCH_FILE_ID = #{searchAtchFileId}
+			<if test="schAuthorCode == 'ROLE_USER'">
+			/* 협력사 조건 *//* COOPERATOR_ID로 조건을 만든건 ★정산 파일을 올릴때 권한이 있는 협력사ID 데이터만 올릴수 있음!!★ - 나머지는 오류 처리할꺼임  */
+			AND COOPERATOR_ID IN (
+				SELECT COOPERATOR_ID FROM RD_COOPERATOR a
+				WHERE a.REGISTRATION_SN = #{schIhidNum} AND use_at ='Y'
+			)
+			</if>
+	</select>
+
+	<select id="selectWeekRiderInfoByAtchFileId" parameterType="egovframework.com.rd.usr.service.vo.WeekInfoVO" resultType="egovframework.com.rd.usr.service.vo.WeekRiderInfoVO">
+		SELECT
+			b.WEEK_ID,b.NO,b.MBER_ID,b.MBER_NM,b.CNT,b.DELIVERY_COST,b.ADD_COST,b.SUM_COST,b.TIME_INSURANCE,b.NECESSARY_EXPENSES,b.PAY,b.OWNER_EMPLOYMENT_INSURANCE
+			,b.RIDER_EMPLOYMENT_INSURANCE,b.OWNER_INDUSTRIAL_INSURANCE,b.RIDER_INDUSTRIAL_INSURANCE,b.WITHHOLDING_TAX_INSURANCE_SUM
+			,b.OWNER_EMPLOYMENT_INSURANCE_ACCOUNTS,b.RIDER_EMPLOYMENT_INSURANCE_ACCOUNTS,b.SUM_EMPLOYMENT_INSURANCE_ACCOUNTS
+			,b.OWNER_INDUSTRIAL_INSURANCE_ACCOUNTS,b.RIDER_INDUSTRIAL_INSURANCE_ACCOUNTS,b.SUM_INDUSTRIAL_INSURANCE_ACCOUNTS
+			,b.OPERATING_COST,b.ACCOUNTS_COST,b.INCOME_TAX,b.RESIDENCE_TAX,b.WITHHOLDING_TAX,b.GIVE_PAY,b.CREAT_DT,b.CREAT_ID
+		FROM RD_WEEK_INFO a, RD_WEEK_RIDER_INFO b
+		WHERE a.week_id = b.week_id
+			AND ATCH_FILE_ID = #{searchAtchFileId}
+			<if test="searchMberId != null and searchMberId != ''">
+			AND b.MBER_ID = #{searchMberId}
+			</if>
+			<if test="schAuthorCode == 'ROLE_USER'">
+			/* 협력사 조건 *//* COOPERATOR_ID로 조건을 만든건 ★정산 파일을 올릴때 권한이 있는 협력사ID 데이터만 올릴수 있음!!★ - 나머지는 오류 처리할꺼임  */
+			AND COOPERATOR_ID IN (
+				SELECT COOPERATOR_ID FROM RD_COOPERATOR a
+				WHERE a.REGISTRATION_SN = #{schIhidNum} AND use_at ='Y'
+			)
+			</if>
+			order by b.WEEK_ID asc, LPAD(b.NO, 4,0) ASC
+	</select>
+
+	<select id="selectUploadStateInWeek" parameterType="egovframework.com.rd.usr.service.vo.WeekInfoVO" resultType="egovframework.com.rd.usr.service.vo.UploadStateVO">
+		SELECT c.ATCH_FILE_ID, d.ORIGNL_FILE_NM, a.COOPERATOR_ID, b.COOPERATOR_NM, a.WEEK_ID, a.ACCOUNTS_ST_DT, a.ACCOUNTS_ED_DT, DATE_FORMAT(c.CREAT_DT,'%Y%m%d') CREAT_DT
+		FROM RD_WEEK_INFO a
+			left JOIN RD_COOPERATOR b ON a.COOPERATOR_ID = b.COOPERATOR_ID
+			LEFT JOIN COMTNFILE c ON a.atch_file_id  =c.ATCH_FILE_ID
+			LEFT JOIN COMTNFILEDETAIL d ON c.ATCH_FILE_ID = d.ATCH_FILE_ID
+		WHERE SUBSTRING(a.ACCOUNTS_ST_DT, 1, 6) = #{searchDate}
+
+			<if test="schAuthorCode == 'ROLE_USER'">
+			/* 협력사 조건 *//* COOPERATOR_ID로 조건을 만든건 ★정산 파일을 올릴때 권한이 있는 협력사ID 데이터만 올릴수 있음!!★ - 나머지는 오류 처리할꺼임  */
+			AND a.COOPERATOR_ID IN (
+				SELECT COOPERATOR_ID FROM RD_COOPERATOR a
+				WHERE a.REGISTRATION_SN = #{schIhidNum} AND use_at ='Y'
+			)
+			</if>
+
+			/*AND b.USE_AT ='Y'*/
+			<if test='searchCooperatorId != null and searchCooperatorId != "all"'>
+				AND	a.COOPERATOR_ID = #{searchCooperatorId}
+			</if>
+
+	</select>
+	<select id="selectUploadStateInDay" parameterType="egovframework.com.rd.usr.service.vo.WeekInfoVO" resultType="egovframework.com.rd.usr.service.vo.UploadStateVO">
+		SELECT c.ATCH_FILE_ID, d.ORIGNL_FILE_NM, a.COOPERATOR_ID, b.COOPERATOR_NM, COUNT(a.DELIVERY_SN) CNT, DATE_FORMAT(a.CREAT_DT,'%Y%m%d') CREAT_DT
+		FROM RD_DELIVERY_INFO a
+			LEFT JOIN RD_COOPERATOR b ON a.COOPERATOR_ID = b.COOPERATOR_ID
+			LEFT JOIN COMTNFILE c ON a.atch_file_id  =c.ATCH_FILE_ID
+			LEFT JOIN COMTNFILEDETAIL d ON c.ATCH_FILE_ID = d.ATCH_FILE_ID
+		WHERE SUBSTRING(a.RUN_DE, 1, 6) = #{searchDate}
+			/*AND b.USE_AT ='Y'*/
+			<if test='searchCooperatorId != null and searchCooperatorId != "all"'>
+				AND	a.COOPERATOR_ID = #{searchCooperatorId}
+			</if>
+		GROUP BY a.atch_file_id, b.COOPERATOR_ID
+	</select>
+
+	<select id="selectCooperatorList" resultType="egovframework.com.rd.usr.service.vo.SearchKeyVO">
+		SELECT COOPERATOR_ID as seleceKey, COOPERATOR_NM as selectValue
+		FROM RD_COOPERATOR
+		WHERE USE_AT ='Y'
+			<if test="schAuthorCode == 'ROLE_USER'">
+			/* 협력사 조건 */
+			AND COOPERATOR_ID IN (
+				SELECT COOPERATOR_ID FROM RD_COOPERATOR a
+				WHERE a.REGISTRATION_SN = #{schIhidNum} AND use_at ='Y'
+			)
+			</if>
+
+		<if test="schAuthorCode == 'ROLE_ADMIN'">
+		UNION
+		SELECT a.COOPERATOR_ID as seleceKey, CONCAT('미등록 / ',a.cooperator_id) as selectValue
+		FROM RD_WEEK_INFO a LEFT JOIN RD_COOPERATOR b ON a.cooperator_id  =b.cooperator_id
+		WHERE (b.cooperator_id IS NULL or IFNULL(b.use_at, 'N') ='N')
+		GROUP BY a.cooperator_id
+
+		UNION
+		SELECT a.COOPERATOR_ID as seleceKey, CONCAT('미등록 / ',a.cooperator_id) as selectValue
+		FROM RD_DELIVERY_INFO a LEFT JOIN RD_COOPERATOR b ON a.cooperator_id  =b.cooperator_id
+		WHERE (b.cooperator_id IS NULL or IFNULL(b.use_at, 'N') ='N')
+		GROUP BY a.cooperator_id
+		</if>
+	</select>
+
+	<insert id="insertWeekPay" parameterType="egovframework.com.rd.usr.service.vo.WeekPayVO">
+		INSERT INTO RD_WEEK_PAY
+		(WKP_ID, COOPERATOR_ID, MBER_ID, DW_GUBUN, IO_GUBUN, ABLE_PRICE, FEE, SEND_PRICE, ACCOUNTS_ST_DT
+		, ACCOUNTS_ED_DT, DYP_ID, ATCH_FILE_ID, WEEK_ID, TRAN_DAY, TELEGRAM_NO, USE_AT, CREAT_DT, CREAT_ID)
+		VALUE(#{wkpId}, #{cooperatorId}, #{mberId}, #{dwGubun}, #{ioGubun}, #{ablePrice}, #{fee}, #{sendPrice}
+		, #{accountsStDt}, #{accountsEdDt}, #{dypId}, #{atchFileId}, #{weekId}, #{tranDay}, #{telegramNo},#{useAt}, SYSDATE(), #{creatId})
+	</insert>
+
+	<select id="selectDayPay" parameterType="egovframework.com.rd.usr.service.vo.DayPayVO" resultType="egovframework.com.rd.usr.service.vo.DayPayVO">
+		SELECT COOPERATOR_ID, MBER_ID, DAY, '1' AS IO_GUBUN, DELIVERY_PRICE, DAY_FEE, INSURANCE, DELIVERY_PRICE-DAY_FEE-INSURANCE AS ABLE_PRICE
+		, 'N' AS WEEK_YN, 'Y' AS USE_AT, ATCH_FILE_ID AS DAY_ATCH_FILE_ID
+		FROM
+		(
+			SELECT COOPERATOR_ID, MBER_ID,RUN_DE AS DAY, SUM(DELIVERY_PRICE) AS DELIVERY_PRICE
+			, CEILING(SUM(DELIVERY_PRICE)*0.011) AS DAY_FEE, CEILING(SUM(DELIVERY_PRICE)*0.05) AS INSURANCE, ATCH_FILE_ID
+			FROM RD_DELIVERY_INFO
+			WHERE ATCH_FILE_ID = #{dayAtchFileId}
+			GROUP BY COOPERATOR_ID, MBER_ID, RUN_DE
+		) tab
+	</select>
+	<insert id="insertDayPay" parameterType="egovframework.com.rd.usr.service.vo.DayPayVO">
+		INSERT INTO RD_DAY_PAY
+		(DYP_ID, COOPERATOR_ID,MBER_ID, DAY, IO_GUBUN, DELIVERY_PRICE, DAY_FEE, INSURANCE, SEND_FEE, ABLE_PRICE, SEND_PRICE, WEEK_YN
+		, DAY_ATCH_FILE_ID, WEK_ATCH_FILE_ID, WEEK_ID, TRAN_DAY, TELEGRAM_NO, USE_AT, CREAT_DT, CREAT_ID)
+		VALUES(#{dypId}, #{cooperatorId}, #{mberId}, #{day}, #{ioGubun}, #{deliveryPrice}, #{dayFee}, #{insurance}, #{sendFee}, #{ablePrice}, #{sendPrice}, #{weekYn}
+		, #{dayAtchFileId}, #{wekAtchFileId}, #{weekId}, #{tranDay}, #{telegramNo}, #{useAt}, SYSDATE(), #{creatId})
+	</insert>
+
+	<select id="getAbleDateWeek" parameterType="egovframework.com.rd.usr.service.vo.WeekInfoVO" resultType="boolean">
+		SELECT if(COUNT(week_id)>=1, false, true) able
+		FROM RD_WEEK_INFO
+		WHERE cooperator_id = #{cooperatorId}
+		AND (#{accountsStDt} between ACCOUNTS_ST_DT  AND ACCOUNTS_ED_DT OR #{accountsEdDt} between ACCOUNTS_ST_DT  AND ACCOUNTS_ED_DT)
+	</select>
+
+	<select id="selectRiderDayPayList" parameterType="egovframework.com.rd.usr.service.vo.DayPayVO" resultType="egovframework.com.rd.usr.service.vo.DayPayVO">
+		SELECT A.MBER_ID, A.DAY, A.DELIVERY_PRICE, A.DAY_FEE, A.INSURANCE, A.ABLE_PRICE, A.WEEK_YN, B.MBER_NM
+		FROM RD_DAY_PAY A
+		LEFT JOIN COMTNGNRLMBER B ON A.MBER_ID = B.MBER_ID
+		WHERE A.MBER_ID = #{mberId} AND A.IO_GUBUN ='1' AND A.USE_AT ='Y'
+		AND A.DAY BETWEEN #{searchFromDate} AND #{searchToDate}
+	</select>
+	<update id="updateDayPayWeekConfirm" parameterType="egovframework.com.rd.usr.service.vo.WeekInfoVO">
+		UPDATE RD_DAY_PAY
+		SET WEEK_YN ='Y'
+		, WEK_ATCH_FILE_ID = #{wekAtchFileId}
+		, WEEK_ID = #{weekId}
+		,LAST_UPDT_PNTTM = SYSDATE()
+		, LAST_UPDUSR_ID = #{lastUpdusrId}
+		WHERE WEEK_YN ='N'
+		AND USE_AT ='Y'
+		AND IO_GUBUN = '1'
+		AND COOPERATOR_ID = #{cooperatorId}
+		AND DAY BETWEEN #{accountsStDt} AND #{accountsEdDt}
+	</update>
+	<update id="updateDayPayWeekConfirm2" parameterType="egovframework.com.rd.usr.service.vo.WeekInfoVO">
+		UPDATE RD_DAY_PAY
+		SET WEEK_YN ='Y'
+		, WEK_ATCH_FILE_ID = #{wekAtchFileId}
+		, WEEK_ID = #{weekId}
+		,LAST_UPDT_PNTTM = SYSDATE()
+		, LAST_UPDUSR_ID = #{lastUpdusrId}
+		WHERE WEEK_YN ='N'
+		AND USE_AT ='Y'
+		AND IO_GUBUN = '2'
+		AND COOPERATOR_ID = #{cooperatorId}
+	</update>
+	<select id="selectDayPayIoGubn2List" parameterType="egovframework.com.rd.usr.service.vo.WeekInfoVO" resultType="egovframework.com.rd.usr.service.vo.WeekPayVO">
+		SELECT COOPERATOR_ID, MBER_ID, 'DAY' DW_GUBUN, '2', IO_GUBUN, NVL(DAY_FEE, 0)+NVL(INSURANCE,0)+NVL(SEND_FEE,0) AS FEE, SEND_PRICE, DYP_ID, TRAN_DAY, TELEGRAM_NO,'Y' AS USE_AT
+		from RD_DAY_PAY
+		WHERE WEEK_YN = 'N'
+		AND USE_AT = 'Y'
+		AND IO_GUBUN = '2'
+		AND COOPERATOR_ID = #{cooperatorId}
+	</select>
+
+	<insert id="insertTransfer" parameterType="egovframework.com.rd.usr.service.vo.DoszTransferVO">
+		INSERT INTO RD_TRANSFER
+		(TRAN_DAY, TELEGRAM_NO, DRW_ACCOUNT_CNTN, RV_BANK_CODE, RV_ACCOUNT, RV_ACCOUNT_CNTN, AMOUNT, RES_ALL_YN, CREAT_DT, CREAT_ID)
+		VALUES(#{tranDay}, #{telegram_no}, #{drw_account_cntn}, #{rv_bank_code}, #{rv_account}, #{rv_account_cntn}, #{amount}, #{res_all_yn}, SYSDATE(), #{creatId})
+	</insert>
+	<select id="selectTelegranNo" resultType="java.lang.String">
+		SELECT LPAD(NEXTVAL(SQ_TRANSFER), '6', '0')
+	</select>
+
+	<update id="updateTransfer" parameterType="egovframework.com.rd.usr.service.vo.DoszTransferVO">
+		UPDATE RD_TRANSFER
+		SET STATUS = #{status}
+			<if test='statusCd != null and statusCd != ""'>
+			, STATUS_CD = #{statusCd}
+			</if>
+			<if test='sendDt != null and sendDt != ""'>
+			, SEND_DT = #{sendDt}
+			</if>
+			<if test='sendTm != null and sendTm != ""'>
+			, SEND_TM = #{sendTm}
+			</if>
+			<if test='natvTrNo != null and natvTrNo != ""'>
+			, NATV_TR_NO = #{natvTrNo}
+			</if>
+			<if test='errorCode != null and errorCode != ""'>
+			, ERROR_CODE = #{errorCode}
+			</if>
+			<if test='errorMessage != null and errorMessage != ""'>
+			, ERROR_MESSAGE = #{errorMessage}
+			</if>
+		WHERE TRAN_DAY = #{tranDay} AND TELEGRAM_NO = #{telegram_no}
+	</update>
+	<insert id="insertSchAccout" parameterType="egovframework.com.rd.usr.service.vo.DoszSchAccoutVO">
+		INSERT INTO RD_SCH_ACCOUNT
+		(TRAN_DAY, TELEGRAM_NO, BANK_CODE, ACCOUNT, AMOUNT, RES_ALL_YN, CREAT_DT, CREAT_ID)
+		VALUES(#{tranDay}, #{telegram_no}, #{bank_code}, #{account},  #{amount}, #{res_all_yn}, SYSDATE(), #{creatId})
+	</insert>
+
+	<update id="updateSchAccout" parameterType="egovframework.com.rd.usr.service.vo.DoszSchAccoutVO">
+		UPDATE RD_SCH_ACCOUNT
+		SET
+			 STATUS = #{status}
+			<if test='statusCd != null and statusCd != ""'>
+			, STATUS_CD = #{statusCd}
+			</if>
+			<if test='sendDt != null and sendDt != ""'>
+			, SEND_DT = #{sendDt}
+			</if>
+			<if test='sendTm != null and sendTm != ""'>
+			, SEND_TM = #{sendTm}
+			</if>
+			<if test='natvTrNo != null and natvTrNo != ""'>
+			, NATV_TR_NO = #{natvTrNo}
+			</if>
+			<if test='depositor != null and depositor != ""'>
+			, DEPOSITOR = #{depositor}
+			</if>
+			<if test='errorCode != null and errorCode != ""'>
+			, ERROR_CODE = #{errorCode}
+			</if>
+			<if test='errorMessage != null and errorMessage != ""'>
+			, ERROR_MESSAGE = #{errorMessage}
+			</if>
+		WHERE TRAN_DAY = #{tranDay} AND TELEGRAM_NO = #{telegram_no}
+	</update>
+
+
+	<select id="selectHistory" parameterType="egovframework.com.rd.usr.service.vo.HistoryVO" resultType="egovframework.com.rd.usr.service.vo.HistoryVO">
+
+		SELECT * FROM(
+			SELECT COOPERATOR_ID,'DAY' AS DW_GUBUN,'선정산' AS GUBUN, DYP_ID AS ID, a.SEND_PRICE, a.DAY_FEE+a.INSURANCE+a.SEND_FEE AS FEE
+			, b.TRAN_DAY , b.RV_ACCOUNT, b.STATUS, b.STATUS_cd, b.error_code
+			, case when b.STATUS='200' then '이체' when b.STATUS= '400' AND b.error_code='VTIM' then '처리중' when b.STATUS= '400' AND b.error_code='0011' then '처리중' ELSE '실패' end  AS STATUS_NM
+			, b.SEND_DT, b.SEND_TM, b.CREAT_DT, b.error_message
+			FROM RD_DAY_PAY a
+			LEFT JOIN RD_TRANSFER b ON a.TRAN_DAY = b.TRAN_DAY AND a.TELEGRAM_NO = b.TELEGRAM_NO
+			WHERE week_yn ='N'
+				AND IO_GUBUN ='2'
+				AND COOPERATOR_ID = #{searchCooperatorId}
+				AND MBER_ID = #{schId}
+				AND a.TRAN_DAY BETWEEN #{searchFromDate} AND #{searchToDate}
+
+			UNION all
+
+			SELECT COOPERATOR_ID, DW_GUBUN, if(DW_GUBUN='DAY', '선정산', '정산') AS GUBUN, WKP_ID AS ID, a.SEND_PRICE, a.FEE
+			, b.TRAN_DAY , b.RV_ACCOUNT, b.STATUS, b.STATUS_cd, b.error_code
+			, case when b.STATUS='200' then '이체' when b.STATUS= '400' AND b.error_code='VTIM' then '처리중' when b.STATUS= '400' AND b.error_code='0011' then '처리중' ELSE '실패' end  AS STATUS_NM
+			, b.SEND_DT, b.SEND_TM, b.CREAT_DT, b.error_message
+			FROM RD_WEEK_PAY a
+			LEFT JOIN RD_TRANSFER b ON a.tran_day = b.tran_day AND a.TELEGRAM_NO = b.TELEGRAM_NO
+			WHERE a.USE_AT ='Y'
+				AND IO_GUBUN ='2'
+				AND COOPERATOR_ID = #{searchCooperatorId}
+				AND MBER_ID = #{schId}
+				AND a.TRAN_DAY BETWEEN #{searchFromDate} AND #{searchToDate}
+		) tab
+		ORDER BY creat_dt desc
+	</select>
+
+	<select id="selectTakeDeliveryInfoListByMberId" parameterType="egovframework.com.rd.usr.service.vo.DeliveryInfoVO" resultType="egovframework.com.rd.usr.service.vo.DeliveryInfoVO">
+			SELECT
+			<choose>
+				<when test="isSum == true">
+					SUM(DELIVERY_PRICE) DELIVERY_PRICE
+				</when>
+				<otherwise>
+					COOPERATOR_ID, COOPERATOR_NM,REGISTRATION_SN,REGISTRATION_NM,RUN_DE,DELIVERY_SN,DELIVERY_STATE,
+					SERVICE_TYPE,DELIVERY_TYPE,RIDER_ID,MBER_ID,RIDER_NM,DELIVERY_METHOD,SHOP_SN,SHOP_NM,GOODS_PRICE,
+					PICKUP_ADDR,DESTINATION_ADDR,ORDER_DT,OPERATE_RIDER_DT,SHOP_COMEIN_DT,PICKUP_FINIST_DT,DELIVERY_FINIST_DT,
+					DISTANCE,ADD_DELIVERY_REASON,ADD_DELIVERY_DESC,PICKUP_LAW_DONG,BASIC_PRICE,WEATHER_PRIMAGE,ADD_PRIMAGE,
+					PEAK_PRIMAGE_ETC,DELIVERY_PRICE,RIDER_CAUSE_YN,ADD_PRIMAGE_DESC,NOTE,ATCH_FILE_ID,CREAT_DT,CREAT_ID
+				</otherwise>
+			</choose>
+			FROM RD_DELIVERY_INFO
+			WHERE
+				MBER_ID = #{searchId}
+				<![CDATA[AND RUN_DE>= #{searchFromDate}AND RUN_DE <= #{searchToDate} ]]>
+			ORDER BY run_de DESC;
+
+	</select>
+
+	<update id="updateDayPayByTransfer" parameterType="egovframework.com.rd.usr.service.vo.DoszTransferVO">
+		UPDATE RD_DAY_PAY
+		set USE_AT = 'N'
+		WHERE TRAN_DAY = #{tranDay} AND  TELEGRAM_NO = #{telegram_no} AND USE_AT ='Y'
+	</update>
+
+	<update id="updateWeekPayByTransfer" parameterType="egovframework.com.rd.usr.service.vo.DoszTransferVO">
+		UPDATE RD_WEEK_PAY
+		set USE_AT = 'N'
+		WHERE TRAN_DAY = #{tranDay} AND  TELEGRAM_NO = #{telegram_no} AND USE_AT ='Y'
+	</update>
+</mapper>

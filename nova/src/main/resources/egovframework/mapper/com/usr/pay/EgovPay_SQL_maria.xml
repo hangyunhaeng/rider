@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="payDAO">
+
+	<resultMap id="doszResultVO" type="egovframework.com.rd.usr.service.vo.DoszResultVO">
+		<result property="org_telegram_no" column="TELEGRAM_NO"/>
+		<result property="tr_dt" column="TRAN_DAY"/>
+	</resultMap>
+
+	<select id="selectPayList" parameterType="egovframework.com.rd.usr.service.vo.HistoryVO" resultType="egovframework.com.rd.usr.service.vo.HistoryVO">
+		SELECT * FROM(
+			SELECT a.cooperator_id,'DAY' AS dw_gubun,'선정산' AS gubun, DYP_ID AS ID, if(a.io_gubun=1, a.ABLE_PRICE, a.send_price) as send_price, a.day_fee+a.insurance+a.send_fee AS fee
+			, b.tran_day, b.TELEGRAM_NO, b.rv_account, b.status, b.status_cd
+			, case when b.status='200' then '성공' when io_gubun=2 AND b.STATUS= '400' AND b.error_code='VTIM' then '처리중' when io_gubun=2 AND b.STATUS= '400' AND b.error_code='0011' then '처리중'  when io_gubun=2 then '실패' ELSE '' end AS status_nm
+			, b.send_dt, b.send_tm, b.ERROR_MESSAGE
+			, case when io_gubun='1' then DATE_FORMAT(a.CREAT_DT, '%Y%m%d%H%i%s') when io_gubun = '2' then if(b.STATUS_CD = '0000', concat(b.send_dt,b.send_tm), DATE_FORMAT(b.creat_dt, '%Y%m%d%H%i%s')) ELSE '' END  AS CREAT_DT
+			, c.MBER_NM, d.COOPERATOR_NM, io_gubun, if(io_gubun='1', '입금', '출금') AS io_gubun_nm, DAY_ATCH_FILE_ID, WEK_ATCH_FILE_ID
+			, week_yn, case when week_yn = 'Y' then '정산완료' ELSE '선입금' END week_NM
+			, a.DAY AS ACCOUNTS_ST_DT, '' AS ACCOUNTS_ED_DT, e.CD_NM AS RV_BANK_NM, a.mber_id, DATE_FORMAT(f.CREAT_DT, '%Y%m%d') AS FILE_DATE
+			FROM RD_DAY_PAY a
+			LEFT JOIN RD_TRANSFER b ON a.tran_day = b.tran_day AND a.TELEGRAM_NO = b.TELEGRAM_NO
+			LEFT JOIN COMTNGNRLMBER c ON a.mber_id = c.mber_id
+			LEFT JOIN RD_COOPERATOR d ON a.COOPERATOR_ID= d.COOPERATOR_ID
+			LEFT JOIN RD_CD e ON b.RV_BANK_CODE = e.CD AND e.CD_GROUP ='BANK_CD'
+			LEFT JOIN COMTNFILE f ON a.DAY_ATCH_FILE_ID = f.ATCH_FILE_ID
+			WHERE 1=1
+			AND (week_yn ='N' or io_gubun ='1')	/*정산완료된 출금이력은 주정산으로 넘어가기때문에 제외한다*/
+			<if test="searchGubun != 'all'">
+			AND io_gubun = #{searchGubun}
+			</if>
+			<if test='searchCooperatorId != null and searchCooperatorId != "all"'>
+			AND a.cooperator_id = #{searchCooperatorId}
+			</if>
+			<if test="searchNm != null and searchNm != ''">
+			AND c.mber_nm like '%' #{searchNm} '%'
+			</if>
+			AND DATE_FORMAT(a.CREAT_DT,'%Y%m%d') BETWEEN #{searchFromDate} AND #{searchToDate}
+			<if test="searchRegistrationSn != null and searchRegistrationSn != ''">
+			AND a.COOPERATOR_ID IN (
+				SELECT COOPERATOR_ID from rd_cooperator
+				WHERE REGISTRATION_SN = #{searchRegistrationSn}
+			)
+			</if>
+			UNION all
+
+			SELECT a.cooperator_id, dw_gubun, if(dw_gubun='DAY', '선정산', '정산') AS gubun, wkp_id AS ID, if(a.io_gubun=1, a.ABLE_PRICE, a.send_price) as send_price, a.fee
+			, b.tran_day, b.TELEGRAM_NO, b.rv_account, b.status, b.status_cd
+			, case when b.status='200' then '성공' when io_gubun=2 AND b.STATUS= '400' AND b.error_code='VTIM' then '처리중' when io_gubun=2 AND b.STATUS= '400' AND b.error_code='0011' then '처리중'  when io_gubun=2 then '실패' ELSE '' end AS status_nm
+			, b.send_dt, b.send_tm, b.ERROR_MESSAGE
+			, case when io_gubun='1' then DATE_FORMAT(a.CREAT_DT, '%Y%m%d%H%i%s') when io_gubun = '2' then if(b.STATUS_CD = '0000', concat(b.send_dt,b.send_tm), DATE_FORMAT(b.creat_dt, '%Y%m%d%H%i%s')) ELSE '' END  AS CREAT_DT
+			, c.MBER_NM, d.COOPERATOR_NM, io_gubun, if(io_gubun='1', '입금', '출금') AS io_gubun_nm, '' as DAY_ATCH_FILE_ID, a.atch_file_id AS WEK_ATCH_FILE_ID
+			, '' week_yn, '정산완료' AS week_NM
+			, ACCOUNTS_ST_DT, ACCOUNTS_ED_DT, e.CD_NM AS RV_BANK_NM, a.mber_id, DATE_FORMAT(f.CREAT_DT, '%Y%m%d') AS FILE_DATE
+			FROM RD_WEEK_PAY a
+			LEFT JOIN RD_TRANSFER b ON a.tran_day = b.tran_day AND a.TELEGRAM_NO = b.TELEGRAM_NO
+			LEFT JOIN COMTNGNRLMBER c ON a.mber_id = c.mber_id
+			LEFT JOIN RD_COOPERATOR d ON a.COOPERATOR_ID= d.COOPERATOR_ID
+			LEFT JOIN RD_CD e ON b.RV_BANK_CODE = e.CD AND e.CD_GROUP ='BANK_CD'
+			LEFT JOIN COMTNFILE f ON a.ATCH_FILE_ID = f.ATCH_FILE_ID
+			WHERE a.use_at ='Y'
+			<if test="searchGubun != 'all'">
+			AND io_gubun = #{searchGubun}
+			</if>
+			<if test='searchCooperatorId != null and searchCooperatorId != "all"'>
+			AND a.cooperator_id = #{searchCooperatorId}
+			</if>
+			<if test="searchNm != null and searchNm != ''">
+			AND c.mber_nm like '%' #{searchNm} '%'
+			</if>
+			AND DATE_FORMAT(a.CREAT_DT,'%Y%m%d') BETWEEN #{searchFromDate} AND #{searchToDate}
+			<if test="searchRegistrationSn != null and searchRegistrationSn != ''">
+			AND a.COOPERATOR_ID IN (
+				SELECT COOPERATOR_ID from RD_COOPERATOR
+				WHERE REGISTRATION_SN = #{searchRegistrationSn}
+			)
+			</if>
+		) tab
+		WHERE 1=1
+			<if test="schAuthorCode == 'ROLE_USER'">
+			/* 협력사 조건 */
+			AND COOPERATOR_ID IN (
+				SELECT COOPERATOR_ID FROM RD_COOPERATOR a
+				WHERE a.REGISTRATION_SN = #{schIhidNum} AND use_at ='Y'
+			)
+			</if>
+		ORDER BY creat_dt desc
+	</select>
+	<select id="selectTransterProsseceResult" resultMap="doszResultVO">
+		SELECT TELEGRAM_NO, TRAN_DAY FROM RD_TRANSFER
+		WHERE STATUS = '999'
+
+		UNION ALL
+
+		SELECT TELEGRAM_NO, TRAN_DAY FROM RD_TRANSFER
+		WHERE STATUS = '400'
+		AND error_code IN ('VTIM', '0011')
+	</select>
+	<update id="updateTransterProsseceResult" parameterType="egovframework.com.rd.usr.service.vo.DoszResultVO">
+		UPDATE RD_TRANSFER
+		SET STATUS = #{status}
+			<if test='statusCd != null and statusCd != ""'>
+			, STATUS_CD = #{statusCd}
+			</if>
+			<if test='natvTrNo != null and natvTrNo != ""'>
+			, NATV_TR_NO = #{natvTrNo}
+			</if>
+			<if test='sendDt != null and sendDt != ""'>
+			, SEND_DT = #{sendDt}
+			</if>
+			<if test='sendTm != null and sendTm != ""'>
+			, SEND_TM = #{sendTm}
+			</if>
+			<if test='errorCode != null and errorCode != ""'>
+
+			, ERROR_CODE = #{errorCode}
+			</if>
+			<if test='errorMessage != null and errorMessage != ""'>
+			, ERROR_MESSAGE = #{errorMessage}
+			</if>
+			, LAST_UPDT_PNTTM = SYSDATE()
+			, LAST_UPDUSR_ID = #{lastUpdusrId}
+
+		WHERE TRAN_DAY = #{tranDay}
+		AND TELEGRAM_NO = #{telegramNo}
+	</update>
+
+	<insert id="insertDoznHistory" parameterType="egovframework.com.rd.usr.service.vo.DoznHistoryVO">
+		insert into RD_DOZN_HISTORY (TRAN_DAY, TELEGRAM_NO, URL, SEND_LONGTXT)
+		values(#{tranDay}, #{telegramNo}, #{url}, #{sendLongtxt})
+	</insert>
+
+	<update id="updateDoznHistory" parameterType="egovframework.com.rd.usr.service.vo.DoznHistoryVO">
+		update RD_DOZN_HISTORY
+		set RECV_LONGTXT = #{recvLongtxt}
+		where TRAN_DAY = #{tranDay} and TELEGRAM_NO = #{telegramNo}
+	</update>
+
+	<insert id="insertDoznDs" parameterType="egovframework.com.rd.usr.service.vo.DoszDSResultVO">
+		INSERT INTO RD_DOZN_DS
+		(DS_DT, DS_TM, PAYMENT_SUCC_CNT, PAYMENT_SUCC_AMOUNT, PAYMENT_FAIL_CNT, PAYMENT_FAIL_AMOUNT, DEPOSITOR_SUCC_CNT, DEPOSITOR_TIME_CNT, DEPOSITOR_FAIL_CNT)
+		VALUES(#{dsDt}, #{dsTm}, #{paymentSuccCnt}, #{paymentSuccAmount}, #{paymentFailCnt}, #{paymentFailAmount}, #{depositorSuccCnt}, #{depositorTimeCnt}, #{depositorFailCnt})
+	</insert>
+	<update id="updateDoznDs" parameterType="egovframework.com.rd.usr.service.vo.DoszDSResultVO">
+		UPDATE RD_DOZN_DS a, (SELECT tran_day, SUM(if(STATUS=200, 1, 0)) DAON_SUCC_CNT, SUM(if(STATUS=200, amount, 0)) DAON_SUCC_AMOUNT
+										, SUM(if(STATUS!=200 OR STATUS IS null, 1, 0)) DAON_FAIL_CNT
+										, SUM(if(STATUS!=200 OR STATUS IS null, amount, 0)) DAON_FAIL_AMOUNT
+										FROM RD_TRANSFER
+										WHERE tran_day = #{dsDt}
+										GROUP BY tran_day) b
+		SET a.DAON_SUCC_CNT = nvl(b.DAON_SUCC_CNT, 0)
+			, a.DAON_SUCC_AMOUNT = nvl(b.DAON_SUCC_AMOUNT, 0)
+			, a.DAON_FAIL_CNT = nvl(b.DAON_FAIL_CNT, 0)
+			, a.DAON_FAIL_AMOUNT = nvl(b.DAON_FAIL_AMOUNT, 0)
+		WHERE a.DS_DT = #{dsDt} and a.DS_TM = #{dsTm}
+
+	</update>
+	<select id="selectDoznDs" parameterType="egovframework.com.rd.usr.service.vo.DoszDSResultVO" resultType="egovframework.com.rd.usr.service.vo.DoszDSResultVO">
+		SELECT DS_DT, DS_TM, PAYMENT_SUCC_CNT, PAYMENT_SUCC_AMOUNT, PAYMENT_FAIL_CNT, PAYMENT_FAIL_AMOUNT, DEPOSITOR_SUCC_CNT, DEPOSITOR_TIME_CNT, DEPOSITOR_FAIL_CNT
+			, DAON_SUCC_CNT, DAON_SUCC_AMOUNT, DAON_FAIL_CNT, DAON_FAIL_AMOUNT, CREAT_DT
+		FROM RD_DOZN_DS;
+	</select>
+</mapper>

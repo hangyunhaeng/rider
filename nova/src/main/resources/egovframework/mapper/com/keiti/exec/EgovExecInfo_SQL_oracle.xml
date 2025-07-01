@@ -1,0 +1,413 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="ExecInfoDAO">
+	<resultMap id="ExecInfoVOList" type="egovframework.com.keiti.exec.service.ExecInfoVO" />
+	<resultMap id="BdgSummaryInfoVOList" type="egovframework.com.keiti.exec.service.BdgSummaryInfoVO" />
+	<resultMap id="ExecSummaryInfoVOList" type="egovframework.com.keiti.exec.service.ExecSummaryInfoVO" />
+	<resultMap id="CommonDocInfoVOList" type="egovframework.com.keiti.exec.service.CommonDocInfoVO" />
+	<resultMap id="TaxInvItmInfoVOList" type="egovframework.com.keiti.exec.service.TaxInvItmInfoVO" />
+	<resultMap id="TaxInvInfoVOList" type="egovframework.com.keiti.exec.service.TaxInvInfoVO" />
+	<resultMap id="ExecFileInfoVOList" type="egovframework.com.keiti.exec.service.ExecFileInfoVO" />
+	<select id="selectExecInfoList" parameterType="egovframework.com.keiti.exec.service.ExecInfoVO" resultMap="ExecInfoVOList">
+            SELECT  *
+              FROM  (
+		            SELECT ROWNUM RNUM, ROWNUM AS NO, ALL_LIST.*
+		            FROM  (
+				        SELECT RG_DT AS RG_DT
+						    ,TRNS_DT AS TRNS_DT
+						    ,EXEC_DT AS EXEC_DT
+						    ,RMK AS RMK
+						    ,STS AS STS
+						    ,EXEC_MTD AS EXEC_MTD
+						    ,IOE_CD AS IOE_CD
+						    ,EXEC_AMT AS EXEC_AMT
+						    ,VAT AS VAT
+						    ,EXEC_AMT+VAT AS TOT_AMT
+						    ,(SELECT ISSUE_ID FROM TP_EXEC_TAX_INVOICE TETI WHERE TETI.EXEC_NO = TE.EXEC_NO) ISSUE_ID
+						    ,(SELECT EXEC_NO FROM TP_EXEC_FILE TEF WHERE TEF.TASK_NO = TE.TASK_NO AND TEF.EXEC_NO = TE.EXEC_NO AND ROWNUM=1) AS STL_KEY
+						    ,EXEC_NO AS EXEC_NO
+						    ,NVL(MCT,'') AS MCT
+						    ,NVL(USG,MCT) AS USG
+						    ,'' AS BIGO
+						    ,NVL(TRNS_AMT,0) AS TRNS_AMT
+						    ,MATCH_ID
+					   FROM (	SELECT *
+					   			FROM TP_EXEC TE2
+					   			WHERE 1=1
+					   			AND IOE_CD != 'CMXXXXXX'
+					   			<if test="srcTaskNo != null and srcTaskNo != ''">
+			                        AND TASK_NO = #{srcTaskNo}
+			                    </if>
+							   <if test="srcSRgDt != null and srcSRgDt != '' and srcERgDt != null and srcERgDt != ''">
+									AND RG_DT BETWEEN #{srcSRgDt} AND #{srcERgDt}
+								</if>
+		               			<if test="srcSTrnsDt != null and srcSTrnsDt != '' and srcETrnsDt != null and srcETrnsDt != ''">
+									AND RG_DT BETWEEN #{srcSTrnsDt} AND #{srcETrnsDt}
+								</if>
+			                    <if test="srcIoeCd != null and srcIoeCd != ''">
+			                        AND IOE_CD = #{srcIoeCd}
+			                    </if>
+			                    <if test="srcExecMtd != null and srcExecMtd != ''">
+			                        AND EXEC_MTD = #{srcExecMtd}
+			                    </if>
+			                    <if test="srcSts != null and srcSts != ''">
+			                        AND STS = #{srcSts}
+			                    </if>
+			                    <choose>
+									<when test="srcOpt == '01'">
+										AND USG LIKE '%' || #{srcOptValue} || '%'
+									</when>
+									<when test="srcOpt == '02'">
+										AND MCT LIKE '%' || #{srcOptValue} || '%'
+									</when>
+									<when test="srcOpt == '03'">
+										AND EXEC_AMT = #{srcOptValue}
+									</when>
+									<otherwise>
+									</otherwise>
+								</choose>
+					   		) TE
+						WHERE 1=1
+		                <choose>
+		                    <when test="srcOrderBy == 'IOE_CD'">
+		                        START WITH TE.R_EXE_SEQ_N IS NULL
+								CONNECT BY PRIOR TE.EXEC_NO = TE.R_EXE_SEQ_N
+						      	ORDER SIBLINGS BY IOE_CD, TE.EXEC_DT DESC,TE.EXEC_NO DESC
+		                    </when>
+		                    <when test="srcOrderBy == 'EXEC_TP_2'">
+		                        ORDER BY EXEC_DT DESC ,EXEC_NO DESC
+		                    </when>
+		                    <!-- Add more cases as needed -->
+		                    <otherwise>
+		                    	START WITH TE.R_EXE_SEQ_N IS NULL
+								CONNECT BY PRIOR TE.EXEC_NO = TE.R_EXE_SEQ_N
+		                        ORDER SIBLINGS BY TE.EXEC_DT DESC,
+							    CASE WHEN TE.EXEC_MTD = 'CD' THEN TE.EXEC_NO END DESC,
+							    CASE WHEN TE.EXEC_MTD != 'CD' THEN TE.EXEC_NO END ASC
+		                    </otherwise>
+		                </choose>
+		                    ) ALL_LIST
+                    )
+		<![CDATA[
+             WHERE  RNUM  > #{firstIndex}
+               AND  RNUM <= #{firstIndex} + #{recordCountPerPage}
+    	]]>
+	</select>
+
+	<select id="selectExecInfoListCnt" parameterType="egovframework.com.keiti.exec.service.ExecInfoVO" resultType="java.lang.Integer">
+        SELECT COUNT(1)
+        FROM TP_EXEC
+        WHERE 1=1
+        AND IOE_CD != 'CMXXXXXX'
+        <if test="srcTaskNo != null and srcTaskNo != ''">
+            AND TASK_NO = #{srcTaskNo}
+        </if>
+        <if test="srcSRgDt != null and srcSRgDt != '' and srcERgDt != null and srcERgDt != ''">
+            AND RG_DT BETWEEN #{srcSRgDt} AND #{srcERgDt}
+        </if>
+        <if test="srcSTrnsDt != null and srcSTrnsDt != '' and srcETrnsDt != null and srcETrnsDt != ''">
+            AND RG_DT BETWEEN #{srcSTrnsDt} AND #{srcETrnsDt}
+        </if>
+        <if test="srcIoeCd != null and srcIoeCd != ''">
+            AND IOE_CD = #{srcIoeCd}
+        </if>
+        <if test="srcExecMtd != null and srcExecMtd != ''">
+            AND EXEC_MTD = #{srcExecMtd}
+        </if>
+        <if test="srcSts != null and srcSts != ''">
+            AND STS = #{srcSts}
+        </if>
+        <choose>
+            <when test="srcOpt == '01'">
+                AND USG LIKE '%' || #{srcOptValue} || '%'
+            </when>
+            <when test="srcOpt == '02'">
+                AND MCT LIKE '%' || #{srcOptValue} || '%'
+            </when>
+            <when test="srcOpt == '03'">
+                AND EXEC_AMT = #{srcOptValue}
+            </when>
+            <otherwise>
+            </otherwise>
+        </choose>
+	</select>
+	<select id="selectBdgSummaryInfoList" parameterType="egovframework.com.keiti.exec.service.ExecInfoVO" resultMap="BdgSummaryInfoVOList">
+		SELECT
+		    S.LEV AS LEV,
+		    PATH,
+		    S.NM_ABRV AS IOE_NM,
+		    S.CS_AMT AS BDG_CASH,
+		    S.TH_AMT AS BDG_NON,
+		    S.TOT_AMT AS BDG_TOT,
+		    S.EXEC_CASH,
+		    S.EXEC_NON,
+		    S.EXEC_VAT,
+		    S.EXEC_TOT,
+		    S.CS_AMT + NVL(BDG.CHG_CA, 0) + NVL(BDG.CHG_IA, 0) - S.EXEC_CASH AS BAL_CASH,
+		    S.TH_AMT - S.EXEC_NON AS BAL_NON,
+		    (S.CS_AMT + NVL(BDG.CHG_CA, 0) + NVL(BDG.CHG_IA, 0) - S.EXEC_CASH) + (S.TH_AMT - S.EXEC_NON) AS BAL_TOT,
+		    '0.00' AS EXEC_RAT,
+		    NVL(S.EXEC_CNT, 0) AS EXEC_CNT,
+		    NVL(BDG.CHG_CA, 0) AS CHG_CA,
+		    NVL(BDG.CHG_IA, 0) AS CHG_IA,
+		    NVL(S.TOT_AMT, 0) + NVL(BDG.CHG_CA, 0)+ NVL(BDG.CHG_IA, 0) AS CHG_TOT,
+		    TO_NUMBER(S.LUP_N) LUP_N,
+		    SUM_INPT_F
+		FROM (
+		    SELECT
+		        LEVEL AS LEV,
+		        SYS_CONNECT_BY_PATH(TIC.IOE_CD, '/') AS PATH,
+		        TIC.IOE_CD AS IOE_CD,
+		        TGC.LUP_N AS LUP_N,
+		        DECODE(LEVEL, 1, TGC.NM_ABRV, 2, ' ○ ' || TGC.NM_ABRV, 3, '    ▶ ' || TGC.NM_ABRV) AS NM_ABRV,
+		        NVL(B.CS_AMT, 0) AS CS_AMT,
+		        NVL(B.TH_AMT, 0) AS TH_AMT,
+		        NVL(B.CS_AMT, 0) + NVL(B.TH_AMT, 0) AS TOT_AMT,
+		        NVL(TE.EXEC_CASH, 0) AS EXEC_CASH,
+		        NVL(TE.EXEC_NON, 0) AS EXEC_NON,
+		        NVL(TE.EXEC_VAT, 0) AS EXEC_VAT,
+		        NVL(TE.EXEC_TOT, 0) AS EXEC_TOT,
+		        NVL(TE.EXEC_CNT, 0) AS EXEC_CNT,
+		        TIC.IOE_CD AS IOE_CD2,
+		        TIC.UP_IOE_CD,
+		        SUM_INPT_F
+		    FROM
+		        TP_IOE_CD TIC
+		    LEFT JOIN TP_IOE_GRP_CD TGC ON TIC.IOE_CD = TGC.IOE_CD
+		    LEFT JOIN TP_TASK_IOE_GRP TTG ON TGC.IOE_GRP_CD = TTG.IOE_GRP_CD AND TTG.TASK_NO = #{srcTaskNo}
+		    LEFT JOIN TP_BDG B ON TTG.TASK_NO = B.TASK_NO
+		        AND TGC.IOE_GRP_CD = B.IOE_GRP_CD
+		        AND TGC.IOE_CD = B.IOE_CD
+		        AND B.BDG_KND_CD = '01'
+		    LEFT JOIN (
+		        SELECT
+		            IOE_CD,
+		            SUM(CASE WHEN EXEC_MTD != 'TH' THEN EXEC_AMT ELSE 0 END) AS EXEC_CASH,
+		            SUM(CASE WHEN EXEC_MTD = 'TH' THEN EXEC_AMT ELSE 0 END) AS EXEC_NON,
+		            SUM(VAT) AS EXEC_VAT,
+		            SUM(EXEC_AMT) AS EXEC_TOT,
+		            COUNT(1) AS EXEC_CNT
+		        FROM TP_EXEC TE
+		        WHERE TASK_NO = #{srcTaskNo}
+		        <if test="srcExecMtd != null and srcExecMtd != ''">
+		            AND TE.EXEC_MTD = #{srcExecMtd}
+		        </if>
+		        AND STS NOT IN ('1','700')
+		        GROUP BY IOE_CD
+		    ) TE ON TIC.IOE_CD = TE.IOE_CD
+		    WHERE
+		        TTG.TASK_NO = #{srcTaskNo}
+		        AND TIC.IOE_CD != 'CMXXXXXX'
+		    START WITH
+		        TIC.UP_IOE_CD IS NULL
+		    CONNECT BY
+		        PRIOR TIC.IOE_CD = TIC.UP_IOE_CD
+		) S
+		LEFT JOIN (
+		    SELECT
+		        IOE_CD,
+		        SUM(CASE WHEN BDG_KND_CD = '03' THEN CS_AMT + TH_AMT ELSE 0 END) AS CHG_CA,
+		        SUM(CASE WHEN BDG_KND_CD = '04' THEN CS_AMT + TH_AMT ELSE 0 END) AS CHG_IA,
+		        SUM(CASE WHEN BDG_KND_CD = '03' THEN CS_AMT + TH_AMT ELSE 0 END) +
+		        SUM(CASE WHEN BDG_KND_CD = '04' THEN CS_AMT + TH_AMT ELSE 0 END) AS CHG_TOT
+		    FROM TP_BDG
+		    WHERE TASK_NO IN( #{srcTaskNo},#{srcUnionF})
+		    GROUP BY IOE_CD
+		) BDG ON S.IOE_CD2 = BDG.IOE_CD
+		<if test='srcUnionF != null and srcUnionF == "Y"'>
+		UNION ALL
+		SELECT
+		    3 AS LEV,
+		    '/'||M.EXEC_MTD AS PATH,
+		    DECODE(M.EXEC_MTD,'X1','미등록카드건','X2','미등록계좌이체건') AS IOE_NM,
+		    0 AS BDG_CASH,
+		    0 AS BDG_NON,
+		    0 AS BDG_TOT,
+		    NVL(AMT,0) AS EXEC_CASH,
+		    0 AS EXEC_NON,
+		    NVL(TEG.TAX, 0) AS EXEC_VAT,
+		    NVL(TEG.AMT, 0) AS EXEC_TOT,
+		    0-NVL(AMT,0) AS BAL_CASH,
+		    0 AS BAL_NON,
+		    0-NVL(TEG.AMT, 0) AS BAL_TOT,
+		    '0.00' AS EXEC_RAT,
+		    NVL(TEG.CNT, 0) AS EXEC_CNT,
+		    0 AS CHG_CA,
+		    0 AS CHG_IA,
+		    0 AS CHG_TOT,
+		    TO_NUMBER(ORDER_SEQ) AS LUP_N,
+		    '1' AS SUM_INPT_F
+		FROM (
+		    SELECT 'X1' AS EXEC_MTD, 99 AS ORDER_SEQ FROM DUAL UNION ALL
+		    SELECT 'X2' AS EXEC_MTD, 98 AS ORDER_SEQ FROM DUAL
+		) M
+		LEFT JOIN TP_EXEC_GB TEG
+		ON M.EXEC_MTD = TEG.TYPE_CD
+		AND TEG.TASK_NO = #{srcTaskNo}
+		</if>
+		ORDER BY LUP_N,PATH
+	</select>
+	<select id="selectExecSummaryInfoList" parameterType="java.lang.String" resultMap="ExecSummaryInfoVOList">
+		SELECT
+		    DECODE(M.EXEC_MTD, 'CD', '카드사용내역', 'CDCC', '카드사용내역', 'CDIC', '카드사용내역',
+		        'X1', '카드사용내역', '계좌이체/기타내역') AS GB,
+		    M.EXEC_MTD,
+		    NVL(TEG.CNT, 0) AS CNT,
+		    NVL(TEG.AMT, 0) AS AMT,
+		    NVL(TEG.TAX, 0) AS VAT,
+		    NVL(TEG.AMT, 0) AS EXEC_AMT,
+		    NVL(TRUNC((TEG.AMT / SUM(CASE WHEN M.EXEC_MTD NOT IN ('X1', 'X2') THEN TEG.AMT ELSE 0 END) OVER ()) * 100, 2), 0) AS EXEC_RAT
+		FROM (
+		    SELECT 'CD' AS EXEC_MTD, 1 AS ORDER_SEQ FROM DUAL UNION ALL
+		    SELECT 'CDCC' AS EXEC_MTD, 2 AS ORDER_SEQ FROM DUAL UNION ALL
+		    SELECT 'CDIC' AS EXEC_MTD, 3 AS ORDER_SEQ FROM DUAL UNION ALL
+		    SELECT 'X1' AS EXEC_MTD, 4 AS ORDER_SEQ FROM DUAL UNION ALL
+		    SELECT 'TR' AS EXEC_MTD, 5 AS ORDER_SEQ FROM DUAL UNION ALL
+		    SELECT 'IB' AS EXEC_MTD, 6 AS ORDER_SEQ FROM DUAL UNION ALL
+		    SELECT 'CS' AS EXEC_MTD, 7 AS ORDER_SEQ FROM DUAL UNION ALL
+		    SELECT 'TH' AS EXEC_MTD, 8 AS ORDER_SEQ FROM DUAL UNION ALL
+		    SELECT 'GR' AS EXEC_MTD, 9 AS ORDER_SEQ FROM DUAL UNION ALL
+		    SELECT 'PC' AS EXEC_MTD, 10 AS ORDER_SEQ FROM DUAL UNION ALL
+		    SELECT 'CK' AS EXEC_MTD, 11 AS ORDER_SEQ FROM DUAL UNION ALL
+		    SELECT 'CC' AS EXEC_MTD, 12 AS ORDER_SEQ FROM DUAL UNION ALL
+		    SELECT 'X2' AS EXEC_MTD, 14 AS ORDER_SEQ FROM DUAL
+			) M
+		LEFT JOIN TP_EXEC_GB TEG
+		ON M.EXEC_MTD = TEG.TYPE_CD
+		AND TEG.TASK_NO = #{taskNo}
+		ORDER BY
+		    M.ORDER_SEQ
+	</select>
+	<select id="selectCommonDocInfoList"  parameterType="egovframework.com.keiti.exec.service.CommonDocInfoVO" resultMap="CommonDocInfoVOList">
+	    SELECT RTM_ITM,
+	           FILE_PATH,
+	           FILE_NM,
+	           RTM_KEY,
+	           SEQ_N,
+	           FILE_ORG_NM,
+	           FILE_PATH||'/'||FILE_NM FULL_PATH
+	    FROM TP_STL_DOC TSD
+	    WHERE 1=1
+	    AND TSD.TASK_NO = #{taskNo}
+	    <!-- rtmItm 조건 추가 -->
+	    <if test="rtmItm != null and rtmItm != ''">
+	        AND TSD.RTM_ITM = #{rtmItm}
+	    </if>
+	    <!-- rtmKey 조건 추가 -->
+	    <if test="rtmKey != null and rtmKey != ''">
+	        AND TSD.RTM_KEY = #{rtmKey}
+	    </if>
+	    <!-- seqN 조건 추가 -->
+	    <if test="seqN != null and seqN != ''">
+	        AND TSD.SEQ_N = #{seqN}
+	    </if>
+	    ORDER BY SEQ_N
+	</select>
+	<select id="selectExecFileInfoList" parameterType="egovframework.com.keiti.exec.service.ExecInfoVO" resultMap="ExecFileInfoVOList">
+		SELECT
+		    TASK_NO,
+		    EXEC_NO,
+		    SEQ_N,
+		    FILE_PATH,
+		    FILE_NM,
+		    FILE_ORG_NM
+		FROM
+		    TP_EXEC_FILE TEF
+  		WHERE 1=1
+			AND TEF.TASK_NO = #{taskNo}
+			AND TEF.EXEC_NO = #{execNo}
+			<!-- seqN 조건 추가 -->
+		    <if test="seqN != null and seqN != ''">
+	        	AND TEF.SEQ_N = #{seqN}
+		    </if>
+	</select>
+	<select id="selectTaxInvItmInfoList" parameterType="egovframework.com.keiti.exec.service.ExecInfoVO" resultMap="TaxInvItmInfoVOList">
+		SELECT
+		    TTI.ISSUE_ID,
+		    TTI.ITM_SEQ_N,
+		    TTI.SPL_D,
+		    TTI.NM,
+		    TTI.INFO_TXT,
+		    TTI.ITM_DESC,
+		    TTI.QTY,
+		    TTI.UPRC,
+		    TTI.SUPPLY_AMT,
+		    TTI.TAX_AMT
+		FROM TP_TAX_INV_ITM TTI
+		WHERE 1=1
+			AND TTI.ISSUE_ID = #{issueId}
+	</select>
+	<select id="selectTaxInvInfoList" parameterType="egovframework.com.keiti.exec.service.ExecInfoVO" resultMap="TaxInvInfoVOList">
+		SELECT
+		    TTI.ISSUE_ID,
+		    TTI.ASP_ORG_CD,
+		    TTI.ASP_ID,
+		    TTI.ASP_REF_DOC_ID,
+		    TTI.ASP_IS_D,
+		    TTI.IS_D,
+		    TTI.TYPE_CD,
+		    TTI.PRPS_CD,
+		    TTI.MDF_RSN,
+		    TTI.RMK,
+		    TTI.IM_DOC_ID,
+		    TTI.IM_ACP_ST_D,
+		    TTI.IM_ACP_END_D,
+		    TTI.IM_ITM_QTY,
+		    TTI.SND_BSN_RG_N,
+		    TTI.SND_TX_ID,
+		    TTI.SND_NAME,
+		    TTI.SND_RPRSND_NM,
+		    TTI.SND_ADR,
+		    TTI.SND_BCND,
+		    TTI.SND_ITP,
+		    TTI.SND_CHP_DPT,
+		    TTI.SND_CHP_NM,
+		    TTI.SND_CHP_PHN,
+		    TTI.SND_CHP_EM,
+		    TTI.RCV_BSN_CD,
+		    TTI.RCV_BSN_RG_N,
+		    TTI.RCV_TX_ID,
+		    TTI.RCV_NAME,
+		    TTI.RCV_RPRS_NM,
+		    TTI.RCV_ADR,
+		    TTI.RCV_BCND,
+		    TTI.RCV_ITP,
+		    TTI.RCV_CHP_DPT,
+		    TTI.RCV_CHP_NM,
+		    TTI.RCV_CHP_PHN,
+		    TTI.RCV_CHP_EM,
+		    TTI.RCV_SUB_CHP_DPT,
+		    TTI.RCV_SUB_CHP_NM,
+		    TTI.RCV_SUB_CHP_PHN,
+		    TTI.RCV_SUB_CHP_EM,
+		    TTI.BRK_BSN_RG_N,
+		    TTI.BRK_TX_ID,
+		    TTI.BRK_NAME,
+		    TTI.BRK_RPRS_NM,
+		    TTI.BRK_ADR,
+		    TTI.BRK_BCND,
+		    TTI.BRK_ITP,
+		    TTI.BRK_CHP_DPT,
+		    TTI.BRK_CHP_NM,
+		    TTI.BRK_CHP_PHN,
+		    TTI.BRK_CHP_EM,
+		    TTI.CS_AMT,
+		    TTI.CHK_AMT,
+		    TTI.BIL_AMT,
+		    TTI.CRDT_AMT,
+		    TTI.SUPPLY_AMT,
+		    TTI.TAX_AMT,
+		    TTI.TOT_AMT,
+		    TTI.SHC_ETC_INFO,
+		    TTI.EXE_RG_AMT,
+		    TTI.RSN_RMK
+		FROM TP_TASK TT
+		JOIN TP_EXEC TE		ON TT.TASK_NO = TE.TASK_NO
+		JOIN TP_EXEC_TAX_INVOICE ETI		ON TE.EXEC_NO = ETI.EXEC_NO
+		JOIN TP_TAX_INV TTI		ON ETI.ISSUE_ID = TTI.ISSUE_ID
+		WHERE 1=1
+			AND TT.TASK_NO = #{taskNo}
+			AND ETI.ISSUE_ID = #{issueId}
+	</select>
+</mapper>

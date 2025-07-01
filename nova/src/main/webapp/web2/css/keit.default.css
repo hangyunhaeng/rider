@@ -1,0 +1,87 @@
+@charset "utf-8";
+
+html,body{font-size:13px;color:#333;/*letter-spacing:-.04rem;*/height:100%}/*keit 180515*/
+html, body, input, select, textarea, button{font-family:'맑은 고딕','돋움','Malgun Gothic', Dotum, Helvetica, AppleSDGothicNeo, sans-serif}
+body,div,dl,dt,dd,ul,ol,li,h1,h2,h3,h4,h5,form,fieldset,p,button,input,select,legend{margin:0;padding:0}
+html,div,p,a,input,select,textarea,td,th,fieldset,dl,dt,dd{box-sizing:border-box; text-decoration: none;}
+html{overflow-y:auto}
+body{/*-ms-word-break:break-all;*/word-break:break-all;height:80%}/*keit 180525:commenting*/
+img,fieldset,iframe{border:0}
+li{list-style:none}
+input,select,button,img{vertical-align:middle}
+i,em,address{font-style:normal}
+a{color:#333;text-decoration:none}
+a:hover, a:focus, a:active{color:#0079c2}/*keit 180525: color*/
+hr{display:none}
+table{width:100%;border-collapse:collapse;border-spacing:0;font-size:13px;}/*keit 180525:commenting because of style inherit of BODY, 180528: uncommenting for popup style */
+th, td{border:1px solid #d1d1d1;height:32px;padding:4px 10px!important;}/*keit 180509:padding-top,padding-bottom,letter-spacing, 180525: remove letter-spacing*/
+th{padding:4px 10px!important;text-align:left;color:#333;background-color:#e2f2e1;} /*keit 180509: bg*/
+td{color:#555;background-color:#fff}
+td input[type="text"]:only-child, td input[type="email"]:only-child, td input[type="password"]:only-child, td select:only-child{width:100%} /*keit 180521: commenting, 180525: :only-child*/
+caption{position:absolute!important;clip:rect(1px,1px, 1px, 1px)}
+
+input[type="text"], input[type="password"], input[type="email"], select, textarea{padding:0 5px;color:#555;font-size:13px;line-height:18px;border:1px solid #bcbcbc}
+input[type="text"], input[type="email"], input[type="password"], select{height:22px}
+textarea{width:100%;padding:5px;resize:vertical;margin:4px 0}
+button *{position:relative}
+button img{left:-3px}
+option{padding-right:6px}
+label,button{cursor:pointer}
+select{padding:0 20px 0 5px;background:#fff url(../../web2/images/ic_sel.png) right 50% no-repeat;appearance:none;-webkit-appearance:none;-moz-appearance:none}
+select::-ms-expand{display:none}
+button, [class^="btn"]:not(div){letter-spacing:-.016rem;font-weight:bold;color:#fff;display:inline-block;height:24px;white-space:nowrap;vertical-align:middle;border:0}
+[class^="btn"]:not(div):hover, [class^="btn"]:not(div):focus, [class^="btn"]:not(div):active{color:#fff!important;text-decoration:none!important}
+
+.fl{float:left}
+.fr{float:right}
+.db{display:block}
+.dn{display:none}
+.fix{position:fixed;top:0;width:80%;min-width:1000px}
+.clear{clear:both}
+.clearfix:after, .contents:after, .slide_wrap:after, .viewbox:after, .fmenu:after, .tab:after, .tab_sub:after{content:"";display:block;clear:both}/*keit 180523: .fmenu:after, .tab:after, .tab_sub:after, .clearfix:after*/
+.flex{display:-webkit-box;display:-moz-box;display:-ms-flexbox;display:-webkit-flex;display:flex}
+.flex > div{float:left}
+.flex-child1{border-right:1px solid #d7d7d7;width:15%}
+.flex-child2{width:85%;overflow-x:scroll}
+.flex-child2 table{margin-bottom:0}
+
+.w10p{width:10% !important}
+.w20p{width:20% !important}
+.w30p{width:29% !important}
+.w35p{width:34% !important}
+.w40p{width:39% !important}
+.w50p{width:49% !important}
+.w60p{width:59% !important}
+.w65p{width:64% !important}
+.w80p{width:79% !important}
+.w100p{width:100% !important}
+.w100{width:100px !important}
+.w150{width:150px !important}
+.w200{width:200px !important}
+.w300{width:300px !important}
+
+.m0{margin:0}
+.mt0{margin-top:0 !important}
+.mt5{margin-top:5px !important}
+.mt10{margin-top:10px !important}
+.mt20{margin-top:20px !important}
+.mt30{margin-top:30px !important}
+.mt35{margin-top:35px !important}
+.mr10{margin-right:10px !important}
+.ml4{margin-left:4px !important}
+.mr5{margin-right:5px!important}
+
+.ir, .ic_cal, .ic.cal, .ic.new, .ic.file, .ic.ess{font:0/0 a;color:transparent}
+.has-multilines{line-height:2}
+em, .strong--orange{color:#fe600d}
+em.ty1, .strong--blue{color:#2875db}
+.thl th, .tdl td, .ltdl td{text-align:left}
+.thc th, .tdc td, .list th, .total th, .stotal th{text-align:center}
+.thr th, .tdr td, .ltdr td, .total td, .stotal td{text-align:right}
+.txtl{text-align:left !important}
+.txtc{text-align:center !important}
+.txtr{text-align:right !important}
+
+
+
+.no-scroll { overflow: hidden;}

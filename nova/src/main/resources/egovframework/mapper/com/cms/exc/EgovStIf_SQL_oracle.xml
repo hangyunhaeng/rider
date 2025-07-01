@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="TbjtInfoDAO">
+
+	<resultMap id="TaskInfoVOList" type="egovframework.com.keiti.comm.service.TaskInfoVO">
+	</resultMap>
+	<select id="selectTbjtInfoOne" parameterType="java.lang.String" resultType="egovframework.com.keiti.comm.service.TaskInfoVO">
+
+			SELECT
+				MNST_CD,SBJT_CD,SBJT_N,ORG_NM,SBJT_D_START,SBJT_D_END,SBJT_NM,BIZ_CD1,BIZ_NM1,BIZ_CD2,BIZ_NM2,BIZ_CD3,BIZ_NM3
+				,BSN_Y,SBJT_F,MNG_F,MNG_PNM,MNG_STTS,SBJTG_PNM,FINAN_PNM
+
+			FROM
+				SBJT_SAM
+			WHERE 1=1
+			AND SBJT_CD LIKE '%' || #{sbjtCd} || '%'
+	</select>
+
+	<select id="selectTbjtInfoList" parameterType="egovframework.com.keiti.comm.service.TaskInfoVO" resultMap="TaskInfoVOList">
+            SELECT  *
+              FROM  (
+            SELECT ROWNUM RNUM, ALL_LIST.*
+              FROM  (
+
+        /* 구현 Sql */
+
+			SELECT
+				MNST_CD,SBJT_CD,SBJT_N,ORG_NM,SBJT_D_START,SBJT_D_END,SBJT_NM,BIZ_CD1,BIZ_NM1,BIZ_CD2,BIZ_NM2,BIZ_CD3,BIZ_NM3
+				,BSN_Y,SBJT_F,MNG_F,MNG_PNM,MNG_STTS,SBJTG_PNM,FINAN_PNM
+
+			FROM
+				SBJT_SAM
+			WHERE 1=1
+
+
+			<if test="searchCnd == 0">AND
+					SBJT_NM LIKE '%' || #{searchWrd} || '%'
+
+			</if>
+	<![CDATA[
+			ORDER BY SBJT_CD
+
+        /* 구현 Sql */
+
+                    ) ALL_LIST
+                    )
+             WHERE  RNUM  > #{firstIndex}
+               AND  RNUM <= #{firstIndex} + #{recordCountPerPage}
+    ]]>
+	</select>
+
+
+	<select id="selectTbjtInfoListCnt" parameterType="egovframework.com.keiti.comm.service.TaskInfoVO" resultType="java.lang.Integer">
+
+			SELECT COUNT(SBJT_CD)
+			FROM
+				SBJT_SAM
+			WHERE 1=1
+
+
+			<if test="searchCnd == 0">AND
+					SBJT_NM LIKE '%' || #{searchWrd} || '%'
+			</if>
+
+
+	</select>
+</mapper>

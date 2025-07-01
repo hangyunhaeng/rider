@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="rotDAO">
+	<select id="selectMyInfo" parameterType="egovframework.com.rd.usr.service.vo.MyInfoVO" resultType="egovframework.com.rd.usr.service.vo.MyInfoVO">
+			SELECT cte.*, usr.MBER_ID, usr.MBER_NM, usr.MBER_EMAIL_ADRES, usr.MBTLNUM
+			, b.BNK_CD, b.ACCOUNT_NUM, b.ACCOUNT_NM, c.CD_NM AS BNK_NM
+			, coo.COOPERATOR_NM, coo.COMPANY_NM, coo.REGISTRATION_SN, coo.CEO_NM
+			FROM COMTNGNRLMBER usr
+			LEFT JOIN RD_COOPERATOR_RIDER_CONNECT cte ON cte.mber_id = usr.mber_id
+			LEFT JOIN RD_BNK b ON usr.ESNTL_ID = b.ESNTL_ID AND b.USE_AT = 'Y'
+			LEFT JOIN RD_COOPERATOR coo ON cte.COOPERATOR_ID = coo.COOPERATOR_ID
+			LEFT JOIN RD_CD c ON b.bnk_cd = c.cd AND c.CD_GROUP ='BANK_CD'
+			WHERE 1 = 1
+			<if test="searchCooperatorId !='' and searchCooperatorId != null">
+			AND cte.COOPERATOR_ID = #{searchCooperatorId}
+			</if>
+			and usr.mber_id = #{mberId}
+	</select>
+	<select id="selectMyInfo2" parameterType="egovframework.com.rd.usr.service.vo.MyInfoVO" resultType="egovframework.com.rd.usr.service.vo.MyInfoVO">
+			/* 총판 or 협력사 */
+			SELECT emplyr_id AS MBER_ID, user_nm AS MBER_NM, EMAIL_ADRES AS MBER_EMAIL_ADRES
+			, MBTLNUM, b.BNK_CD, b.ACCOUNT_NUM, b.ACCOUNT_NM, c.CD_NM AS BNK_NM, d.AUTHOR_CODE, if(d.AUTHOR_CODE ='ROLE_ADMIN', '운영사', '협력사') AS AUTHOR_CODE_NM
+			from COMTNEMPLYRINFO usr
+					LEFT JOIN RD_BNK b ON usr.IHIDNUM = b.ESNTL_ID AND b.USE_AT ='Y'
+					LEFT JOIN RD_CD c ON b.bnk_cd = c.cd AND c.CD_GROUP ='BANK_CD'
+					JOIN COMTNEMPLYRSCRTYESTBS d ON usr.ESNTL_ID = d.SCRTY_DTRMN_TRGET_ID
+			WHERE emplyr_id = #{mberId}
+	</select>
+	<select id="selectMyCooperatorList" parameterType="egovframework.com.rd.usr.service.vo.MyInfoVO" resultType="egovframework.com.rd.usr.service.vo.MyInfoVO">
+		/*	WITH RECURSIVE cte AS (
+			    SELECT 1 as lv, CON_ID, UP_CON_ID , COOPERATOR_ID, MBER_ID, use_at
+				 FROM RD_COOPERATOR_RIDER_CONNECT
+				  WHERE UP_CON_ID is null
+				  AND mber_id = #{mberId}
+
+				 UNION ALL
+
+				 SELECT 1+cte.lv lv, m.CON_ID, m.UP_CON_ID , m.COOPERATOR_ID, m.MBER_ID , m.use_at
+				 FROM RD_COOPERATOR_RIDER_CONNECT m
+			   	 	INNER JOIN  cte ON m.UP_CON_ID = cte.con_id
+
+			       )*/
+			SELECT cte.COOPERATOR_ID AS seleceKey, a.COOPERATOR_NM AS selectValue
+			FROM RD_COOPERATOR_RIDER_CONNECT cte
+			LEFT JOIN RD_COOPERATOR a ON cte.COOPERATOR_ID = a.COOPERATOR_ID
+			/*WHERE (cte.lv , cte.COOPERATOR_ID, cte.MBER_ID) IN (
+				SELECT MAX(lv) lv,  COOPERATOR_ID, MBER_ID FROM cte
+				GROUP BY MBER_ID, COOPERATOR_ID
+			)*/
+			WHERE 1 = 1
+			AND cte.mber_id = #{mberId}
+	</select>
+	<update id="updateMyInfoByMberId" parameterType="egovframework.com.rd.usr.service.vo.MyInfoVO">
+		<if test="schUserSe =='GNR'">
+			/* 라이더 */
+			UPDATE COMTNGNRLMBER
+			SET MBER_EMAIL_ADRES = #{mberEmailAdres}
+			, MBTLNUM = #{mbtlnum}
+			<if test="password !='' and password != null">
+			, PASSWORD = #{password}
+			</if>
+			WHERE mber_id = #{mberId}
+		</if>
+		<if test="schUserSe =='USR'">
+			/* 총판 or 협력사 */
+			UPDATE COMTNEMPLYRINFO
+			SET EMAIL_ADRES = #{mberEmailAdres}
+			, MBTLNUM = #{mbtlnum}
+			<if test="password !='' and password != null">
+			, PASSWORD = #{password}
+			</if>
+			WHERE EMPLYR_ID = #{mberId}
+		</if>
+	</update>
+	<select id="selectCodeList" parameterType="egovframework.com.rd.usr.service.vo.MyInfoVO" resultType="egovframework.com.rd.usr.service.vo.MyInfoVO">
+
+		 SELECT cd AS SELECE_KEY, cd_nm AS SELECT_VALUE
+		 FROM RD_CD
+		 WHERE cd_group = #{schCdGroup}
+		 AND use_at ='Y'
+		 ORDER BY ORDE
+	</select>
+	<select id="selectBankByEsntlId" parameterType="egovframework.com.rd.usr.service.vo.MyInfoVO" resultType="egovframework.com.rd.usr.service.vo.MyInfoVO">
+		 SELECT BNK_ID, ESNTL_ID, BNK_CD, ACCOUNT_NUM, ACCOUNT_NM, USE_AT, CREAT_DT, CREAT_ID, LAST_UPDT_PNTTM, LAST_UPDUSR_ID
+		 FROM RD_BNK
+		 WHERE ESNTL_ID = #{esntlId} and USE_AT = 'Y'
+	</select>
+	<update id="deleteBnkByEsntlId" parameterType="egovframework.com.rd.usr.service.vo.MyInfoVO">
+		UPDATE RD_BNK
+		SET USE_AT = 'N'
+		, LAST_UPDT_PNTTM = SYSDATE()
+		, LAST_UPDUSR_ID = #{lastUpdusrId}
+		WHERE ESNTL_ID = #{esntlId}
+		AND USE_AT ='Y'
+	</update>
+	<insert id="insertBnk" parameterType="egovframework.com.rd.usr.service.vo.MyInfoVO">
+		INSERT INTO RD_BNK
+		(BNK_ID, ESNTL_ID, BNK_CD, ACCOUNT_NUM, ACCOUNT_NM, USE_AT, CREAT_DT, CREAT_ID)
+		VALUES
+		(#{bnkId}, #{esntlId}, #{bnkCd}, #{accountNum}, #{accountNm}, 'Y', SYSDATE(), #{creatId})
+	</insert>
+
+	<select id="selectAblePrice" parameterType="egovframework.com.rd.usr.service.vo.MyInfoVO" resultType="egovframework.com.rd.usr.service.vo.MyInfoVO">
+		SELECT SUM(DAY_ABLE_PRICE) AS DAY_ABLE_PRICE, SUM(WEEK_ABLE_PRICE) AS WEEK_ABLE_PRICE
+		, (SELECT if(a.USE_AT='Y' AND b.USE_AT='Y', 'Y', 'N') FROM RD_COOPERATOR a
+				LEFT JOIN RD_COOPERATOR_RIDER_CONNECT b ON a.COOPERATOR_ID = b.COOPERATOR_ID
+				WHERE a.COOPERATOR_ID = #{searchCooperatorId} AND b.MBER_ID = #{mberId}) USE_AT
+		FROM(
+			SELECT SUM(ABLE_PRICE) - SUM(SEND_PRICE) AS DAY_ABLE_PRICE, 0 AS WEEK_ABLE_PRICE
+			FROM (
+				/*일정산 입금액*/
+				SELECT NVL(SUM(ABLE_PRICE), 0) ABLE_PRICE, 0 AS SEND_PRICE
+				FROM RD_DAY_PAY
+				WHERE mber_id = #{mberId} AND week_yn ='N' AND use_at ='Y' AND IO_GUBUN ='1' AND COOPERATOR_ID = #{searchCooperatorId}
+
+				UNION
+
+				/*일정산 출금액*/
+				SELECT 0 AS ABLE_PRICE, NVL(SUM(/*DAY_FEE+INSURANCE+*/SEND_FEE+SEND_PRICE), 0) SEND_PRICE
+				FROM RD_DAY_PAY
+				WHERE mber_id = #{mberId} AND week_yn ='N' AND use_at ='Y' AND IO_GUBUN ='2' AND COOPERATOR_ID = #{searchCooperatorId}
+			) A
+
+
+			UNION
+
+			SELECT 0 AS DAY_ABLE_PRICE, SUM(ABLE_PRICE) - SUM(SEND_PRICE) AS WEEK_ABLE_PRICE
+			FROM (
+				/*주정산 입금액*/
+				SELECT NVL(SUM(ABLE_PRICE), 0) AS ABLE_PRICE, 0 AS SEND_PRICE
+				FROM RD_WEEK_PAY
+				WHERE mber_id = #{mberId} AND use_at ='Y' AND IO_GUBUN ='1' AND COOPERATOR_ID = #{searchCooperatorId}
+
+				UNION
+
+				/*주정산 출금액*/
+				SELECT 0 AS ABLE_PRICE, NVL(SUM(FEE+SEND_PRICE), 0) SEND_PRICE
+				FROM RD_WEEK_PAY
+				WHERE mber_id = #{mberId} AND use_at ='Y' AND IO_GUBUN ='2' AND COOPERATOR_ID = #{searchCooperatorId}
+			) B
+		) TAB
+	</select>
+
+</mapper>

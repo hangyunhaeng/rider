@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="inqDAO">
+	<insert id="insertInquiry" parameterType="egovframework.com.rd.usr.service.vo.InquiryVO">
+		INSERT INTO RD_INQUIRY
+		(INQ_ID, UP_INQ_ID, TITLE, LONGTXT, USE_AT, CREAT_DT, CREAT_ID)
+		VALUES(#{inqId}, #{upInqId}, #{title}, #{longtxt}, #{useAt}, SYSDATE(), #{creatId})
+	</insert>
+
+	<update id="updateInquiry" parameterType="egovframework.com.rd.usr.service.vo.InquiryVO">
+		UPDATE RD_INQUIRY
+		SET TITLE = #{title}, LONGTXT = #{longtxt}
+		, LAST_UPDT_PNTTM = SYSDATE(), LAST_UPDUSR_ID = #{lastUpdusrId}
+		WHERE INQ_ID = #{inqId}
+	</update>
+
+	<select id="selectInquiryByInqId" parameterType="egovframework.com.rd.usr.service.vo.InquiryVO" resultType = "egovframework.com.rd.usr.service.vo.InquiryVO">
+		SELECT INQ_ID, UP_INQ_ID, TITLE, LONGTXT, USE_AT, CREAT_DT, CREAT_ID
+		FROM RD_INQUIRY
+		WHERE INQ_ID = #{inqId}
+	</select>
+
+
+	<select id="selectInquiryList" parameterType="egovframework.com.rd.usr.service.vo.InquiryVO" resultType = "egovframework.com.rd.usr.service.vo.InquiryVO">
+		<if test="schIdx !=0 and schPagePerCnt != 0">
+		SELECT * FROM (
+			SELECT ROWNUM() RN,m.*
+			FROM (
+		</if>
+				SELECT INQ_ID, UP_INQ_ID, TITLE, LONGTXT, USE_AT
+				, DATE_FORMAT(CREAT_DT, '%Y-%m-%d') CREAT_DT, CREAT_ID, DATE_FORMAT(LAST_UPDT_PNTTM, '%Y-%m-%d') LAST_UPDT_PNTTM
+				, LAST_UPDUSR_ID, b.MBER_NM AS CREAT_NM
+				FROM RD_INQUIRY a
+				LEFT JOIN COMTNGNRLMBER b ON a.CREAT_ID = b.MBER_ID
+				WHERE a.use_at ='Y'
+				<if test="schUserSe == 'GNR'">
+					AND a.CREAT_ID = #{schId}
+				</if>
+				<if test="schUserSe == 'USR'">
+					AND UP_INQ_ID IS null
+				</if>
+				ORDER BY a.CREAT_DT DESC
+		<if test="schIdx !=0 and schPagePerCnt != 0">
+			) m
+		) m
+		<![CDATA[WHERE RN > #{schIdx}*#{schPagePerCnt} -#{schPagePerCnt} AND RN <= #{schIdx}*#{schPagePerCnt}]]>
+		</if>
+	</select>
+
+	<select id="selectInquiryListCnt" parameterType="egovframework.com.rd.usr.service.vo.InquiryVO" resultType = "egovframework.com.rd.usr.service.vo.InquiryVO">
+			SELECT
+				COUNT(INQ_ID) TOTAL_CNT
+		FROM RD_INQUIRY a
+		LEFT JOIN COMTNGNRLMBER b ON a.CREAT_ID = b.MBER_ID
+		WHERE a.use_at ='Y'
+		<if test="schUserSe == 'GNR'">
+			AND a.CREAT_ID = #{schId}
+		</if>
+		<if test="schUserSe == 'USR'">
+			AND UP_INQ_ID IS null
+		</if>
+	</select>
+
+
+
+	<select id="selectInquiryListByInqId" parameterType="egovframework.com.rd.usr.service.vo.InquiryVO" resultType = "egovframework.com.rd.usr.service.vo.InquiryVO">
+
+		SELECT GUBUN, INQ_ID, UP_INQ_ID, TITLE, LONGTXT, USE_AT
+					, DATE_FORMAT(CREAT_DT, '%Y-%m-%d') CREAT_DT, CREAT_ID, DATE_FORMAT(LAST_UPDT_PNTTM, '%Y-%m-%d') LAST_UPDT_PNTTM
+					, LAST_UPDUSR_ID,  CREAT_NM, MODIFY_AUTH
+		FROM (
+			SELECT 'Q' AS GUBUN, INQ_ID, UP_INQ_ID, TITLE, LONGTXT, USE_AT
+					, CREAT_DT, CREAT_ID, LAST_UPDT_PNTTM
+					, LAST_UPDUSR_ID, b.MBER_NM AS CREAT_NM
+					, 'N' MODIFY_AUTH
+					FROM RD_INQUIRY a
+					LEFT JOIN COMTNGNRLMBER b ON a.CREAT_ID = b.MBER_ID
+					WHERE a.use_at ='Y'
+					AND INQ_ID = #{inqId}
+
+			UNION ALL
+
+			SELECT 'A' AS GUBUN, INQ_ID, UP_INQ_ID, TITLE, LONGTXT, USE_AT
+					, CREAT_DT, CREAT_ID, LAST_UPDT_PNTTM
+					, LAST_UPDUSR_ID, b.USER_NM AS CREAT_NM
+					, if('ROLE_ADMIN' = #{schAuthorCode}, 'Y', if(CREAT_ID = #{schId}, 'Y', 'N')) MODIFY_AUTH
+					FROM RD_INQUIRY a
+					LEFT JOIN COMTNEMPLYRINFO b ON a.CREAT_ID = b.EMPLYR_ID
+					WHERE a.use_at ='Y'
+					AND UP_INQ_ID = #{inqId}
+		) m
+
+		ORDER BY m.CREAT_DT DESC
+
+	</select>
+
+	<select id="selectGnrInquiryList" parameterType="egovframework.com.rd.usr.service.vo.InquiryVO" resultType = "egovframework.com.rd.usr.service.vo.InquiryVO">
+		WITH RECURSIVE cte AS (
+			<if test="schIdx !=0 and schPagePerCnt != 0">
+			SELECT * FROM (
+				SELECT ROWNUM() RN,m.*
+				FROM (
+			</if>
+
+							SELECT 1 as lv,INQ_ID, UP_INQ_ID, TITLE, LONGTXT, USE_AT
+							, CREAT_DT, CREAT_ID, LAST_UPDT_PNTTM, IFNULL(UP_INQ_ID, INQ_ID) id
+							, LAST_UPDUSR_ID, b.MBER_NM AS CREAT_NM
+							FROM RD_INQUIRY a
+							LEFT JOIN COMTNGNRLMBER b ON a.CREAT_ID = b.MBER_ID
+							WHERE a.use_at ='Y'
+							AND a.UP_INQ_ID IS null
+							AND a.CREAT_ID = #{schId}
+			<if test="schIdx !=0 and schPagePerCnt != 0">
+							ORDER BY if(a.creat_dt > IFNULL(a.LAST_UPDT_PNTTM, 1), creat_dt, IFNULL(a.LAST_UPDT_PNTTM, 1)) DESC
+				) m
+			) m
+			<![CDATA[WHERE RN > #{schIdx}*#{schPagePerCnt} -#{schPagePerCnt} AND RN <= #{schIdx}*#{schPagePerCnt}]]>
+			</if>
+
+
+				 UNION ALL
+
+				 SELECT
+				 <if test="schIdx !=0 and schPagePerCnt != 0"> ROWNUM() RN,</if>
+				 1+cte.lv lv, m.INQ_ID, m.UP_INQ_ID, m.TITLE, m.LONGTXT, m.USE_AT
+				, m.CREAT_DT, m.CREAT_ID, m.LAST_UPDT_PNTTM, IFNULL(m.UP_INQ_ID, m.INQ_ID) id
+				, m.LAST_UPDUSR_ID, b.USER_NM AS CREAT_NM
+				 FROM RD_INQUIRY m
+				 	LEFT JOIN COMTNEMPLYRINFO b ON m.CREAT_ID = b.EMPLYR_ID
+			  	 	INNER JOIN  cte ON m.UP_INQ_ID = cte.INQ_ID
+			  	 WHERE m.use_at ='Y'
+
+		       )
+		SELECT cte.lv, cte.id, cte.INQ_ID, cte.UP_INQ_ID, cte.TITLE, cte.LONGTXT, cte.USE_AT
+				, DATE_FORMAT(CREAT_DT, '%Y-%m-%d') CREAT_DT, CREAT_ID, DATE_FORMAT(LAST_UPDT_PNTTM, '%Y-%m-%d') LAST_UPDT_PNTTM
+				, LAST_UPDUSR_ID, cte.CREAT_NM
+		FROM cte
+		<![CDATA[
+		ORDER BY lv, if(creat_dt > IFNULL(LAST_UPDT_PNTTM, 1), creat_dt, IFNULL(LAST_UPDT_PNTTM, 1)) DESC
+		]]>
+	</select>
+	<update id="deleteInquiryByInqId" parameterType="egovframework.com.rd.usr.service.vo.InquiryVO">
+		UPDATE RD_INQUIRY
+		SET USE_AT = #{useAt}
+		, LAST_UPDT_PNTTM = SYSDATE(), LAST_UPDUSR_ID = #{lastUpdusrId}
+		WHERE INQ_ID = #{inqId}
+	</update>
+
+</mapper>
