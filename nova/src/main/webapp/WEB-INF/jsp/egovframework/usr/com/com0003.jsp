@@ -80,6 +80,12 @@
 <script type="text/javascript" src="<c:url value='/web2/js/keit.jquery.ui.js' />" ></script>
 <script type="text/javascript" src="<c:url value='/web2/js/kaia.pbCommon.js' />" ></script>
 <script type="text/javaScript">
+//onLoad
+document.addEventListener('DOMContentLoaded', function() {
+	if('${loginMessage}'.trim() != ''){
+		alert("아이디 패스워드가 일치하지 않습니다");
+	}
+});
 function 로그인() {
 
 	if ($('#Id').val() =="") {
