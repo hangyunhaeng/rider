@@ -18,8 +18,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import egovframework.com.cmm.SessionVO;
 import egovframework.com.rd.Util;
+import egovframework.com.rd.usr.service.DtyService;
 import egovframework.com.rd.usr.service.MemService;
 import egovframework.com.rd.usr.service.vo.DeliveryInfoVO;
+import egovframework.com.rd.usr.service.vo.NiceVO;
+import egovframework.com.rd.usr.service.vo.WeekPayVO;
 import egovframework.com.rd.usr.web.DtyController;
 import egovframework.com.sec.rgm.service.AuthorGroup;
 import egovframework.com.sec.rgm.service.EgovAuthorGroupService;
@@ -48,6 +51,9 @@ public class EgovRdrController {
 	/** EgovLoginService */
 	@Resource(name = "MemService")
 	private MemService memService;
+
+    @Resource(name = "DtyService")
+    private DtyService dtyService;
 
     /** mberManageService */
     @Resource(name = "mberManageService")
@@ -228,7 +234,7 @@ public class EgovRdrController {
 		MberManageVO member = memService.selectMemberInfo(mberId);
 		if(member == null || "".equals(member.getMberId().trim())) {
 			map.put("resultCode", "failReg");
-			map.put("resultMessage", "등록되지 않은 사용자입니다.<br/><br/>메인페이지에서 라이더 등록을 하시기 바랍니다.");
+			map.put("resultMessage", "등록되지 않은 사용자입니다.<br/><br/>등록된 라이더만 사용하실 수 있습니다<br/>협력사에 문의하시기 바랍니다");
 			return ResponseEntity.ok(map);
 		}
 
@@ -276,14 +282,128 @@ public class EgovRdrController {
 		if(!Util.isGnr(request.getSession()))
 			return ResponseEntity.status(401).body("Unauthorized");
 
+		//최초등록 사용자의 패스워드 변경시 pass인증 않태움 .. 일단은
+		MberManageVO vo = memService.selectMemberInfo(EgovStringUtil.isNullToString((String)request.getSession().getAttribute("mberId")));
+
+    	if(Util.isReal() && "Y".equals( vo.getMberConfirmAt())) {
+        	if(Util.isEmpty((String)request.getSession().getAttribute("niceSuccess"))) {
+    			throw new IllegalArgumentException("PASS 미인증으로 변경 불가") ;
+        	}
+        	if(!"success".equals((String)request.getSession().getAttribute("niceSuccess"))) {
+    			throw new IllegalArgumentException("PASS 미인증으로 변경 불가") ;
+        	}
+    	}
+
+        request.getSession().removeAttribute("req_no");
+        request.getSession().removeAttribute("key");
+        request.getSession().removeAttribute("iv");
+        request.getSession().removeAttribute("hmac_key");
+        request.getSession().removeAttribute("token_version_id");
+        request.getSession().removeAttribute("niceSuccess");
+
 		// 2. 비밀번호 변경
 	    mberManageVO.setUniqId((String)request.getSession().getAttribute("uniqId"));
         mberManageVO.setPassword(EgovFileScrty.encryptPassword(mberManageVO.getPassword(), EgovStringUtil.isNullToString((String)request.getSession().getAttribute("mberId"))));
         mberManageVO.setMberConfirmAt("Y");
         mberManageService.updatePasswordSelf(mberManageVO);
 
+
+        request.getSession().removeAttribute("mberId");
+        request.getSession().removeAttribute("uniqId");
+        request.getSession().removeAttribute("mberNm");
+
 		map.put("resultCode", "success");
 		return ResponseEntity.ok(map);
 	}
 
+
+	/**
+	 * 나이스 토큰 가져오기
+	 * @param request
+	 * @param model
+	 * @return
+	 * @throws Exception
+	 */
+    @RequestMapping("/com/com0010_0000.do")
+    public ResponseEntity<?> com0010_0000(@ModelAttribute("WeekPayVO") WeekPayVO weekPayVO, HttpServletRequest request,ModelMap model) throws Exception {
+
+    	//로그인 체크
+//        LoginVO user = (LoginVO)EgovUserDetailsHelper.getAuthenticatedUser();
+//        Boolean isAuthenticated = EgovUserDetailsHelper.isAuthenticated();
+//
+//        if(!isAuthenticated) {
+//        	return ResponseEntity.status(401).body("Unauthorized");
+//        }
+//
+//        if(!Util.isGnr()) {
+//        	return ResponseEntity.status(401).body("Unauthorized");
+//        }
+        //return value
+        Map<String, Object> map =  new HashMap<String, Object>();
+
+        //라이더 권한
+//        weekPayVO.setSchAuthorCode(user.getAuthorCode());
+//        weekPayVO.setSchId(user.getId());
+
+        try {
+	        NiceVO niceVO = dtyService.makeNiceEncData(request);
+	        // 인증 완료 후 success페이지에서 사용을 위한 key값은 DB,세션등 업체 정책에 맞춰 관리 후 사용하면 됩니다.
+	        // 예시에서 사용하는 방법은 세션이며, 세션을 사용할 경우 반드시 인증 완료 후 세션이 유실되지 않고 유지되도록 확인 바랍니다.
+	        // key, iv, hmac_key 값들은 token_version_id에 따라 동일하게 생성되는 고유값입니다.
+	        // success페이지에서 token_version_id가 일치하는지 확인 바랍니다.
+	        request.getSession().setAttribute("req_no", niceVO.getReq_no());
+	        request.getSession().setAttribute("key" , niceVO.getKey());
+	        request.getSession().setAttribute("iv" , niceVO.getIv());
+	        request.getSession().setAttribute("hmac_key" , niceVO.getHmac_key());
+	        request.getSession().setAttribute("token_version_id", niceVO.getToken_version_id());
+
+	        map.put("token_version_id", niceVO.getToken_version_id());
+	        map.put("enc_data", niceVO.getEnc_data());
+	        map.put("integrity", niceVO.getIntegrity_value());
+	    	map.put("resultCode", "success");
+	    } catch (Exception e) {
+			map.put("resultCode", "fail");
+			map.put("resultMsg", e.getMessage());
+			return ResponseEntity.ok(map);
+		}
+        return ResponseEntity.ok(map);
+
+	}
+
+
+	/**
+	 * 나이스 핸드폰 본인인증
+	 * @param request
+	 * @param model
+	 * @return
+	 * @throws Exception
+	 */
+    @RequestMapping("/com/com0010_0001.do")
+    public String com0010_0001(@ModelAttribute("NiceVO") NiceVO niceVO, HttpServletRequest request,ModelMap model) throws Exception {
+
+//    	//로그인 체크
+//        LoginVO user = (LoginVO)EgovUserDetailsHelper.getAuthenticatedUser();
+//        Boolean isAuthenticated = EgovUserDetailsHelper.isAuthenticated();
+//
+//        if(!isAuthenticated) {
+//        	return "egovframework/com/cmm/error/accessDenied";
+//        }
+//
+//		// 1. 사용자 확인
+//		if(!Util.isGnr()) {
+//			return "egovframework/com/cmm/error/accessDenied";
+//        }
+
+        //라이더 권한
+//        niceVO.setSchAuthorCode(user.getAuthorCode());
+//        niceVO.setSchId(user.getId());
+
+        NiceVO reNiceVO = dtyService.returnNiceData(niceVO, request);
+        if("success".equals(reNiceVO.getResultCode()) ) {
+            request.getSession().setAttribute("niceSuccess", reNiceVO.getResultCode());
+        }
+        model.addAttribute("resultMsg", reNiceVO.getResultMsg());
+        model.addAttribute("resultCode", reNiceVO.getResultCode());
+        return "egovframework/gnr/rot/niceResult";
+	}
 }

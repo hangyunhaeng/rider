@@ -148,7 +148,7 @@
 
 
 		    const params = new URLSearchParams();
-		    axios.post('${pageContext.request.contextPath}/gnr/rot0003_0003.do', params)
+		    axios.post('${pageContext.request.contextPath}/com/com0010_0000.do', params)
 		        .then(response => {
 		        	// 로딩 종료
 		            $('.loading-wrap--js').hide();
@@ -234,7 +234,7 @@
 
 
 		    const params = new URLSearchParams();
-		    axios.post('${pageContext.request.contextPath}/gnr/rot0003_0003.do', params)
+		    axios.post('${pageContext.request.contextPath}/com/com0010_0000.do', params)
 		        .then(response => {
 		        	// 로딩 종료
 		            $('.loading-wrap--js').hide();

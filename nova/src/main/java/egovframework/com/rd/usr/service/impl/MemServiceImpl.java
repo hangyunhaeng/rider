@@ -282,6 +282,9 @@ public class MemServiceImpl extends EgovAbstractServiceImpl implements MemServic
         	if(oneVO == null) {
         		String conId = egovConIdGnrService.getNextStringId();
         		vo.setConId(conId);
+        		if(!Util.isEmpty(vo.getMbtlnum())){
+        			vo.setRegDt("YES");
+        		}
         		memDAO.insertCooperatorRiderConnect(vo);
         	}
         	if(oneVO != null /*&& vo.getFee() != oneVO.getFee()*/ ) {
@@ -293,6 +296,9 @@ public class MemServiceImpl extends EgovAbstractServiceImpl implements MemServic
 //        		if("N".equals(vo.getUseAt()) ) {
 //
 //        		}
+        		if(!Util.isEmpty(vo.getMbtlnum())){
+        			vo.setRegDt("YES");
+        		}
         		memDAO.updateCooperatorRiderConnect(vo);
         	}
 

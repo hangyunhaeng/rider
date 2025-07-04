@@ -160,13 +160,25 @@
 	</select>
 	<insert id="insertCooperatorRiderConnect" parameterType="egovframework.com.rd.usr.service.vo.CooperatorVO">
 		INSERT INTO RD_COOPERATOR_RIDER_CONNECT
-		    (CON_ID/*, UP_CON_ID*/,COOPERATOR_ID, MBER_ID, CREAT_DT, CREAT_ID)
+		    (CON_ID/*, UP_CON_ID*/,COOPERATOR_ID, MBER_ID, REG_DT, END_DT, CREAT_DT, CREAT_ID)
 		VALUES
-		   (#{conId},#{cooperatorId}, #{mberId}, SYSDATE(), #{creatId})
+		   (#{conId},#{cooperatorId}, #{mberId},
+
+		<if test="regDt == 'YES'">
+			DATE_FORMAT(SYSDATE(), '%Y%m%d'),
+		</if>
+		<if test="regDt == null or regDt != 'YES'">
+			null,
+		</if>
+		    #{endDt}, SYSDATE(), #{creatId})
 	</insert>
 	<update id="updateCooperatorRiderConnect" parameterType="egovframework.com.rd.usr.service.vo.CooperatorVO">
 		UPDATE RD_COOPERATOR_RIDER_CONNECT
 		SET USE_AT = #{useAt}
+		<if test="regDt == 'YES'">
+			, REG_DT = if(REG_DT is null OR REG_DT = '', DATE_FORMAT(SYSDATE(), '%Y%m%d') , REG_DT)
+		</if>
+			, END_DT = DATE_FORMAT(#{endDt}, '%Y%m%d')
 			, LAST_UPDT_PNTTM = sysdate()
 			, LAST_UPDUSR_ID = #{lastUpdusrId}
 		WHERE CON_ID = #{conId}

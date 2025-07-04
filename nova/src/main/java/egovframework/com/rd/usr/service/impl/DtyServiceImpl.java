@@ -81,7 +81,7 @@ import egovframework.com.uss.umt.service.EgovMberManageService;
 import egovframework.com.uss.umt.service.MberManageVO;
 import egovframework.com.uss.umt.service.UserDefaultVO;
 import egovframework.com.uss.umt.service.impl.MberManageDAO;
-
+import egovframework.com.utl.fcc.service.EgovStringUtil;
 import kr.co.dozn.secure.base.CryptoUtil;
 
 /**
@@ -1344,11 +1344,38 @@ public class DtyServiceImpl extends EgovAbstractServiceImpl implements DtyServic
                 mobileco =plain_data.get("mobileco").toString();
                 niceVO.setResultMsg(sMessage);
                 niceVO.setResultCode("success");
-                LoginVO user = (LoginVO)EgovUserDetailsHelper.getAuthenticatedUser();
-                LOGGER.debug("nice★★★★★★★★name : "+name+"   ★★★★★★★★mobileno : "+mobileno);
-                LOGGER.debug("세션★★★★★★★★name : "+user.getName()+"   ★★★★★★★★mobileno : "+user.getMbtlnum());
-                if(!name.trim().equals(user.getName().trim()) || !mobileno.equals(Util.getOnlyNumber(user.getMbtlnum()))) {
-                    sMessage = "사용자의 정보(이름, 핸드폰)가 다릅니다 \n\n출금을 취소합니다.";
+                Boolean isAuthenticated = EgovUserDetailsHelper.isAuthenticated();
+                if( isAuthenticated ) {
+	                LoginVO user = (LoginVO)EgovUserDetailsHelper.getAuthenticatedUser();
+	                LOGGER.debug("nice★★★★★★★★name : "+name+"   ★★★★★★★★mobileno : "+mobileno);
+	                LOGGER.debug("세션★★★★★★★★name : "+user.getName()+"   ★★★★★★★★mobileno : "+user.getMbtlnum());
+
+	                MberManageVO vo = memDAO.selectMemberInfo(user.getId());
+	                LOGGER.debug("재조회★★★★★★★★name : "+vo.getMberNm()+"   ★★★★★★★★mobileno : "+vo.getMbtlnum());
+
+	                if(Util.isEmpty(vo.getMbtlnum())) {
+	                	sMessage = "개인정보의 핸드폰번호를 확인할 수 없습니다\n\n핸드폰번호 등록 후 재시도 하시기바랍니다";
+	                    niceVO.setResultMsg(sMessage);
+	                    niceVO.setResultCode("fail");
+	                }
+	                if(!name.trim().equals(vo.getMberNm().trim()) || !mobileno.equals(Util.getOnlyNumber(vo.getMbtlnum()))) {
+	                    sMessage = "사용자의 정보(이름, 핸드폰)가 다릅니다 \n\n요청을 취소합니다";
+	                    niceVO.setResultMsg(sMessage);
+	                    niceVO.setResultCode("fail");
+	                }
+                } else if(!Util.isEmpty(EgovStringUtil.isNullToString((String)request.getSession().getAttribute("mberId"))) ) {
+                	MberManageVO vo = memDAO.selectMemberInfo(EgovStringUtil.isNullToString((String)request.getSession().getAttribute("mberId")));
+	                LOGGER.debug("nice★★★★★★★★name : "+name+"   ★★★★★★★★mobileno : "+mobileno);
+	                LOGGER.debug("재조회★★★★★★★★name : "+vo.getMberNm()+"   ★★★★★★★★mobileno : "+vo.getMbtlnum());
+                	if(!name.trim().equals(vo.getMberNm().trim()) || !mobileno.equals(Util.getOnlyNumber(vo.getMbtlnum()))) {
+	                    sMessage = "사용자의 정보(이름, 핸드폰)가 다릅니다 \n\n요청을 취소합니다";
+	                    niceVO.setResultMsg(sMessage);
+	                    niceVO.setResultCode("fail");
+                	}
+                } else {
+                	LOGGER.debug("nice★★★★★★★★name : "+name+"   ★★★★★★★★mobileno : "+mobileno);
+	                LOGGER.debug("기준정보 없음");
+                    sMessage = "사용자의 정보(이름, 핸드폰)가 다릅니다 \n\n요청을 취소합니다.";
                     niceVO.setResultMsg(sMessage);
                     niceVO.setResultCode("fail");
                 }
@@ -1605,6 +1632,9 @@ public class DtyServiceImpl extends EgovAbstractServiceImpl implements DtyServic
     		coopConn.setConId(conId);
     		coopConn.setCreatId(user.getId());
     		coopConn.setFee(0);
+    		if( userOne != null && !Util.isEmpty(userOne.getMbtlnum())) {
+    			coopConn.setRegDt("YES");
+    		}
     		memDAO.insertCooperatorRiderConnect(coopConn);
     	}
 	}

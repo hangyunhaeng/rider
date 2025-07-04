@@ -60,4 +60,6 @@ public class Sch implements Serializable {
 	private String searchError;	//에러건 조회 여부
 
 
+	private String shcn;		//나이스용도
+
 }

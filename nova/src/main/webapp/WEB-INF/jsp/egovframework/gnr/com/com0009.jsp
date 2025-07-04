@@ -84,9 +84,12 @@
 			    axios.post('${pageContext.request.contextPath}/com/com0009_0001.do', params)
 			        .then(response => {
 
-			        	if(response.data.resultCode == "success")
+			        	if(response.data.resultCode == "success"){
 							alert("비밀번호가 변경되었습니다.");
 			        		메인으로이동();
+			        	} else {
+							alert("비밀번호 변경 실패하였습니다");
+			        	}
 			        })
 			        .catch(error => {
 			            console.error('Error fetching data:', error);

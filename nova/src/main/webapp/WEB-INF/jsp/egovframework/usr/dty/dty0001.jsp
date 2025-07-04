@@ -212,6 +212,7 @@
 			if(response.data.resultCode == "success"){
 
 	            document.getElementById('TT_CNT0').textContent = currencyFormatter(response.data.list.length);
+	            document.getElementById('TT_CNT1').textContent = 0;
 
 	        	if (response.data.list.length == 0 && response.data.listE.length == 0) {
 	        		grid.setGridOption('rowData',[]);  	// 데이터가 없는 경우 빈 배열 설정
@@ -406,7 +407,7 @@
           <li class="dropdown"><a href="" onclick="javascript:return false;"><span>라이더/협력사 현황</span> <i class="bi bi-chevron-down toggle-dropdown"></i></a>
             <ul>
               <li style="display:none;"><a href="${pageContext.request.contextPath}/usr/mem0001.do">협력사관리</a></li>
-              <li><a href="${pageContext.request.contextPath}/usr/mem0003.do">협력사계정관리</a></li>
+              <li style="display:none;"><a href="${pageContext.request.contextPath}/usr/mem0003.do">협력사계정관리</a></li>
               <li><a href="${pageContext.request.contextPath}/usr/mem0002.do">라이더관리</a></li>
 			  <li><a href="${pageContext.request.contextPath}/usr/mem0004.do">내정보관리</a></li>
             </ul>

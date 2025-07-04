@@ -83,7 +83,7 @@
 //onLoad
 document.addEventListener('DOMContentLoaded', function() {
 	if('${loginMessage}'.trim() != ''){
-		alert("아이디 패스워드가 일치하지 않습니다");
+		alert('${loginMessage}');
 	}
 });
 function 로그인() {

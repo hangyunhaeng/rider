@@ -104,8 +104,8 @@
 		}
 
 
-		$('#dayAblePrice').html(currencyFormatter(${ablePrice.dayAblePrice})+"원");
-		$('#weekAblePrice').html(currencyFormatter(${ablePrice.weekAblePrice})+"원");
+		$('#dayAblePrice').html(currencyFormatter(${ablePrice.dayAblePrice-sendFee})+"원");
+		$('#weekAblePrice').html(currencyFormatter(${ablePrice.weekAblePrice-sendFee})+"원");
 		$('#sendFee').html(currencyFormatter(sendFee));
 		$("#dayPrice").on("propertychange change keyup paste input", function(e) {
 			calPrice();
@@ -157,16 +157,30 @@
     }
 	function goAct(){
 
-		if(Number($('#inputPrice').html().replace(/[^0-9]-/g, '').replace(/(\..*)\./g, '$1'), 10) <= 0){
-			alert('출금금액이 이체 수수료보다 커야 합니다.');
-
-			if("${myInfoVOData.gubun}" == "DAY")
-				$('#dayPrice').focus();
-			if("${myInfoVOData.gubun}" == "WEK")
-				$('#weekPrice').focus();
-
+		if("${myInfoVO.mbtlnum}" == "null" || "${myInfoVO.mbtlnum}".trim() == '' ){
+			alert('핸드폰번호가가 등록되어있지 않습니다.\n상위업체에  정보등록 후 사용하기 바랍니다');
 			return;
 		}
+
+		if("${myInfoVO.accountNum}" == null || "${myInfoVO.accountNum}".trim() == '' ){
+			if(confirm('계좌가 등록되어있지 않습니다.\n내정보관리 메뉴에서 계좌등록을 하셔야 합니다.\n\n계좌등록화면으로 이동하시겠습니까?')){
+				$('#myForm').attr("action", "${pageContext.request.contextPath}/gnr/rot0002.do");
+				$('#myForm').submit();
+				return;
+			}
+			return;
+		}
+
+// 		if(Number($('#inputPrice').html().replace(/[^0-9]-/g, '').replace(/(\..*)\./g, '$1'), 10) <= 0){
+// 			alert('출금금액이 이체 수수료보다 커야 합니다.');
+
+// 			if("${myInfoVOData.gubun}" == "DAY")
+// 				$('#dayPrice').focus();
+// 			if("${myInfoVOData.gubun}" == "WEK")
+// 				$('#weekPrice').focus();
+
+// 			return;
+// 		}
 
 		if("${myInfoVOData.gubun}" == "DAY"){
 			if(Number($('#dayPrice').val().replace(/[^0-9]-/g, '').replace(/(\..*)\./g, '$1'), 10) <= 0){
@@ -198,7 +212,7 @@
 
 
 		    const params = new URLSearchParams();
-		    axios.post('${pageContext.request.contextPath}/gnr/rot0003_0003.do', params)
+		    axios.post('${pageContext.request.contextPath}/com/com0010_0000.do', params)
 		        .then(response => {
 		            $('.loading-wrap--js').hide();
 					if(response.data.resultCode == "success"){
@@ -341,7 +355,7 @@
 							<div id="divDay" class="d-flex hover-actions-trigger py-2 border-translucent position-relative" style="display:none !important;">
 								<div class="col-12">
 									<div class="form-floating">
-									<input id="dayPrice" class="form-control" id="1" type="text" maxlength="15" oninput="onInputVal(this, ${ablePrice.dayAblePrice});" placeholder="선출금" value="0"><label for="floatingInputZipcode">선출금<em id="dayAblePrice" style="color:red;"> 0원</em></label>
+									<input id="dayPrice" class="form-control" id="1" type="text" maxlength="15" oninput="onInputVal(this, ${ablePrice.dayAblePrice-sendFee});" placeholder="선출금가능금액" value="0"><label for="floatingInputZipcode">선출금가능금액<em id="dayAblePrice" style="color:red;"> 0원</em></label>
 									</div>
 								</div>
 							</div>
@@ -350,7 +364,7 @@
 							<div id="divWek" class="d-flex hover-actions-trigger py-2 border-translucent position-relative" style="display:none !important;">
 								<div class="col-12">
 									<div class="form-floating">
-									<input id="weekPrice" class="form-control" id="2" type="text" maxlength="15" oninput="onInputVal(this, ${ablePrice.weekAblePrice});" placeholder="정산완료" value="0"><label for="floatingInputZipcode">정산완료<em id="weekAblePrice" style="color:red;"> 0원</em></label>
+									<input id="weekPrice" class="form-control" id="2" type="text" maxlength="15" oninput="onInputVal(this, ${ablePrice.weekAblePrice-sendFee});" placeholder="정산완료출금가능금액" value="0"><label for="floatingInputZipcode">정산완료출금가능금액<em id="weekAblePrice" style="color:red;"> 0원</em></label>
 									</div>
 								</div>
 							</div>

@@ -50,6 +50,7 @@
 	//onLoad
 	document.addEventListener('DOMContentLoaded', function() {
 
+		debugger;
 		$("#조회버튼").on("click", function(e){
 
 			if ($("#mberId").val() == "") {
@@ -77,7 +78,8 @@
 						}
 
 						if(response.data.resultCode == "success"){
-							location.replace("${pageContext.request.contextPath}/com/com0009.do");
+							//location.replace("${pageContext.request.contextPath}/com/com0009.do");
+							doNext();
 						}
 			        })
 			        .catch(error => {
@@ -87,7 +89,40 @@
 		});
 	});
 
+	//나이스
+	function doNext(){
+	    const params = new URLSearchParams();
+	    axios.post('${pageContext.request.contextPath}/com/com0010_0000.do', params)
+	        .then(response => {
+	            $('.loading-wrap--js').hide();
+				if(response.data.resultCode == "success"){
+					document.form_chk.token_version_id.value = response.data.token_version_id;
+					document.form_chk.enc_data.value = response.data.enc_data;
+					document.form_chk.integrity_value.value = response.data.integrity;
 
+					fnPopup();
+				} else {
+					if(response.data.resultMsg != '' && response.data.resultMsg != null)
+						alert(response.data.resultMsg);
+					else alert("비밀번호 변경에 실패하였습니다");
+					return ;
+				}
+	        })
+	        .catch(error => {
+	            $('.loading-wrap--js').hide();
+	            console.error('Error fetching data:', error);
+	        });
+	}
+
+	function goActStep2(){
+		location.replace("${pageContext.request.contextPath}/com/com0009.do");
+	}
+    function fnPopup(){
+        window.open('', 'popupChk', 'width=480, height=812, top=100, fullscreen=no, menubar=no, status=no, toolbar=no,titlebar=yes, location=no, scrollbar=no');
+        document.form_chk.action = "https://nice.checkplus.co.kr/CheckPlusSafeModel/checkplus.cb";
+        document.form_chk.target = "popupChk";
+        document.form_chk.submit();
+    }
 	function showErrorMessege(msg){
 
 	    document.querySelector('.php-email-form .loading').classList.remove('d-block');
@@ -150,7 +185,7 @@
                   <div class="error-message"></div>
                   <div class="sent-message">Your message has been sent. Thank you!</div>
 
-                  <button id="조회버튼" type="submit" onclick="javascript:조회();">조회</button>
+                  <button id="조회버튼" type="submit">조회</button>
                   <button id="메인버튼" type="submit" style="display:none;" onclick="javascript:메인으로이동();">메인으로</button>
                 </div>
 
@@ -217,6 +252,12 @@
 	</div>
 	</form>
 
+    <form name="form_chk" method="post">
+        <input type="hidden" name="m" value="service"/>
+        <input type="hidden" name="token_version_id"/>
+        <input type="hidden" name="enc_data"/>
+        <input type="hidden" name="integrity_value"/>
+    </form>
 </body>
 
 </html>

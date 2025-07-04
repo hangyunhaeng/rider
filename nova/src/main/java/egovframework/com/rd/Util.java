@@ -99,7 +99,7 @@ public class Util {
      */
     public static String getOnlyNumber(final String str) {
         StringBuilder sb = new StringBuilder();
-        Matcher matcher = GET_NUMBER.matcher(str);
+        Matcher matcher = GET_NUMBER.matcher((str == null ? "": str));
 
         while (matcher.find()) {
             sb.append(matcher.group());

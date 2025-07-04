@@ -88,6 +88,18 @@
 		{ headerName: "이름", field: "mberNm", minWidth: 90, editable: true, cellClass: (params) => {return agGrideditClass(params)}},
 // 		{ headerName: "수수료", field: "fee", minWidth: 90, editable: true, cellClass: (params) => {return agGrideditClass(params, 'ag-cell-right')} },
 		{ headerName: "핸드폰번호", field: "mbtlnum", minWidth: 120, editable: true, cellClass: (params) => {return agGrideditClass(params, 'ag-cell-right')}},
+		{ headerName: "등록일", field: "regDt", minWidth: 90
+	        , valueParser: (params) => {
+	            return gridValidDate(params);
+	        }
+	        , cellClass: (params) => {return agGrideditClass(params)}
+		},
+		{ headerName: "종료일", field: "endDt", minWidth: 90, editable: true
+	        , valueParser: (params) => {
+	            return gridValidDate(params);
+	        }
+	        , cellClass: (params) => {return agGrideditClass(params)}
+		},
 		{ headerName: "사용여부", field: "useAt", minWidth: 90, editable: true
 		,valueGetter:(params) => { return (params.node.data.useAt=='Y')?"사용": "미사용"}
 		,cellEditor: 'agSelectCellEditor'
@@ -389,7 +401,7 @@
 					<li class="dropdown"><a href="" onclick="javascript:return false;" class="active"><span>라이더/협력사 현황</span><i class="bi bi-chevron-down toggle-dropdown"></i></a>
 						<ul>
 							<li style="display:none;"><a href="${pageContext.request.contextPath}/usr/mem0001.do">협력사관리</a></li>
-              				<li><a href="${pageContext.request.contextPath}/usr/mem0003.do">협력사계정관리</a></li>
+              				<li style="display:none;"><a href="${pageContext.request.contextPath}/usr/mem0003.do">협력사계정관리</a></li>
 							<li><a href="${pageContext.request.contextPath}/usr/mem0002.do" class="active">라이더관리</a></li>
 							<li><a href="${pageContext.request.contextPath}/usr/mem0004.do">내정보관리</a></li>
 						</ul></li>
@@ -473,7 +485,7 @@
 				<!-- grid  -->
 
 				<div style="height: 0px;">
-					<span class="pagetotal" style='margin-right: 20px;'>ID : 미사용으로 변경시 라이더 출금이 막힘</span>
+					<span class="pagetotal" style='margin-right: 20px;'>ID : 미사용으로 변경시 or 종료일 이후 라이더 출금이 막힘</span>
 					<div class="btnwrap">
 						<button id="아이디추가버튼" class="btn btn-primary">추가</button>
 						<button id="아이디저장버튼" class="btn ty1">저장</button>

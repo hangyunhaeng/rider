@@ -77,6 +77,12 @@
 <script type="text/javascript" src="<c:url value='/web2/js/keit.jquery.ui.js' />" ></script>
 <script type="text/javascript" src="<c:url value='/web2/js/kaia.pbCommon.js' />" ></script>
 <script type="text/javaScript">
+//onLoad
+document.addEventListener('DOMContentLoaded', function() {
+	if('${loginMessage}'.trim() != ''){
+		alert('${loginMessage}');
+	}
+});
 function 로그인() {
 
 	if ($('#Id').val() =="") {

@@ -184,6 +184,15 @@
 			LEFT JOIN COMTNFILE c ON a.atch_file_id  =c.ATCH_FILE_ID
 			LEFT JOIN COMTNFILEDETAIL d ON c.ATCH_FILE_ID = d.ATCH_FILE_ID
 		WHERE SUBSTRING(a.RUN_DE, 1, 6) = #{searchDate}
+
+			<if test="schAuthorCode == 'ROLE_USER'">
+			/* 협력사 조건 *//* COOPERATOR_ID로 조건을 만든건 ★정산 파일을 올릴때 권한이 있는 협력사ID 데이터만 올릴수 있음!!★ - 나머지는 오류 처리할꺼임  */
+			AND a.COOPERATOR_ID IN (
+				SELECT COOPERATOR_ID FROM RD_COOPERATOR a
+				WHERE a.REGISTRATION_SN = #{schIhidNum} AND use_at ='Y'
+			)
+			</if>
+
 			/*AND b.USE_AT ='Y'*/
 			<if test='searchCooperatorId != null and searchCooperatorId != "all"'>
 				AND	a.COOPERATOR_ID = #{searchCooperatorId}
