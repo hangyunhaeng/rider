@@ -123,11 +123,7 @@
 		SELECT cte.*, usr.mber_nm, usr.MBTLNUM
 		FROM RD_COOPERATOR_RIDER_CONNECT cte
 		LEFT JOIN COMTNGNRLMBER usr ON cte.mber_id = usr.mber_id
-		/*WHERE (cte.lv , cte.COOPERATOR_ID, cte.MBER_ID) IN (
-			SELECT MAX(lv) lv,  COOPERATOR_ID, MBER_ID FROM cte
-			WHERE COOPERATOR_ID = #{cooperatorId}
-			GROUP BY MBER_ID
-		)*/
+
 		WHERE 1=1
 		AND COOPERATOR_ID = #{cooperatorId}
 
@@ -151,6 +147,11 @@
 		   	 	INNER JOIN  cte ON m.UP_CON_ID = cte.con_id
 
 		       )*/
+		/*WHERE (cte.lv , cte.COOPERATOR_ID, cte.MBER_ID) IN (
+			SELECT MAX(lv) lv,  COOPERATOR_ID, MBER_ID FROM cte
+			WHERE COOPERATOR_ID = #{cooperatorId}
+			GROUP BY MBER_ID
+		)*/
 	</select>
 
 	<select id="selectCooperatorRiderConnect" parameterType="egovframework.com.rd.usr.service.vo.CooperatorVO" resultType="egovframework.com.rd.usr.service.vo.CooperatorVO">
