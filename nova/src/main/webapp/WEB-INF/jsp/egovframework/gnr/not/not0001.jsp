@@ -93,7 +93,7 @@
 
 		// 로딩 시작
         $('.loading-wrap--js').show();
-	    axios.post('${pageContext.request.contextPath}/grn/not0001_0001.do', params)
+	    axios.post('${pageContext.request.contextPath}/gnr/not0001_0001.do', params)
 	        .then(response => {
 	        	// 로딩 종료
 	            $('.loading-wrap--js').hide();

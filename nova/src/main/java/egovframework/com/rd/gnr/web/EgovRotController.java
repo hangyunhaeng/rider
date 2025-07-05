@@ -133,7 +133,7 @@ public class EgovRotController {
 	 * @return
 	 * @throws Exception
 	 */
-	@RequestMapping("/grn/rot0001_0001.do")
+	@RequestMapping("/gnr/rot0001_0001.do")
 	public ResponseEntity<?> rot0001_0001(@ModelAttribute("NoticeVO") NoticeVO noticeVO, HttpServletRequest request) throws Exception{
 
     	//로그인 체크

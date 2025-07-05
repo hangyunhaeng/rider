@@ -76,7 +76,7 @@ public class EgovNotController {
 	 * @return
 	 * @throws Exception
 	 */
-	@RequestMapping("/grn/not0001_0001.do")
+	@RequestMapping("/gnr/not0001_0001.do")
 	public ResponseEntity<?> not0001_0001(@ModelAttribute("NoticeVO") NoticeVO noticeVO, HttpServletRequest request) throws Exception{
 
     	//로그인 체크
