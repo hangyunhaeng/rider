@@ -7,7 +7,6 @@ import javax.annotation.Resource;
 
 import org.egovframe.rte.fdl.cmmn.EgovAbstractServiceImpl;
 import org.egovframe.rte.fdl.idgnr.EgovIdGnrService;
-import org.egovframe.rte.psl.dataaccess.util.EgovMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -80,6 +79,16 @@ public class MemServiceImpl extends EgovAbstractServiceImpl implements MemServic
 	 */
 	public List<CooperatorVO> selectCooperatorList(CooperatorVO vo) throws Exception {
 		return memDAO.selectCooperatorList(vo);
+	}
+
+	/**
+	 * 협력사 조회(라이더)
+	 * @param vo
+	 * @return
+	 * @throws Exception
+	 */
+	public List<CooperatorVO> selectCooperatorListRDCnt(CooperatorVO vo) throws Exception {
+		return memDAO.selectCooperatorListRDCnt(vo);
 	}
 	/**
 	 * 협력사 등록

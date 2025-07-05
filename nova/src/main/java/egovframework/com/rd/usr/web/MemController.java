@@ -326,6 +326,41 @@ public class MemController {
         }
     }
 
+
+    /**
+     * 협력사 조회(라이더)
+     * @param request
+     * @param model
+     * @return
+     * @throws Exception
+     */
+    @RequestMapping("/usr/mem0001_0008.do")
+    public ResponseEntity<?> mem0001_0008(@ModelAttribute("cooperatorVO")CooperatorVO cooperatorVO, HttpServletRequest request,ModelMap model) throws Exception {
+
+    	//로그인 체크
+        LoginVO user = (LoginVO)EgovUserDetailsHelper.getAuthenticatedUser();
+        Boolean isAuthenticated = EgovUserDetailsHelper.isAuthenticated();
+
+        if(!isAuthenticated) {
+        	return ResponseEntity.status(401).body("Unauthorized");
+        }
+
+        if(!Util.isUsr()) {
+        	return ResponseEntity.status(401).body("Unauthorized");
+        }
+        //return value
+        Map<String, Object> map =  new HashMap<String, Object>();
+
+        //총판 or 협력사
+        cooperatorVO.setSchAuthorCode(user.getAuthorCode());
+        cooperatorVO.setSchIhidNum(user.getIhidNum());
+
+        List<CooperatorVO> list = memService.selectCooperatorListRDCnt(cooperatorVO);
+
+        map.put("list", list);
+        map.put("resultCode", "success");
+        return ResponseEntity.ok(map);
+    }
     /**
      * 라이더 아이디로 개인정보 불러오기
      * @param request
@@ -442,9 +477,17 @@ public class MemController {
         //return value
         Map<String, Object> map =  new HashMap<String, Object>();
 
+        //총판 or 협력사
+        cooperatorVO.setSchAuthorCode(user.getAuthorCode());
+        cooperatorVO.setSchIhidNum(user.getIhidNum());
+
         try {
 	        CooperatorVO searchVo = memService.saveCooperatoRider(list, user);
 	        map.put("list", memService.selectCooperatorRiderListByCooperator(searchVo));
+
+	        CooperatorVO vo = new CooperatorVO();
+	        vo.setSearchGubun("R");
+	        map.put("orglist", memService.selectCooperatorListRDCnt(vo));
 	        map.put("resultCode", "success");
         } catch(IllegalArgumentException e) {
         	map.put("resultCode", "fail");

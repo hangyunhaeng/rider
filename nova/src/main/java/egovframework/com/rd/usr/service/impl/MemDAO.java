@@ -46,6 +46,16 @@ public class MemDAO extends EgovComAbstractDAO {
 	}
 
 	/**
+	 * 협력사 조회(라이더)
+	 * @param vo
+	 * @return
+	 * @throws Exception
+	 */
+	public List<CooperatorVO> selectCooperatorListRDCnt(CooperatorVO vo) throws Exception {
+		return selectList("memDAO.selectCooperatorListRDCnt", vo);
+	}
+
+	/**
 	 * 협력사 등록
 	 * @param vo
 	 * @return

@@ -75,6 +75,7 @@
 		{ headerName: "상호", field: "companyNm", minWidth: 150, cellClass: 'ag-cell-left'},
 		{ headerName: "사업자이름", field: "registrationNm", minWidth: 90, hide:true},
 		{ headerName: "대표자명", field: "ceoNm", minWidth: 90, hide:true},
+		{ headerName: "소속라이더", field: "rdcnt", minWidth: 90, cellClass: 'ag-cell-right'},
 		{ headerName: "사용여부", field: "useAt", minWidth: 90, hide:true, valueGetter:(params) => { return (params.node.data.useAt=='Y')?"사용": "미사용"}},
 		{ headerName: "생성자", field: "creatId", minWidth: 90, hide:true},
 		{ headerName: "구분", field: "gubun", minWidth: 90, hide:true}
@@ -139,7 +140,7 @@
 		params.append('searchGubun', "R");
 		// 로딩 시작
         $('.loading-wrap--js').show();
-        axios.post('${pageContext.request.contextPath}/usr/mem0001_0001.do',params).then(function(response) {
+        axios.post('${pageContext.request.contextPath}/usr/mem0001_0008.do',params).then(function(response) {
         	// 로딩 종료
             $('.loading-wrap--js').hide();
         	if(response.data.resultCode == "success"){
@@ -232,6 +233,16 @@
 	        axios.post('${pageContext.request.contextPath}/usr/mem0002_0002.do',getEditRows(grid1)).then(function(response) {        	// 로딩 종료
 	            $('.loading-wrap--js').hide();
 	        	if(response.data.resultCode == "success"){
+
+		        	if (response.data.orglist.length == 0) {
+		        		grid.setGridOption('rowData',[]);  	// 데이터가 없는 경우 빈 배열 설정
+		        		grid.showNoRowsOverlay();  			// 데이터가 없는 경우
+		            } else {
+
+						var lst = response.data.orglist;	//정상데이터
+						grid.setGridOption("rowData", lst);
+		            }
+
 		        	if (response.data.list.length == 0) {
 		        		grid1.setGridOption('rowData',[]);  	// 데이터가 없는 경우 빈 배열 설정
 		        		grid1.showNoRowsOverlay();  			// 데이터가 없는 경우
@@ -240,6 +251,7 @@
 						var lst = response.data.list;	//정상데이터
 						grid1.setGridOption("rowData", lst);
 		            }
+
 	        	} else {
 	        		if(response.data.resultMsg != null && response.data.resultMsg != ''){
 	        			alert(response.data.resultMsg);

@@ -13,7 +13,7 @@
 		</if>
 
 		<if test='searchGubun == "R"'>
-		and USE_AT ='Y'
+			and USE_AT ='Y'
 		</if>
 		<if test="schAuthorCode == 'ROLE_ADMIN'">
 			<if test='searchGubun == null or searchGubun == ""'>
@@ -29,6 +29,24 @@
 			GROUP BY a.cooperator_id
 			</if>
 		</if>
+	</select>
+
+	<select id="selectCooperatorListRDCnt" parameterType="egovframework.com.rd.usr.service.vo.CooperatorVO" resultType="egovframework.com.rd.usr.service.vo.CooperatorVO">
+		SELECT a.COOPERATOR_ID, COOPERATOR_NM, REGISTRATION_SN, COMPANY_NM, REGISTRATION_NM, CEO_NM, a.USE_AT, a.CREAT_DT, a.CREAT_ID, 'R' GUBUN
+		<![CDATA[, sum(if(b.USE_AT='Y' AND (DATE_FORMAT(SYSDATE(), '%Y%m%d') <= b.END_DT OR b.END_DT IS null),1, 0)) RDCNT]]>
+		FROM RD_COOPERATOR a
+		LEFT JOIN RD_COOPERATOR_RIDER_CONNECT b ON a.COOPERATOR_ID = b.COOPERATOR_ID AND b.USE_AT = 'Y'
+		where 1= 1
+
+		<if test="schAuthorCode == 'ROLE_USER'">
+			AND REGISTRATION_SN = #{schIhidNum}
+			and a.USE_AT ='Y'
+		</if>
+
+		<if test='searchGubun == "R"'>
+			and a.USE_AT ='Y'
+		</if>
+		GROUP BY a.COOPERATOR_ID
 	</select>
 
 	<select id="selectCooperatorByCooperatorId" parameterType="egovframework.com.rd.usr.service.vo.CooperatorVO" resultType="egovframework.com.rd.usr.service.vo.CooperatorVO">

@@ -48,6 +48,7 @@ public class CooperatorVO extends Sch implements Serializable {
 //	private String upConId;
 	private String regDt;
 	private String endDt;
+	private String rdcnt;
 
 
 	private List<CooperatorVO> cooperatorVO;
