@@ -100,9 +100,13 @@
 			params.append("schIdx", schIdx);
 			params.append("schPagePerCnt", schPagePerCnt);
 
+			// 로딩 시작
+	        $('.loading-wrap--js').show();
 		    axios.post('${pageContext.request.contextPath}/gnr/inq0001_0001.do', params)
 		        .then(response => {
 
+		        	// 로딩 종료
+		            $('.loading-wrap--js').hide();
 					document.querySelector('.php-email-form .loading').classList.remove('d-block');
 					if(response.data.resultCode == "success"){
 						$('#반복부').html("");
@@ -188,6 +192,8 @@
 					}
 		        })
 		        .catch(error => {
+		        	// 로딩 종료
+		            $('.loading-wrap--js').hide();
 		            console.error('Error fetching data:', error);
 		        });
 	}
@@ -198,6 +204,10 @@
 	</script>
 
 <body>
+      <div class="loading-wrap loading-wrap--js" style="display: none;z-index:10000;">
+        <div class="loading-spinner loading-spinner--js"></div>
+        <p id="loadingMessage">로딩중</p>
+      </div>
 
   <header id="header" class="header d-flex align-items-center fixed-top" style="background-color:#0e1d34;">
     <div class="container-fluid container-xl position-relative d-flex align-items-center">

@@ -111,7 +111,6 @@
 
 	});
 	function 저장(){
-		document.querySelector('.php-email-form .loading').classList.add('d-block');
 	    const params = new URLSearchParams();
 
 	    params.append("inqId", $('#inqId').val());
@@ -119,15 +118,20 @@
 	    params.append("longtxt", $('#longtxt').val());
 	    params.append("useAt", 'Y');
 
+		// 로딩 시작
+        $('.loading-wrap--js').show();
 	    axios.post('${pageContext.request.contextPath}/gnr/inq0002_0001.do', params)
 	        .then(response => {
-				document.querySelector('.php-email-form .loading').classList.remove('d-block');
+	        	// 로딩 종료
+	            $('.loading-wrap--js').hide();
 				if(response.data.resultCode == "success"){
 					alert("저장되었습니다");
 					goList();
 				}
 	        })
 	        .catch(error => {
+	        	// 로딩 종료
+	            $('.loading-wrap--js').hide();
 	            console.error('Error fetching data:', error);
 	        });
 
@@ -143,14 +147,19 @@
 
 		    params.append("inqId", $('#inqId').val());
 
+			// 로딩 시작
+	        $('.loading-wrap--js').show();
 		    axios.post('${pageContext.request.contextPath}/gnr/inq0002_0002.do', params)
 		        .then(response => {
-					document.querySelector('.php-email-form .loading').classList.remove('d-block');
+		        	// 로딩 종료
+		            $('.loading-wrap--js').hide();
 					if(response.data.resultCode == "success"){
 						goList();
 					}
 		        })
 		        .catch(error => {
+		        	// 로딩 종료
+		            $('.loading-wrap--js').hide();
 		            console.error('Error fetching data:', error);
 		        });
 
@@ -160,6 +169,11 @@
 	</script>
 
 <body>
+
+      <div class="loading-wrap loading-wrap--js" style="display: none;z-index:10000;">
+        <div class="loading-spinner loading-spinner--js"></div>
+        <p id="loadingMessage">로딩중</p>
+      </div>
 
   <header id="header" class="header d-flex align-items-center fixed-top" style="background-color:#0e1d34;">
     <div class="container-fluid container-xl position-relative d-flex align-items-center">
@@ -215,18 +229,6 @@
                   </div>
                 </div>
 
-
-          <div class="col-lg-8">
-            <div method="post" class="php-email-form" >
-              <div class="row gy-4">
-                <div class="col-md-12 text-center">
-                  <div class="loading" >Loading</div>
-                  <div class="error-message"></div>
-                </div>
-              </div>
-            </form>
-          </div>
-        </div>
 
 
 

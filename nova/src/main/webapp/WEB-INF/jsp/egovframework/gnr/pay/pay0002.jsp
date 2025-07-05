@@ -119,8 +119,12 @@
 	    params.append('searchFromDate', $($('#fromRunDe')[0]).val().replace(regex, ""));
 	    params.append('searchToDate', $($('#toRunDe')[0]).val().replace(regex, ""));
 
+		// 로딩 시작
+        $('.loading-wrap--js').show();
 	    axios.post('${pageContext.request.contextPath}/gnr/pay0002_001.do', params)
 	        .then(response => {
+	        	// 로딩 종료
+	            $('.loading-wrap--js').hide();
 				if(response.data.resultCode == "success"){
 
 					//$('#customer-order-table-body').find('tr:hidden')
@@ -152,13 +156,11 @@
 
 				}
 
-	        	// 로딩 종료
-	            $('.loading-wrap--js').hide();
 	        })
 	        .catch(error => {
-	            console.error('Error fetching data:', error);
 	        	// 로딩 종료
 	            $('.loading-wrap--js').hide();
+	            console.error('Error fetching data:', error);
 	        });
 	}
 	</script>
