@@ -73,8 +73,8 @@
 <!-- $('#summernote').summernote('undo'); -->
 <!-- // 앞으로가기 -->
 <!-- $('#summernote').summernote('redo'); -->
-	<link href="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css" rel="stylesheet">
-	<script src="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+	<link href="<c:url value='/vendor/admin/bootstrap/3.4.1/bootstrap.min.css' />" rel="stylesheet">
+	<script src="<c:url value='/vendor/admin/bootstrap/3.4.1/bootstrap.min.js' />"></script>
 
 	<!-- include summernote css/js -->
 <!-- 	<link href="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote.min.css" rel="stylesheet"> -->
