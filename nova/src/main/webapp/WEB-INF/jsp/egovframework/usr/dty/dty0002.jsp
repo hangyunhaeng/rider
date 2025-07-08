@@ -406,7 +406,7 @@
 			  <li><a href="${pageContext.request.contextPath}/usr/mem0004.do">내정보관리</a></li>
             </ul>
           </li>
-          <li class="dropdown"><a href="" onclick="javascript:return false;"  class="active"><span>자료 업로드</span> <i class="bi bi-chevron-down toggle-dropdown"></i></a>
+          <li class="dropdown" style="display:none;"><a href="" onclick="javascript:return false;"  class="active"><span>자료 업로드</span> <i class="bi bi-chevron-down toggle-dropdown"></i></a>
             <ul>
               <li><a href="${pageContext.request.contextPath}/usr/dty0001.do">일별 자료 업로드</a></li>
               <li><a href="${pageContext.request.contextPath}/usr/dty0002.do" class="active">주별 자료 업로드</a></li>
