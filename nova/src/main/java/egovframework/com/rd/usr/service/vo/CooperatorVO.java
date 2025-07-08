@@ -39,6 +39,7 @@ public class CooperatorVO extends Sch implements Serializable {
 	private String mbtlnum;//핸드폰번호
 	private String ihidnum;//사업자번호
 	private String emplyrSttusCode;	//사용여부
+	private String password;
 
 	//RD_COOPERATOR_RIDER_CONNECT
 	private float fee;

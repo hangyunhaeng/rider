@@ -109,6 +109,14 @@ public class UserManageDAO extends EgovComAbstractDAO{
     }
 
     /**
+     * 업무사용자 암호수정 & 초기화
+     * @param passVO 업무사용자수정정보(비밀번호)
+     */
+    public void updatePasswordInit(UserManageVO passVO) {
+        update("userManageDAO.updatePassword_init", passVO);
+    }
+
+    /**
      * 업무사용자가 비밀번호를 기억하지 못할 때 비밀번호를 찾을 수 있도록 함
      * @param userManageVO 업무 사용자암호 조회조건정보
      * @return UserManageVO 업무사용자 암호정보

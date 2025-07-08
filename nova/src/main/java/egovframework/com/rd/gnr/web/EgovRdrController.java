@@ -27,7 +27,9 @@ import egovframework.com.rd.usr.web.DtyController;
 import egovframework.com.sec.rgm.service.AuthorGroup;
 import egovframework.com.sec.rgm.service.EgovAuthorGroupService;
 import egovframework.com.uss.umt.service.EgovMberManageService;
+import egovframework.com.uss.umt.service.EgovUserManageService;
 import egovframework.com.uss.umt.service.MberManageVO;
+import egovframework.com.uss.umt.service.UserManageVO;
 import egovframework.com.utl.fcc.service.EgovStringUtil;
 import egovframework.com.utl.sim.service.EgovFileScrty;
 
@@ -54,6 +56,9 @@ public class EgovRdrController {
 
     @Resource(name = "DtyService")
     private DtyService dtyService;
+
+	@Resource(name = "userManageService")
+	EgovUserManageService userManageService;
 
     /** mberManageService */
     @Resource(name = "mberManageService")
@@ -278,34 +283,46 @@ public class EgovRdrController {
         //return value
         Map<String, Object> map =  new HashMap<String, Object>();
 
-		// 1. 사용자 확인
-		if(!Util.isGnr(request.getSession()))
-			return ResponseEntity.status(401).body("Unauthorized");
+		// 1. 라이더
+		if(Util.isGnr(request.getSession())) {
 
-		//최초등록 사용자의 패스워드 변경시 pass인증 않태움 .. 일단은
-		MberManageVO vo = memService.selectMemberInfo(EgovStringUtil.isNullToString((String)request.getSession().getAttribute("mberId")));
+			//최초등록 사용자의 패스워드 변경시 pass인증 않태움 .. 일단은
+			MberManageVO vo = memService.selectMemberInfo(EgovStringUtil.isNullToString((String)request.getSession().getAttribute("mberId")));
 
-    	if(Util.isReal() && "Y".equals( vo.getMberConfirmAt())) {
-        	if(Util.isEmpty((String)request.getSession().getAttribute("niceSuccess"))) {
-    			throw new IllegalArgumentException("PASS 미인증으로 변경 불가") ;
-        	}
-        	if(!"success".equals((String)request.getSession().getAttribute("niceSuccess"))) {
-    			throw new IllegalArgumentException("PASS 미인증으로 변경 불가") ;
-        	}
-    	}
+	    	if(Util.isReal() && "Y".equals( vo.getMberConfirmAt())) {
+	        	if(Util.isEmpty((String)request.getSession().getAttribute("niceSuccess"))) {
+	    			throw new IllegalArgumentException("PASS 미인증으로 변경 불가") ;
+	        	}
+	        	if(!"success".equals((String)request.getSession().getAttribute("niceSuccess"))) {
+	    			throw new IllegalArgumentException("PASS 미인증으로 변경 불가") ;
+	        	}
+	    	}
 
-        request.getSession().removeAttribute("req_no");
-        request.getSession().removeAttribute("key");
-        request.getSession().removeAttribute("iv");
-        request.getSession().removeAttribute("hmac_key");
-        request.getSession().removeAttribute("token_version_id");
-        request.getSession().removeAttribute("niceSuccess");
+	        request.getSession().removeAttribute("req_no");
+	        request.getSession().removeAttribute("key");
+	        request.getSession().removeAttribute("iv");
+	        request.getSession().removeAttribute("hmac_key");
+	        request.getSession().removeAttribute("token_version_id");
+	        request.getSession().removeAttribute("niceSuccess");
 
-		// 2. 비밀번호 변경
-	    mberManageVO.setUniqId((String)request.getSession().getAttribute("uniqId"));
-        mberManageVO.setPassword(EgovFileScrty.encryptPassword(mberManageVO.getPassword(), EgovStringUtil.isNullToString((String)request.getSession().getAttribute("mberId"))));
-        mberManageVO.setMberConfirmAt("Y");
-        mberManageService.updatePasswordSelf(mberManageVO);
+			// 2. 비밀번호 변경
+		    mberManageVO.setUniqId((String)request.getSession().getAttribute("uniqId"));
+	        mberManageVO.setPassword(EgovFileScrty.encryptPassword(mberManageVO.getPassword(), EgovStringUtil.isNullToString((String)request.getSession().getAttribute("mberId"))));
+	        mberManageVO.setMberConfirmAt("Y");
+	        mberManageService.updatePasswordSelf(mberManageVO);
+		}
+
+		// 1. 관리자
+		if(Util.isUsr(request.getSession())) {
+//			MberManageVO vo = memService.selectUserInfo(EgovStringUtil.isNullToString((String)request.getSession().getAttribute("mberId")));
+
+			// 2. 비밀번호 변경
+			UserManageVO userManageVO = new UserManageVO();
+			userManageVO.setUniqId((String)request.getSession().getAttribute("uniqId"));
+			userManageVO.setPassword(EgovFileScrty.encryptPassword(mberManageVO.getPassword(), EgovStringUtil.isNullToString((String)request.getSession().getAttribute("mberId"))));
+			userManageService.updatePassword(userManageVO);
+
+		}
 
 
         request.getSession().removeAttribute("mberId");

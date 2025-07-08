@@ -324,6 +324,20 @@ FROM(
             SET
                    PASSWORD   =  #{password}
                  , CHG_PWD_LAST_PNTTM = sysdate()
+                 , MBER_CONFIRM_AT = 'Y'
+            WHERE  ESNTL_ID  = #{uniqId}
+
+    </update>
+
+    <update id="updatePassword_init">
+
+            UPDATE COMTNEMPLYRINFO
+            SET
+                   PASSWORD   =  #{password}
+                 , CHG_PWD_LAST_PNTTM = sysdate()
+                 , MBER_CONFIRM_AT = 'N'
+                 , LOCK_AT = null
+                 , LOCK_CNT = null
             WHERE  ESNTL_ID  = #{uniqId}
 
     </update>

@@ -142,8 +142,24 @@ function gridRegistrationSn(params){
     var regex = /[^0-9]/g;
     if(params.newValue.replace(regex, "").length != 10){
 		alert('사업자번호는 총 10자리 입니다.');
-		return params.newValue.replace(regex, "").substring(0, 10);
+		//return params.newValue.replace(regex, "").substring(0, 10);
+		return params.oldValue;
 	}
+    return params.newValue;
+}
+function gridCheckPass(params){
+	let pw_check = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[$@$!%*#?&])[A-Za-z\d$@$!%*#?&]{8,16}$/; // 패스워드 정규식 체크
+
+	if(params.newValue.length == 0 || params.newValue.length < 8){
+		alert("새 비밀번호 는 8자리 이상이어야 합니다");
+		return params.oldValue;
+	}
+
+    if(!pw_check.test(params.newValue)){
+        alert("영문, 숫자, 특수문자를 1자리씩 포함해야 합니다");
+		return params.oldValue;
+    }
+
     return params.newValue;
 }
 function getOnlyNumber(str){

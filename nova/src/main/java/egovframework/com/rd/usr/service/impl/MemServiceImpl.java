@@ -166,11 +166,19 @@ public class MemServiceImpl extends EgovAbstractServiceImpl implements MemServic
         			userOne.setIhidnum(vo.getIhidnum());
         		}
         		userManageService.updateUser(userOne);
+
+
+        		//기존 사용자의 패스워드 변경
+        		if(!Util.isEmpty(vo.getPassword())) {
+        			userOne.setPassword(vo.getPassword());
+        			userManageService.updatePasswordInit(userOne);
+        		}
+
         	} else {
                 UserManageVO voMem = new UserManageVO();
                 voMem.setEmplyrId(vo.getMberId());
                 voMem.setEmplyrNm(vo.getUserNm());
-                voMem.setPassword("hanma!@1234");
+                voMem.setPassword(Util.isEmpty(vo.getPassword())? "hanma!@1234" : vo.getPassword());
                 voMem.setMoblphonNo(vo.getMbtlnum());
                 // 협력사는 자신의 관련 사업자 사용자만 등록한다.
                 if("ROLE_USER".equals(user.getAuthorCode())) {
@@ -342,6 +350,16 @@ public class MemServiceImpl extends EgovAbstractServiceImpl implements MemServic
 	 */
 	public MberManageVO selectMemberInfo(String mberId) throws Exception {
 		return memDAO.selectMemberInfo(mberId);
+	}
+
+	/**
+	 * 관리자측 개인정보 조회
+	 * @param mberId
+	 * @return
+	 * @throws Exception
+	 */
+	public MberManageVO selectUserInfo(String mberId) throws Exception {
+		return memDAO.selectUserInfo(mberId);
 	}
 	/**
 	 * 협력사별 수수료 리스트 조회

@@ -175,6 +175,18 @@ public class EgovUserManageServiceImpl extends EgovAbstractServiceImpl implement
 	}
 
 	/**
+     * 업무사용자 암호수정 & 초기화
+     * @param passVO 업무사용자수정정보(비밀번호)
+	 * @throws Exception
+	 */
+	@Override
+	public void updatePasswordInit(UserManageVO userManageVO) throws Exception {
+		//패스워드 암호화
+		String pass = EgovFileScrty.encryptPassword(userManageVO.getPassword(), EgovStringUtil.isNullToString(userManageVO.getEmplyrId()));//KISA 보안약점 조치 (2018-10-29, 윤창원)
+		userManageVO.setPassword(pass);
+		userManageDAO.updatePasswordInit(userManageVO);
+	}
+	/**
 	 * 사용자가 비밀번호를 기억하지 못할 때 비밀번호를 찾을 수 있도록 함
 	 * @param passVO 업무사용자 암호 조회조건정보
 	 * @return userManageVO 업무사용자 암호정보

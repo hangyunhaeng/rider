@@ -245,6 +245,19 @@
             WHERE   MBER_ID = #{mberId}
 
     </select>
+
+    <select id="selectUserInfo" resultType="egovframework.com.uss.umt.service.MberManageVO">
+
+            SELECT
+                    EMPLYR_ID			AS mberId
+                    , USER_NM			AS mberNm
+                    , MBTLNUM			AS mbtlnum
+                    , ESNTL_ID			AS uniqId
+                    , MBER_CONFIRM_AT 	AS mberConfirmAt
+            FROM    COMTNEMPLYRINFO
+            WHERE   EMPLYR_ID = #{mberId}
+
+    </select>
     <select id="selectFeeListByCooperatorId" parameterType="egovframework.com.rd.usr.service.vo.CooperatorFeeVO" resultType="egovframework.com.rd.usr.service.vo.CooperatorFeeVO">
 		SELECT FEE_ID, COOPERATOR_ID, FEE_TYPE, FEE
 		, DATE_FORMAT(STR_TO_DATE(START_DT, '%Y%m%d'), '%Y-%m-%d') START_DT

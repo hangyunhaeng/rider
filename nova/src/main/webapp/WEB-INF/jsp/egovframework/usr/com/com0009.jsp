@@ -51,7 +51,7 @@
 	//onLoad
 	document.addEventListener('DOMContentLoaded', function() {
 
-
+	debugger;
 
 		$("#비밀번호변경버튼").on("click", function(e){
 			if ($("#password").val() == "") {
@@ -73,9 +73,6 @@
 		        return false;
 			}
 
-		      document.querySelector('.php-email-form .loading').classList.add('d-block');
-		      document.querySelector('.php-email-form .error-message').classList.remove('d-block');
-		      document.querySelector('.php-email-form .sent-message').classList.remove('d-block');
 
 		    // 폼 데이터를 생성
 			    const params = new URLSearchParams();
@@ -85,9 +82,9 @@
 		        $('.loading-wrap--js').show();
 			    axios.post('${pageContext.request.contextPath}/com/com0009_0001.do', params)
 			        .then(response => {
-
 			        	// 로딩 종료
 			            $('.loading-wrap--js').hide();
+
 			        	if(response.data.resultCode == "success"){
 							alert("비밀번호가 변경되었습니다.");
 			        		메인으로이동();
@@ -112,17 +109,17 @@
 
 <body onLoad="" style="" class="contact-page">
 
-
       <div class="loading-wrap loading-wrap--js" style="display: none;z-index:10000;">
         <div class="loading-spinner loading-spinner--js"></div>
         <p id="loadingMessage">로딩중</p>
       </div>
 
 
+
   <header id="header" class="header d-flex align-items-center fixed-top">
     <div class="container-fluid container-xl position-relative d-flex align-items-center">
 
-      <a href="${pageContext.request.contextPath}/indexGnr.jsp" class="logo d-flex align-items-center me-auto">
+      <a href="${pageContext.request.contextPath}/com/com0002.do" class="logo d-flex align-items-center me-auto">
         <!-- Uncomment the line below if you also wish to use an image logo -->
         <!-- <img src="assets/img/logo.png" alt=""> -->
         <h1 class="sitename">RIDER BANK</h1>
@@ -142,7 +139,7 @@
     <!-- Page Title -->
     <div class="page-title dark-background" data-aos="fade" style="">
       <div class="container position-relative">
-        <h1>Contact</h1>
+        <h1>비밀번호 변경</h1>
         <p>변경 하실 비밀번호를 등록하세요</p>
       </div>
     </div><!-- End Page Title -->
@@ -181,21 +178,20 @@
 
 <!--           </div> -->
 
-          <div class="col-lg-8">
+          <div>
             <div name="조회폼" id="조회폼" method="post" class="php-email-form" data-aos="fade-up" data-aos-delay="200">
               <div class="row gy-4">
-                <div class="col-md-6">
-                  <input id="password" name="password" class="form-control" placeholder="비밀번호" required="" autocomplete="off" type="password">
+                <div class="justify-content-center text-center py-2" style="display:flex;">
+                  <input id="password" name="password" class="form-control w-50" placeholder="비밀번호" required="" autocomplete="off" type="password">
                 </div>
-                <div class="col-md-6">
-                  <input id="passwordConFirm" name="passwordConFirm" class="form-control" placeholder="비밀번호 확인" required="" autocomplete="off" type="password">
+              </div>
+
+              <div class="row gy-4">
+                <div class="justify-content-center text-center py-2" style="display:flex;">
+                  <input id="passwordConFirm" name="passwordConFirm" onKeyDown="javascript:if(event.keyCode==13){$('#비밀번호변경버튼').trigger('click')}" class="form-control w-50" placeholder="비밀번호 확인" required="" autocomplete="off" type="password">
                 </div>
 
                 <div class="col-md-12 text-center">
-                  <div class="loading">Loading</div>
-                  <div class="error-message"></div>
-                  <div class="sent-message">Your message has been sent. Thank you!</div>
-
                   <button id="비밀번호변경버튼" type="submit">비밀번호변경</button>
                 </div>
 

@@ -210,6 +210,15 @@ public class MemDAO extends EgovComAbstractDAO {
 	public MberManageVO selectMemberInfo(String mberId) throws Exception {
 		return selectOne("memDAO.selectMemberInfo", mberId);
 	}
+	/**
+	 * 관리자측 개인정보 조회
+	 * @param mberId
+	 * @return
+	 * @throws Exception
+	 */
+	public MberManageVO selectUserInfo(String mberId) throws Exception {
+		return selectOne("memDAO.selectUserInfo", mberId);
+	}
 
 	/**
 	 * 협력사별 수수료 리스트 조회

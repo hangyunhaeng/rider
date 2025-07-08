@@ -91,6 +91,13 @@ public interface EgovUserManageService  {
 	public void updatePassword(UserManageVO userManageVO) throws Exception;
 
 	/**
+     * 업무사용자 암호수정 & 초기화
+     * @param passVO 업무사용자수정정보(비밀번호)
+	 * @throws Exception
+	 */
+	public void updatePasswordInit(UserManageVO userManageVO) throws Exception;
+
+	/**
 	 * 사용자가 비밀번호를 기억하지 못할 때 비밀번호를 찾을 수 있도록 함
 	 * @param passVO 업무사용자 암호 조회조건정보
 	 * @return userManageVO 업무사용자 암호정보

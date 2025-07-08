@@ -1,8 +1,5 @@
 package egovframework.com.cmm.web;
 
-import java.lang.reflect.Method;
-import java.util.Map;
-import java.util.TreeMap;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
@@ -16,14 +13,10 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import egovframework.com.cmm.IncludedCompInfoVO;
 import egovframework.com.cmm.LoginVO;
-import egovframework.com.cmm.annotation.IncludedInfo;
-import egovframework.com.cmm.service.EgovProperties;
 import egovframework.com.cmm.util.EgovUserDetailsHelper;
 import egovframework.com.rd.Util;
 import egovframework.com.rd.usr.service.MemService;
-import egovframework.com.uat.uia.service.EgovLoginService;
 import egovframework.com.uss.umt.service.MberManageVO;
 
 /**
@@ -90,21 +83,25 @@ public class EgovRDComIndexController {
 			return "egovframework/com/cmm/error/accessDenied";
 
 
-		// 1. 협력사가 사용자를 넣었을 경우 로그인한 유저가 패스워드 재등록 할수 있도록 유도 하는 페이지로 이동
-		if(!Util.isUsr(request.getSession())) {	//라이더 페이지
-			LoginVO loginVO = (LoginVO)EgovUserDetailsHelper.getAuthenticatedUser();
-			if(loginVO != null) {
-				MberManageVO memberVo = memService.selectMemberInfo(loginVO.getId());
-				if(!"Y".equals(memberVo.getMberConfirmAt())) {
+		// 1. 로그인한 유저가 패스워드 재등록 할수 있도록 유도 하는 페이지로 이동
 
-					// 1.1 다음페이지의 비밀번호 변경시 사용할 아이디를 저장한다.
-					request.getSession().setAttribute("mberId", memberVo.getMberId());
-					request.getSession().setAttribute("uniqId", memberVo.getUniqId());
-					request.getSession().setAttribute("mberNm", memberVo.getMberNm());
+		LoginVO loginVO = (LoginVO)EgovUserDetailsHelper.getAuthenticatedUser();
+		if(loginVO != null) {
+			MberManageVO memberVo;
+			if(!Util.isUsr(request.getSession())) {	//라이더 페이지
+				memberVo = memService.selectMemberInfo(loginVO.getId());
+			} else {								//관리자 페이지
+				memberVo = memService.selectUserInfo(loginVO.getId());
+			}
+			if(!"Y".equals(memberVo.getMberConfirmAt())) {
+
+				// 1.1 다음페이지의 비밀번호 변경시 사용할 아이디를 저장한다.
+				request.getSession().setAttribute("mberId", memberVo.getMberId());
+				request.getSession().setAttribute("uniqId", memberVo.getUniqId());
+				request.getSession().setAttribute("mberNm", memberVo.getMberNm());
 
 
-					return "egovframework/"+rootUrl+"/com/com0009";
-				}
+				return "egovframework/"+rootUrl+"/com/com0009";
 			}
 		}
 

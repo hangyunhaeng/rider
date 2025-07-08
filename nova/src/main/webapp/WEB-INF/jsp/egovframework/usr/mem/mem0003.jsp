@@ -77,6 +77,11 @@
         },
 		{ headerName: "이름", field: "userNm", minWidth: 90, editable: true, cellClass: (params) => {return agGrideditClass(params)}},
 		{ headerName: "핸드폰번호", field: "mbtlnum", minWidth: 90, editable: true, cellClass: (params) => {return agGrideditClass(params)}},
+		{ headerName: "패스워드", field: "password", minWidth: 90, editable: true, cellClass: (params) => {return agGrideditClass(params)}
+			, valueParser: (params) =>{
+				return gridCheckPass(params);
+			}
+		},
 		{ headerName: "사용여부", field: "emplyrSttusCode", minWidth: 90, editable: true, valueGetter:(params) => { return (params.node.data.emplyrSttusCode=='P')?"사용": "미사용"} ,cellEditor: 'agSelectCellEditor', cellEditorParams: params => { return {values: ['P', 'D']}; }, cellClass: (params) => {return agGrideditClass(params)} },
 		{ headerName: "생성자", field: "creatId", minWidth: 90, hide:true}
 	];
@@ -250,6 +255,7 @@
 		setTimeout(function(){
 			var updateItem = getEditRows(grid);
 			debugger;
+			var isNOPass = false;
 			for(var i = 0; i < updateItem.length ; i++ ){
 
 				if(updateItem[i].mberId==null || updateItem[i].mberId.trim() == ''){
@@ -263,6 +269,16 @@
 				if(updateItem[i].userNm==null || updateItem[i].userNm.trim() == ''){
 					alert("이름은 필수 입력항목입니다");
 					return;
+				}
+				if(updateItem[i].crud == 'c'){
+					if(updateItem[i].password==null || updateItem[i].password.trim() == ''){
+						isNOPass = true;
+					}
+				}
+			}
+			if(isNOPass){
+				if(!confirm("패스워드 미입력 시 기본 패스워드로 hanma!@1234입니다.\n계속 진행하시겠습니까?")){
+					return false;
 				}
 			}
 			if(updateItem.length <=0 ){
@@ -409,7 +425,7 @@
 							<li><a href="${pageContext.request.contextPath}/usr/mem0002.do">라이더관리</a></li>
 							<li><a href="${pageContext.request.contextPath}/usr/mem0004.do">내정보관리</a></li>
 						</ul></li>
-					<li class="dropdown"><a href="" onclick="javascript:return false;"><span>자료 업로드</span> <i class="bi bi-chevron-down toggle-dropdown"></i></a>
+					<li class="dropdown" style="display:none;"><a href="" onclick="javascript:return false;"><span>자료 업로드</span> <i class="bi bi-chevron-down toggle-dropdown"></i></a>
 						<ul>
 							<li><a href="${pageContext.request.contextPath}/usr/dty0001.do">일별 자료 업로드</a></li>
 							<li><a href="${pageContext.request.contextPath}/usr/dty0002.do">주별 자료 업로드</a></li>
@@ -473,7 +489,7 @@
 
 			<div style="float: left; width: 49%; margin-right: 1%">
 				<div style="height: 0px;">
-					<span class="pagetotal" style='margin-right: 20px;'>계정</span>
+					<span class="pagetotal" style='margin-right: 20px;'>계정:기존사용자 패스워드 수정시 등록된 핸드폰번호로 패스워드가 카톡으로 전송됩니다</span>
 					<div class="btnwrap">
 						<button id="계정추가버튼" class="btn btn-primary">추가</button>
 						<button id="계정사삭제버튼" class="btn btn-primary" style="display:none;">삭제</button>

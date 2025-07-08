@@ -92,6 +92,14 @@ public interface MemService {
 	 * @throws Exception
 	 */
 	public MberManageVO selectMemberInfo(String mberId) throws Exception ;
+
+	/**
+	 * 관리자측 개인정보 조회
+	 * @param mberId
+	 * @return
+	 * @throws Exception
+	 */
+	public MberManageVO selectUserInfo(String mberId) throws Exception ;
 	/**
 	 * 협력사별 수수료 리스트 조회
 	 * @param vo
