@@ -108,7 +108,6 @@
 
 
 	function serchList(){
-		document.querySelector('.php-email-form .loading').classList.add('d-block');
 	    const params = new URLSearchParams();
 	    var regex = /[^0-9]/g;
 	    params.append('searchFromDate', $($('#fromRunDe')[0]).val().replace(regex, ""));
@@ -123,7 +122,6 @@
 				if(response.data.resultCode == "success"){
 
 					$('#반복부').html("");
-					document.querySelector('.php-email-form .loading').classList.remove('d-block');
 
 					if(response.data.takeData == null || response.data.takeData.length == 0){
 						$('#총건수').text("0건");
@@ -331,17 +329,6 @@
                 </div>
 
 
-          <div class="col-lg-8">
-            <div method="post" class="php-email-form" >
-              <div class="row gy-4">
-                <div class="col-md-12 text-center">
-                  <div class="loading" >Loading</div>
-                  <div class="error-message"></div>
-                </div>
-              </div>
-            </form>
-          </div>
-        </div>
 
 
 

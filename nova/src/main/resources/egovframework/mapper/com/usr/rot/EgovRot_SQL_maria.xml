@@ -103,7 +103,7 @@
 
 	<select id="selectAblePrice" parameterType="egovframework.com.rd.usr.service.vo.MyInfoVO" resultType="egovframework.com.rd.usr.service.vo.MyInfoVO">
 		SELECT SUM(DAY_ABLE_PRICE) AS DAY_ABLE_PRICE, SUM(WEEK_ABLE_PRICE) AS WEEK_ABLE_PRICE
-		<![CDATA[, (SELECT if(a.USE_AT='Y' AND b.USE_AT='Y' AND DATE_FORMAT(SYSDATE(), '%Y%m%d') <= b.end_dt , 'Y', 'N') FROM RD_COOPERATOR a ]]>
+		<![CDATA[, (SELECT if(a.USE_AT='Y' AND b.USE_AT='Y' AND (DATE_FORMAT(SYSDATE(), '%Y%m%d') <= b.end_dt OR b.END_DT IS null) , 'Y', 'N') FROM RD_COOPERATOR a ]]>
 				LEFT JOIN RD_COOPERATOR_RIDER_CONNECT b ON a.COOPERATOR_ID = b.COOPERATOR_ID
 				WHERE a.COOPERATOR_ID = #{searchCooperatorId} AND b.MBER_ID = #{mberId}) USE_AT
 		FROM(

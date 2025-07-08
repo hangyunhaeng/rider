@@ -95,7 +95,6 @@
 		$('#myForm').submit();
 	}
 	function serchList(schIdx, schPagePerCnt){
-			document.querySelector('.php-email-form .loading').classList.add('d-block');
 		    const params = new URLSearchParams();
 			params.append("schIdx", schIdx);
 			params.append("schPagePerCnt", schPagePerCnt);
@@ -107,7 +106,6 @@
 
 		        	// 로딩 종료
 		            $('.loading-wrap--js').hide();
-					document.querySelector('.php-email-form .loading').classList.remove('d-block');
 					if(response.data.resultCode == "success"){
 						$('#반복부').html("");
 
@@ -263,17 +261,6 @@
                 </div>
 
 
-          <div class="col-lg-8">
-            <div method="post" class="php-email-form" >
-              <div class="row gy-4">
-                <div class="col-md-12 text-center">
-                  <div class="loading" >Loading</div>
-                  <div class="error-message"></div>
-                </div>
-              </div>
-            </form>
-          </div>
-        </div>
 
 
 
