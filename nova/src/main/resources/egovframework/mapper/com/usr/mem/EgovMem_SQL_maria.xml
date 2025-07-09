@@ -197,7 +197,7 @@
 		<if test="regDt == 'YES'">
 			, REG_DT = if(REG_DT is null OR REG_DT = '', DATE_FORMAT(SYSDATE(), '%Y%m%d') , REG_DT)
 		</if>
-			, END_DT = DATE_FORMAT(#{endDt}, '%Y%m%d')
+			, END_DT = DATE_FORMAT(if(#{endDt} = '', NULL, #{endDt}) , '%Y%m%d')
 			, LAST_UPDT_PNTTM = sysdate()
 			, LAST_UPDUSR_ID = #{lastUpdusrId}
 		WHERE CON_ID = #{conId}
@@ -260,8 +260,8 @@
     </select>
     <select id="selectFeeListByCooperatorId" parameterType="egovframework.com.rd.usr.service.vo.CooperatorFeeVO" resultType="egovframework.com.rd.usr.service.vo.CooperatorFeeVO">
 		SELECT FEE_ID, COOPERATOR_ID, FEE_TYPE, FEE
-		, DATE_FORMAT(STR_TO_DATE(START_DT, '%Y%m%d'), '%Y-%m-%d') START_DT
-		, DATE_FORMAT(STR_TO_DATE(END_DT, '%Y%m%d'), '%Y-%m-%d') END_DT, USE_AT, CREAT_DT, CREAT_ID, LAST_UPDT_PNTTM, LAST_UPDUSR_ID
+		, /*DATE_FORMAT(STR_TO_DATE(START_DT, '%Y%m%d'), '%Y%m%d')*/ START_DT
+		, /*DATE_FORMAT(STR_TO_DATE(END_DT, '%Y%m%d'), '%Y%m%d')*/ END_DT, USE_AT, CREAT_DT, CREAT_ID, LAST_UPDT_PNTTM, LAST_UPDUSR_ID
 		FROM RD_COOPERATOR_FEE
 		WHERE COOPERATOR_ID = #{cooperatorId}
 		<if test="schAuthorCode == 'ROLE_USER'">

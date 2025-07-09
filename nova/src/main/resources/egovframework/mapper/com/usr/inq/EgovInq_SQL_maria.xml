@@ -40,6 +40,15 @@
 				<if test="schUserSe == 'USR'">
 					AND UP_INQ_ID IS null
 				</if>
+
+				<if test="schAuthorCode == 'ROLE_USER'">
+					/* 협력사 조건 */
+					AND b.MBER_ID IN (
+						SELECT MBER_ID FROM RD_COOPERATOR_RIDER_CONNECT a
+						LEFT JOIN RD_COOPERATOR b ON a.COOPERATOR_ID = b.COOPERATOR_ID
+						WHERE b.REGISTRATION_SN = #{schIhidNum} AND b.use_at ='Y'
+					)
+				</if>
 				ORDER BY a.CREAT_DT DESC
 		<if test="schIdx !=0 and schPagePerCnt != 0">
 			) m
@@ -59,6 +68,15 @@
 		</if>
 		<if test="schUserSe == 'USR'">
 			AND UP_INQ_ID IS null
+		</if>
+
+		<if test="schAuthorCode == 'ROLE_USER'">
+			/* 협력사 조건 */
+			AND b.MBER_ID IN (
+				SELECT MBER_ID FROM RD_COOPERATOR_RIDER_CONNECT a
+				LEFT JOIN RD_COOPERATOR b ON a.COOPERATOR_ID = b.COOPERATOR_ID
+				WHERE b.REGISTRATION_SN = #{schIhidNum} AND b.use_at ='Y'
+			)
 		</if>
 	</select>
 

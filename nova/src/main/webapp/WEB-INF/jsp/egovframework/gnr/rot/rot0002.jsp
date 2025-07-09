@@ -125,13 +125,14 @@
 			}
 	    }
 
-		//이메일유효성
-		if(!validEmail(document.getElementById('mberEmailAdres'))){
-			return;
-		}
 
 	    // 전화번호 유효성 검사
 		if(!validMobile(document.getElementById('mbtlnum'))){
+			return;
+		}
+
+		//이메일유효성
+		if(!validEmail(document.getElementById('mberEmailAdres'))){
 			return;
 		}
 	debugger;

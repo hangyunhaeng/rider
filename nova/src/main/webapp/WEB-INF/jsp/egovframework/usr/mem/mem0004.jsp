@@ -418,55 +418,55 @@
 					<tr>
 						<th>아이디</th>
 						<td>
-							<p>${myInfoVO.mberId}</p>
+							<sm>${myInfoVO.mberId}</sm>
 						</td>
 					</tr>
 					<tr>
 						<th>권한</th>
 						<td>
-							<p>${myInfoVO.authorCodeNm}</p>
+							<sm>${myInfoVO.authorCodeNm}</sm>
 						</td>
 					</tr>
 					<tr>
 						<th>이름</th>
 						<td>
-							<p>${myInfoVO.mberNm}</p>
+							<sm>${myInfoVO.mberNm}</sm>
 						</td>
 					</tr>
 					<tr>
 						<th>비밀번호</th>
 						<td>
-							<p>*********</p>
+							<sm>*********</sm>
 						</td>
 					</tr>
 					<tr>
 						<th>휴대전화번호</th>
 						<td>
-							<p id="strMbtlnum"></p>
+							<sm id="strMbtlnum"></sm>
 						</td>
 					</tr>
 					<tr>
 						<th>이메일</th>
 						<td>
-							<p>${myInfoVO.mberEmailAdres}</p>
+							<sm>${myInfoVO.mberEmailAdres}</sm>
 						</td>
 					</tr>
 					<tr>
 						<th>은행</th>
 						<td>
-							<p>${myInfoVO.bnkNm}</p>
+							<sm>${myInfoVO.bnkNm}</sm>
 						</td>
 					</tr>
 					<tr>
 						<th>계좌번호</th>
 						<td>
-							<p>${myInfoVO.accountNum}</p>
+							<sm>${myInfoVO.accountNum}</sm>
 						</td>
 					</tr>
 					<tr>
 						<th>예금주</th>
 						<td>
-							<p>${myInfoVO.accountNm}</p>
+							<sm>${myInfoVO.accountNm}</sm>
 						</td>
 					</tr>
 				</table>

@@ -114,12 +114,14 @@
 	            return gridValidDate(params);
 	        }
 	        , cellClass: (params) => {return agGrideditClass(params)}
+	        , valueGetter:(params) => { return getStringDate(params.data.startDt)}
 		},
 		{ headerName: "적용종료일", field: "endDt", minWidth: 110, editable: true
 	        , valueParser: (params) => {
 	            return gridValidDate(params);
 	        }
 	        , cellClass: (params) => {return agGrideditClass(params)}
+	        , valueGetter:(params) => { return getStringDate(params.data.endDt)}
 	    },
 		{ headerName: "생성자", field: "creatId", minWidth: 90, hide:true}
 	];

@@ -94,6 +94,7 @@ public class InqController {
         inquiryVO.setSchUserSe(user.getUserSe());
         inquiryVO.setSchAuthorCode(user.getAuthorCode());
         inquiryVO.setSchId(user.getId());
+        inquiryVO.setSchIhidNum(user.getIhidNum());
 
         map.put("cnt", inqService.selectInquiryListCnt(inquiryVO));
         map.put("list", inqService.selectInquiryList(inquiryVO));

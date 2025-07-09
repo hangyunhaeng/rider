@@ -242,23 +242,23 @@
 							+'	<tr>'
 							+'		<th>제목</th>'
 							+'		<td colspan="3">'
-							+'			<p name="title">'+one.title+'</p>'
+							+'			<sm name="title">'+one.title+'</sm>'
 							+'		</td>'
 							+'	</tr>'
 							+'	<tr>'
 							+'		<th>등록자</th>'
 							+'		<td>'
-							+'			<p>'+one.creatNm+'</p>'
+							+'			<sm>'+one.creatNm+'</sm>'
 							+'		</td>'
 							+'		<th>등록일</th>'
 							+'		<td>'
-							+'			<p>'+one.creatDt+'</p>'
+							+'			<sm>'+one.creatDt+'</sm>'
 							+'		</td>'
 							+'	</tr>'
 							+'	<tr>'
 							+'		<th>내용</th>'
 							+'		<td colspan="3">'
-							+'			<p name="longtxt">'+replaceRevN(one.longtxt)+'</p>'
+							+'			<sm name="longtxt">'+replaceRevN(one.longtxt)+'</sm>'
 							+'		</td>'
 							+'	</tr>'
 							+'</table>'
@@ -498,23 +498,23 @@
 							<tr>
 								<th>제목</th>
 								<td colspan='3'>
-									<p id="title"></p>
+									<sm id="title"></sm>
 								</td>
 							</tr>
 							<tr>
 								<th>등록자</th>
 								<td>
-									<p id="creatNm"></p>
+									<sm id="creatNm"></sm>
 								</td>
 								<th>등록일</th>
 								<td>
-									<p id="creatDt"></p>
+									<sm id="creatDt"></sm>
 								</td>
 							</tr>
 							<tr>
 								<th>내용</th>
 								<td colspan='3'>
-									<p id="longtxt"></p>
+									<sm id="longtxt"></sm>
 								</td>
 							</tr>
 						</table>

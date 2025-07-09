@@ -88,18 +88,26 @@
 		{ headerName: "ID", field: "mberId", minWidth: 90, editable: (params) => {return (params.node.data.crud == 'c')? true: false}, cellClass: (params) => {return agGrideditClass(params)}},
 		{ headerName: "이름", field: "mberNm", minWidth: 90, editable: true, cellClass: (params) => {return agGrideditClass(params)}},
 // 		{ headerName: "수수료", field: "fee", minWidth: 90, editable: true, cellClass: (params) => {return agGrideditClass(params, 'ag-cell-right')} },
-		{ headerName: "핸드폰번호", field: "mbtlnum", minWidth: 120, editable: true, cellClass: (params) => {return agGrideditClass(params, 'ag-cell-right')}},
-		{ headerName: "등록일", field: "regDt", minWidth: 90
+		{ headerName: "핸드폰번호", field: "mbtlnum", minWidth: 120, editable: true
 	        , valueParser: (params) => {
-	            return gridValidDate(params);
+	            return gridValidPhoneNumber(params);
 	        }
-	        , cellClass: (params) => {return agGrideditClass(params)}
+			, cellClass: (params) => {return agGrideditClass(params, 'ag-cell-left')}
+			,valueGetter:(params) => { return addHyphenToPhoneNumber(params.data.mbtlnum)}
 		},
-		{ headerName: "종료일", field: "endDt", minWidth: 90, editable: true
+		{ headerName: "등록일", field: "regDt", minWidth: 100
+	        , valueParser: (params) => {
+	            return gridValidDate(params);
+	        }
+	        , cellClass: (params) => { return agGrideditClass(params)}
+	        , valueGetter:(params) => { return getStringDate(params.data.regDt)}
+		},
+		{ headerName: "종료일", field: "endDt", minWidth: 100, editable: true
 	        , valueParser: (params) => {
 	            return gridValidDate(params);
 	        }
 	        , cellClass: (params) => {return agGrideditClass(params)}
+	        , valueGetter:(params) => { return getStringDate(params.data.endDt)}
 		},
 		{ headerName: "사용여부", field: "useAt", minWidth: 90, editable: true
 		,valueGetter:(params) => { return (params.node.data.useAt=='Y')?"사용": "미사용"}

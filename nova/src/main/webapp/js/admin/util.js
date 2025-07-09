@@ -1,3 +1,4 @@
+/** 날짜 */
 function getStringDate(str){
 	if(str == null)
 		return null;
@@ -7,28 +8,58 @@ function getStringDate(str){
 	return str.substr(0, 4)+"-"+str.substr(4, 2)+"-"+str.substr(6, 2);
 
 }
+/**
+ * null을 ""반환
+ */
+function nullToString(str){
+	var descStr = str;
+	if(descStr == null){
+		return "";
+	}
+	if(descStr.trim() == "null"){
+		return "";
+	}
 
+	return descStr.trim();
+}
+/**
+ * 숫자만 반환
+ */
+function getOnlyNumber(str){
+	 var regex = /[^0-9]/g;
+	 return str.replace(regex, "");
+}
+
+/**
+ * 핸드폰 번호 하이픈 처리
+ */
 function addHyphenToPhoneNumber(phoneNumberInput) {
-    const phoneNumber = phoneNumberInput;
+    const phoneNumber = nullToString(phoneNumberInput);
+
     const length = phoneNumber.length;
     if(length >= 9) {
-        let numbers = phoneNumber.replace(/[^0-9]/g, "")
-        			.replace(/^(\d{2,3})(\d{3,4})(\d{4})$/, `$1-$2-$3`);
+        let numbers = phoneNumber.replace(/[^0-9]/g, "").replace(/^(\d{2,3})(\d{3,4})(\d{4})$/, `$1-$2-$3`);
         return numbers;
     }
     return phoneNumberInput;
 }
+
+/**
+ * 사업자번호 하이픈 처리
+ */
 function addHyphenToregistrationSn(registrationSnInput) {
-    const registrationSn = registrationSnInput;
+    const registrationSn = nullToString(registrationSnInput);
     const length = registrationSn.length;
     if(length >= 10) {
-        let numbers = registrationSn.replace(/[^0-9]/g, "")
-        			.replace(/^(\d{3})(\d{2})(\d{5})$/, `$1-$2-$3`);
+        let numbers = registrationSn.replace(/[^0-9]/g, "").replace(/^(\d{3})(\d{2})(\d{5})$/, `$1-$2-$3`);
         return numbers;
     }
     return registrationSnInput;
 }
 
+/**
+ * 비밀번호 체크
+ */
 function chkPass(jqueryObj){
 	let pw_check = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[$@$!%*#?&])[A-Za-z\d$@$!%*#?&]{8,16}$/; // 패스워드 정규식 체크
 	let enterPW = jqueryObj.val();
@@ -112,15 +143,9 @@ async function populateSelectOptions(selectId, mapping, selectedValue = '', opti
     });
 }
 
-function nullToString(str){
-	var descStr = str;
-	if(descStr.trim() == "null"){
-		return "";
-	}
-
-	return descStr.trim();
-}
-// 숫자 컴마처리 / 화폐처리
+/**
+ * 숫자 컴마처리 / 화폐처리
+ */
 function currencyFormatter(params) {
     if (params === null || params === undefined) {
         return '0'; // null 또는 undefined인 경우 빈 문자열 반환
@@ -133,6 +158,9 @@ function currencyFormatter(params) {
     }
 }
 
+/**
+ * 그리드 - 사업자번호
+ */
 function gridRegistrationSn(params){
     if (new RegExp(/[^0-9+-]/).test(params.newValue)) {
         alert('숫자만 입력하세요');
@@ -147,6 +175,9 @@ function gridRegistrationSn(params){
 	}
     return params.newValue;
 }
+/**
+ * 그리드 - 비밀번호
+ */
 function gridCheckPass(params){
 	let pw_check = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[$@$!%*#?&])[A-Za-z\d$@$!%*#?&]{8,16}$/; // 패스워드 정규식 체크
 
@@ -162,10 +193,19 @@ function gridCheckPass(params){
 
     return params.newValue;
 }
-function getOnlyNumber(str){
-	 var regex = /[^0-9]/g;
-	 return str.replace(regex, "");
+
+/**
+ * 그리드 전화번호 검사
+ */
+function gridValidPhoneNumber(params){
+
+	if(!validMobileCheck(params.newValue)){
+		alert("유효한 핸드폰 번호가 아닙니다");
+		return params.oldValue;
+	}
+    return params.newValue;
 }
+
 
 /** 유효한 날짜 체크 */
 function gridValidDate(params) {
@@ -175,6 +215,9 @@ function gridValidDate(params) {
 		inputDate = getStringDate(inputDate)
 	}
 
+	if(nullToString(inputDate) == ""){
+		return "";
+	}
 	// 날짜 형식이 YYYY-MM-DD 인지 확인 (정규 표현식 사용)
     const regex = /^\d{4}-\d{2}-\d{2}$/;
     if (!regex.test(inputDate)) {
@@ -188,7 +231,7 @@ function gridValidDate(params) {
 
     // Date 객체가 입력된 날짜와 일치하는지 확인
     if(date.getFullYear() === year && date.getMonth() + 1 === month && date.getDate() === day)
-    	return inputDate;
+    	return getOnlyNumber(inputDate);
 	else {
 		alert('유효한 날짜가 아닙니다');
     	return '';
@@ -327,7 +370,14 @@ let paging = {
     		return params.colDef.editable == true ? "edited-bg "+pAddClass:" "+pAddClass;
     	}
 	}
+
+	/**
+	 * html용 이메일 검사
+	 */
 	function validEmail(obj){
+		if(nullToString(obj.value) == ""){
+	    	return true;
+	    }
 	    if(validEmailCheck(obj)==false){
 	        alert('올바른 이메일 주소를 입력해주세요.')
 	        obj.focus();
@@ -335,23 +385,42 @@ let paging = {
 	    }
 	    return true;
 	}
+	/**
+	 * 이메일 유효성 검사
+	 */
 	function validEmailCheck(obj){
 	    var pattern = /^[0-9a-zA-Z]([-_.]?[0-9a-zA-Z])*@[0-9a-zA-Z]([-_.]?[0-9a-zA-Z])*.[a-zA-Z]{2,3}$/i;
 	    return (obj.value.match(pattern)!=null)
 	}
+
+	/**
+	 * html용 전화번호 검사
+	 */
 	function validMobile(obj){
-	    // 전화번호 유효성 검사
-	    let mobile_pattern0 = /^[0-9]{2,3}-[0-9]{3,4}-[0-9]{4}/;
-	    let mobile_pattern1 = /^[0-9]{2,3}[0-9]{3,4}[0-9]{4}/;
-	    var p = /^010/;
-	    if(!mobile_pattern0.test(obj.value) &&!mobile_pattern1.test(obj.value)) {
+		if(nullToString(obj.value) == ""){
+	    	return true;
+	    }
+
+		if(!validMobileCheck(obj.value)){
 	    	alert('핸드폰 번호를 확인해주세요.');  // swal == alert대용
 	    	obj.focus();
+	    	return false;
+		}
+	    return true;
+	}
+
+	/**
+	 * 전화번호 유효성 검사
+	 */
+	function validMobileCheck(val){
+	    // 전화번호 유효성 검사
+	    let mobile_pattern0 = /^[0-9]{3}-[0-9]{3,4}-[0-9]{4}/;
+	    let mobile_pattern1 = /^[0-9]{3}[0-9]{3,4}[0-9]{4}/;
+	    var p = /^010/;
+	    if(!mobile_pattern0.test(val) &&!mobile_pattern1.test(val)) {
 	        return false;
 	    }
-		if(!p.test(obj.value)){
-	    	alert('핸드폰 번호를 확인해주세요.');  // swal == alert대용
-	    	obj.focus();
+		if(!p.test(val)){
 	        return false;
         }
 	    return true;
