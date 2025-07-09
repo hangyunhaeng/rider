@@ -70,7 +70,7 @@
 			AND UP_INQ_ID IS null
 		</if>
 
-		<if test="schAuthorCode == 'ROLE_USER'">
+		<if test="schAuthorCode == 'ROLE_USER' and schUserSe == 'USR'">
 			/* 협력사 조건 */
 			AND b.MBER_ID IN (
 				SELECT MBER_ID FROM RD_COOPERATOR_RIDER_CONNECT a
