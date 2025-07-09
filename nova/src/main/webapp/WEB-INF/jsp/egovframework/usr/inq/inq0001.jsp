@@ -165,9 +165,10 @@
 	}
 
 	function doModify(obj){
+		debugger;
 		$('#reInqId').val( $(obj).closest('.drawTable').find('[name=inqId]').val() );
 		$('#reTitle').val( $(obj).closest('.drawTable').find('[name=title]').text() );
-		$('#reLongtxt').val( replaceN($(obj).closest('.drawTable').find('[name=longtxt]').html()) );
+		$('#reLongtxt').val( replaceRevTag(replaceN($(obj).closest('.drawTable').find('[name=longtxt]').html()) ));
 	}
 	function doDelete(obj){
 		if(confirm("삭제하시겠습니까?")){
@@ -205,7 +206,7 @@
         	if(response.data.resultCode == "success"){
         		$('#reTitle').val('');
         		$('#reLongtxt').val('');
-        		$('#myGrid1').find('.drawTable').remove();
+        		$('#myGrid1').find('.drawTable:visible').remove();
         		$('#답변버튼').hide();
         		if (response.data.list.length > 0){
 
@@ -220,50 +221,17 @@
 							$('#creatDt').text('').append(one.creatDt);
 							$('#답변버튼').show();
 						} else {
-
-							$('#myGrid1').append(
-							 '<div class="drawTable">'
-							+'<div style="margin-bottom:10px;">'
-							+'	<span class="pagetotal" style="margin-right: 20px;"><img src="/images/egovframework/com/cmm/bul/bul_i.jpg" style="width:30px;" />답변</span>'
-
-							+'		<div class="btnwrap">'
-							+'			<button class="btn btn-primary" style="'+ (one.modifyAuth=='Y'?'':'display:none;') +'" onclick="doModify(this)">수정</button>'
-							+'			<button class="btn btn-primary" style="'+ (one.modifyAuth=='Y'?'':'display:none;') +'" onclick="doDelete(this)">삭제</button>'
-							+'		</div>'
-							+'</div>'
-							+'<input type="hidden" value="'+one.inqId+'" name="inqId" />'
-							+'<table>'
-							+'	<colgroup>'
-							+'		<col style="width: 13%">'
-							+'		<col style="width: 37%">'
-							+'		<col style="width: 13%">'
-							+'		<col style="width: *">'
-							+'	</colgroup>'
-							+'	<tr>'
-							+'		<th>제목</th>'
-							+'		<td colspan="3">'
-							+'			<sm name="title">'+one.title+'</sm>'
-							+'		</td>'
-							+'	</tr>'
-							+'	<tr>'
-							+'		<th>등록자</th>'
-							+'		<td>'
-							+'			<sm>'+one.creatNm+'</sm>'
-							+'		</td>'
-							+'		<th>등록일</th>'
-							+'		<td>'
-							+'			<sm>'+one.creatDt+'</sm>'
-							+'		</td>'
-							+'	</tr>'
-							+'	<tr>'
-							+'		<th>내용</th>'
-							+'		<td colspan="3">'
-							+'			<sm name="longtxt">'+replaceRevN(one.longtxt)+'</sm>'
-							+'		</td>'
-							+'	</tr>'
-							+'</table>'
-							+'</div>'
-							);
+							var 내역 = $('.drawTable:hidden').clone();
+							$('#myGrid1').append(내역);
+							if(one.modifyAuth=='Y'){
+								내역.find(".btn:hidden").show();
+							}
+							내역.find("[name=inqId]").val(one.inqId);
+							내역.find("[name=title]").text(one.title);
+							내역.find("[name=creatNm]").text(one.creatNm);
+							내역.find("[name=creatDt]").text(one.creatDt);
+							내역.find("[name=longtxt]").html(replaceRevN(one.longtxt));
+							내역.show();
 						}
 
         			}
@@ -519,7 +487,49 @@
 							</tr>
 						</table>
 
+						<!-- 반복부 시작 -->
+						<div class="drawTable" style="display:none;">
+							<div style="margin-bottom:10px;">
+								<span class="pagetotal" style="margin-right: 20px;"><img src="/images/egovframework/com/cmm/bul/bul_i.jpg" style="width:30px;" />답변</span>
 
+									<div class="btnwrap">
+										<button class="btn btn-primary" style="display:none;" onclick="doModify(this)">수정</button>
+										<button class="btn btn-primary" style="display:none;" onclick="doDelete(this)">삭제</button>
+									</div>
+							</div>
+							<input type="hidden" name="inqId" />
+							<table>
+								<colgroup>
+									<col style="width: 13%">
+									<col style="width: 37%">
+									<col style="width: 13%">
+									<col style="width: *">
+								</colgroup>
+								<tr>
+									<th>제목</th>
+									<td colspan="3">
+										<sm name="title"></sm>
+									</td>
+								</tr>
+								<tr>
+									<th>등록자</th>
+									<td>
+										<sm name="creatNm"></sm>
+									</td>
+									<th>등록일</th>
+									<td>
+										<sm name="creatDt"></sm>
+									</td>
+								</tr>
+								<tr>
+									<th>내용</th>
+									<td colspan="3">
+										<sm name="longtxt"></sm>
+									</td>
+								</tr>
+							</table>
+						</div>
+						<!-- 반복부 종료 -->
 
 					</div>
 				</div>
