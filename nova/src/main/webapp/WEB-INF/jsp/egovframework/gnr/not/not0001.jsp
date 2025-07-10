@@ -117,8 +117,8 @@
 						내역.find('span[class~=tag-badge-tag-phoenix]').addClass("tag-badge-tag-phoenix-"+(dataInfo.authorCode == "ROLE_ADMIN" ? "warning" : "success"));
 						내역.find('span[class~=tag-badge-tag-phoenix]').text(dataInfo.authorCodeNm);
 						내역.find('label[class~=cursor-pointer]').text(dataInfo.title);
-						내역.find('p:eq(1)').text(dataInfo.creatDt);
-						내역.find('p:eq(2)').text(dataInfo.creatNm);
+						내역.find('p:eq(0)').text(dataInfo.creatDt);
+						내역.find('p:eq(1)').text(dataInfo.creatNm);
 						내역.find('div[class~=collapse]').addClass("collapseExample"+idx);
 						내역.find('div[class~=collapse]').append(replaceRevTag(dataInfo.longtxt));
 						내역.show();

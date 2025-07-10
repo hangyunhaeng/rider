@@ -107,7 +107,8 @@
 		        	// 로딩 종료
 		            $('.loading-wrap--js').hide();
 					if(response.data.resultCode == "success"){
-						$('#반복부').html("");
+						//보이는 내역 모두 삭제
+						$('#반복부 > div :visible').remove();
 
 						if(response.data.list == null || response.data.list.length == 0){
 
@@ -127,56 +128,31 @@
 
 						response.data.list.forEach(function(dataInfo, idx){
 							if(dataInfo.upInqId == null){
-								$('#반복부').append(
+								//질문원본
+								var 내역 = $('#반복부').find('[repeatObj=true]:hidden:eq(0)').clone();
+								$('#반복부').append(내역);
+								내역.addClass(dataInfo.inqId);
+								내역.find('div[data-bs-toggle=collapse]').attr("data-bs-target", ".collapseExample"+idx);
+								내역.find('[name=inqId]').val(dataInfo.inqId);
+								내역.find('p[class~=cursor-pointer]').text(dataInfo.title);
+								내역.find('p[class~=text-body-tertiary]').text(dataInfo.creatDt);
+								내역.find('div[class~=collapse]').addClass("collapseExample"+idx);
+								내역.find('div[class~=collapse]').append(replaceRevN(dataInfo.longtxt));
+								내역.show();
 
-						          '        <div class="'+dataInfo.inqId+' drawTable d-flex hover-actions-trigger py-3 border-translucent border-top">'
-						          +'          <div class="row justify-content-between align-items-md-center btn-reveal-trigger border-translucent gx-0 flex-1 cursor-pointer w-100">'
-						          +'            <div class="col-12">'
-						          +'              <div class="row justify-content-between mb-1 mb-md-0 d-flex align-items-center lh-1">'
-						          +'				<div style="width: calc(100% - 55px);"class="col-auto" data-bs-toggle="collapse" data-bs-target=".collapseExample'+idx+'" aria-expanded="false">'
-						          +'					<input type="hidden" name="inqId" value="'+dataInfo.inqId+'" />'
-						          +'              		<p class="form-check-label mb-1 mb-md-0 mb-xl-1 mb-xxl-0 fs-8 me-2 text-body cursor-pointer">'+dataInfo.title+'</p>'
-						          +'				</div>'
-						          +'     			<div class="col-auto d-flex">'
-						          +'     				<a class="fw-bold fs-9" href="#" onclick="modifyInq(this);">수정</a>'
-						          +'     			</div>'
-						          +'              </div>'
-
-
-						          +'            <div class="col-12">'
-						          +'              <div class="d-flex lh-1 align-items-center">'
-						          +'                <p class="text-body-tertiary fs-10 mb-md-0 me-6  mb-0">'+dataInfo.creatDt+'</p>'
-						          +'                <span class="fs-9 mb-0" style="display:none;">답변 <em name="replayCnt" >0</em>건</span>'
-						          +'              </div>'
-						          +'            </div>'
-
-						          +'                <div class="collapse  py-2 collapseExample'+idx+'">'
-							      + 					replaceRevN(dataInfo.longtxt)
-						          +'                </div>'
-						          +'          </div>'
-						          +'      </div>'
-						          );
 							} else {
-
+								//답변
 								$('.'+dataInfo.upInqId+'').find('[name=replayCnt]').text(Number($('.'+dataInfo.upInqId+'').find('[name=replayCnt]').text())+1);
 								$('.'+dataInfo.upInqId+'').find('[name=replayCnt]').parent().show();
 
-								$('.'+dataInfo.upInqId+'').find('.collapse').append(
-								'<div class="card col-12 col-md-auto col-xl-12 col-xxl-auto mt-3">'
-								+'	<div class="row justify-content-between mb-1 mb-md-0 d-flex align-items-center lh-1">'
-								+'		<div class="col-auto gy-3">'
-								+'			<p class="form-check-label mb-1 mb-md-0 mb-xl-1 mb-xxl-0 fs-8 me-2 text-body cursor-pointer ms-2">'+dataInfo.title+'</p>'
-								+'		</div>'
-								+'	</div>'
-								+'	<div class="col-12 col-md-auto col-xl-12 col-xxl-auto">'
-								+'		<div class="d-flex lh-1 align-items-center">'
-								+'			<p class="text-body-tertiary fs-10 mb-md-0 me-2 me-md-3 me-xl-2 me-xxl-3 mb-0 ms-2">'+dataInfo.creatDt+'</p>'
-								+'			<span class="fs-9 mb-0" style="">'+dataInfo.creatNm+'</span>'
-								+'		</div>'
-								+'	</div>'
-								+'	<div class="ms-2 text-body-tertiary fw-semibold py-2" style="">'+replaceRevN(dataInfo.longtxt)+'</div>'
-								+'</div>'
-								);
+
+								var 내역 = $('#반복부').find('[repeatObj=true]:hidden:eq(1)').clone();
+								$('.'+dataInfo.upInqId+'').find('.collapse').append(내역);
+								내역.find('p[class~=cursor-pointer]').text(dataInfo.title);
+								내역.find('p[class~=text-body-tertiary]').text(dataInfo.creatDt);
+								내역.find('span:eq(0)').text(dataInfo.creatNm);
+								내역.find('div[class~=text-body-tertiary]').html(replaceRevN(dataInfo.longtxt));
+								내역.show();
 
 							}
 
@@ -270,6 +246,65 @@
                 <div id="반복부" class="card-body py-0 scrollbar to-do-list-body">
 
 
+					<!-- 조회내역 없음 -->
+					<div repeatObj="no" class="d-flex hover-actions-trigger py-1 border-translucent border-top" style="display:none !important;">
+						<div class="row justify-content-between align-items-md-center btn-reveal-trigger border-translucent gx-0 flex-1 cursor-pointer" data-bs-toggle="modal" data-bs-target="#exampleModal">
+							<div class="col-12 col-md-auto col-xl-12 col-xxl-auto">
+								<div class="mb-1 mb-md-0 d-flex align-items-center lh-1">
+									<label class="form-check-label mb-md-0 mb-xl-1 mb-xxl-0 fs-8 me-2 text-body cursor-pointer my-4">조회된 내역이 없습니다.</label>
+								</div>
+							</div>
+						</div>
+					</div>
+					<!-- 조회내역 없음 -->
+
+					<!-- 1:1문의 질문 start -->
+					<div repeatObj="true" class="drawTable d-flex hover-actions-trigger py-3 border-translucent border-top" style="display:none !important;">
+						<div class="row justify-content-between align-items-md-center btn-reveal-trigger border-translucent gx-0 flex-1 cursor-pointer w-100">
+							<div class="col-12">
+								<div class="row justify-content-between mb-1 mb-md-0 d-flex align-items-center lh-1">
+									<div style="width: calc(100% - 55px);"class="col-auto" data-bs-toggle="collapse" data-bs-target="" aria-expanded="false">
+									<input type="hidden" name="inqId" value="" />
+									<p class="form-check-label mb-1 mb-md-0 mb-xl-1 mb-xxl-0 fs-8 me-2 text-body cursor-pointer"></p>
+									</div>
+									<div class="col-auto d-flex">
+									<a class="fw-bold fs-9" href="#" onclick="modifyInq(this);">수정</a>
+									</div>
+								</div>
+
+
+								<div class="col-12">
+									<div class="d-flex lh-1 align-items-center">
+									<p class="text-body-tertiary fs-10 mb-md-0 me-6  mb-0"></p>
+									<span class="fs-9 mb-0" style="display:none;">답변 <em name="replayCnt" >0</em>건</span>
+									</div>
+								</div>
+
+								<div class="collapse  py-2">
+								</div>
+							</div>
+						</div>
+					</div>
+					<!-- 1:1문의 질문 end -->
+
+					<!-- 1:1문의 답변 start -->
+					<div repeatObj="true" class="card col-12 col-md-auto col-xl-12 col-xxl-auto mt-3" style="display:none !important;">
+						<div class="row justify-content-between mb-1 mb-md-0 d-flex align-items-center lh-1">
+							<div class="col-auto gy-3">
+								<p class="form-check-label mb-1 mb-md-0 mb-xl-1 mb-xxl-0 fs-8 me-2 text-body cursor-pointer ms-2"></p>
+							</div>
+						</div>
+						<div class="col-12 col-md-auto col-xl-12 col-xxl-auto">
+							<div class="d-flex lh-1 align-items-center">
+								<p class="text-body-tertiary fs-10 mb-md-0 me-2 me-md-3 me-xl-2 me-xxl-3 mb-0 ms-2"></p>
+								<span class="fs-9 mb-0" style=""></span>
+							</div>
+						</div>
+						<div class="ms-2 text-body-tertiary fw-semibold py-2" style="">
+						</div>
+					</div>
+					<!-- 1:1문의 답변 end -->
+
 <!-- 								<div class="INQ_000000000000030 drawTable d-flex hover-actions-trigger py-3 border-translucent border-top"> -->
 <!-- 									<div class="row justify-content-between align-items-md-center btn-reveal-trigger border-translucent gx-0 flex-1 cursor-pointer"> -->
 <!-- 										<div class="col-12 col-md-auto col-xl-12 col-xxl-auto"> -->
@@ -325,12 +360,6 @@
 								</div>
 
 							</div>
-            </div>
-          </div>
-        </div>
-
-
-	</div>
 </main>
 
 

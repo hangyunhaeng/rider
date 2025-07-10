@@ -873,7 +873,7 @@ section,
   min-height: 50vh;
   position: relative;
   padding: 120px 0 60px 0;
-  min-width: 1000px;
+  /*min-width: 1000px;*/
 }
 
 .hero .hero-bg {
