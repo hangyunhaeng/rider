@@ -54,8 +54,26 @@
 <script src="<c:url value='/js/xlsx.full.min.js' />"></script>
 <script src="<c:url value='/js/xlsx-populate.min.js' />"></script>
 <script src="<c:url value='/js/axios.min.js' />"></script>
-	<link href="<c:url value='/vendor/admin/bootstrap/3.4.1/bootstrap.min.css' />" rel="stylesheet">
+<%-- 	<link href="<c:url value='/vendor/admin/bootstrap/3.4.1/bootstrap.min.css' />" rel="stylesheet"> --%>
 <!-- 	<script src="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script> -->
+
+
+	<!-- phoenix -->
+	<script src="<c:url value='/vendor/admin/bootstrap/js/bootstrap.min.js' />"></script>
+    <script src="<c:url value='/js/phoenix/simplebar.min.js' />"></script>
+    <script src="<c:url value='/js/phoenix/config.js' />"></script>
+    <link href="<c:url value='/css/phoenix/choices.min.css' />" rel="stylesheet">
+    <link href="<c:url value='/css/phoenix/dhtmlxgantt.css' />" rel="stylesheet">
+    <link href="<c:url value='/css/phoenix/flatpickr.min.css' />" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com/">
+    <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin="">
+    <link href="<c:url value='/css/phoenix/css2.css' />" rel="stylesheet">
+    <link href="<c:url value='/css/phoenix/simplebar.min.css' />" rel="stylesheet">
+    <link rel="stylesheet" href="<c:url value='/css/phoenix/line.css' />">
+    <link href="<c:url value='/css/phoenix/theme-rtl.min.css' />" type="text/css" rel="stylesheet" id="style-rtl" disabled="true">
+    <link href="<c:url value='/css/phoenix/theme.min.css' />" type="text/css" rel="stylesheet" id="style-default">
+    <link href="<c:url value='/css/phoenix/user-rtl.min.css' />" type="text/css" rel="stylesheet" id="user-style-rtl" disabled="true">
+    <link href="<c:url value='/css/phoenix/user.min.css' />" type="text/css" rel="stylesheet" id="user-style-default">
 
 </head>
 <script type="text/javaScript">
@@ -64,6 +82,7 @@
 	let gridOptions="";
 	var grid="";
 	var grid1="";
+	var grid2="";
 	let data;
 	let data1;
 	var columnDefs= [
@@ -144,10 +163,8 @@
 			, valueGetter:(params) => { return currencyFormatter(params.data.feeCall);}
             , valueParser: (params) => { return gridWan(params);}
 		},
-		{ headerName: "기타(대여,리스)(원)", field: "etcCall", minWidth: 90
-			, cellClass: (params) => {return agGrideditClass(params, "ag-cell-right");}
-			, valueGetter:(params) => { return currencyFormatter(params.data.etcCall);}
-            , valueParser: (params) => { return gridWan(params);}
+		{ headerName: "기타(대여,리스)", field: "etcCall", minWidth: 90
+			, cellRenderer:(params) => { return '<div class="row justify-content-between align-items-md-center btn-reveal-trigger border-translucent gx-0 flex-1 cursor-pointer" data-bs-toggle="modal" data-bs-target="#exampleModal" onclick="clickEtc(\''+params.data.cooperatorId+'\', \''+params.data.mberId+'\')">관리</div>';}
 		},
 
 		{ headerName: "사용여부", field: "useAt", minWidth: 90, editable: true
@@ -156,6 +173,36 @@
 		,cellEditorParams: params => { return {values: ['Y', 'N']}; }
 		, cellClass: (params) => {return agGrideditClass(params)}},
 		{ headerName: "생성자", field: "creatId", minWidth: 90, hide:true}
+	];
+
+	var columnDefs2= [
+		{ headerName: "NO", field: "no", minWidth: 70, valueGetter:(params) => { return params.node.rowIndex + 1} },
+		{ headerName: "crud", field: "crud", minWidth: 90, hide:true},
+		{ headerName: "협력사아이디", field: "cooperatorId", minWidth: 120},
+		{ headerName: "ID", field: "mberId", minWidth: 90},
+
+		//대여:D, 리스,:R 기타:E
+		{ headerName: "구분", field: "gubun", minWidth: 90, editable: true
+			, valueGetter:(params) => { return (params.node.data.gubun=='D')?"대여": (params.node.data.gubun=='R')?"리스":"기타"}
+			, cellEditor: 'agSelectCellEditor'
+			, cellEditorParams: params => { return {values: ['D', 'R', 'E']}; }
+			, cellClass: (params) => {return agGrideditClass(params)}
+		},
+		{ headerName: "상환기간(일)", field: "paybackDay", minWidth: 90, editable: true
+			, cellClass: (params) => {return agGrideditClass(params, "ag-cell-right");}
+			, valueGetter:(params) => { return currencyFormatter(params.data.paybackDay);}
+//             , valueParser: (params) => { return gridWan(params);}
+		},
+		{ headerName: "일별상환금액", field: "paybackCost", minWidth: 90, editable: true
+			, cellClass: (params) => {return agGrideditClass(params, "ag-cell-right");}
+			, valueGetter:(params) => { return currencyFormatter(params.data.paybackCost);}
+//             , valueParser: (params) => { return gridWan(params);}
+		},
+		{ headerName: "총상환금액", field: "paybackCostAll", minWidth: 90
+			, cellClass: (params) => {return agGrideditClass(params, "ag-cell-right");}
+			, valueGetter:(params) => { return currencyFormatter(params.data.paybackCostAll);}
+//             , valueParser: (params) => { return gridWan(params);}
+		},
 	];
 
 	//onLoad
@@ -174,11 +221,19 @@
  			saveCooperatorUsr();
 		});
 
+		$("#기타추가버튼").on("click", function(e){
+			addEtc(grid2);
+		});
+		$("#기타저장버튼").on("click", function(e){
+ 			saveEtc();
+		});
+
 
 
 		//그리드 설정
 		setGrid();
 		setGrid1();
+		setGrid2();
 
 		//협력사 리스트 조회
 		loadCooperatorList();
@@ -238,11 +293,55 @@
             $('.loading-wrap--js').hide();
         });
 	}
+	function clickEtc(strCooperatorId, strMberId){
+		$('#modalCooperatorId').val(strCooperatorId);
+		$('#modalMberId').val(strMberId);
+
+		const params = new URLSearchParams();
+		params.append("cooperatorId", strCooperatorId);
+		params.append("mberId", strMberId);
+		// 로딩 시작
+        $('.loading-wrap--js').show();
+        axios.post('${pageContext.request.contextPath}/usr/mem0002_0004.do',params).then(function(response) {
+        	// 로딩 종료
+            $('.loading-wrap--js').hide();
+        	if(response.data.resultCode == "success"){
+	        	if (response.data.list.length == 0) {
+	        		grid2.setGridOption('rowData',[]);  	// 데이터가 없는 경우 빈 배열 설정
+	        		grid2.showNoRowsOverlay();  			// 데이터가 없는 경우
+	            } else {
+
+	            	data = response.data.list;	//정상데이터
+					grid2.setGridOption("rowData", data);
+	            }
+        	}
+        })
+        .catch(function(error) {
+            console.error('There was an error fetching the data:', error);
+        }).finally(function() {
+        	// 로딩 종료
+            $('.loading-wrap--js').hide();
+        });
+
+	}
 
 	function createNewRowData1() {
 	    var newData = {
     		cooperatorId: grid.getRowNode(grid.getFocusedCell().rowIndex).data.cooperatorId,
     		useAt: 'Y',
+    		crud: "c"
+	    };
+	    return newData;
+	}
+
+
+	function createNewRowData2() {
+	    var newData = {
+    		cooperatorId: $('#modalCooperatorId').val(),
+    		mberId: $('#modalMberId').val(),
+    		gubun: 'D',
+    		useAt: 'Y',
+    		no: grid2.getDisplayedRowCount()+1,
     		crud: "c"
 	    };
 	    return newData;
@@ -265,6 +364,12 @@
 	      gridObj.setGridOption("rowData", newStore);
 	}
 
+	function addEtc(gridObj){
+		  const newStore = getAllRows(gridObj);
+		  const newItem = createNewRowData2();
+	      newStore.push(newItem);
+	      gridObj.setGridOption("rowData", newStore);
+	}
 
 	// 변경된 협력사 id를 저장한다.
 	function saveCooperatorUsr(){
@@ -316,6 +421,49 @@
 	            $('.loading-wrap--js').hide();
 	        });
 		}, 100);
+	}
+
+	function saveEtc(){
+		grid1.stopEditing();
+
+		setTimeout(function(){
+			var updateItem = getEditRows(grid2);
+
+			if(updateItem.length <=0 ){
+				alert("저장할 항목이 없습니다");
+				return;
+			}
+			// 로딩 시작
+	        $('.loading-wrap--js').show();
+	        axios.post('${pageContext.request.contextPath}/usr/mem0002_0005.do',getEditRows(grid2)).then(function(response) {        	// 로딩 종료
+	            $('.loading-wrap--js').hide();
+	        	if(response.data.resultCode == "success"){
+
+		        	if (response.data.list.length == 0) {
+		        		grid2.setGridOption('rowData',[]);  	// 데이터가 없는 경우 빈 배열 설정
+		        		grid2.showNoRowsOverlay();  			// 데이터가 없는 경우
+		            } else {
+
+						var lst = response.data.list;	//정상데이터
+						grid2.setGridOption("rowData", lst);
+		            }
+
+	        	} else {
+	        		if(response.data.resultMsg != null && response.data.resultMsg != ''){
+	        			alert(response.data.resultMsg);
+	        		} else {
+	        			alert("저장에 실패하였습니다");
+	        		}
+	        	}
+	        })
+	        .catch(function(error) {
+	            console.error('There was an error fetching the data:', error);
+	        }).finally(function() {
+	        	// 로딩 종료
+	            $('.loading-wrap--js').hide();
+	        });
+		}, 100);
+
 	}
 	function setGrid(){
 		// 사용자 정의 컴포넌트를 글로벌 네임스페이스에 추가
@@ -391,6 +539,18 @@
 			}
 		}
 	}
+	function changeCost(params){
+		debugger;
+		const colId = params.column.getId();
+		if(colId == 'paybackDay' || colId == 'paybackCost'){
+// 			const gridIdx = params.node.rowIndex;
+// 			grid2.getRowNode(gridIdx).setDataValue('paybackCostAll', Number(params.node.data.paybackDay, 10)*Number(params.node.data.paybackCost, 10));
+			var nowSelNode = findRowNode(grid2, 'no', params.node.data.no);
+			if(params.node.data.paybackDay != undefined && params.node.data.paybackCost != undefined){
+				nowSelNode.setDataValue('paybackCostAll', Number(params.node.data.paybackDay, 10)*Number(params.node.data.paybackCost, 10));
+			}
+		}
+	}
 	function setGrid1(){
 		// 사용자 정의 컴포넌트를 글로벌 네임스페이스에 추가
 		window.CustomHeader = CustomHeader;
@@ -429,6 +589,47 @@
         grid1 = agGrid.createGrid(gridDiv, gridOptions);
 
         grid1.hideOverlay();
+
+	}
+
+	function setGrid2(){
+		// 사용자 정의 컴포넌트를 글로벌 네임스페이스에 추가
+		window.CustomHeader = CustomHeader;
+    	gridOptions = {
+                columnDefs: columnDefs2,
+                rowData: [], // 초기 행 데이터를 빈 배열로 설정
+                defaultColDef: { headerComponent: 'CustomHeader'}, //
+                components: { CustomHeader: CustomHeader },
+                enableCellTextSelection: true, // 셀 텍스트 선택을 활성화합니다.
+                rowHeight: 35,
+                headerHeight: 35,
+                alwaysShowHorizontalScroll : true,
+                alwaysShowVerticalScroll: true,
+                onGridReady: function(params) {
+                    //loadData(params.api); // 그리드가 준비된 후 데이터 로드
+                    params.api.sizeColumnsToFit();
+                },
+                rowClassRules: {'ag-cell-err ': (params) => { return params.data.err === true; }},
+				overlayLoadingTemplate: '<span class="ag-overlay-loading-center">로딩 중</span>',
+				overlayNoRowsTemplate: '<span class="ag-overlay-loading-center">데이터가 없습니다</span>',
+				suppressScrollOnNewData: true,
+			    onCellValueChanged: function (event) {
+			        changeCrud(event, grid2, "etcId");
+			        changeCost(event);
+			    },
+			    getRowStyle: params => {
+			        if (params.node.data.crud == 'c' || params.node.data.crud == 'u') {
+			            return { background: '#e99494' };
+			        }
+			        if (params.node.data.crud == 'd') {
+			            return { background: '#65676b' };
+			        }
+			    }
+            };
+        const gridDiv = document.querySelector('#myGrid2');
+        grid2 = agGrid.createGrid(gridDiv, gridOptions);
+
+        grid2.hideOverlay();
 
 	}
 
@@ -511,6 +712,51 @@
 		<div class="search_box ty2">
 
 
+			<div class="card-body py-0 scrollbar to-do-list-body" id="notList">
+				<!-- 팝업 -->
+                  <div class="modal fade" id="exampleModal" tabindex="-1" style="display: none;" aria-hidden="true">
+                    <div class="modal-dialog modal-xl">
+                      <div class="modal-content bg-body overflow-hidden">
+                        <div class="modal-header justify-content-between px-6 py-5 pe-sm-5 px-md-6 dark__bg-gray-1100">
+                          <h3 class="text-body-highlight fw-bolder mb-0" id="title">기타(대여.리스) 관리</h3>
+                          <button style="min-width:50px!important; min-height:50px!important;" class="btn btn-phoenix-secondary btn-icon btn-icon-xl flex-shrink-0" type="button" data-bs-dismiss="modal" aria-label="Close"><svg class="svg-inline--fa fa-xmark" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="xmark" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512" data-fa-i2svg=""><path fill="currentColor" d="M342.6 150.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L192 210.7 86.6 105.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L146.7 256 41.4 361.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L192 301.3 297.4 406.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L237.3 256 342.6 150.6z"></path></svg></button>
+                        </div>
+                        <div class="modal-body bg-body-highlight px-6 py-0">
+                          <div class="row gx-14">
+                            <div class="col-12 border-end-lg">
+                              <div class="py-6">
+                                <div class="mb-7">
+<!--                                   <div class="d-flex align-items-center mb-3"> -->
+<!--                                     <h4 class="text-body me-3">Description</h4> -->
+<!--                                   </div> -->
+<!--                                   <p class="text-body-highlight mb-0" id="longtxt">The female circus horse-rider is a recurring subject in Chagall’s work. In 1926 the art dealer Ambroise Vollard invited Chagall to make a project based on the circus. They visited Paris’s historic Cirque d’Hiver Bouglione together; Vollard lent Chagall his private box seats. Chagall completed 19 gouaches Chagall’s work. In 1926 the art dealer Ambroise Vollard invited Chagall to make a project based on the circus.</p> -->
+									<input type="hidden" id="modalCooperatorId" />
+									<input type="hidden" id="modalMberId" />
+
+									<div style="height: 0px;">
+										<span class="pagetotal" style='margin-right: 20px;'>라이더 승인 후에는 정보 변경이 안됩니다. 신중히 승인 요청해 주세요</span>
+										<div class="btnwrap">
+											<button id="기타추가버튼" class="btn btn-primary">추가</button>
+											<button id="기타저장버튼" class="btn ty1">저장</button>
+										</div>
+									</div>
+									<div class="ib_product">
+										<div id="myGrid2" class="ag-theme-alpine" style="height: 420px; width: 100%;"></div>
+									</div>
+                                </div>
+<!--                                 <div class="mb-3"> -->
+<!--                                   <div> -->
+<!--                                     <h4 class="mb-3">Files</h4> -->
+<!--                                   </div> -->
+<!--                                 </div> -->
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
 			<!-- 				<div id="ajaxUp2" class="btnwrap"> -->
 			<!-- 				<p> ajax파일 : <input type="file" name="fileName" multiple="multiple"/> -->
 			<!-- 				<button id="uploadBtn" class="btn btn-primary" >ajax업르드</button> -->

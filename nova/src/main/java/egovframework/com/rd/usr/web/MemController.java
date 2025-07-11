@@ -30,6 +30,7 @@ import egovframework.com.rd.usr.service.RotService;
 import egovframework.com.rd.usr.service.vo.CooperatorFeeVO;
 import egovframework.com.rd.usr.service.vo.CooperatorVO;
 import egovframework.com.rd.usr.service.vo.DoszSchAccoutVO;
+import egovframework.com.rd.usr.service.vo.EtcVO;
 import egovframework.com.rd.usr.service.vo.MyInfoVO;
 import egovframework.com.sec.rgm.service.EgovAuthorGroupService;
 import egovframework.com.uss.umt.service.EgovUserManageService;
@@ -428,6 +429,68 @@ public class MemController {
         }
         else
         	map.put("resultCode", "fail");
+        return ResponseEntity.ok(map);
+    }
+
+
+    /**
+     * 협력사,라이더별 대출 리스트 조회
+     * @param request
+     * @param model
+     * @return
+     * @throws Exception
+     */
+    @RequestMapping("/usr/mem0002_0004.do")
+    public ResponseEntity<?> mem0002_0004(@ModelAttribute("etcVO")EtcVO etcVO, HttpServletRequest request,ModelMap model) throws Exception {
+
+    	//로그인 체크
+        LoginVO user = (LoginVO)EgovUserDetailsHelper.getAuthenticatedUser();
+        Boolean isAuthenticated = EgovUserDetailsHelper.isAuthenticated();
+
+        if(!isAuthenticated) {
+        	return ResponseEntity.status(401).body("Unauthorized");
+        }
+
+        if(!Util.isUsr()) {
+        	return ResponseEntity.status(401).body("Unauthorized");
+        }
+
+        List<EtcVO> list = memService.selectEtcList(etcVO);
+        //return value
+        Map<String, Object> map =  new HashMap<String, Object>();
+        map.put("resultCode", "success");
+        map.put("list", list);
+        return ResponseEntity.ok(map);
+    }
+
+    /**
+     * 협력사,라이더별 대출 리스트 저장
+     * @param request
+     * @param model
+     * @return
+     * @throws Exception
+     */
+    @RequestMapping("/usr/mem0002_0005.do")
+    public ResponseEntity<?> mem0002_0005(HttpServletRequest request,ModelMap model, @RequestBody List<EtcVO> list) throws Exception {
+
+    	//로그인 체크
+        LoginVO user = (LoginVO)EgovUserDetailsHelper.getAuthenticatedUser();
+        Boolean isAuthenticated = EgovUserDetailsHelper.isAuthenticated();
+
+        if(!isAuthenticated) {
+        	return ResponseEntity.status(401).body("Unauthorized");
+        }
+
+        if(!Util.isUsr()) {
+        	return ResponseEntity.status(401).body("Unauthorized");
+        }
+
+        EtcVO vo = memService.saveEtcList(list);
+
+        //return value
+        Map<String, Object> map =  new HashMap<String, Object>();
+        map.put("list", memService.selectEtcList(vo));
+        map.put("resultCode", "success");
         return ResponseEntity.ok(map);
     }
 

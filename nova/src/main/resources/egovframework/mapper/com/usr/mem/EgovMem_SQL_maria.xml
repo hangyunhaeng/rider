@@ -449,5 +449,25 @@
 			LIMIT 5
 
 	</select>
+	<select id="selectEtcList" parameterType="egovframework.com.rd.usr.service.vo.EtcVO" resultType="egovframework.com.rd.usr.service.vo.EtcVO">
+		SELECT @ROWNUM:=@ROWNUM+1 AS no, ETC_ID, COOPERATOR_ID, MBER_ID, GUBUN, PAYBACK_DAY, PAYBACK_COST, PAYBACK_COST_ALL, AUTH_REQUEST_DT
+		, AUTH_RESPONS_DT, RESPONS_AT, USE_AT, CREAT_DT, CREAT_ID, LAST_UPDT_PNTTM, LAST_UPDUSR_ID
+		FROM RD_ETC, (SELECT @ROWNUM:=0) AS R
+		WHERE COOPERATOR_ID = #{cooperatorId} AND MBER_ID = #{mberId}
+	</select>
+	<insert id="insertEtc" parameterType="egovframework.com.rd.usr.service.vo.EtcVO">
+
+		INSERT INTO RD_ETC
+		(ETC_ID, COOPERATOR_ID, MBER_ID, GUBUN, PAYBACK_DAY, PAYBACK_COST, PAYBACK_COST_ALL
+		, USE_AT, CREAT_DT, CREAT_ID)
+		SELECT #{etcId}, #{cooperatorId}, #{mberId}, #{gubun}, #{paybackDay}, #{paybackCost}, #{paybackCostAll}
+		, 'Y', SYSDATE(), #{creatId}
+		<if test="schAuthorCode == 'ROLE_USER'">
+		/* 협력사 조건 */
+		FROM 	RD_COOPERATOR a
+		WHERE a.REGISTRATION_SN = #{schIhidNum} AND use_at ='Y'
+		AND a.COOPERATOR_ID = #{cooperatorId}
+		</if>
+	</insert>
 
 </mapper>

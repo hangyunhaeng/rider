@@ -10,6 +10,7 @@ import egovframework.com.cmm.service.impl.EgovComAbstractDAO;
 import egovframework.com.rd.usr.service.vo.CooperatorFeeVO;
 import egovframework.com.rd.usr.service.vo.CooperatorVO;
 import egovframework.com.rd.usr.service.vo.DeliveryInfoVO;
+import egovframework.com.rd.usr.service.vo.EtcVO;
 import egovframework.com.uat.uia.web.EgoRDLoginController;
 import egovframework.com.uss.umt.service.MberManageVO;
 
@@ -325,6 +326,24 @@ public class MemDAO extends EgovComAbstractDAO {
 	public List<DeliveryInfoVO> selectDeliveryInfoByMberId(DeliveryInfoVO deliveryInfoVO) throws Exception {
 		return selectList("memDAO.selectDeliveryInfoListByMberId", deliveryInfoVO);
 	}
-}
 
+	/**
+	 * 협력사,라이더별 대출 리스트 조회
+	 * @param etcVO
+	 * @return
+	 * @throws Exception
+	 */
+	public List<EtcVO> selectEtcList(EtcVO vo) throws Exception{
+		return selectList("memDAO.selectEtcList", vo);
+	}
+	/**
+	 * 협력사,라이더별 대출 등록
+	 * @param vo
+	 * @return
+	 * @throws Exception
+	 */
+	public int insertEtc(EtcVO vo) throws Exception{
+		return insert("memDAO.insertEtc", vo);
+	}
+}
 

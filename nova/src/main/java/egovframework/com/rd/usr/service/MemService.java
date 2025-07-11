@@ -6,6 +6,7 @@ import egovframework.com.cmm.LoginVO;
 import egovframework.com.rd.usr.service.vo.CooperatorFeeVO;
 import egovframework.com.rd.usr.service.vo.CooperatorVO;
 import egovframework.com.rd.usr.service.vo.DeliveryInfoVO;
+import egovframework.com.rd.usr.service.vo.EtcVO;
 import egovframework.com.uss.umt.service.MberManageVO;
 
 public interface MemService {
@@ -123,4 +124,20 @@ public interface MemService {
 	public CooperatorFeeVO saveCooperatorFee(List<CooperatorFeeVO> list, LoginVO user) throws Exception ;
 
 	public List<DeliveryInfoVO> selectDeliveryInfoByMberId(DeliveryInfoVO deliveryInfoVO) throws Exception;
+
+	/**
+	 * 협력사,라이더별 대출 리스트 조회
+	 * @param etcVO
+	 * @return
+	 * @throws Exception
+	 */
+	public List<EtcVO> selectEtcList(EtcVO etcVO) throws Exception ;
+
+	/**
+	 * 협력사,라이더별 대출 리스트 저장
+	 * @param etcVO
+	 * @return
+	 * @throws Exception
+	 */
+	public EtcVO saveEtcList(List<EtcVO> list) throws Exception ;
 }

@@ -12,11 +12,13 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import egovframework.com.cmm.LoginVO;
+import egovframework.com.cmm.util.EgovUserDetailsHelper;
 import egovframework.com.rd.Util;
 import egovframework.com.rd.usr.service.MemService;
 import egovframework.com.rd.usr.service.vo.CooperatorFeeVO;
 import egovframework.com.rd.usr.service.vo.CooperatorVO;
 import egovframework.com.rd.usr.service.vo.DeliveryInfoVO;
+import egovframework.com.rd.usr.service.vo.EtcVO;
 import egovframework.com.sec.rgm.service.AuthorGroup;
 import egovframework.com.sec.rgm.service.EgovAuthorGroupService;
 import egovframework.com.uss.umt.service.EgovMberManageService;
@@ -70,6 +72,9 @@ public class MemServiceImpl extends EgovAbstractServiceImpl implements MemServic
     /** ID Generation */
 	@Resource(name="egovRFeeIdGnrService")
 	private EgovIdGnrService egovRFeeIdGnrService;
+    /** ID Generation */
+	@Resource(name="egovEtcIdGnrService")
+	private EgovIdGnrService egovEtcIdGnrService;
 
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(MemServiceImpl.class);
@@ -477,5 +482,35 @@ public class MemServiceImpl extends EgovAbstractServiceImpl implements MemServic
 
 	public List<DeliveryInfoVO> selectDeliveryInfoByMberId(DeliveryInfoVO deliveryInfoVO) throws Exception{
 		return memDAO.selectDeliveryInfoByMberId(deliveryInfoVO);
+	}
+
+	/**
+	 * 협력사,라이더별 대출 리스트 조회
+	 * @param etcVO
+	 * @return
+	 * @throws Exception
+	 */
+	public List<EtcVO> selectEtcList(EtcVO etcVO) throws Exception{
+		return memDAO.selectEtcList(etcVO);
+	}
+
+	/**
+	 * 협력사,라이더별 대출 리스트 저장
+	 * @param etcVO
+	 * @return
+	 * @throws Exception
+	 */
+	public EtcVO saveEtcList(List<EtcVO> list) throws Exception{
+		EtcVO returnVo = new EtcVO();
+		LoginVO user = (LoginVO)EgovUserDetailsHelper.getAuthenticatedUser();
+		for(int i =0; i< list.size() ;i++) {
+			EtcVO one = list.get(i);
+			returnVo = one;
+			one.setEtcId(egovEtcIdGnrService.getNextStringId());
+			one.setCreatId(user.getId());
+			memDAO.insertEtc(one);
+		}
+
+		return returnVo;
 	}
 }
