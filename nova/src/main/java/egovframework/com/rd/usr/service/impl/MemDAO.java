@@ -256,6 +256,14 @@ public class MemDAO extends EgovComAbstractDAO {
 	public int updateFeeUseNo(CooperatorVO vo) throws Exception {
 		return update("memDAO.updateFeeUseNo", vo);
 	}
+
+	/**
+	 * 수수료 삭제(라이더)
+	 */
+	public int updateRiderFeeUseNo(CooperatorVO vo) throws Exception {
+		return update("memDAO.updateRiderFeeUseNo", vo);
+	}
+
 	/**
 	 * 수수료 등록
 	 * @param vo
@@ -267,6 +275,16 @@ public class MemDAO extends EgovComAbstractDAO {
 	}
 
 	/**
+	 * 수수료 등록(라이더)
+	 * @param vo
+	 * @return
+	 * @throws Exception
+	 */
+	public int insertRiderFee(CooperatorVO vo) throws Exception {
+		return insert("memDAO.insertRiderFee", vo);
+	}
+
+	/**
 	 * 같은 수수료가 있는지 조회
 	 * @param vo
 	 * @return
@@ -275,6 +293,17 @@ public class MemDAO extends EgovComAbstractDAO {
 	public List<CooperatorVO> selectFeeSame(CooperatorVO vo) throws Exception {
 		return selectList("memDAO.selectFeeSame", vo);
 	}
+
+	/**
+	 * 같은 수수료가 있는지 조회(라이더)
+	 * @param vo
+	 * @return
+	 * @throws Exception
+	 */
+	public List<CooperatorVO> selectRiderFeeSame(CooperatorVO vo) throws Exception {
+		return selectList("memDAO.selectRiderFeeSame", vo);
+	}
+
 	public List<CooperatorVO> selectCooperatorRiderConnectByMberId(CooperatorVO vo) throws Exception {
 		return selectList("memDAO.selectCooperatorRiderConnectByMberId", vo);
 	}

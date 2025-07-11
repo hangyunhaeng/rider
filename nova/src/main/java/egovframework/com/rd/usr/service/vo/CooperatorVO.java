@@ -70,5 +70,9 @@ public class CooperatorVO extends Sch implements Serializable {
 	private int feeCall;
 
 
+	//RD_RIDER_FEE
+	private String riderFeeId;
+
+
 	private List<CooperatorVO> cooperatorVO;
 }

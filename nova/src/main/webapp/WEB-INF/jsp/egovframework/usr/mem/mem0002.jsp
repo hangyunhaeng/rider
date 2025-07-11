@@ -78,6 +78,15 @@
 		{ headerName: "소속라이더", field: "rdcnt", minWidth: 90, cellClass: 'ag-cell-right'},
 		{ headerName: "사용여부", field: "useAt", minWidth: 90, hide:true, valueGetter:(params) => { return (params.node.data.useAt=='Y')?"사용": "미사용"}},
 		{ headerName: "생성자", field: "creatId", minWidth: 90, hide:true},
+
+		{ headerName: "운영사<br/>선지급수수료(%)", field: "feeAdminstrator", minWidth: 90},
+		{ headerName: "협력사<br/>선지급수수료(%)", field: "feeCooperator", minWidth: 90},
+		{ headerName: "고용보험(%)", field: "feeEmploymentInsurance", minWidth: 90},
+		{ headerName: "산재보험(%)", field: "feeIndustrialInsurance", minWidth: 90},
+		{ headerName: "원천세(%)", field: "feeWithholdingTax", minWidth: 90},
+		{ headerName: "시간제보험(원)", field: "feeTimeInsurance", minWidth: 90},
+		{ headerName: "콜수수료(원)", field: "feeCall", minWidth: 90},
+
 		{ headerName: "구분", field: "gubun", minWidth: 90, hide:true}
 	];
 
@@ -109,6 +118,38 @@
 	        , cellClass: (params) => {return agGrideditClass(params)}
 	        , valueGetter:(params) => { return getStringDate(params.data.endDt)}
 		},
+
+		{ headerName: "고용보험(%)", field: "feeEmploymentInsurance", minWidth: 90, editable: true
+			, cellClass: (params) => {return agGrideditClass(params, "ag-cell-right");}
+// 			, valueGetter:(params) => { return currencyFormatter(params.data.feeEmploymentInsurance);}
+            , valueParser: (params) => { return gridPercent(params);}
+		},
+		{ headerName: "산재보험(%)", field: "feeIndustrialInsurance", minWidth: 90, editable: true
+			, cellClass: (params) => {return agGrideditClass(params, "ag-cell-right");}
+// 			, valueGetter:(params) => { return currencyFormatter(params.data.feeIndustrialInsurance);}
+            , valueParser: (params) => { return gridPercent(params);}
+		},
+		{ headerName: "원천세(%)", field: "feeWithholdingTax", minWidth: 90, editable: true
+			, cellClass: (params) => {return agGrideditClass(params, "ag-cell-right");}
+// 			, valueGetter:(params) => { return currencyFormatter(params.data.feeWithholdingTax);}
+            , valueParser: (params) => { return gridPercent(params);}
+		},
+		{ headerName: "시간제보험(원)", field: "feeTimeInsurance", minWidth: 90, editable: true
+			, cellClass: (params) => {return agGrideditClass(params, "ag-cell-right");}
+			, valueGetter:(params) => { return currencyFormatter(params.data.feeTimeInsurance);}
+            , valueParser: (params) => { return gridWan(params);}
+		},
+		{ headerName: "콜수수료(원)", field: "feeCall", minWidth: 90, editable: true
+			, cellClass: (params) => {return agGrideditClass(params, "ag-cell-right");}
+			, valueGetter:(params) => { return currencyFormatter(params.data.feeCall);}
+            , valueParser: (params) => { return gridWan(params);}
+		},
+		{ headerName: "기타(대여,리스)(원)", field: "etcCall", minWidth: 90
+			, cellClass: (params) => {return agGrideditClass(params, "ag-cell-right");}
+			, valueGetter:(params) => { return currencyFormatter(params.data.etcCall);}
+            , valueParser: (params) => { return gridWan(params);}
+		},
+
 		{ headerName: "사용여부", field: "useAt", minWidth: 90, editable: true
 		,valueGetter:(params) => { return (params.node.data.useAt=='Y')?"사용": "미사용"}
 		,cellEditor: 'agSelectCellEditor'
@@ -148,7 +189,7 @@
 		params.append('searchGubun', "R");
 		// 로딩 시작
         $('.loading-wrap--js').show();
-        axios.post('${pageContext.request.contextPath}/usr/mem0001_0008.do',params).then(function(response) {
+        axios.post('${pageContext.request.contextPath}/usr/mem0001_0000.do',params).then(function(response) {
         	// 로딩 종료
             $('.loading-wrap--js').hide();
         	if(response.data.resultCode == "success"){
@@ -487,7 +528,7 @@
 			<!-- grid  -->
 			<br>
 
-			<div style="float: left; width: 49%; margin-right: 1%">
+<!-- 			<div style="float: left; width: 49%; margin-right: 1%"> -->
 				<div style="height: 0px;">
 					<span class="pagetotal" style='margin-right: 20px;'>협력사</span>
 					<div class="btnwrap">
@@ -501,10 +542,10 @@
 
 				<div class="ib_product">
 					<div id="myGrid" class="ag-theme-alpine"
-						style="height: 550px; width: 100%;"></div>
+						style="height: 150px; width: 100%;"></div>
 				</div>
-			</div>
-			<div style="float: left; width: 50%;">
+<!-- 			</div> -->
+<!-- 			<div style="float: left; width: 50%;"> -->
 
 				<!-- grid  -->
 
@@ -517,9 +558,9 @@
 				</div>
 				<div class="ib_product">
 					<div id="myGrid1" class="ag-theme-alpine"
-						style="height: 550px; width: 100%;"></div>
+						style="height: 420px; width: 100%;"></div>
 				</div>
-			</div>
+<!-- 			</div> -->
 		</div>
 
 	</div>

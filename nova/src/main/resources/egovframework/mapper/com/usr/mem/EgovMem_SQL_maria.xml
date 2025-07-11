@@ -181,16 +181,25 @@
 
 	<select id="selectCooperatorRiderListByCooperator" parameterType="egovframework.com.rd.usr.service.vo.CooperatorVO" resultType="egovframework.com.rd.usr.service.vo.CooperatorVO">
 
-		SELECT cte.*, usr.mber_nm, usr.MBTLNUM
+		SELECT cte.con_id, cte.COOPERATOR_ID, cte.MBER_ID, cte.USE_AT, cte.REG_DT, cte.END_DT
+		, usr.mber_nm, usr.MBTLNUM
+		, NVL(fee.FEE_EMPLOYMENT_INSURANCE, b.FEE_EMPLOYMENT_INSURANCE) AS FEE_EMPLOYMENT_INSURANCE
+		, NVL(fee.FEE_INDUSTRIAL_INSURANCE, b.FEE_INDUSTRIAL_INSURANCE) AS FEE_INDUSTRIAL_INSURANCE
+		, NVL(fee.FEE_WITHHOLDING_TAX, b.FEE_WITHHOLDING_TAX) AS FEE_WITHHOLDING_TAX
+		, NVL(fee.FEE_TIME_INSURANCE, b.FEE_TIME_INSURANCE) AS FEE_TIME_INSURANCE
+		, NVL(fee.FEE_CALL, b.FEE_CALL) AS FEE_CALL
+
 		FROM RD_COOPERATOR_RIDER_CONNECT cte
 		LEFT JOIN COMTNGNRLMBER usr ON cte.mber_id = usr.mber_id
+		LEFT JOIN rd_rider_fee fee ON cte.MBER_ID = fee.MBER_ID AND fee.USE_AT ='Y'
+		LEFT JOIN rd_cooperator_fee b ON cte.COOPERATOR_ID = b.COOPERATOR_ID AND b.USE_AT = 'Y'
 
 		WHERE 1=1
-		AND COOPERATOR_ID = #{cooperatorId}
+		AND cte.COOPERATOR_ID = #{cooperatorId}
 
 		<if test="schAuthorCode == 'ROLE_USER'">
 		/* 협력사 조건 */
-		AND COOPERATOR_ID IN (
+		AND cte.COOPERATOR_ID IN (
 			SELECT COOPERATOR_ID FROM RD_COOPERATOR a
 			WHERE a.REGISTRATION_SN = #{schIhidNum} AND use_at ='Y'
 		)
@@ -345,6 +354,15 @@
 			, LAST_UPDUSR_ID = #{lastUpdusrId}
 		WHERE COOPERATOR_ID = #{cooperatorId} and USE_AT = 'Y'
     </update>
+    <update id="updateRiderFeeUseNo"  parameterType="egovframework.com.rd.usr.service.vo.CooperatorVO">
+		UPDATE RD_RIDER_FEE
+		SET USE_AT = 'N'
+			, LAST_UPDT_PNTTM = sysdate()
+			, LAST_UPDUSR_ID = #{lastUpdusrId}
+		WHERE COOPERATOR_ID = #{cooperatorId}
+			and MBER_ID =  #{mberId}
+			and USE_AT = 'Y'
+    </update>
     <select id="selectFeeSame" parameterType="egovframework.com.rd.usr.service.vo.CooperatorVO" resultType="egovframework.com.rd.usr.service.vo.CooperatorVO">
 		select a.FEE_ID from RD_COOPERATOR_FEE a
 		WHERE a.COOPERATOR_ID = #{cooperatorId} AND use_at ='Y'
@@ -357,16 +375,45 @@
 		AND a.FEE_CALL = #{feeCall}
 
     </select>
+
+    <select id="selectRiderFeeSame" parameterType="egovframework.com.rd.usr.service.vo.CooperatorVO" resultType="egovframework.com.rd.usr.service.vo.CooperatorVO">
+		select a.RIDER_FEE_ID from RD_RIDER_FEE a
+		WHERE a.COOPERATOR_ID = #{cooperatorId} AND use_at ='Y' AND a.MBER_ID = #{mberId}
+		AND a.FEE_EMPLOYMENT_INSURANCE = #{feeEmploymentInsurance}
+		AND a.FEE_INDUSTRIAL_INSURANCE = #{feeIndustrialInsurance}
+		AND a.FEE_WITHHOLDING_TAX = #{feeWithholdingTax}
+		AND a.FEE_TIME_INSURANCE = #{feeTimeInsurance}
+		AND a.FEE_CALL = #{feeCall}
+
+    </select>
     <insert id="insertFee"  parameterType="egovframework.com.rd.usr.service.vo.CooperatorVO">
 		INSERT INTO RD_COOPERATOR_FEE
 		(FEE_ID, COOPERATOR_ID
 		, FEE_ADMINSTRATOR, FEE_COOPERATOR, FEE_EMPLOYMENT_INSURANCE, FEE_INDUSTRIAL_INSURANCE
 		, FEE_WITHHOLDING_TAX, FEE_TIME_INSURANCE, FEE_CALL
-		, USE_AT, CREAT_DT, CREAT_ID, LAST_UPDT_PNTTM, LAST_UPDUSR_ID)
+		, USE_AT, CREAT_DT, CREAT_ID)
 		SELECT #{feeId}, #{cooperatorId}
 		, #{feeAdminstrator}, #{feeCooperator}, #{feeEmploymentInsurance}, #{feeIndustrialInsurance}
 		, #{feeWithholdingTax}, #{feeTimeInsurance}, #{feeCall}
-		, 'Y', SYSDATE(), #{creatId}, SYSDATE(), #{creatId}
+		, 'Y', SYSDATE(), #{creatId}
+		<if test="schAuthorCode == 'ROLE_USER'">
+		/* 협력사 조건 */
+		FROM 	RD_COOPERATOR a
+		WHERE a.REGISTRATION_SN = #{schIhidNum} AND use_at ='Y'
+		AND a.COOPERATOR_ID = #{cooperatorId}
+		</if>
+    </insert>
+
+    <insert id="insertRiderFee"  parameterType="egovframework.com.rd.usr.service.vo.CooperatorVO">
+		INSERT INTO RD_RIDER_FEE
+		(RIDER_FEE_ID, COOPERATOR_ID, MBER_ID
+		, FEE_EMPLOYMENT_INSURANCE, FEE_INDUSTRIAL_INSURANCE
+		, FEE_WITHHOLDING_TAX, FEE_TIME_INSURANCE, FEE_CALL
+		, USE_AT, CREAT_DT, CREAT_ID)
+		SELECT #{riderFeeId}, #{cooperatorId}, #{mberId}
+		, #{feeEmploymentInsurance}, #{feeIndustrialInsurance}
+		, #{feeWithholdingTax}, #{feeTimeInsurance}, #{feeCall}
+		, 'Y', SYSDATE(), #{creatId}
 		<if test="schAuthorCode == 'ROLE_USER'">
 		/* 협력사 조건 */
 		FROM 	RD_COOPERATOR a
