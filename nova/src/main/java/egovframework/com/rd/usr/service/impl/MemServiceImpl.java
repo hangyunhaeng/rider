@@ -82,6 +82,15 @@ public class MemServiceImpl extends EgovAbstractServiceImpl implements MemServic
 	}
 
 	/**
+	 * 협력사 조회(상세)
+	 * @param vo
+	 * @return
+	 * @throws Exception
+	 */
+	public List<CooperatorVO> selectCooperatorDetailList(CooperatorVO vo) throws Exception {
+		return memDAO.selectCooperatorDetailList(vo);
+	}
+	/**
 	 * 협력사 조회(라이더)
 	 * @param vo
 	 * @return
@@ -115,7 +124,7 @@ public class MemServiceImpl extends EgovAbstractServiceImpl implements MemServic
 			if(vo.getCooperatorId() == null || "".equals(vo.getCooperatorId()))
 				continue;
 
-
+			// 1. 협력사 저장
 			CooperatorVO oneVo = memDAO.selectCooperatorByCooperatorId(vo);
 			if(oneVo != null) {
 				vo.setSchAuthorCode(user.getAuthorCode());
@@ -126,6 +135,31 @@ public class MemServiceImpl extends EgovAbstractServiceImpl implements MemServic
 					memDAO.insertCooperator(vo);
 				}
 			}
+
+			// 2. 협력사 수수료 저장
+			// 2.1 수수료는 변경시 기존 수수료를 use_yn을 N로 변경 후 새로 insert한다
+			// 2.2 기존수수료 조회 후 변경 된 사항이 있을 시에만 insert한다
+			List<CooperatorVO> sameFee = memDAO.selectFeeSame(vo);
+			if(sameFee.size() == 1) {	//기존 수수료와 현재 등록된 수수료가 같으면 pass
+				//pass
+			} else if(sameFee.size() > 1){
+				//데이터가 이상함. 기존 라인들 지우고 새로 등록
+				for(int j = 0 ; j < sameFee.size() ;j++) {
+					CooperatorVO delVo = sameFee.get(j);
+					memDAO.updateFeeUseNo(delVo);
+				}
+	    		String feeId = egovFeeIdGnrService.getNextStringId();
+	    		vo.setFeeId(feeId);
+				memDAO.insertFee(vo);
+			} else {
+				//수수료가 달라질 시 기존 정책 use_yn을 n로 변경 후 신규 등록
+				memDAO.updateFeeUseNo(vo);
+
+	    		String feeId = egovFeeIdGnrService.getNextStringId();
+	    		vo.setFeeId(feeId);
+				memDAO.insertFee(vo);
+			}
+
 		}
 	}
 	/**
@@ -379,36 +413,36 @@ public class MemServiceImpl extends EgovAbstractServiceImpl implements MemServic
 	 */
 	public CooperatorFeeVO saveCooperatorFee(List<CooperatorFeeVO> list, LoginVO user) throws Exception {
 		CooperatorFeeVO returnVo = new CooperatorFeeVO();
-        for(int i = 0 ; i< list.size() ;i++) {
-        	CooperatorFeeVO vo = list.get(i);
-        	vo.setCreatId(user.getId());
-        	vo.setLastUpdusrId(user.getId());
-			vo.setSchAuthorCode(user.getAuthorCode());
-			vo.setSchIhidNum(user.getIhidNum());
-
-			//총판 or 협력사
-			// 협력사가 권한이 없는 cooperatorId를 등록하려 할 경우 오류 처리
-			if("ROLE_USER".equals(user.getAuthorCode())) {
-	        	CooperatorVO authChkByCoop =  new CooperatorVO();
-	        	authChkByCoop.setMberId(user.getId());
-	        	authChkByCoop.setCooperatorId(vo.getCooperatorId());
-	        	if(!memDAO.selectAuthChkByCoop(authChkByCoop)) {
-	        		throw new IllegalArgumentException("권한이 없는 협력사데이터는 등록되지 않습니다.") ;
-	        	}
-			}
-
-			CooperatorFeeVO userOne = memDAO.selectFeeListByFeeId(vo);
-			if(userOne != null) {
-				memDAO.updaetFee(vo);
-			} else {
-        		String feeId = egovFeeIdGnrService.getNextStringId();
-        		vo.setFeeId(feeId);
-				memDAO.insertFee(vo);
-			}
-
-			returnVo = vo;
-
-        }
+//        for(int i = 0 ; i< list.size() ;i++) {
+//        	CooperatorFeeVO vo = list.get(i);
+//        	vo.setCreatId(user.getId());
+//        	vo.setLastUpdusrId(user.getId());
+//			vo.setSchAuthorCode(user.getAuthorCode());
+//			vo.setSchIhidNum(user.getIhidNum());
+//
+//			//총판 or 협력사
+//			// 협력사가 권한이 없는 cooperatorId를 등록하려 할 경우 오류 처리
+//			if("ROLE_USER".equals(user.getAuthorCode())) {
+//	        	CooperatorVO authChkByCoop =  new CooperatorVO();
+//	        	authChkByCoop.setMberId(user.getId());
+//	        	authChkByCoop.setCooperatorId(vo.getCooperatorId());
+//	        	if(!memDAO.selectAuthChkByCoop(authChkByCoop)) {
+//	        		throw new IllegalArgumentException("권한이 없는 협력사데이터는 등록되지 않습니다.") ;
+//	        	}
+//			}
+//
+//			CooperatorFeeVO userOne = memDAO.selectFeeListByFeeId(vo);
+//			if(userOne != null) {
+//				memDAO.updaetFee(vo);
+//			} else {
+//        		String feeId = egovFeeIdGnrService.getNextStringId();
+//        		vo.setFeeId(feeId);
+//				memDAO.insertFee(vo);
+//			}
+//
+//			returnVo = vo;
+//
+//        }
         return returnVo;
 	}
 

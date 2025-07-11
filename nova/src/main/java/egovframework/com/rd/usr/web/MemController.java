@@ -95,6 +95,42 @@ public class MemController {
         return "egovframework/usr/mem/mem0001";
 	}
 
+
+    /**
+     * 협력사 상세 조회
+     * @param request
+     * @param model
+     * @return
+     * @throws Exception
+     */
+    @RequestMapping("/usr/mem0001_0000.do")
+    public ResponseEntity<?> mem0001_0000(@ModelAttribute("cooperatorVO")CooperatorVO cooperatorVO, HttpServletRequest request,ModelMap model) throws Exception {
+
+    	//로그인 체크
+        LoginVO user = (LoginVO)EgovUserDetailsHelper.getAuthenticatedUser();
+        Boolean isAuthenticated = EgovUserDetailsHelper.isAuthenticated();
+
+        if(!isAuthenticated) {
+        	return ResponseEntity.status(401).body("Unauthorized");
+        }
+
+        if(!Util.isUsr()) {
+        	return ResponseEntity.status(401).body("Unauthorized");
+        }
+        //return value
+        Map<String, Object> map =  new HashMap<String, Object>();
+
+        //총판 or 협력사
+        cooperatorVO.setSchAuthorCode(user.getAuthorCode());
+        cooperatorVO.setSchIhidNum(user.getIhidNum());
+
+        List<CooperatorVO> list = memService.selectCooperatorDetailList(cooperatorVO);
+
+        map.put("list", list);
+        map.put("resultCode", "success");
+        return ResponseEntity.ok(map);
+    }
+
     /**
      * 협력사 조회
      * @param request
@@ -160,7 +196,7 @@ public class MemController {
         //총판 or 협력사
         cooperatorVO.setSchAuthorCode(user.getAuthorCode());
         cooperatorVO.setSchIhidNum(user.getIhidNum());
-        map.put("list", memService.selectCooperatorList(cooperatorVO));
+        map.put("list", memService.selectCooperatorDetailList(cooperatorVO));
         map.put("resultCode", "success");
         return ResponseEntity.ok(map);
     }

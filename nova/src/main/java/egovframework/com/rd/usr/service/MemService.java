@@ -17,6 +17,13 @@ public interface MemService {
 	 */
 	public List<CooperatorVO> selectCooperatorList(CooperatorVO vo) throws Exception ;
 	/**
+	 * 협력사 조회(상세)
+	 * @param vo
+	 * @return
+	 * @throws Exception
+	 */
+	public List<CooperatorVO> selectCooperatorDetailList(CooperatorVO vo) throws Exception ;
+	/**
 	 * 협력사 조회(라이더)
 	 * @param vo
 	 * @return

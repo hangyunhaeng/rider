@@ -31,6 +31,49 @@
 		</if>
 	</select>
 
+	<select id="selectCooperatorDetailList" parameterType="egovframework.com.rd.usr.service.vo.CooperatorVO" resultType="egovframework.com.rd.usr.service.vo.CooperatorVO">
+
+		SELECT a.COOPERATOR_ID, COOPERATOR_NM, REGISTRATION_SN, COMPANY_NM, REGISTRATION_NM, CEO_NM, a.USE_AT, DATE_FORMAT(b.CREAT_DT, '%Y%m%d') AS CREAT_DT, a.CREAT_ID, 'R' GUBUN
+		, FEE_ID, FEE_ADMINSTRATOR, FEE_COOPERATOR, FEE_EMPLOYMENT_INSURANCE, FEE_INDUSTRIAL_INSURANCE, FEE_WITHHOLDING_TAX, FEE_TIME_INSURANCE, FEE_CALL
+		<![CDATA[, sum(if(c.USE_AT='Y' AND (DATE_FORMAT(SYSDATE(), '%Y%m%d') <= c.END_DT OR c.END_DT IS null),1, 0)) RDCNT]]>
+		FROM RD_COOPERATOR a
+		LEFT JOIN RD_COOPERATOR_FEE b ON a.COOPERATOR_ID = b.COOPERATOR_ID AND b.USE_AT = 'Y'
+		LEFT JOIN RD_COOPERATOR_RIDER_CONNECT c ON a.COOPERATOR_ID = c.COOPERATOR_ID AND c.USE_AT = 'Y'
+
+
+		<if test="schAuthorCode == 'ROLE_USER'">
+			AND REGISTRATION_SN = #{schIhidNum}
+			and a.USE_AT ='Y'
+		</if>
+
+		<if test='searchGubun == "R"'>
+			and a.USE_AT ='Y'
+		</if>
+		GROUP BY a.COOPERATOR_ID
+		<if test="schAuthorCode == 'ROLE_ADMIN'">
+			<if test='searchGubun == null or searchGubun == ""'>
+			UNION
+			SELECT a.cooperator_id, '' COOPERATOR_NM, '' REGISTRATION_SN, '' COMPANY_NM, '' REGISTRATION_NM, '' CEO_NM, 'Y' USE_AT, '' CREAT_DT, '' CREAT_ID, 'T' GUBUN
+			, '0' AS FEE_ID, '0' AS FEE_ADMINSTRATOR, '0' AS FEE_COOPERATOR, '0' AS FEE_EMPLOYMENT_INSURANCE, '0' AS FEE_INDUSTRIAL_INSURANCE, '0' AS FEE_WITHHOLDING_TAX, '0' AS FEE_TIME_INSURANCE
+			, '0' AS FEE_CALL
+			<![CDATA[, sum(if(c.USE_AT='Y' AND (DATE_FORMAT(SYSDATE(), '%Y%m%d') <= c.END_DT OR c.END_DT IS null),1, 0)) RDCNT]]>
+			FROM RD_WEEK_INFO a LEFT JOIN RD_COOPERATOR b ON a.cooperator_id  =b.cooperator_id
+			LEFT JOIN RD_COOPERATOR_RIDER_CONNECT c ON a.COOPERATOR_ID = c.COOPERATOR_ID AND c.USE_AT = 'Y'
+			WHERE (b.cooperator_id IS NULL /*or IFNULL(b.use_at, 'N') ='N'*/)
+			GROUP BY a.cooperator_id
+			UNION
+			SELECT a.cooperator_id, '' COOPERATOR_NM, '' REGISTRATION_SN, '' COMPANY_NM, '' REGISTRATION_NM, '' CEO_NM, 'Y' USE_AT, '' CREAT_DT, '' CREAT_ID, 'T' GUBUN
+			, '0' AS FEE_ID, '0' AS FEE_ADMINSTRATOR, '0' AS FEE_COOPERATOR, '0' AS FEE_EMPLOYMENT_INSURANCE, '0' AS FEE_INDUSTRIAL_INSURANCE, '0' AS FEE_WITHHOLDING_TAX, '0' AS FEE_TIME_INSURANCE
+			, '0' AS FEE_CALL
+			<![CDATA[, sum(if(c.USE_AT='Y' AND (DATE_FORMAT(SYSDATE(), '%Y%m%d') <= c.END_DT OR c.END_DT IS null),1, 0)) RDCNT]]>
+			FROM RD_DELIVERY_INFO a LEFT JOIN RD_COOPERATOR b ON a.cooperator_id  =b.cooperator_id
+			LEFT JOIN RD_COOPERATOR_RIDER_CONNECT c ON a.COOPERATOR_ID = c.COOPERATOR_ID AND c.USE_AT = 'Y'
+			WHERE (b.cooperator_id IS NULL /*or IFNULL(b.use_at, 'N') ='N'*/)
+			GROUP BY a.cooperator_id
+			</if>
+		</if>
+	</select>
+
 	<select id="selectCooperatorListRDCnt" parameterType="egovframework.com.rd.usr.service.vo.CooperatorVO" resultType="egovframework.com.rd.usr.service.vo.CooperatorVO">
 		SELECT a.COOPERATOR_ID, COOPERATOR_NM, REGISTRATION_SN, COMPANY_NM, REGISTRATION_NM, CEO_NM, a.USE_AT, a.CREAT_DT, a.CREAT_ID, 'R' GUBUN
 		<![CDATA[, sum(if(b.USE_AT='Y' AND (DATE_FORMAT(SYSDATE(), '%Y%m%d') <= b.END_DT OR b.END_DT IS null),1, 0)) RDCNT]]>
@@ -259,9 +302,10 @@
 
     </select>
     <select id="selectFeeListByCooperatorId" parameterType="egovframework.com.rd.usr.service.vo.CooperatorFeeVO" resultType="egovframework.com.rd.usr.service.vo.CooperatorFeeVO">
-		SELECT FEE_ID, COOPERATOR_ID, FEE_TYPE, FEE
-		, /*DATE_FORMAT(STR_TO_DATE(START_DT, '%Y%m%d'), '%Y%m%d')*/ START_DT
-		, /*DATE_FORMAT(STR_TO_DATE(END_DT, '%Y%m%d'), '%Y%m%d')*/ END_DT, USE_AT, CREAT_DT, CREAT_ID, LAST_UPDT_PNTTM, LAST_UPDUSR_ID
+		SELECT FEE_ID, COOPERATOR_ID
+		, FEE_ADMINSTRATOR, FEE_COOPERATOR, FEE_EMPLOYMENT_INSURANCE, FEE_INDUSTRIAL_INSURANCE
+		, FEE_WITHHOLDING_TAX, FEE_TIME_INSURANCE, FEE_CALL
+		, USE_AT, CREAT_DT, CREAT_ID, LAST_UPDT_PNTTM, LAST_UPDUSR_ID
 		FROM RD_COOPERATOR_FEE
 		WHERE COOPERATOR_ID = #{cooperatorId}
 		<if test="schAuthorCode == 'ROLE_USER'">
@@ -273,7 +317,9 @@
 		</if>
     </select>
     <select id="selectFeeListByFeeId" parameterType="egovframework.com.rd.usr.service.vo.CooperatorFeeVO" resultType="egovframework.com.rd.usr.service.vo.CooperatorFeeVO">
-		SELECT FEE_ID, COOPERATOR_ID, FEE_TYPE, FEE, START_DT, END_DT, USE_AT, CREAT_DT, CREAT_ID, LAST_UPDT_PNTTM, LAST_UPDUSR_ID
+		SELECT FEE_ID, COOPERATOR_ID
+		, FEE_ADMINSTRATOR, FEE_COOPERATOR, FEE_EMPLOYMENT_INSURANCE, FEE_INDUSTRIAL_INSURANCE
+		, FEE_WITHHOLDING_TAX, FEE_TIME_INSURANCE, FEE_CALL USE_AT, CREAT_DT, CREAT_ID, LAST_UPDT_PNTTM, LAST_UPDUSR_ID
 		FROM RD_COOPERATOR_FEE
 		WHERE FEE_ID = #{feeId}
     </select>
@@ -291,13 +337,36 @@
 		)
 		</if>
     </update>
-    <insert id="insertFee"  parameterType="egovframework.com.rd.usr.service.vo.CooperatorFeeVO">
+
+    <update id="updateFeeUseNo"  parameterType="egovframework.com.rd.usr.service.vo.CooperatorVO">
+		UPDATE RD_COOPERATOR_FEE
+		SET USE_AT = 'N'
+			, LAST_UPDT_PNTTM = sysdate()
+			, LAST_UPDUSR_ID = #{lastUpdusrId}
+		WHERE COOPERATOR_ID = #{cooperatorId} and USE_AT = 'Y'
+    </update>
+    <select id="selectFeeSame" parameterType="egovframework.com.rd.usr.service.vo.CooperatorVO" resultType="egovframework.com.rd.usr.service.vo.CooperatorVO">
+		select a.FEE_ID from RD_COOPERATOR_FEE a
+		WHERE a.COOPERATOR_ID = #{cooperatorId} AND use_at ='Y'
+		AND a.FEE_ADMINSTRATOR = #{feeAdminstrator}
+		AND a.FEE_COOPERATOR = #{feeCooperator}
+		AND a.FEE_EMPLOYMENT_INSURANCE = #{feeEmploymentInsurance}
+		AND a.FEE_INDUSTRIAL_INSURANCE = #{feeIndustrialInsurance}
+		AND a.FEE_WITHHOLDING_TAX = #{feeWithholdingTax}
+		AND a.FEE_TIME_INSURANCE = #{feeTimeInsurance}
+		AND a.FEE_CALL = #{feeCall}
+
+    </select>
+    <insert id="insertFee"  parameterType="egovframework.com.rd.usr.service.vo.CooperatorVO">
 		INSERT INTO RD_COOPERATOR_FEE
-		(FEE_ID, COOPERATOR_ID, FEE_TYPE, FEE, START_DT, END_DT, USE_AT, CREAT_DT, CREAT_ID)
-		SELECT #{feeId}, #{cooperatorId}, #{feeType}, #{fee}
-		, DATE_FORMAT(#{startDt}, '%Y%m%d')
-		, DATE_FORMAT(#{endDt}, '%Y%m%d')
-		, 'Y', SYSDATE(), #{creatId}
+		(FEE_ID, COOPERATOR_ID
+		, FEE_ADMINSTRATOR, FEE_COOPERATOR, FEE_EMPLOYMENT_INSURANCE, FEE_INDUSTRIAL_INSURANCE
+		, FEE_WITHHOLDING_TAX, FEE_TIME_INSURANCE, FEE_CALL
+		, USE_AT, CREAT_DT, CREAT_ID, LAST_UPDT_PNTTM, LAST_UPDUSR_ID)
+		SELECT #{feeId}, #{cooperatorId}
+		, #{feeAdminstrator}, #{feeCooperator}, #{feeEmploymentInsurance}, #{feeIndustrialInsurance}
+		, #{feeWithholdingTax}, #{feeTimeInsurance}, #{feeCall}
+		, 'Y', SYSDATE(), #{creatId}, SYSDATE(), #{creatId}
 		<if test="schAuthorCode == 'ROLE_USER'">
 		/* 협력사 조건 */
 		FROM 	RD_COOPERATOR a

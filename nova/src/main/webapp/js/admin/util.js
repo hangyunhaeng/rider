@@ -147,10 +147,11 @@ async function populateSelectOptions(selectId, mapping, selectedValue = '', opti
  * 숫자 컴마처리 / 화폐처리
  */
 function currencyFormatter(params) {
+	debugger;
     if (params === null || params === undefined) {
         return '0'; // null 또는 undefined인 경우 빈 문자열 반환
     } else if (typeof params === 'string' || typeof params === 'number') {
-        return params.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+        return getOnlyNumber(params.toString()).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
     } else if (params.value !== undefined && params.value !== null) {
         return params.value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
     } else {
@@ -205,8 +206,57 @@ function gridValidPhoneNumber(params){
 	}
     return params.newValue;
 }
+/**
+ * 그리드 수수료 퍼센트 검사
+ */
+function gridPercent(params) {
+
+	var inputDate = params.newValue.toString();
 
 
+    if (new RegExp(/[^0-9.]/).test(inputDate)) {
+        alert('숫자만 입력하세요');
+        return params.oldValue;
+    }
+
+    var arrInputData = inputDate.split('.');
+    if(arrInputData.length > 2){
+		alert("정확한 숫자를 입력하세요");
+        return params.oldValue;
+	}
+
+    if(arrInputData[1] != undefined && arrInputData[1].length > 3){
+		alert("소수점 이하 3자리까지만 허용됩니다");
+        return params.oldValue;
+	}
+	if(arrInputData[0] != undefined && arrInputData[0].length > 2){
+		alert("100%이상은 적용할 수 없습니다");
+        return params.oldValue;
+	}
+
+    return params.newValue;
+}
+
+/**
+ * 그리드 수수료 금액 검사
+ */
+function gridWan(params) {
+
+	var inputDate = params.newValue;
+
+    if (new RegExp(/[^0-9,]/).test(inputDate)) {
+        alert('숫자만 입력하세요');
+        return params.oldValue;
+    }
+
+    inputDate = getOnlyNumber(inputDate);
+    if(inputDate.length > 10){
+		alert("10자리 이상 적용할 수 없습니다");
+        return params.oldValue;
+	}
+
+    return params.newValue;
+}
 /** 유효한 날짜 체크 */
 function gridValidDate(params) {
 
@@ -238,6 +288,7 @@ function gridValidDate(params) {
     }
 
 }
+
 
 const add = new Function('i','a', 'b', 'c', 'return (a.getRowNode(i).data[b] == c) ? a.getRowNode(i) : null ;');
 //그리드 내에서 값이 같은 node를 리턴한다.(그런데 루프문에 break가 안되네..)

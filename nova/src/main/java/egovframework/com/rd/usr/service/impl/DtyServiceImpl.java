@@ -715,6 +715,7 @@ public class DtyServiceImpl extends EgovAbstractServiceImpl implements DtyServic
 					weekInfoVO.setIndustrialInsuranceAccounts(new BigDecimal( Util.getOnlyNumber(getValue(rowObj.getCell(14)))));
 					weekInfoVO.setG(new BigDecimal( 0 ));
 					weekInfoVO.setAccountsScheduleCost(new BigDecimal( Util.getOnlyNumber(getValue(rowObj.getCell(15)))));
+					weekInfoVO.setAtchFileId(atchFileId);
 
 					weekInfoVO.setWekAtchFileId(atchFileId);
 					weekInfoVO.setCreatId(loginVO.getId());

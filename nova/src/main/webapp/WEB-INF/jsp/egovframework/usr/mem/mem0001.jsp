@@ -68,9 +68,9 @@
 		{ headerName: "crud", field: "crud", minWidth: 90, hide:true},
 		{ headerName: "협력사아이디", field: "cooperatorId", minWidth: 120, editable: (params) => {return (params.node.data.crud == 'c')? true: false}
 			, cellClass: (params) => {return agGrideditClass(params)}},
-		{ headerName: "협력사이름", field: "cooperatorNm", minWidth: 90, editable: true
+		{ headerName: "협력사이름", field: "cooperatorNm", minWidth: 120, editable: true
 			, cellClass: (params) => {return agGrideditClass(params)}},
-		{ headerName: "사업자등록번호", field: "registrationSn", minWidth: 90, editable: (params) => {return ('${loginVO.authorCode}' == 'ROLE_ADMIN')? true: false}
+		{ headerName: "사업자등록번호", field: "registrationSn", minWidth: 110, editable: (params) => {return ('${loginVO.authorCode}' == 'ROLE_ADMIN')? true: false}
             , valueParser: (params) => {
                 return gridRegistrationSn(params);
             }
@@ -82,49 +82,93 @@
 			, cellClass: (params) => {return agGrideditClass(params, "ag-cell-left")} },
 		{ headerName: "대표자명", field: "ceoNm", minWidth: 90, editable: true, cellClass: (params) => {return agGrideditClass(params)}},
 // 		{ headerName: "사용여부", field: "useAt", minWidth: 90, valueGetter:(params) => { return (params.node.data.useAt=='Y')?"사용": "미사용"}},
+
+		{ headerName: "소속<br/>라이더", field: "rdcnt", minWidth: 80, cellClass: 'ag-cell-right'},
+		{ headerName: "출금가능금액", field: "xxx", minWidth: 90, cellClass: 'ag-cell-right'},
+		{ headerName: "feeId", field: "feeId", minWidth: 90, hide:true},
+		{ headerName: "운영사<br/>선지급수수료(%)", field: "feeAdminstrator", minWidth: 90, editable: true
+			, cellClass: (params) => {return agGrideditClass(params, "ag-cell-right");}
+// 			, valueGetter:(params) => { return currencyFormatter(params.data.feeAdminstrator);}
+            , valueParser: (params) => { return gridPercent(params);}
+		},
+		{ headerName: "협력사<br/>선지급수수료(%)", field: "feeCooperator", minWidth: 90, editable: true
+			, cellClass: (params) => {return agGrideditClass(params, "ag-cell-right");}
+// 			, valueGetter:(params) => { return currencyFormatter(params.data.feeCooperator);}
+            , valueParser: (params) => { return gridPercent(params);}
+		},
+		{ headerName: "고용보험(%)", field: "feeEmploymentInsurance", minWidth: 90, editable: true
+			, cellClass: (params) => {return agGrideditClass(params, "ag-cell-right");}
+// 			, valueGetter:(params) => { return currencyFormatter(params.data.feeEmploymentInsurance);}
+            , valueParser: (params) => { return gridPercent(params);}
+		},
+		{ headerName: "산재보험(%)", field: "feeIndustrialInsurance", minWidth: 90, editable: true
+			, cellClass: (params) => {return agGrideditClass(params, "ag-cell-right");}
+// 			, valueGetter:(params) => { return currencyFormatter(params.data.feeIndustrialInsurance);}
+            , valueParser: (params) => { return gridPercent(params);}
+		},
+		{ headerName: "원천세(%)", field: "feeWithholdingTax", minWidth: 90, editable: true
+			, cellClass: (params) => {return agGrideditClass(params, "ag-cell-right");}
+// 			, valueGetter:(params) => { return currencyFormatter(params.data.feeWithholdingTax);}
+            , valueParser: (params) => { return gridPercent(params);}
+		},
+		{ headerName: "시간제보험(원)", field: "feeTimeInsurance", minWidth: 90, editable: true
+			, cellClass: (params) => {return agGrideditClass(params, "ag-cell-right");}
+			, valueGetter:(params) => { return currencyFormatter(params.data.feeTimeInsurance);}
+            , valueParser: (params) => { return gridWan(params);}
+		},
+		{ headerName: "콜수수료(원)", field: "feeCall", minWidth: 90, editable: true
+			, cellClass: (params) => {return agGrideditClass(params, "ag-cell-right");}
+			, valueGetter:(params) => { return currencyFormatter(params.data.feeCall);}
+            , valueParser: (params) => { return gridWan(params);}
+		},
 		{ headerName: "사용여부", field: "useAt", minWidth: 90, editable: (params) => {return ('${loginVO.authorCode}' == 'ROLE_ADMIN')? true: false}
-				,valueGetter:(params) => { return (params.node.data.useAt=='Y')?"사용": "미사용"}
-				,cellEditor: 'agSelectCellEditor'
-				,cellEditorParams: params => { return {values: ['Y', 'N']}; }
-				, cellClass: (params) => {return agGrideditClass(params)}},
+		, valueGetter:(params) => { return (params.node.data.useAt=='Y')?"사용": "미사용"}
+		, cellEditor: 'agSelectCellEditor'
+		, cellEditorParams: params => { return {values: ['Y', 'N']}; }
+		, cellClass: (params) => {return agGrideditClass(params)}},
+		{ headerName: "수수료적용일", field: "creatDt", minWidth: 100
+	        , valueGetter:(params) => { return getStringDate(params.data.creatDt)}
+	    },
 		{ headerName: "생성자", field: "creatId", minWidth: 90, hide:true},
 		{ headerName: "구분", field: "gubun", minWidth: 90, hide:true}
+
+
 	];
 
-	var columnDefs1= [
-		{ headerName: "NO", field: "no", minWidth: 70, valueGetter:(params) => { return params.node.rowIndex + 1} },
-		{ headerName: "crud", field: "crud", minWidth: 90, hide:true},
-		{ headerName: "협력사아이디", field: "cooperatorId", minWidth: 120},
-		{ headerName: "타입", field: "feeType", minWidth: 120, editable: (params) => {return (params.node.data.crud == 'c')? true: false}
-			, valueGetter:(params) => {
-				if(params.node.data.feeType=='A') return"콜당수술료금액";
-				else if (params.node.data.feeType=='B') return "콜당수수료율";
-				else return "기타";
-				}
-			, cellEditor: 'agSelectCellEditor', cellEditorParams: {values: ["A", "B"]}
-			, cellClass: (params) => {return agGrideditClass(params)}
-		},
-		{ headerName: "수수료", field: "fee", minWidth: 90
-			, editable: (params) => {return (params.node.data.crud == 'c')? true: false}
-			, valueGetter:(params) => { return currencyFormatter(params.data.fee)}
-			, cellClass: (params) => {return agGrideditClass(params, "ag-cell-left")}
-		},
-		{ headerName: "적용시작일", field: "startDt", minWidth: 110, editable: (params) => {return (params.node.data.crud == 'c')? true: false}
-	        , valueParser: (params) => {
-	            return gridValidDate(params);
-	        }
-	        , cellClass: (params) => {return agGrideditClass(params)}
-	        , valueGetter:(params) => { return getStringDate(params.data.startDt)}
-		},
-		{ headerName: "적용종료일", field: "endDt", minWidth: 110, editable: true
-	        , valueParser: (params) => {
-	            return gridValidDate(params);
-	        }
-	        , cellClass: (params) => {return agGrideditClass(params)}
-	        , valueGetter:(params) => { return getStringDate(params.data.endDt)}
-	    },
-		{ headerName: "생성자", field: "creatId", minWidth: 90, hide:true}
-	];
+// 	var columnDefs1= [
+// 		{ headerName: "NO", field: "no", minWidth: 70, valueGetter:(params) => { return params.node.rowIndex + 1} },
+// 		{ headerName: "crud", field: "crud", minWidth: 90, hide:true},
+// 		{ headerName: "협력사아이디", field: "cooperatorId", minWidth: 120},
+// 		{ headerName: "타입", field: "feeType", minWidth: 120, editable: (params) => {return (params.node.data.crud == 'c')? true: false}
+// 			, valueGetter:(params) => {
+// 				if(params.node.data.feeType=='A') return"콜당수술료금액";
+// 				else if (params.node.data.feeType=='B') return "콜당수수료율";
+// 				else return "기타";
+// 				}
+// 			, cellEditor: 'agSelectCellEditor', cellEditorParams: {values: ["A", "B"]}
+// 			, cellClass: (params) => {return agGrideditClass(params)}
+// 		},
+// 		{ headerName: "수수료", field: "fee", minWidth: 90
+// 			, editable: (params) => {return (params.node.data.crud == 'c')? true: false}
+// 			, valueGetter:(params) => { return currencyFormatter(params.data.fee)}
+// 			, cellClass: (params) => {return agGrideditClass(params, "ag-cell-left")}
+// 		},
+// 		{ headerName: "적용시작일", field: "startDt", minWidth: 110, editable: (params) => {return (params.node.data.crud == 'c')? true: false}
+// 	        , valueParser: (params) => {
+// 	            return gridValidDate(params);
+// 	        }
+// 	        , cellClass: (params) => {return agGrideditClass(params)}
+// 	        , valueGetter:(params) => { return getStringDate(params.data.startDt)}
+// 		},
+// 		{ headerName: "적용종료일", field: "endDt", minWidth: 110, editable: true
+// 	        , valueParser: (params) => {
+// 	            return gridValidDate(params);
+// 	        }
+// 	        , cellClass: (params) => {return agGrideditClass(params)}
+// 	        , valueGetter:(params) => { return getStringDate(params.data.endDt)}
+// 	    },
+// 		{ headerName: "생성자", field: "creatId", minWidth: 90, hide:true}
+// 	];
 
 	//onLoad
 	document.addEventListener('DOMContentLoaded', function() {
@@ -148,12 +192,12 @@
 
 
 		// 2. 수수료 추가
-		$("#수수료추가버튼").on("click", function(e){
-			addFee(grid1);
-		});
-		$("#수수료저장버튼").on("click", function(e){
-			saveFee();
-		});
+// 		$("#수수료추가버튼").on("click", function(e){
+// 			addFee(grid1);
+// 		});
+// 		$("#수수료저장버튼").on("click", function(e){
+// 			saveFee();
+// 		});
 
 		if('${loginVO.authorCode}' == 'ROLE_ADMIN'){
 			$("#협력사추가버튼").show();
@@ -161,7 +205,7 @@
 
 		//그리드 설정
 		setGrid();
-		setGrid1();
+// 		setGrid1();
 
 		//협력사 리스트 조회
 		loadCooperatorList();
@@ -171,7 +215,7 @@
 
 		// 로딩 시작
         $('.loading-wrap--js').show();
-        axios.post('${pageContext.request.contextPath}/usr/mem0001_0001.do',params).then(function(response) {
+        axios.post('${pageContext.request.contextPath}/usr/mem0001_0000.do',params).then(function(response) {
         	// 로딩 종료
             $('.loading-wrap--js').hide();
 
@@ -193,33 +237,33 @@
         });
 	}
 
-	function loadCooperatorFeeList(value){
+// 	function loadCooperatorFeeList(value){
 
-		const params = new URLSearchParams();
-		params.append("cooperatorId", value);
-		// 로딩 시작
-        $('.loading-wrap--js').show();
-        axios.post('${pageContext.request.contextPath}/usr/mem0001_0006.do',params).then(function(response) {
-        	// 로딩 종료
-            $('.loading-wrap--js').hide();
-        	if(response.data.resultCode == "success"){
-	        	if (response.data.list.length == 0) {
-	        		grid1.setGridOption('rowData',[]);  	// 데이터가 없는 경우 빈 배열 설정
-	        		grid1.showNoRowsOverlay();  			// 데이터가 없는 경우
-	            } else {
+// 		const params = new URLSearchParams();
+// 		params.append("cooperatorId", value);
+// 		// 로딩 시작
+//         $('.loading-wrap--js').show();
+//         axios.post('${pageContext.request.contextPath}/usr/mem0001_0006.do',params).then(function(response) {
+//         	// 로딩 종료
+//             $('.loading-wrap--js').hide();
+//         	if(response.data.resultCode == "success"){
+// 	        	if (response.data.list.length == 0) {
+// 	        		grid1.setGridOption('rowData',[]);  	// 데이터가 없는 경우 빈 배열 설정
+// 	        		grid1.showNoRowsOverlay();  			// 데이터가 없는 경우
+// 	            } else {
 
-	            	data = response.data.list;	//정상데이터
-					grid1.setGridOption("rowData", data);
-	            }
-        	}
-        })
-        .catch(function(error) {
-            console.error('There was an error fetching the data:', error);
-        }).finally(function() {
-        	// 로딩 종료
-            $('.loading-wrap--js').hide();
-        });
-	}
+// 	            	data = response.data.list;	//정상데이터
+// 					grid1.setGridOption("rowData", data);
+// 	            }
+//         	}
+//         })
+//         .catch(function(error) {
+//             console.error('There was an error fetching the data:', error);
+//         }).finally(function() {
+//         	// 로딩 종료
+//             $('.loading-wrap--js').hide();
+//         });
+// 	}
 
 	function createNewRowData() {
 
@@ -271,14 +315,14 @@
 		}
 	}
 
-	var bfSelNode;		//onSelectionChanged가 안되서 임시로 만듬
-	function selcetRow(params){
-		var nowSelNode = findRowNode(grid, 'cooperatorId', params.node.data.cooperatorId);
-		if(bfSelNode != nowSelNode){
-			bfSelNode = nowSelNode;
- 			loadCooperatorFeeList(params.node.data.cooperatorId)
-		}
-	}
+// 	var bfSelNode;		//onSelectionChanged가 안되서 임시로 만듬
+// 	function selcetRow(params){
+// 		var nowSelNode = findRowNode(grid, 'cooperatorId', params.node.data.cooperatorId);
+// 		if(bfSelNode != nowSelNode){
+// 			bfSelNode = nowSelNode;
+//  			loadCooperatorFeeList(params.node.data.cooperatorId)
+// 		}
+// 	}
 
 	function addCooperator(gridObj) {
 		  const newStore = getAllRows(gridObj);
@@ -293,12 +337,12 @@
 
 	}
 
-	function addFee(gridObj) {
-		  const newStore = getAllRows(gridObj);
-		  const newItem = createNewRowData1();
-	      newStore.push(newItem);
-	      gridObj.setGridOption("rowData", newStore);
-	}
+// 	function addFee(gridObj) {
+// 		  const newStore = getAllRows(gridObj);
+// 		  const newItem = createNewRowData1();
+// 	      newStore.push(newItem);
+// 	      gridObj.setGridOption("rowData", newStore);
+// 	}
 
 	// 변경된 협력사를 저장한다.
 	function saveCooperator(){
@@ -338,57 +382,57 @@
 	        });
 		}, 100);
 	}
-	function saveFee(){
-		grid1.stopEditing();
+// 	function saveFee(){
+// 		grid1.stopEditing();
 
-		setTimeout(function(){
-			var updateItem = getEditRows(grid1);
+// 		setTimeout(function(){
+// 			var updateItem = getEditRows(grid1);
 
 
-			for(var i = 0; i < updateItem.length ; i++ ){
+// 			for(var i = 0; i < updateItem.length ; i++ ){
 
-				if(updateItem[i].startDt==null || updateItem[i].startDt.trim() == ''){
-					alert("적용시작일은 필수 입력항목입니다");
-					return;
-				}
-			}
+// 				if(updateItem[i].startDt==null || updateItem[i].startDt.trim() == ''){
+// 					alert("적용시작일은 필수 입력항목입니다");
+// 					return;
+// 				}
+// 			}
 
-			if(updateItem.length <=0 ){
-				alert("저장할 항목이 없습니다");
-				return;
-			}
+// 			if(updateItem.length <=0 ){
+// 				alert("저장할 항목이 없습니다");
+// 				return;
+// 			}
 
-			// 로딩 시작
-	        $('.loading-wrap--js').show();
-	        axios.post('${pageContext.request.contextPath}/usr/mem0001_0007.do',getEditRows(grid1)).then(function(response) {
-	        	// 로딩 종료
-	            $('.loading-wrap--js').hide();
-	        	debugger;
-	        	if(response.data.resultCode == "success"){
-		        	if (response.data.list.length == 0) {
-		        		grid1.setGridOption('rowData',[]);  	// 데이터가 없는 경우 빈 배열 설정
-		        		grid1.showNoRowsOverlay();  			// 데이터가 없는 경우
-		            } else {
+// 			// 로딩 시작
+// 	        $('.loading-wrap--js').show();
+// 	        axios.post('${pageContext.request.contextPath}/usr/mem0001_0007.do',getEditRows(grid1)).then(function(response) {
+// 	        	// 로딩 종료
+// 	            $('.loading-wrap--js').hide();
+// 	        	debugger;
+// 	        	if(response.data.resultCode == "success"){
+// 		        	if (response.data.list.length == 0) {
+// 		        		grid1.setGridOption('rowData',[]);  	// 데이터가 없는 경우 빈 배열 설정
+// 		        		grid1.showNoRowsOverlay();  			// 데이터가 없는 경우
+// 		            } else {
 
-						var lst = response.data.list;	//정상데이터
-						grid1.setGridOption("rowData", lst);
-		            }
-	        	} else {
-	        		if(response.data.resultMsg != null && response.data.resultMsg != ''){
-	        			alert(response.data.resultMsg);
-	        		} else {
-	        			alert("저장에 실패하였습니다");
-	        		}
-	        	}
-	        })
-	        .catch(function(error) {
-	            console.error('There was an error fetching the data:', error);
-	        }).finally(function() {
-	        	// 로딩 종료
-	            $('.loading-wrap--js').hide();
-	        });
-		}, 100);
-	}
+// 						var lst = response.data.list;	//정상데이터
+// 						grid1.setGridOption("rowData", lst);
+// 		            }
+// 	        	} else {
+// 	        		if(response.data.resultMsg != null && response.data.resultMsg != ''){
+// 	        			alert(response.data.resultMsg);
+// 	        		} else {
+// 	        			alert("저장에 실패하였습니다");
+// 	        		}
+// 	        	}
+// 	        })
+// 	        .catch(function(error) {
+// 	            console.error('There was an error fetching the data:', error);
+// 	        }).finally(function() {
+// 	        	// 로딩 종료
+// 	            $('.loading-wrap--js').hide();
+// 	        });
+// 		}, 100);
+// 	}
 
 	function setGrid(){
 		// 사용자 정의 컴포넌트를 글로벌 네임스페이스에 추가
@@ -414,9 +458,9 @@
 			    onCellValueChanged: function (event) {
 			        changeCrud(event, grid, 'cooperatorId');
 			    },
-			    onRowClicked : function (event) { //onSelectionChanged  :row가 바뀌었을때 발생하는 이벤트인데 잘 안됨.
-			    	selcetRow(event);
-			    },
+// 			    onRowClicked : function (event) { //onSelectionChanged  :row가 바뀌었을때 발생하는 이벤트인데 잘 안됨.
+// 			    	selcetRow(event);
+// 			    },
 			    getRowStyle: params => {
 			        if (params.node.data.crud == 'c' || params.node.data.crud == 'u') {
 			            return { background: '#e99494' };
@@ -433,46 +477,46 @@
 
 	}
 
-	function setGrid1(){
-		// 사용자 정의 컴포넌트를 글로벌 네임스페이스에 추가
-		window.CustomHeader = CustomHeader;
-    	gridOptions = {
-                columnDefs: columnDefs1,
-                rowData: [], // 초기 행 데이터를 빈 배열로 설정
-                defaultColDef: { headerComponent: 'CustomHeader'}, //
-                components: { CustomHeader: CustomHeader },
-                enableCellTextSelection: true, // 셀 텍스트 선택을 활성화합니다.
-                rowHeight: 35,
-                headerHeight: 35,
-                alwaysShowHorizontalScroll : true,
-                alwaysShowVerticalScroll: true,
-                onGridReady: function(params) {
-                    //loadData(params.api); // 그리드가 준비된 후 데이터 로드
-                    params.api.sizeColumnsToFit();
-                },
-                rowClassRules: {'ag-cell-err ': (params) => { return params.data.err === true; }},
-				overlayLoadingTemplate: '<span class="ag-overlay-loading-center">로딩 중</span>',
-				overlayNoRowsTemplate: '<span class="ag-overlay-loading-center">데이터가 없습니다</span>',
-				suppressScrollOnNewData: true,
-			    onCellValueChanged: function (event) {
-			    	changeCrud(event, grid1, 'mberId');
-			        chkId(event);
-			    },
-			    getRowStyle: params => {
-			        if (params.node.data.crud == 'c' || params.node.data.crud == 'u') {
-			            return { background: '#e99494' };
-			        }
-			        if (params.node.data.crud == 'd') {
-			            return { background: '#65676b' };
-			        }
-			    }
-            };
-        const gridDiv = document.querySelector('#myGrid1');
-        grid1 = agGrid.createGrid(gridDiv, gridOptions);
+// 	function setGrid1(){
+// 		// 사용자 정의 컴포넌트를 글로벌 네임스페이스에 추가
+// 		window.CustomHeader = CustomHeader;
+//     	gridOptions = {
+//                 columnDefs: columnDefs1,
+//                 rowData: [], // 초기 행 데이터를 빈 배열로 설정
+//                 defaultColDef: { headerComponent: 'CustomHeader'}, //
+//                 components: { CustomHeader: CustomHeader },
+//                 enableCellTextSelection: true, // 셀 텍스트 선택을 활성화합니다.
+//                 rowHeight: 35,
+//                 headerHeight: 35,
+//                 alwaysShowHorizontalScroll : true,
+//                 alwaysShowVerticalScroll: true,
+//                 onGridReady: function(params) {
+//                     //loadData(params.api); // 그리드가 준비된 후 데이터 로드
+//                     params.api.sizeColumnsToFit();
+//                 },
+//                 rowClassRules: {'ag-cell-err ': (params) => { return params.data.err === true; }},
+// 				overlayLoadingTemplate: '<span class="ag-overlay-loading-center">로딩 중</span>',
+// 				overlayNoRowsTemplate: '<span class="ag-overlay-loading-center">데이터가 없습니다</span>',
+// 				suppressScrollOnNewData: true,
+// 			    onCellValueChanged: function (event) {
+// 			    	changeCrud(event, grid1, 'mberId');
+// 			        chkId(event);
+// 			    },
+// 			    getRowStyle: params => {
+// 			        if (params.node.data.crud == 'c' || params.node.data.crud == 'u') {
+// 			            return { background: '#e99494' };
+// 			        }
+// 			        if (params.node.data.crud == 'd') {
+// 			            return { background: '#65676b' };
+// 			        }
+// 			    }
+//             };
+//         const gridDiv = document.querySelector('#myGrid1');
+//         grid1 = agGrid.createGrid(gridDiv, gridOptions);
 
-        grid1.hideOverlay();
+//         grid1.hideOverlay();
 
-	}
+// 	}
 
 	</script>
 <body class="index-page">
@@ -570,39 +614,36 @@
 			<!-- grid  -->
 			<br>
 
-			<div style="float: left; width: 49%; margin-right: 1%">
+<!-- 			<div style="float: left; width: 49%; margin-right: 1%"> -->
 				<div style="height: 0px;">
-					<span class="pagetotal" style='margin-right: 20px;'>협력사 : 미사용으로 변경시 하위 모든 라이더 출금이 막힘</span>
+					<span class="pagetotal" style='margin-right: 20px;'>협력사 : 미사용으로 변경시 하위 모든 라이더 출금이 막힘(%는 소수점 이하 3자리)</span>
 					<div class="btnwrap">
 						<button id="협력사추가버튼" class="btn btn-primary" style='display:none;'>추가</button>
 						<button id="협력사삭제버튼" class="btn btn-primary" style="display:none;">삭제</button>
 						<button id="협력사저장버튼" class="btn ty1">저장</button>
 					</div>
 				</div>
+
 				<div id="loadingOverlay" style="display: none;">Loading...</div>
-
-
-				<div class="ib_product">
-					<div id="myGrid" class="ag-theme-alpine"
-						style="height: 550px; width: 100%;"></div>
+				<div  class="ib_product">
+					<div id="myGrid" class="ag-theme-alpine" style="height: 550px; width: 100%;"></div>
 				</div>
-			</div>
-			<div style="float: left; width: 50%;">
+<!-- 			</div> -->
+<!-- 			<div style="float: left; width: 50%;"> -->
 
 				<!-- grid  -->
 
-				<div style="height: 0px;">
-					<span class="pagetotal" style='margin-right: 20px;'>수수료 : 기존데이터는 종료일만 수정가능</span>
-					<div class="btnwrap">
-						<button id="수수료추가버튼" class="btn btn-primary">추가</button>
-						<button id="수수료저장버튼" class="btn ty1">저장</button>
-					</div>
-				</div>
-				<div class="ib_product">
-					<div id="myGrid1" class="ag-theme-alpine"
-						style="height: 550px; width: 100%;"></div>
-				</div>
-			</div>
+<!-- 				<div style="height: 0px;"> -->
+<!-- 					<span class="pagetotal" style='margin-right: 20px;'>수수료 : 기존데이터는 종료일만 수정가능</span> -->
+<!-- 					<div class="btnwrap"> -->
+<!-- 						<button id="수수료추가버튼" class="btn btn-primary">추가</button> -->
+<!-- 						<button id="수수료저장버튼" class="btn ty1">저장</button> -->
+<!-- 					</div> -->
+<!-- 				</div> -->
+<!-- 				<div  class="ib_product"> -->
+<!-- 					<div id="myGrid1" class="ag-theme-alpine" style="height: 380px; width: 100%;"></div> -->
+<!-- 				</div> -->
+<!-- 			</div> -->
 		</div>
 
 	</div>

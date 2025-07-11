@@ -52,5 +52,23 @@ public class CooperatorVO extends Sch implements Serializable {
 	private String rdcnt;
 
 
+	//RD_COOPERATOR_FEE
+	private String feeId;
+	//운영사선지급수수료(%)
+	private float feeAdminstrator;
+	//협력사선지급수수료(%)
+	private float feeCooperator;
+	//고용보험(%)
+	private float feeEmploymentInsurance;
+	//산재보험(%)
+	private float feeIndustrialInsurance;
+	//원천세(%)
+	private float feeWithholdingTax;
+	//시간제보험(원)
+	private int feeTimeInsurance;
+	//콜수수료(원)
+	private int feeCall;
+
+
 	private List<CooperatorVO> cooperatorVO;
 }
