@@ -147,16 +147,20 @@ async function populateSelectOptions(selectId, mapping, selectedValue = '', opti
  * 숫자 컴마처리 / 화폐처리
  */
 function currencyFormatter(params) {
-	debugger;
     if (params === null || params === undefined) {
         return '0'; // null 또는 undefined인 경우 빈 문자열 반환
-    } else if (typeof params === 'string' || typeof params === 'number') {
-        return getOnlyNumber(params.toString()).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-    } else if (params.value !== undefined && params.value !== null) {
-        return params.value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-    } else {
-        return params;
     }
+
+	var inputDataArr;
+    if (typeof params === 'string' || typeof params === 'number') {
+        inputDataArr = params.toString().split(".");
+    } else if (params.value !== undefined && params.value !== null) {
+        inputDataArr = params.value.toString().split(".");
+    } else {
+        inputDataArr = params.toString().split(".");
+    }
+
+    return getOnlyNumber(inputDataArr[0]).replace(/\B(?=(\d{3})+(?!\d))/g, ",")+(inputDataArr[1] != undefined ? "."+inputDataArr[1] : "");
 }
 
 /**

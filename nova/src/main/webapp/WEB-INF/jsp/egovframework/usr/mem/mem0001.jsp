@@ -88,27 +88,27 @@
 		{ headerName: "feeId", field: "feeId", minWidth: 90, hide:true},
 		{ headerName: "운영사<br/>선지급수수료(%)", field: "feeAdminstrator", minWidth: 90, editable: true
 			, cellClass: (params) => {return agGrideditClass(params, "ag-cell-right");}
-// 			, valueGetter:(params) => { return currencyFormatter(params.data.feeAdminstrator);}
+			, valueGetter:(params) => { return currencyFormatter(params.data.feeAdminstrator);}
             , valueParser: (params) => { return gridPercent(params);}
 		},
 		{ headerName: "협력사<br/>선지급수수료(%)", field: "feeCooperator", minWidth: 90, editable: true
 			, cellClass: (params) => {return agGrideditClass(params, "ag-cell-right");}
-// 			, valueGetter:(params) => { return currencyFormatter(params.data.feeCooperator);}
+			, valueGetter:(params) => { return currencyFormatter(params.data.feeCooperator);}
             , valueParser: (params) => { return gridPercent(params);}
 		},
 		{ headerName: "고용보험(%)", field: "feeEmploymentInsurance", minWidth: 90, editable: true
 			, cellClass: (params) => {return agGrideditClass(params, "ag-cell-right");}
-// 			, valueGetter:(params) => { return currencyFormatter(params.data.feeEmploymentInsurance);}
+			, valueGetter:(params) => { return currencyFormatter(params.data.feeEmploymentInsurance);}
             , valueParser: (params) => { return gridPercent(params);}
 		},
 		{ headerName: "산재보험(%)", field: "feeIndustrialInsurance", minWidth: 90, editable: true
 			, cellClass: (params) => {return agGrideditClass(params, "ag-cell-right");}
-// 			, valueGetter:(params) => { return currencyFormatter(params.data.feeIndustrialInsurance);}
+			, valueGetter:(params) => { return currencyFormatter(params.data.feeIndustrialInsurance);}
             , valueParser: (params) => { return gridPercent(params);}
 		},
 		{ headerName: "원천세(%)", field: "feeWithholdingTax", minWidth: 90, editable: true
 			, cellClass: (params) => {return agGrideditClass(params, "ag-cell-right");}
-// 			, valueGetter:(params) => { return currencyFormatter(params.data.feeWithholdingTax);}
+			, valueGetter:(params) => { return currencyFormatter(params.data.feeWithholdingTax);}
             , valueParser: (params) => { return gridPercent(params);}
 		},
 		{ headerName: "시간제보험(원)", field: "feeTimeInsurance", minWidth: 90, editable: true
