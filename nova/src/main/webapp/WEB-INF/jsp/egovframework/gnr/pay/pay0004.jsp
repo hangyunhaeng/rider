@@ -270,8 +270,8 @@
 									<p class="form-check-label mb-1 mb-md-0 mb-xl-1 mb-xxl-0 fs-8 me-2 text-body cursor-pointer">30일간 매일 1,000원</p>
 									</div>
 									<div class="col-auto d-flex">
-										<a class="fw-bold fs-9" href="#" onclick="modifyInq(this);">승인</a>
-<!-- 										<p class="fw-bold fs-9">진행중</p> -->
+<!-- 										<a class="fw-bold fs-9" href="#" onclick="modifyInq(this);">승인</a> -->
+										<p class="fw-bold fs-9">진행중</p>
 									</div>
 								</div>
 
