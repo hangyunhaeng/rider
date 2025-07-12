@@ -67,6 +67,7 @@ import egovframework.com.rd.usr.service.vo.DeliveryInfoVO;
 import egovframework.com.rd.usr.service.vo.DoszSchAccoutVO;
 import egovframework.com.rd.usr.service.vo.DoszTransferVO;
 import egovframework.com.rd.usr.service.vo.DoznHistoryVO;
+import egovframework.com.rd.usr.service.vo.EtcVO;
 import egovframework.com.rd.usr.service.vo.HistoryVO;
 import egovframework.com.rd.usr.service.vo.MyInfoVO;
 import egovframework.com.rd.usr.service.vo.NiceVO;
@@ -234,7 +235,7 @@ public class DtyServiceImpl extends EgovAbstractServiceImpl implements DtyServic
 
 
 
-    	//일정산 입금내역 수수료 계산 후 조회
+    	//일정산 입금내역 수수료 계산 후 입금이력 등록
 		DayPayVO inVo = new DayPayVO();
 		inVo.setDayAtchFileId(atchFileId);
     	List<DayPayVO> dayList = dtyDAO.selectDayPay(inVo);
@@ -243,6 +244,63 @@ public class DtyServiceImpl extends EgovAbstractServiceImpl implements DtyServic
     		one.setDypId(egovDypIdGnrService.getNextStringId());
     		one.setCreatId(user.getId());
     		dtyDAO.insertDayPay(one);
+    	}
+
+    	//대출 입금 대상 조회 후 출금이력 생성
+    	List<EtcVO> etcList = dtyDAO.selectEtcList(inVo);
+    	for(int i = 0 ; i<etcList.size() ; i++) {
+    		EtcVO one = etcList.get(i);
+    		one.setLastUpdusrId(user.getId());
+
+    		//1.출금 가능금액 내의 금액인지 확인
+    		MyInfoVO myInfoVO = new MyInfoVO();
+    		myInfoVO.setMberId(one.getMberId());
+    		myInfoVO.setSearchCooperatorId(one.getCooperatorId());
+    		MyInfoVO ablePrice = rotService.selectAblePrice(myInfoVO);
+    		if(one.getPaybackCost() <= ablePrice.getWeekAblePrice()) {
+
+    			WeekPayVO insertVo = new WeekPayVO();
+    			insertVo.setWkpId(egovWkpIdGnrService.getNextStringId());
+    			insertVo.setMberId(one.getMberId());
+    			insertVo.setCooperatorId(one.getCooperatorId());
+    			insertVo.setDwGubun("WEK");
+    			insertVo.setIoGubun("2");
+    			insertVo.setFee(0);
+    			insertVo.setSendPrice(new BigDecimal(one.getPaybackCost()));
+    			insertVo.setEtcId(one.getEtcId());
+//    			insertVo.setTranDay(tranDay);
+//    			insertVo.setTelegramNo(telegramNo);
+    			insertVo.setUseAt("Y");
+    			insertVo.setCreatId(user.getId());
+
+    			dtyDAO.insertWeekPay(insertVo);
+    			dtyDAO.finishEtc(one);
+    		} else if(one.getPaybackCost() <= ablePrice.getDayAblePrice() ) {	//출금 가능금액 체크
+
+    			DayPayVO insertVo = new DayPayVO();
+    			int dayFee = (int)Math.ceil(one.getPaybackCost()*0.011);
+    			int insurance = (int)Math.ceil(one.getPaybackCost()*0.05);
+
+    			insertVo.setDypId(egovDypIdGnrService.getNextStringId());
+    			insertVo.setMberId(one.getMberId());
+    			insertVo.setCooperatorId(one.getCooperatorId());
+    			insertVo.setDay(Util.getDay());
+    			insertVo.setIoGubun("2");			//출금
+    			insertVo.setDayFee(dayFee);		//선출금수수료
+    			insertVo.setInsurance(insurance);	//보험료
+    			insertVo.setSendFee(0);		//이체수수료
+    			insertVo.setSendPrice(one.getPaybackCost());
+    			insertVo.setWeekYn("N");			//정산완료
+    			insertVo.setEtcId(one.getEtcId());
+//    			insertVo.setTranDay(tranDay);
+//    			insertVo.setTelegramNo(telegramNo);
+    			insertVo.setUseAt("Y");
+    			insertVo.setCreatId(user.getId());
+    			dtyDAO.insertDayPay(insertVo);
+    			dtyDAO.finishEtc(one);
+
+    		}
+
     	}
 
 

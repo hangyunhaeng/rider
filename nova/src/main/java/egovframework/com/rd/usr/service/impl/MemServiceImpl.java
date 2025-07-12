@@ -493,6 +493,15 @@ public class MemServiceImpl extends EgovAbstractServiceImpl implements MemServic
 	public List<EtcVO> selectEtcList(EtcVO etcVO) throws Exception{
 		return memDAO.selectEtcList(etcVO);
 	}
+	/**
+	 * 협력사,라이더별 대출 리스트 Cnt
+	 * @param vo
+	 * @return
+	 * @throws Exception
+	 */
+	public int selectEtcListCnt(EtcVO vo) throws Exception {
+		return memDAO.selectEtcListCnt(vo);
+	}
 
 	/**
 	 * 협력사,라이더별 대출 리스트 저장
@@ -580,5 +589,15 @@ public class MemServiceImpl extends EgovAbstractServiceImpl implements MemServic
 
 		return returnVo;
 
+	}
+
+	/**
+	 * 협력사,라이더별 대출 승인
+	 * @param etcVO
+	 * @return
+	 * @throws Exception
+	 */
+	public int responseEtc(EtcVO vo) throws Exception {
+		return memDAO.responseEtc(vo);
 	}
 }

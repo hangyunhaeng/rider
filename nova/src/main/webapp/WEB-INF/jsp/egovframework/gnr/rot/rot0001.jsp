@@ -122,7 +122,6 @@
 
 	function 공지사항(){
 
-		debugger;
 	    var gongjiList = JSON.parse('${gongjiList}'.replace(/\r/gi, '\\r').replace(/\n/gi, '\\n').replace(/\t/gi, '\\t').replace(/\f/gi, '\\f'));
 		var gongjiCnt = 0;
 		var gongjiCookie = "";

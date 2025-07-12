@@ -11,6 +11,7 @@ import egovframework.com.rd.usr.service.vo.CooperatorFeeVO;
 import egovframework.com.rd.usr.service.vo.CooperatorVO;
 import egovframework.com.rd.usr.service.vo.DeliveryInfoVO;
 import egovframework.com.rd.usr.service.vo.EtcVO;
+import egovframework.com.rd.usr.service.vo.InquiryVO;
 import egovframework.com.uat.uia.web.EgoRDLoginController;
 import egovframework.com.uss.umt.service.MberManageVO;
 
@@ -337,6 +338,16 @@ public class MemDAO extends EgovComAbstractDAO {
 		return selectList("memDAO.selectEtcList", vo);
 	}
 	/**
+	 * 협력사,라이더별 대출 리스트 Cnt
+	 * @param vo
+	 * @return
+	 * @throws Exception
+	 */
+	public int selectEtcListCnt(EtcVO vo) throws Exception {
+		EtcVO reVo = selectOne("memDAO.selectEtcListCnt", vo);
+		return reVo.getTotalCnt();
+	}
+	/**
 	 * 협력사,라이더별 대출 등록
 	 * @param vo
 	 * @return
@@ -363,6 +374,16 @@ public class MemDAO extends EgovComAbstractDAO {
 	 */
 	public int requestEtc(EtcVO vo) throws Exception {
 		return insert("memDAO.requestEtc", vo);
+	}
+
+	/**
+	 * 협력사,라이더별 대출 승인
+	 * @param etcVO
+	 * @return
+	 * @throws Exception
+	 */
+	public int responseEtc(EtcVO vo) throws Exception {
+		return update("memDAO.responseEtc", vo);
 	}
 }
 

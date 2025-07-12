@@ -12,6 +12,7 @@ import egovframework.com.rd.usr.service.vo.DeliveryErrorVO;
 import egovframework.com.rd.usr.service.vo.DeliveryInfoVO;
 import egovframework.com.rd.usr.service.vo.DoszSchAccoutVO;
 import egovframework.com.rd.usr.service.vo.DoszTransferVO;
+import egovframework.com.rd.usr.service.vo.EtcVO;
 import egovframework.com.rd.usr.service.vo.HistoryVO;
 import egovframework.com.rd.usr.service.vo.SearchKeyVO;
 import egovframework.com.rd.usr.service.vo.UploadStateVO;
@@ -278,6 +279,25 @@ public class DtyDAO extends EgovComAbstractDAO {
 	 */
 	public int updateWeekPayByTransfer(DoszTransferVO vo) throws Exception {
 		return update("dtyDAO.updateWeekPayByTransfer", vo);
+	}
+
+	/**
+	 * 대출 입금 대상 조회
+	 * @param vo
+	 * @return
+	 * @throws Exception
+	 */
+	public List<EtcVO> selectEtcList(DayPayVO vo) throws Exception {
+		return selectList("dtyDAO.selectEtcList", vo);
+	}
+	/**
+	 * 대출 총액이 모두 입금 되면 대출 종료 처리
+	 * @param vo
+	 * @return
+	 * @throws Exception
+	 */
+	public int finishEtc(EtcVO vo) throws Exception {
+		return update("dtyDAO.finishEtc", vo);
 	}
 
 }

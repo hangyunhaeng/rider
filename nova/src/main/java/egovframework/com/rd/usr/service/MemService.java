@@ -132,7 +132,13 @@ public interface MemService {
 	 * @throws Exception
 	 */
 	public List<EtcVO> selectEtcList(EtcVO etcVO) throws Exception ;
-
+	/**
+	 * 협력사,라이더별 대출 리스트 Cnt
+	 * @param vo
+	 * @return
+	 * @throws Exception
+	 */
+	public int selectEtcListCnt(EtcVO vo) throws Exception ;
 	/**
 	 * 협력사,라이더별 대출 리스트 저장
 	 * @param etcVO
@@ -148,4 +154,11 @@ public interface MemService {
 	 * @throws Exception
 	 */
 	public EtcVO requestEtcList(List<EtcVO> list) throws Exception ;
+	/**
+	 * 협력사,라이더별 대출 승인
+	 * @param etcVO
+	 * @return
+	 * @throws Exception
+	 */
+	public int responseEtc(EtcVO vo) throws Exception ;
 }

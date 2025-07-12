@@ -280,9 +280,51 @@ public class EgovPayController {
         etcVO.setSchId(user.getId());
 
         etcVO.setMberId(user.getId());
-        etcVO.setSearchGubun("RIDER");
+        etcVO.setSearchGubun("RIDER_LIST");
         etcVO.setCooperatorId((String)request.getSession().getAttribute("cooperatorId"));
 
+        map.put("cnt", memService.selectEtcListCnt(etcVO));
+        map.put("list", memService.selectEtcList(etcVO));
+        map.put("resultCode", "success");
+    	return ResponseEntity.ok(map);
+	}
+
+
+	/**
+	 * 대출 요청 승인
+	 * @param request
+	 * @param sessionVO
+	 * @param model
+	 * @return
+	 */
+	@RequestMapping("/gnr/pay0004_002.do")
+	public ResponseEntity<?> pay0004_002(@ModelAttribute("EtcVO") EtcVO etcVO, HttpServletRequest request) throws Exception{
+
+    	//로그인 체크
+        LoginVO user = (LoginVO)EgovUserDetailsHelper.getAuthenticatedUser();
+        Boolean isAuthenticated = EgovUserDetailsHelper.isAuthenticated();
+
+        if(!isAuthenticated) {
+        	return ResponseEntity.status(401).body("Unauthorized");
+        }
+
+        //return value
+        Map<String, Object> map =  new HashMap<String, Object>();
+
+
+        //라이더 권한
+        etcVO.setSchAuthorCode(user.getAuthorCode());
+        etcVO.setSchId(user.getId());
+
+        //승인
+        etcVO.setMberId(user.getId());
+        memService.responseEtc(etcVO);
+
+        //승인 후 재조회
+        etcVO.setSearchGubun("RIDER_LIST");
+        etcVO.setCooperatorId((String)request.getSession().getAttribute("cooperatorId"));
+
+        map.put("cnt", memService.selectEtcListCnt(etcVO));
         map.put("list", memService.selectEtcList(etcVO));
         map.put("resultCode", "success");
     	return ResponseEntity.ok(map);

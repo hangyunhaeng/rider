@@ -114,7 +114,7 @@ public class EgovRotController {
 		model.addAttribute("cooperatorId", selectCooperId);
 
 		EtcVO etcVO = new EtcVO();
-		etcVO.setSearchGubun("RIDER");
+		etcVO.setSearchGubun("RIDER_ALERT");
 		etcVO.setMberId(user.getId());
 		etcVO.setCooperatorId(selectCooperId);
 		model.addAttribute("requestCnt", memService.selectEtcList(etcVO).size());

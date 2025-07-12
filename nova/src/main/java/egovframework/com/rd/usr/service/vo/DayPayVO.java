@@ -52,6 +52,8 @@ public class DayPayVO extends Sch implements Serializable {
 	private String tranDay;
 	//거래고유번호
 	private String telegramNo;
+	//etcId
+	private String etcId;
 	//사용여부
 	private String useAt;
 	//생성시점
