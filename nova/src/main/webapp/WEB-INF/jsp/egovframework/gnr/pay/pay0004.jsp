@@ -23,7 +23,6 @@
     <meta name="msapplication-TileImage" content="/images/admin/features-2.jpg">
     <meta name="theme-color" content="#ffffff">
 
-
 	<!-- phoenix -->
 	<script src="<c:url value='/vendor/admin/bootstrap/js/bootstrap.min.js' />"></script>
     <script src="<c:url value='/js/phoenix/simplebar.min.js' />"></script>
@@ -59,7 +58,7 @@
 <!-- <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet"> -->
 
 <!-- Vendor CSS Files -->
-<%-- <link href="<c:url value='/vendor/admin/bootstrap/css/bootstrap.min.css' />" rel="stylesheet"> --%>
+<link href="<c:url value='/vendor/admin/bootstrap/css/bootstrap.min.css' />" rel="stylesheet">
 <link href="<c:url value='/vendor/admin/bootstrap-icons/bootstrap-icons.css' />" rel="stylesheet">
 <link href="<c:url value='/vendor/admin/aos/aos.css' />" rel="stylesheet">
 <link href="<c:url value='/vendor/admin/fontawesome-free/css/all.min.css' />" rel="stylesheet">
@@ -81,131 +80,101 @@
 
 	<script type="text/javaScript">
 
+	var pagePerCnt = 10;
 	//onLoad
 	document.addEventListener('DOMContentLoaded', function() {
-		$('#dayAblePrice').html(currencyFormatter(${ablePrice.dayAblePrice})+"원");
-		$('#weekAblePrice').html(currencyFormatter(${ablePrice.weekAblePrice})+"원");
 
-		//라이더 사용여부에 따라 출금 불가 처리
-		if('${ablePrice.useAt}' == 'Y'){
-			$('.card').find('button').attr('disabled', false);
-		} else {
-			$('.card').find('button').attr('disabled', true);
-		}
-
-
-		//공지사항
-		공지사항();
-		대출();
-
-		//다중협력사
-		var cooperatorList = JSON.parse('${cooperatorList}');
-	    populateSelectOptions('cooperatorId', cooperatorList.resultList, "${cooperatorId}");
-
-	    if($('#cooperatorId').find('option').length > 1){
-	    	$('#다중협력사').show();
-	    }
-
-
-		$("#cooperatorId").on("change", function(e) {
-			loadAblePrice();
-		});
-
-		var selectCoopId = getCookie('cooperatorId');
-		if(selectCoopId != undefined){
-			if($('#cooperatorId').find('[value='+selectCoopId+']').length > 0){
-				$("#cooperatorId").val(selectCoopId);
-				loadAblePrice();
-			}
-		}
+		//페이징설정
+		paging.createPaging('#paging', 1, pagePerCnt, serchList);
+ 		serchList((${etcVO.schIdx}==0)?1: ${etcVO.schIdx}, paging.objectCnt);
 	});
-
-	function 공지사항(){
-
-		debugger;
-	    var gongjiList = JSON.parse('${gongjiList}'.replace(/\r/gi, '\\r').replace(/\n/gi, '\\n').replace(/\t/gi, '\\t').replace(/\f/gi, '\\f'));
-		var gongjiCnt = 0;
-		var gongjiCookie = "";
-		if(gongjiList != null && gongjiList.resultList != null){
-
-			gongjiList.resultList.forEach(function(dataInfo, idx){
-
-				if(getCookie("notId") == undefined || getCookie("notId") == 'undefined'){
-					gongjiCnt++;						//읽지 않은 공지
-				}else if( getCookie("notId").indexOf(dataInfo.notId) < 0){
-					gongjiCnt++;						//읽지 않은 공지
-				} else {
-					gongjiCookie += "^"+dataInfo.notId;	//읽은 공지
-				}
-
-			});
-		}
-		var date = new Date();
-		date.setDate(date.getDate() + 14);
-		date = date.toUTCString();
-		document.cookie = "notId = "+gongjiCookie+"; path=/; expires=" + date;
-		$('#공지건수').html(gongjiCnt);
-		if(gongjiCnt > 0){
-			$('#div공지사항').show();
-		}
-	}
-	function 대출(){
-		if(${requestCnt} > 0){
-			$('#div대출').show();
-		}
-	}
-
-	//페이지 이동
-	function go선출금() {
-		$('#myForm').attr("action", "${pageContext.request.contextPath}/gnr/rot0003.do");
-		$('#myForm').append($("<input/>", {type:"hidden", name:"gubun", value:"DAY"}));
+	function 문의하기(inqId){
+		$('#myForm').attr("action", "/gnr/inq0002.do");
+		$('#myForm').append($("<input/>", {type:"hidden", name:"inqId", value:inqId}));
+		$('#myForm').append($("<input/>", {type:"hidden", name:"schIdx", value:paging.pIdx}));
 		$('#myForm').submit();
 	}
+	function serchList(schIdx, schPagePerCnt){
+		    const params = new URLSearchParams();
+			params.append("schIdx", schIdx);
+			params.append("schPagePerCnt", schPagePerCnt);
 
-	//페이지 이동
-	function go출금() {
-		$('#myForm').attr("action", "${pageContext.request.contextPath}/gnr/rot0003.do");
-		$('#myForm').append($("<input/>", {type:"hidden", name:"gubun", value:"WEK"}));
-		$('#myForm').submit();
-	}
-	function loadAblePrice(){
+			// 로딩 시작
+	        $('.loading-wrap--js').show();
+		    axios.post('${pageContext.request.contextPath}/gnr/pay0004_001.do', params)
+		        .then(response => {
 
-	    const params = new URLSearchParams();
-	    params.append("searchCooperatorId", $('#cooperatorId').val());
+		        	// 로딩 종료
+		            $('.loading-wrap--js').hide();
+					if(response.data.resultCode == "success"){
+						//보이는 내역 모두 삭제
+// 						$('#반복부 > div :visible').remove();
 
-		// 로딩 시작
-        $('.loading-wrap--js').show();
-	    axios.post('${pageContext.request.contextPath}/gnr/rot0001_0002.do', params)
-	        .then(response => {
-	        	// 로딩 종료
-	            $('.loading-wrap--js').hide();
-				if(response.data.resultCode == "success"){
+						if(response.data.list == null || response.data.list.length == 0){
 
-					$('#dayAblePrice').html(currencyFormatter(response.data.ablePrice.dayAblePrice)+"원");
-					$('#weekAblePrice').html(currencyFormatter(response.data.ablePrice.weekAblePrice)+"원");
-					if(response.data.ablePrice.useAt == 'Y'){
-						$('.card').find('button').attr('disabled', false);
-					} else {
-						$('.card').find('button').attr('disabled', true);
+							$('#반복부').append(
+							          '         <div class="d-flex hover-actions-trigger py-1 border-translucent border-top">                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                '
+							         +'           <div class="row justify-content-between align-items-md-center btn-reveal-trigger border-translucent gx-0 flex-1 cursor-pointer" data-bs-toggle="modal" data-bs-target="#exampleModal">                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     '
+							         +'             <div class="col-12 col-md-auto col-xl-12 col-xxl-auto">                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  '
+							         +'               <div class="mb-1 mb-md-0 d-flex align-items-center lh-1">                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              '
+							         +'               	<label class="form-check-label mb-md-0 mb-xl-1 mb-xxl-0 fs-8 me-2 text-body cursor-pointer my-4">조회된 내역이 없습니다.</label>                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              '
+							         +'               </div>                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 '
+									 +'			</div>'
+							);
+							return;
+						}
+
+
+
+						response.data.list.forEach(function(dataInfo, idx){
+// 							if(dataInfo.upInqId == null){
+// 								//질문원본
+// 								var 내역 = $('#반복부').find('[repeatObj=true]:hidden:eq(0)').clone();
+// 								$('#반복부').append(내역);
+// 								내역.addClass(dataInfo.inqId);
+// 								내역.find('div[data-bs-toggle=collapse]').attr("data-bs-target", ".collapseExample"+idx);
+// 								내역.find('[name=inqId]').val(dataInfo.inqId);
+// 								내역.find('p[class~=cursor-pointer]').text(dataInfo.title);
+// 								내역.find('p[class~=text-body-tertiary]').text(dataInfo.creatDt);
+// 								내역.find('div[class~=collapse]').addClass("collapseExample"+idx);
+// 								내역.find('div[class~=collapse]').append(replaceRevN(dataInfo.longtxt));
+// 								내역.show();
+
+// 							} else {
+// 								//답변
+// 								$('.'+dataInfo.upInqId+'').find('[name=replayCnt]').text(Number($('.'+dataInfo.upInqId+'').find('[name=replayCnt]').text())+1);
+// 								$('.'+dataInfo.upInqId+'').find('[name=replayCnt]').parent().show();
+
+
+// 								var 내역 = $('#반복부').find('[repeatObj=true]:hidden:eq(1)').clone();
+// 								$('.'+dataInfo.upInqId+'').find('.collapse').append(내역);
+// 								내역.find('p[class~=cursor-pointer]').text(dataInfo.title);
+// 								내역.find('p[class~=text-body-tertiary]').text(dataInfo.creatDt);
+// 								내역.find('span:eq(0)').text(dataInfo.creatNm);
+// 								내역.find('div[class~=text-body-tertiary]').html(replaceRevN(dataInfo.longtxt));
+// 								내역.show();
+
+// 							}
+
+						});
+
+
+						$('#반복부').find('img').attr("width", "100%");
+
+			        	paging.setPageing(schIdx, response.data.cnt);
+
 					}
-
-					document.cookie = "cooperatorId = "+$('#cooperatorId').val();
-				} else {
-					if(response.data.resultMsg != '' && response.data.resultMsg != null)
-						alert(response.data.resultMsg);
-					else alert("실패하였습니다");
-					return ;
-				}
-	        })
-	        .catch(error => {
-	        	// 로딩 종료
-	            $('.loading-wrap--js').hide();
-	            console.error('Error fetching data:', error);
-	        });
+		        })
+		        .catch(error => {
+		        	// 로딩 종료
+		            $('.loading-wrap--js').hide();
+		            console.error('Error fetching data:', error);
+		        });
 	}
+	function modifyInq(obj){
 
-
-
+		문의하기($(obj).closest('.drawTable').find('[name=inqId]').val());
+	}
 	</script>
 
 <body>
@@ -225,9 +194,9 @@
 
       <nav id="navmenu" class="navmenu">
         <ul>
-          <li><a href="${pageContext.request.contextPath}/com/com0002.do" class="active">Home<br></a></li>
+          <li><a href="${pageContext.request.contextPath}/com/com0002.do">Home<br></a></li>
 		  <li><a href="${pageContext.request.contextPath}/gnr/not0001.do">공지사항</a></li>
-		  <li><a href="${pageContext.request.contextPath}/gnr/inq0001.do">1:1문의</a></li>
+		  <li><a href="${pageContext.request.contextPath}/gnr/inq0001.do" class="active">1:1문의</a></li>
           <li class="dropdown"><a href="#"><span>출금</span> <i class="bi bi-chevron-down toggle-dropdown"></i></a>
             <ul>
               <li><a href="${pageContext.request.contextPath}/gnr/rot0003.do?gubun=DAY">선정산 배달비</a></li>
@@ -249,211 +218,161 @@
 
 <main class="main" id="top">
 	<div class="content">
-		<div class="mx-lg-n4 mt-3">
-
-
-
+<div class="mx-lg-n4 mt-3">
           <div class="row g-3">
-            <div class="col-12">
-
-				  <div id="div공지사항" class="card shadow-none border mb-3" data-component-card="data-component-card" style="display:none;">
-		            <div class="card-header p-4 bg-body">
-		              <div class="row g-3 justify-content-between align-items-end">
-		                <div class="col-12 col-md">
-		                  <h4 class="text-body mb-0" data-anchor="data-anchor" id="example"><font _mstmutation="1" _msttexthash="14650168" _msthash="400">공지사항</font><a class="anchorjs-link " aria-label="닻" data-anchorjs-icon="#" href="#example" style="margin-left: 0.1875em; padding-right: 0.1875em; padding-left: 0.1875em;" _mstaria-label="76115" _msthash="399"></a></h4>
-		                  <p class="mb-0 mt-2 text-body-secondary" _msttexthash="621365329" _msthash="401">최근 2주간 등록된 공지사항 중<br/>읽지 않은 공지사항 <sm id="공지건수">4</sm>건</p>
-		                </div>
-		                <div class="col col-md-auto">
-		                  <nav class="nav justify-content-end doc-tab-nav align-items-center" role="tablist">
-		                  <a class="btn btn-sm btn-phoenix-primary code-btn ms-2 collapsed" role="button" href="${pageContext.request.contextPath}/gnr/not0001.do">
-		                  <font _mstmutation="1" _msttexthash="21101600" _msthash="402">공지사항</font></a>
-		                  </nav>
-		                </div>
-		              </div>
-		            </div>
-		          </div>
-
-              <div id="다중협력사" class="card mb-3" style="display:none;">
+            <div class="col-12 col-xxl-7">
+              <div class="card h-100">
                 <div class="card-header border-bottom-0 pb-0">
-                  <div class="row justify-content-between align-items-center mb-2">
+                  <div class="row justify-content-between align-items-center mb-4">
                     <div class="col-auto">
-                      <h3 class="text-body-emphasis">협력사</h3>
+                      <h3 class="text-body-emphasis">대여.리스</h3>
                     </div>
-                       <div class="col-auto d-flex">
-<!--                        	<button class="btn btn-primary mb-2 mb-sm-0 mx-1 fs-9" type="submit" onclick="go선출금();">출금</button> -->
-                       </div>
+<!--                        <div class="col-auto d-flex"> -->
+<!--                        	<button class="btn btn-primary mb-2 mb-sm-0 mx-1 fs-9" type="submit" onclick="문의하기()">문의하기</button> -->
+<!--                        </div> -->
+
+
+
                   </div>
                 </div>
 
 
 
-                <div class="card-body py-0 scrollbar to-do-list-body">
 
 
-								<div class="d-flex hover-actions-trigger py-3 border-translucent border-top">
-									<div class="row justify-content-between align-items-md-center btn-reveal-trigger border-translucent gx-0 flex-1 cursor-pointer">
-										<div class="col-12">
 
-											<div class="row justify-content-between mb-1 mb-md-0 d-flex align-items-center lh-1">
-												<div class="col-auto w-100">
-													<select id="cooperatorId" class="form-select"></select>
-												</div>
-											</div>
 
+
+                <div id="반복부" class="card-body py-0 scrollbar to-do-list-body">
+
+
+					<!-- 조회내역 없음 -->
+					<div repeatObj="no" class="d-flex hover-actions-trigger py-1 border-translucent border-top" style="display:none !important;">
+						<div class="row justify-content-between align-items-md-center btn-reveal-trigger border-translucent gx-0 flex-1 cursor-pointer" data-bs-toggle="modal" data-bs-target="#exampleModal">
+							<div class="col-12 col-md-auto col-xl-12 col-xxl-auto">
+								<div class="mb-1 mb-md-0 d-flex align-items-center lh-1">
+									<label class="form-check-label mb-md-0 mb-xl-1 mb-xxl-0 fs-8 me-2 text-body cursor-pointer my-4">조회된 내역이 없습니다.</label>
+								</div>
+							</div>
+						</div>
+					</div>
+					<!-- 조회내역 없음 -->
+
+					<!-- 1:1문의 질문 start -->
+					<div repeatObj="true" class="drawTable d-flex hover-actions-trigger py-3 border-translucent border-top" style="">
+						<div class="row justify-content-between align-items-md-center btn-reveal-trigger border-translucent gx-0 flex-1 cursor-pointer w-100">
+							<div class="col-12 col-md-auto col-xl-12 col-xxl-auto">
+								<div class="row justify-content-between mb-1 mb-md-0 d-flex align-items-center lh-1">
+									<div style="width: calc(100% - 55px);"class="col-auto" data-bs-toggle="collapse" data-bs-target="" aria-expanded="false">
+									<input type="hidden" name="inqId" value="" />
+
+									<span class="tag-badge-tag tag-badge-tag-phoenix fs-10 mb-0 me-2 tag-badge-tag-phoenix-warning" style="float:left;">대여</span>
+									<p class="form-check-label mb-1 mb-md-0 mb-xl-1 mb-xxl-0 fs-8 me-2 text-body cursor-pointer">30일간 매일 1,000원</p>
+									</div>
+									<div class="col-auto d-flex">
+										<a class="fw-bold fs-9" href="#" onclick="modifyInq(this);">승인</a>
+<!-- 										<p class="fw-bold fs-9">진행중</p> -->
+									</div>
+								</div>
+
+
+								<div class="col-12">
+									<div class="d-flex lh-1 align-items-center">
+									<p class="text-body-tertiary fs-10 mb-md-0 me-6  mb-0">2025-07-01</p>
+									<span class="fs-9 mb-0" style="display:none;">답변 <em name="replayCnt" >0</em>건</span>
+									</div>
+								</div>
+
+								<div class="collapse  py-2">
+								</div>
+							</div>
+						</div>
+					</div>
+					<!-- 1:1문의 질문 end -->
+
+					<!-- 1:1문의 답변 start -->
+					<div repeatObj="true" class="card col-12 col-md-auto col-xl-12 col-xxl-auto mt-3" style="display:none !important;">
+						<div class="row justify-content-between mb-1 mb-md-0 d-flex align-items-center lh-1">
+							<div class="col-auto gy-3">
+								<p class="form-check-label mb-1 mb-md-0 mb-xl-1 mb-xxl-0 fs-8 me-2 text-body cursor-pointer ms-2"></p>
+							</div>
+						</div>
+						<div class="col-12 col-md-auto col-xl-12 col-xxl-auto">
+							<div class="d-flex lh-1 align-items-center">
+								<p class="text-body-tertiary fs-10 mb-md-0 me-2 me-md-3 me-xl-2 me-xxl-3 mb-0 ms-2"></p>
+								<span class="fs-9 mb-0" style=""></span>
+							</div>
+						</div>
+						<div class="ms-2 text-body-tertiary fw-semibold py-2" style="">
+						</div>
+					</div>
+					<!-- 1:1문의 답변 end -->
+
+<!-- 								<div class="INQ_000000000000030 drawTable d-flex hover-actions-trigger py-3 border-translucent border-top"> -->
+<!-- 									<div class="row justify-content-between align-items-md-center btn-reveal-trigger border-translucent gx-0 flex-1 cursor-pointer"> -->
+<!-- 										<div class="col-12 col-md-auto col-xl-12 col-xxl-auto"> -->
 <!-- 											<div class="row justify-content-between mb-1 mb-md-0 d-flex align-items-center lh-1"> -->
-<!-- 												<div class="col-auto"> -->
-<!-- 													<label class="form-check-label mb-2 mb-md-0 fs-9 me-2 line-clamp-1 text-body cursor-pointer"></label> -->
+<!-- 												<div class="col-auto" data-bs-toggle="collapse" -->
+<!-- 													data-bs-target=".collapseExample0" aria-expanded="true"> -->
+<!-- 													<input type="hidden" name="inqId" -->
+<!-- 														value="INQ_000000000000030"> <label -->
+<!-- 														class="form-check-label mb-1 mb-md-0 mb-xl-1 mb-xxl-0 fs-8 me-2 line-clamp-1 text-body cursor-pointer">엔터는?</label> -->
 <!-- 												</div> -->
 <!-- 												<div class="col-auto d-flex"> -->
-<!-- 													<span id="dayAblePrice" class="fs-9 mb-2" style="">원</span> -->
+<!-- 													<a class="fw-bold fs-9" href="#" onclick="modifyInq(this);">수정</a> -->
 <!-- 												</div> -->
 <!-- 											</div> -->
+<!-- 											<div class="col-12 col-md-auto col-xl-12 col-xxl-auto"> -->
+<!-- 												<div class="d-flex lh-1 align-items-center"> -->
+<!-- 													<p -->
+<!-- 														class="text-body-tertiary fs-10 mb-md-0 me-2 me-md-3 me-xl-2 me-xxl-3 mb-0">2025-05-21</p> -->
+<!-- 													<span class="fs-9 mb-0" style="">답변 <em -->
+<!-- 														name="replayCnt">4</em>건 -->
+<!-- 													</span> -->
+<!-- 												</div> -->
+<!-- 											</div> -->
+<!-- 											<div class="collapseExample0 collapse show" style=""> -->
+<!-- 												내용<br>엔터<br>엔터<br> -->
+<!-- 												<br>수정 -->
+
+
+
+
+<!-- 										<div class="card col-12 col-md-auto col-xl-12 col-xxl-auto mt-3"> -->
+<!-- 											<div class="row justify-content-between mb-1 mb-md-0 d-flex align-items-center lh-1"> -->
+<!-- 												<div class="col-auto gy-4"> -->
+<!-- 													<label class="form-check-label mb-1 mb-md-0 mb-xl-1 mb-xxl-0 fs-8 me-2 line-clamp-1 text-body cursor-pointer ms-2">답변 제목</label> -->
+<!-- 												</div> -->
+<!-- 											</div> -->
+<!-- 											<div class="col-12 col-md-auto col-xl-12 col-xxl-auto"> -->
+<!-- 												<div class="d-flex lh-1 align-items-center"> -->
+<!-- 													<p class="text-body-tertiary fs-10 mb-md-0 me-2 me-md-3 me-xl-2 me-xxl-3 mb-0 ms-2">2025-05-21</p> -->
+<!-- 													<span class="fs-9 mb-0" style="">답변자</span> -->
+<!-- 												</div> -->
+<!-- 											</div> -->
+<!-- 											<div class="ms-2 text-body-tertiary fw-semibold" style="">내용</div> -->
+<!-- 										</div> -->
+
+
+
+											</div>
+											<div id="paging" class="d-flex align-items-center justify-content-center mt-3"></div>
 
 										</div>
 									</div>
 								</div>
 
 							</div>
-            </div>
-
-
-				  <div id="div대출" class="card shadow-none border mb-3" data-component-card="data-component-card" style="display:none;">
-		            <div class="card-header p-4 bg-body">
-		              <div class="row g-3 justify-content-between align-items-end">
-		                <div class="col-12 col-md">
-		                  <h4 class="text-body mb-0" data-anchor="data-anchor" id="example"><font _mstmutation="1" _msttexthash="14650168" _msthash="400">대여</font><a class="anchorjs-link " aria-label="닻" data-anchorjs-icon="#" href="#example" style="margin-left: 0.1875em; padding-right: 0.1875em; padding-left: 0.1875em;" _mstaria-label="76115" _msthash="399"></a></h4>
-		                  <p class="mb-0 mt-2 text-body-secondary" _msttexthash="621365329" _msthash="401">대여, 리스 승인요청이 있습니다</p>
-		                </div>
-		                <div class="col col-md-auto">
-		                  <nav class="nav justify-content-end doc-tab-nav align-items-center" role="tablist">
-		                  <a class="btn btn-sm btn-phoenix-primary code-btn ms-2 collapsed" role="button" href="${pageContext.request.contextPath}/gnr/pay0004.do">
-		                  <font _mstmutation="1" _msttexthash="21101600" _msthash="402">대여,리스</font></a>
-		                  </nav>
-		                </div>
-		              </div>
-		            </div>
-		          </div>
-
-              <div class="card mb-3">
-                <div class="card-header border-bottom-0 pb-0">
-                  <div class="row justify-content-between align-items-center mb-2">
-                    <div class="col-auto">
-                      <h3 class="text-body-emphasis">선정산 배달비</h3>
-                    </div>
-                       <div class="col-auto d-flex">
-                       	<button class="btn btn-primary mb-2 mb-sm-0 mx-1 fs-9" type="submit" onclick="go선출금();">출금</button>
-                       </div>
-                  </div>
-                </div>
-
-
-
-                <div class="card-body py-0 scrollbar to-do-list-body">
-
-
-								<div class="d-flex hover-actions-trigger py-3 border-translucent border-top">
-									<div class="row justify-content-between align-items-md-center btn-reveal-trigger border-translucent gx-0 flex-1 cursor-pointer">
-										<div class="col-12">
-
-											<div class="row justify-content-between mb-1 mb-md-0 d-flex align-items-center lh-1">
-												<div class="col-auto">
-													<label class="form-check-label mb-2 mb-md-0 fs-9 me-2 line-clamp-1 text-body cursor-pointer">선출금수수료1.1% & 보험료 반영</label>
-												</div>
-												<div class="col-auto d-flex">
-													<span class="fs-9 mb-2" style=""></span>
-												</div>
-											</div>
-
-											<div class="row justify-content-between mb-1 mb-md-0 d-flex align-items-center lh-1">
-												<div class="col-auto">
-													<label class="form-check-label mb-2 mb-md-0 fs-9 me-2 line-clamp-1 text-body cursor-pointer"></label>
-												</div>
-												<div class="col-auto d-flex">
-													<span id="dayAblePrice" class="fs-9 mb-2" style="">원</span>
-												</div>
-											</div>
-
-										</div>
-									</div>
-								</div>
-
-							</div>
-            </div>
-
-
-
-
-
-
-              <div class="card mb-3">
-                <div class="card-header border-bottom-0 pb-0">
-                  <div class="row justify-content-between align-items-center mb-2">
-                    <div class="col-auto">
-                      <h3 class="text-body-emphasis">확정 배달비</h3>
-                    </div>
-                       <div class="col-auto d-flex">
-                       	<button class="btn btn-primary mb-2 mb-sm-0 mx-1 fs-9" type="submit" onclick="go출금()">출금</button>
-                       </div>
-                  </div>
-                </div>
-
-
-
-                <div class="card-body py-0 scrollbar to-do-list-body">
-
-
-								<div class="d-flex hover-actions-trigger py-3 border-translucent border-top">
-									<div class="row justify-content-between align-items-md-center btn-reveal-trigger border-translucent gx-0 flex-1 cursor-pointer">
-										<div class="col-12">
-
-											<div class="row justify-content-between mb-1 mb-md-0 d-flex align-items-center lh-1">
-												<div class="col-auto">
-													<span class="fs-9 mb-2" style=""><label class="form-check-label mb-2 mb-md-0 fs-9 me-2 line-clamp-1 text-body cursor-pointer">보험료 반영</label>
-												</div>
-												<div class="col-auto d-flex">
-													<span class="fs-9 mb-2" style=""></span>
-												</div>
-											</div>
-
-											<div class="row justify-content-between mb-1 mb-md-0 d-flex align-items-center lh-1">
-												<div class="col-auto">
-													<label class="form-check-label mb-2 mb-md-0 fs-9 me-2 line-clamp-1 text-body cursor-pointer"></label>
-												</div>
-												<div class="col-auto d-flex">
-													<span id="weekAblePrice" class="fs-9 mb-2" style="">원</span>
-												</div>
-											</div>
-
-										</div>
-									</div>
-								</div>
-
-							</div>
-            </div>
-
-<!-- 				<div class="row justify-content-between"> -->
-<!-- 					<div class="col-auto"></div> -->
-<!--                        <div class="col-auto d-flex"> -->
-<!--                        	<button class="btn btn-primary mb-2 mb-sm-0 mx-1 fs-9" type="submit" onclick="go출금()">출금</button> -->
-<!--                        </div> -->
-<!--                 </div> -->
-
-          </div>
-         </div>
-       </div>
-
-	</div>
 </main>
+
+
 
 
 
   <!-- Scroll Top -->
   <a href="#" id="scroll-top" class="scroll-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
+	<form id="myForm" action="" method="POST" style="display: none;"></form>
 
-
-	<!-- 숨겨진 폼 -->
-	<form id="myForm" action="" method="POST"style="display: none;">
-	</form>
 
   <!-- Vendor JS Files -->
 <%--   <script src="<c:url value='/vendor/admin/bootstrap/js/bootstrap.bundle.min.js' />"></script> --%>

@@ -19,8 +19,10 @@ import egovframework.com.cmm.SessionVO;
 import egovframework.com.cmm.util.EgovUserDetailsHelper;
 import egovframework.com.rd.Util;
 import egovframework.com.rd.usr.service.DtyService;
+import egovframework.com.rd.usr.service.MemService;
 import egovframework.com.rd.usr.service.vo.DayPayVO;
 import egovframework.com.rd.usr.service.vo.DeliveryInfoVO;
+import egovframework.com.rd.usr.service.vo.EtcVO;
 import egovframework.com.rd.usr.service.vo.HistoryVO;
 import egovframework.com.sec.rgm.service.EgovAuthorGroupService;
 
@@ -47,6 +49,8 @@ public class EgovPayController {
 
     @Resource(name = "DtyService")
     private DtyService dtyService;
+    @Resource(name = "MemService")
+    private MemService memService;
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(EgovPayController.class);
 
@@ -218,6 +222,68 @@ public class EgovPayController {
         historyVO.setSearchCooperatorId((String)request.getSession().getAttribute("cooperatorId"));
 
         map.put("list", dtyService.selectHistory(historyVO));
+        map.put("resultCode", "success");
+    	return ResponseEntity.ok(map);
+	}
+
+	/**
+	 * 대출 요청 리스트 페이지
+	 * @param request
+	 * @param sessionVO
+	 * @param model
+	 * @return
+	 */
+	@RequestMapping("/gnr/pay0004.do")
+	public String pay0004(@ModelAttribute("etcVO")EtcVO etcVO, HttpServletRequest request, SessionVO sessionVO, ModelMap model) throws Exception{
+
+    	//로그인 체크
+        LoginVO user = (LoginVO)EgovUserDetailsHelper.getAuthenticatedUser();
+        Boolean isAuthenticated = EgovUserDetailsHelper.isAuthenticated();
+
+        if(!isAuthenticated) {
+        	return "egovframework/com/cmm/error/accessDenied";
+        }
+
+		// 1. 사용자 확인
+		if(!Util.isGnr()) {
+			return "egovframework/com/cmm/error/accessDenied";
+        }
+        model.addAttribute("etcVO", etcVO);
+		return "egovframework/gnr/pay/pay0004";
+	}
+
+
+	/**
+	 * 대출 요청 리스트 조회
+	 * @param request
+	 * @param sessionVO
+	 * @param model
+	 * @return
+	 */
+	@RequestMapping("/gnr/pay0004_001.do")
+	public ResponseEntity<?> pay0004_001(@ModelAttribute("EtcVO") EtcVO etcVO, HttpServletRequest request) throws Exception{
+
+    	//로그인 체크
+        LoginVO user = (LoginVO)EgovUserDetailsHelper.getAuthenticatedUser();
+        Boolean isAuthenticated = EgovUserDetailsHelper.isAuthenticated();
+
+        if(!isAuthenticated) {
+        	return ResponseEntity.status(401).body("Unauthorized");
+        }
+
+        //return value
+        Map<String, Object> map =  new HashMap<String, Object>();
+
+
+        //라이더 권한
+        etcVO.setSchAuthorCode(user.getAuthorCode());
+        etcVO.setSchId(user.getId());
+
+        etcVO.setMberId(user.getId());
+        etcVO.setSearchGubun("RIDER");
+        etcVO.setCooperatorId((String)request.getSession().getAttribute("cooperatorId"));
+
+        map.put("list", memService.selectEtcList(etcVO));
         map.put("resultCode", "success");
     	return ResponseEntity.ok(map);
 	}

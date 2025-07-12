@@ -30,6 +30,7 @@ import egovframework.com.rd.usr.service.RotService;
 import egovframework.com.rd.usr.service.vo.DayPayVO;
 import egovframework.com.rd.usr.service.vo.DoszSchAccoutVO;
 import egovframework.com.rd.usr.service.vo.DoszTransferVO;
+import egovframework.com.rd.usr.service.vo.EtcVO;
 import egovframework.com.rd.usr.service.vo.MyInfoVO;
 import egovframework.com.rd.usr.service.vo.NiceVO;
 import egovframework.com.rd.usr.service.vo.NoticeVO;
@@ -112,8 +113,11 @@ public class EgovRotController {
 		model.addAttribute("cooperatorList", cooperatorListJson);
 		model.addAttribute("cooperatorId", selectCooperId);
 
-//		EtcVO etcVO = new EtcVO();
-//		model.addAttribute("requestCnt", memService.selectEtcList(myInfoVO));
+		EtcVO etcVO = new EtcVO();
+		etcVO.setSearchGubun("RIDER");
+		etcVO.setMberId(user.getId());
+		etcVO.setCooperatorId(selectCooperId);
+		model.addAttribute("requestCnt", memService.selectEtcList(etcVO).size());
 
 		//공지사항
 
