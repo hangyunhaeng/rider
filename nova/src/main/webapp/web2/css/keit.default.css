@@ -5,7 +5,7 @@ html, body, input, select, textarea, button{font-family:'맑은 고딕','돋움'
 body,div,dl,dt,dd,ul,ol,li,h1,h2,h3,h4,h5,form,fieldset,p,button,input,select,legend{margin:0;padding:0}
 html,div,p,a,input,select,textarea,td,th,fieldset,dl,dt,dd{box-sizing:border-box; text-decoration: none;}
 html{overflow-y:auto}
-body{/*-ms-word-break:break-all;*/word-break:break-all;height:80%}/*keit 180525:commenting*/
+body{/*-ms-word-break:break-all;*/word-break:break-all;/*height:80%*/}/*keit 180525:commenting*/
 img,fieldset,iframe{border:0}
 li{list-style:none}
 input,select,button,img{vertical-align:middle}
