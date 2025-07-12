@@ -454,7 +454,7 @@
 			FROM RD_ETC a,
 			(SELECT send_price FROM RD_DAY_PAY WHERE etc_id = #{etcId}
 				UNION ALL
-				SELECT send_price FROM RD_week_PAY WHERE etc_id = #{etcId}) b
+				SELECT send_price FROM RD_WEEK_PAY WHERE etc_id = #{etcId}) b
 			WHERE etc_id = #{etcId}
 		)
 	</update>

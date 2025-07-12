@@ -174,7 +174,7 @@
 	<select id="selectCooperatorUsrListByCooperator" parameterType="egovframework.com.rd.usr.service.vo.CooperatorVO" resultType="egovframework.com.rd.usr.service.vo.CooperatorVO">
 		SELECT a.cooperator_id, a.mber_id, a.use_at, b.USER_NM, b.mbtlnum
 		FROM RD_COOPERATOR_USR a
-			left join comtnemplyrinfo b ON a.mber_id = b.EMPLYR_ID
+			left join COMTNEMPLYRINFO b ON a.mber_id = b.EMPLYR_ID
 		WHERE a.use_at = 'Y'
 			AND cooperator_id = #{cooperatorId}
 	</select>
@@ -191,8 +191,8 @@
 
 		FROM RD_COOPERATOR_RIDER_CONNECT cte
 		LEFT JOIN COMTNGNRLMBER usr ON cte.mber_id = usr.mber_id
-		LEFT JOIN rd_rider_fee fee ON cte.COOPERATOR_ID = fee.COOPERATOR_ID AND cte.MBER_ID = fee.MBER_ID AND fee.USE_AT ='Y'
-		LEFT JOIN rd_cooperator_fee b ON cte.COOPERATOR_ID = b.COOPERATOR_ID AND b.USE_AT = 'Y'
+		LEFT JOIN RD_RIDER_FEE fee ON cte.COOPERATOR_ID = fee.COOPERATOR_ID AND cte.MBER_ID = fee.MBER_ID AND fee.USE_AT ='Y'
+		LEFT JOIN RD_COOPERATOR_FEE b ON cte.COOPERATOR_ID = b.COOPERATOR_ID AND b.USE_AT = 'Y'
 
 		WHERE 1=1
 		AND cte.COOPERATOR_ID = #{cooperatorId}
