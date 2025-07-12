@@ -450,8 +450,9 @@
 
 	</select>
 	<select id="selectEtcList" parameterType="egovframework.com.rd.usr.service.vo.EtcVO" resultType="egovframework.com.rd.usr.service.vo.EtcVO">
-		SELECT @ROWNUM:=@ROWNUM+1 AS no, ETC_ID, COOPERATOR_ID, MBER_ID, GUBUN, PAYBACK_DAY, PAYBACK_COST, PAYBACK_COST_ALL, AUTH_REQUEST_DT
-		, AUTH_RESPONS_DT, RESPONS_AT, USE_AT, CREAT_DT, CREAT_ID, LAST_UPDT_PNTTM, LAST_UPDUSR_ID
+		SELECT @ROWNUM:=@ROWNUM+1 AS UNIQ, ETC_ID, COOPERATOR_ID, MBER_ID, GUBUN, PAYBACK_DAY, PAYBACK_COST, PAYBACK_COST_ALL, DATE_FORMAT(AUTH_REQUEST_DT, '%Y%m%d') AUTH_REQUEST_DT
+		, DATE_FORMAT(AUTH_RESPONS_DT, '%Y%m%d') AUTH_RESPONS_DT, RESPONS_AT, USE_AT, DATE_FORMAT(CREAT_DT, '%Y%m%d') CREAT_DT, CREAT_ID, LAST_UPDT_PNTTM, LAST_UPDUSR_ID
+		, 'false' chk
 		FROM RD_ETC, (SELECT @ROWNUM:=0) AS R
 		WHERE COOPERATOR_ID = #{cooperatorId} AND MBER_ID = #{mberId}
 	</select>
@@ -459,9 +460,16 @@
 
 		INSERT INTO RD_ETC
 		(ETC_ID, COOPERATOR_ID, MBER_ID, GUBUN, PAYBACK_DAY, PAYBACK_COST, PAYBACK_COST_ALL
-		, USE_AT, CREAT_DT, CREAT_ID)
+		, USE_AT, CREAT_DT, CREAT_ID
+		<if test="chk == 'true'">
+		, AUTH_REQUEST_DT
+		</if>
+		)
 		SELECT #{etcId}, #{cooperatorId}, #{mberId}, #{gubun}, #{paybackDay}, #{paybackCost}, #{paybackCostAll}
 		, 'Y', SYSDATE(), #{creatId}
+		<if test="chk == 'true'">
+		, SYSDATE()
+		</if>
 		<if test="schAuthorCode == 'ROLE_USER'">
 		/* 협력사 조건 */
 		FROM 	RD_COOPERATOR a
@@ -469,5 +477,17 @@
 		AND a.COOPERATOR_ID = #{cooperatorId}
 		</if>
 	</insert>
+	<update id="updateEtc" parameterType="egovframework.com.rd.usr.service.vo.EtcVO">
+		UPDATE RD_ETC
+		SET GUBUN = #{gubun}, PAYBACK_DAY = #{paybackDay}, PAYBACK_COST = #{paybackCost}, PAYBACK_COST_ALL = #{paybackCostAll}
+			, LAST_UPDT_PNTTM = #{lastUpdtPnttm}, LAST_UPDUSR_ID = SYSDATE()
+		WHERE ETC_ID = #{etcId}
+	</update>
+	<update id="requestEtc" parameterType="egovframework.com.rd.usr.service.vo.EtcVO">
+		UPDATE RD_ETC
+		SET AUTH_REQUEST_DT = SYSDATE()
+			, LAST_UPDT_PNTTM = #{lastUpdtPnttm}, LAST_UPDUSR_ID = SYSDATE()
+		WHERE ETC_ID = #{etcId}
+	</update>
 
 </mapper>

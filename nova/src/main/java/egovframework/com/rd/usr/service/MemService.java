@@ -140,4 +140,12 @@ public interface MemService {
 	 * @throws Exception
 	 */
 	public EtcVO saveEtcList(List<EtcVO> list) throws Exception ;
+
+	/**
+	 * 협력사,라이더별 대출 승인요청
+	 * @param etcVO
+	 * @return
+	 * @throws Exception
+	 */
+	public EtcVO requestEtcList(List<EtcVO> list) throws Exception ;
 }

@@ -484,13 +484,55 @@ public class MemController {
         if(!Util.isUsr()) {
         	return ResponseEntity.status(401).body("Unauthorized");
         }
-
-        EtcVO vo = memService.saveEtcList(list);
-
         //return value
         Map<String, Object> map =  new HashMap<String, Object>();
-        map.put("list", memService.selectEtcList(vo));
-        map.put("resultCode", "success");
+
+        try {
+        	EtcVO vo = memService.saveEtcList(list);
+
+	        map.put("list", memService.selectEtcList(vo));
+	        map.put("resultCode", "success");
+	    } catch(IllegalArgumentException e) {
+	    	map.put("resultCode", "fail");
+	    	map.put("resultMsg", e.getMessage());
+	    	return ResponseEntity.ok(map);
+	    }
+        return ResponseEntity.ok(map);
+    }
+    /**
+     * 협력사,라이더별 대출 승인요청
+     * @param request
+     * @param model
+     * @return
+     * @throws Exception
+     */
+    @RequestMapping("/usr/mem0002_0006.do")
+    public ResponseEntity<?> mem0002_0006(HttpServletRequest request,ModelMap model, @RequestBody List<EtcVO> list) throws Exception {
+
+    	//로그인 체크
+        LoginVO user = (LoginVO)EgovUserDetailsHelper.getAuthenticatedUser();
+        Boolean isAuthenticated = EgovUserDetailsHelper.isAuthenticated();
+
+        if(!isAuthenticated) {
+        	return ResponseEntity.status(401).body("Unauthorized");
+        }
+
+        if(!Util.isUsr()) {
+        	return ResponseEntity.status(401).body("Unauthorized");
+        }
+        //return value
+        Map<String, Object> map =  new HashMap<String, Object>();
+
+        try {
+        	EtcVO vo = memService.requestEtcList(list);
+
+	        map.put("list", memService.selectEtcList(vo));
+	        map.put("resultCode", "success");
+	    } catch(IllegalArgumentException e) {
+	    	map.put("resultCode", "fail");
+	    	map.put("resultMsg", e.getMessage());
+	    	return ResponseEntity.ok(map);
+	    }
         return ResponseEntity.ok(map);
     }
 

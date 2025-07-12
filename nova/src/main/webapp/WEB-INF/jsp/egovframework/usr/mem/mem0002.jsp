@@ -163,7 +163,7 @@
 			, valueGetter:(params) => { return currencyFormatter(params.data.feeCall);}
             , valueParser: (params) => { return gridWan(params);}
 		},
-		{ headerName: "기타(대여,리스)", field: "etcCall", minWidth: 90
+		{ headerName: "기타<br/>(대여,리스)", field: "etcCall", minWidth: 90
 			, cellRenderer:(params) => { return '<div class="row justify-content-between align-items-md-center btn-reveal-trigger border-translucent gx-0 flex-1 cursor-pointer" data-bs-toggle="modal" data-bs-target="#exampleModal" onclick="clickEtc(\''+params.data.cooperatorId+'\', \''+params.data.mberId+'\')">관리</div>';}
 		},
 
@@ -176,33 +176,41 @@
 	];
 
 	var columnDefs2= [
-		{ headerName: "NO", field: "no", minWidth: 70, valueGetter:(params) => { return params.node.rowIndex + 1} },
+		{ headerName: "chk", field: "chk", minWidth: 10, maxWidth: 60, cellDataType: 'boolean', editable:true },
+		{ headerName: "NO", field: "no", minWidth: 10, maxWidth: 60, valueGetter:(params) => { return params.node.rowIndex + 1} },
+		{ headerName: "uniq", field: "uniq", minWidth: 70, hide:true},
 		{ headerName: "crud", field: "crud", minWidth: 90, hide:true},
-		{ headerName: "협력사아이디", field: "cooperatorId", minWidth: 120},
-		{ headerName: "ID", field: "mberId", minWidth: 90},
+		{ headerName: "협력사아이디", field: "cooperatorId", minWidth: 120, maxWidth: 130, hide:true},
+		{ headerName: "ID", field: "mberId", minWidth: 90, maxWidth: 130},
 
 		//대여:D, 리스,:R 기타:E
-		{ headerName: "구분", field: "gubun", minWidth: 90, editable: true
+		{ headerName: "구분", field: "gubun", minWidth: 10, maxWidth: 80, editable: true
 			, valueGetter:(params) => { return (params.node.data.gubun=='D')?"대여": (params.node.data.gubun=='R')?"리스":"기타"}
 			, cellEditor: 'agSelectCellEditor'
 			, cellEditorParams: params => { return {values: ['D', 'R', 'E']}; }
 			, cellClass: (params) => {return agGrideditClass(params)}
 		},
-		{ headerName: "상환기간(일)", field: "paybackDay", minWidth: 90, editable: true
+		{ headerName: "상환기간(일)", field: "paybackDay", minWidth: 10, maxWidth: 100, editable: true
 			, cellClass: (params) => {return agGrideditClass(params, "ag-cell-right");}
 			, valueGetter:(params) => { return currencyFormatter(params.data.paybackDay);}
 //             , valueParser: (params) => { return gridWan(params);}
 		},
-		{ headerName: "일별상환금액", field: "paybackCost", minWidth: 90, editable: true
+		{ headerName: "일별상환금액", field: "paybackCost", minWidth: 10, maxWidth: 100, editable: true
 			, cellClass: (params) => {return agGrideditClass(params, "ag-cell-right");}
 			, valueGetter:(params) => { return currencyFormatter(params.data.paybackCost);}
 //             , valueParser: (params) => { return gridWan(params);}
 		},
-		{ headerName: "총상환금액", field: "paybackCostAll", minWidth: 90
+		{ headerName: "총상환금액", field: "paybackCostAll", minWidth: 10, maxWidth: 100
 			, cellClass: (params) => {return agGrideditClass(params, "ag-cell-right");}
 			, valueGetter:(params) => { return currencyFormatter(params.data.paybackCostAll);}
 //             , valueParser: (params) => { return gridWan(params);}
 		},
+		{ headerName: "등록일", field: "creatDt", minWidth: 10, maxWidth: 100, valueGetter:(params) => { return getStringDate(params.data.creatDt)}},
+		{ headerName: "상환완료금액", field: "xxx", minWidth: 10, maxWidth: 100},
+		{ headerName: "상환완료여부", field: "xxx", minWidth: 10, maxWidth: 100},
+		{ headerName: "승인요청일", field: "authRequestDt", minWidth: 10, maxWidth: 100, valueGetter:(params) => { return getStringDate(params.data.authRequestDt)}},
+		{ headerName: "라이더<br/>승인일", field: "authResponsDt", minWidth: 10, maxWidth: 100, valueGetter:(params) => { return getStringDate(params.data.authResponsDt)}},
+		{ headerName: "라이더<br/>승인여부", field: "xxxx", minWidth: 10, maxWidth: 100}
 	];
 
 	//onLoad
@@ -227,6 +235,10 @@
 		$("#기타저장버튼").on("click", function(e){
  			saveEtc();
 		});
+		$("#기타요청버튼").on("click", function(e){
+ 			requestEtc();
+		});
+
 
 
 
@@ -341,8 +353,9 @@
     		mberId: $('#modalMberId').val(),
     		gubun: 'D',
     		useAt: 'Y',
-    		no: grid2.getDisplayedRowCount()+1,
-    		crud: "c"
+    		uniq: grid2.getDisplayedRowCount()+1,
+    		crud: "c",
+    		chk: false
 	    };
 	    return newData;
 	}
@@ -465,6 +478,58 @@
 		}, 100);
 
 	}
+	//체크된 노드 가져오기
+	function getChkRows(gridObj){
+		var updateRows = [];
+		gridObj.forEachNode( function(rowNode, index) {
+			if(rowNode.data.chk == true || rowNode.data.chk == 'true' ){
+				updateRows.push(rowNode.data);
+			}
+		});
+		return updateRows;
+	}
+
+	function requestEtc(){
+		grid1.stopEditing();
+
+		setTimeout(function(){
+			var updateItem = getChkRows(grid2);
+
+			if(updateItem.length <=0 ){
+				alert("승인요청할 항목을 체크해주세요");
+				return;
+			}
+			// 로딩 시작
+	        $('.loading-wrap--js').show();
+	        axios.post('${pageContext.request.contextPath}/usr/mem0002_0006.do',getEditRows(grid2)).then(function(response) {        	// 로딩 종료
+	            $('.loading-wrap--js').hide();
+	        	if(response.data.resultCode == "success"){
+
+		        	if (response.data.list.length == 0) {
+		        		grid2.setGridOption('rowData',[]);  	// 데이터가 없는 경우 빈 배열 설정
+		        		grid2.showNoRowsOverlay();  			// 데이터가 없는 경우
+		            } else {
+
+						var lst = response.data.list;	//정상데이터
+						grid2.setGridOption("rowData", lst);
+		            }
+
+	        	} else {
+	        		if(response.data.resultMsg != null && response.data.resultMsg != ''){
+	        			alert(response.data.resultMsg);
+	        		} else {
+	        			alert("저장에 실패하였습니다");
+	        		}
+	        	}
+	        })
+	        .catch(function(error) {
+	            console.error('There was an error fetching the data:', error);
+	        }).finally(function() {
+	        	// 로딩 종료
+	            $('.loading-wrap--js').hide();
+	        });
+		}, 100);
+	}
 	function setGrid(){
 		// 사용자 정의 컴포넌트를 글로벌 네임스페이스에 추가
 		window.CustomHeader = CustomHeader;
@@ -545,7 +610,7 @@
 		if(colId == 'paybackDay' || colId == 'paybackCost'){
 // 			const gridIdx = params.node.rowIndex;
 // 			grid2.getRowNode(gridIdx).setDataValue('paybackCostAll', Number(params.node.data.paybackDay, 10)*Number(params.node.data.paybackCost, 10));
-			var nowSelNode = findRowNode(grid2, 'no', params.node.data.no);
+			var nowSelNode = findRowNode(grid2, 'uniq', params.node.data.uniq);
 			if(params.node.data.paybackDay != undefined && params.node.data.paybackCost != undefined){
 				nowSelNode.setDataValue('paybackCostAll', Number(params.node.data.paybackDay, 10)*Number(params.node.data.paybackCost, 10));
 			}
@@ -738,6 +803,7 @@
 										<div class="btnwrap">
 											<button id="기타추가버튼" class="btn btn-primary">추가</button>
 											<button id="기타저장버튼" class="btn ty1">저장</button>
+											<button id="기타요청버튼" class="btn ty1">승인요청</button>
 										</div>
 									</div>
 									<div class="ib_product">

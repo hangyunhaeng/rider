@@ -345,5 +345,24 @@ public class MemDAO extends EgovComAbstractDAO {
 	public int insertEtc(EtcVO vo) throws Exception{
 		return insert("memDAO.insertEtc", vo);
 	}
+	/**
+	 * 협력사,라이더별 대출 수정
+	 * @param vo
+	 * @return
+	 * @throws Exception
+	 */
+	public int updateEtc(EtcVO vo) throws Exception{
+		return insert("memDAO.updateEtc", vo);
+	}
+
+	/**
+	 * 협력사,라이더별 대출 승인요청
+	 * @param etcVO
+	 * @return
+	 * @throws Exception
+	 */
+	public int requestEtc(EtcVO vo) throws Exception {
+		return insert("memDAO.requestEtc", vo);
+	}
 }
 

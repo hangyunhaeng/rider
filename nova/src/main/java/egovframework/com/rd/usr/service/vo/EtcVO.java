@@ -52,7 +52,7 @@ public class EtcVO extends Sch implements Serializable {
 
 
 	//그리드 내 유니크 키
-	private String no;
+	private String uniq;
 
 
 	private List<EtcVO> etcVO;
