@@ -191,7 +191,7 @@
 
 		FROM RD_COOPERATOR_RIDER_CONNECT cte
 		LEFT JOIN COMTNGNRLMBER usr ON cte.mber_id = usr.mber_id
-		LEFT JOIN rd_rider_fee fee ON cte.MBER_ID = fee.MBER_ID AND fee.USE_AT ='Y'
+		LEFT JOIN rd_rider_fee fee ON cte.COOPERATOR_ID = fee.COOPERATOR_ID AND cte.MBER_ID = fee.MBER_ID AND fee.USE_AT ='Y'
 		LEFT JOIN rd_cooperator_fee b ON cte.COOPERATOR_ID = b.COOPERATOR_ID AND b.USE_AT = 'Y'
 
 		WHERE 1=1
@@ -455,6 +455,9 @@
 		, 'false' chk
 		FROM RD_ETC, (SELECT @ROWNUM:=0) AS R
 		WHERE COOPERATOR_ID = #{cooperatorId} AND MBER_ID = #{mberId}
+			<if test="searchGubun == 'RIDER'">
+			AND use_at ='Y' AND auth_request_dt IS NOT NULL AND auth_respons_dt IS NULL	/*요청했으나 승인을 않한건*/
+			</if>
 	</select>
 	<insert id="insertEtc" parameterType="egovframework.com.rd.usr.service.vo.EtcVO">
 

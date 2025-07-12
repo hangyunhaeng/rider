@@ -311,6 +311,23 @@
             </div>
 
 
+				  <div id="div대출" class="card shadow-none border mb-3" data-component-card="data-component-card" style="">
+		            <div class="card-header p-4 bg-body">
+		              <div class="row g-3 justify-content-between align-items-end">
+		                <div class="col-12 col-md">
+		                  <h4 class="text-body mb-0" data-anchor="data-anchor" id="example"><font _mstmutation="1" _msttexthash="14650168" _msthash="400">대여</font><a class="anchorjs-link " aria-label="닻" data-anchorjs-icon="#" href="#example" style="margin-left: 0.1875em; padding-right: 0.1875em; padding-left: 0.1875em;" _mstaria-label="76115" _msthash="399"></a></h4>
+		                  <p class="mb-0 mt-2 text-body-secondary" _msttexthash="621365329" _msthash="401">대여, 리스 승인요청이 있습니다</p>
+		                </div>
+		                <div class="col col-md-auto">
+		                  <nav class="nav justify-content-end doc-tab-nav align-items-center" role="tablist">
+		                  <a class="btn btn-sm btn-phoenix-primary code-btn ms-2 collapsed" role="button" href="${pageContext.request.contextPath}/gnr/not0001.do">
+		                  <font _mstmutation="1" _msttexthash="21101600" _msthash="402">대여,리스</font></a>
+		                  </nav>
+		                </div>
+		              </div>
+		            </div>
+		          </div>
+
               <div class="card mb-3">
                 <div class="card-header border-bottom-0 pb-0">
                   <div class="row justify-content-between align-items-center mb-2">

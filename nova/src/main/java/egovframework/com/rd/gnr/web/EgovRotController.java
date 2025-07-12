@@ -24,6 +24,7 @@ import egovframework.com.cmm.service.EgovProperties;
 import egovframework.com.cmm.util.EgovUserDetailsHelper;
 import egovframework.com.rd.Util;
 import egovframework.com.rd.usr.service.DtyService;
+import egovframework.com.rd.usr.service.MemService;
 import egovframework.com.rd.usr.service.NotService;
 import egovframework.com.rd.usr.service.RotService;
 import egovframework.com.rd.usr.service.vo.DayPayVO;
@@ -57,6 +58,8 @@ public class EgovRotController {
     private RotService rotService;
     @Resource(name = "DtyService")
     private DtyService dtyService;
+    @Resource(name = "MemService")
+    private MemService memService;
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(EgovRotController.class);
 
@@ -109,6 +112,8 @@ public class EgovRotController {
 		model.addAttribute("cooperatorList", cooperatorListJson);
 		model.addAttribute("cooperatorId", selectCooperId);
 
+//		EtcVO etcVO = new EtcVO();
+//		model.addAttribute("requestCnt", memService.selectEtcList(myInfoVO));
 
 		//공지사항
 
