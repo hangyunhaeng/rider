@@ -232,6 +232,7 @@
           <li><a href="${pageContext.request.contextPath}/com/com0002.do" class="active">Home<br></a></li>
 		  <li><a href="${pageContext.request.contextPath}/gnr/not0001.do">공지사항</a></li>
 		  <li><a href="${pageContext.request.contextPath}/gnr/inq0001.do">1:1문의</a></li>
+		  <li><a href="${pageContext.request.contextPath}/gnr/pay0004.do">대여.리스</a></li>
           <li class="dropdown"><a href="#"><span>출금</span> <i class="bi bi-chevron-down toggle-dropdown"></i></a>
             <ul>
               <li><a href="${pageContext.request.contextPath}/gnr/rot0003.do?gubun=DAY">선정산 배달비</a></li>

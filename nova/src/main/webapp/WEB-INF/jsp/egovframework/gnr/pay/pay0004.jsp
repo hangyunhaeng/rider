@@ -176,7 +176,7 @@
 			}
 			내역.find('label[class~=form-check-label]:eq(1)').html(dataInfo.paybackDay+'일동안 '+currencyFormatter(dataInfo.paybackCost)+'원 출금');
 			내역.find('label[class~=text-body-tertiary]').html(getStringDate(dataInfo.authRequestDt));
-			내역.find('span[class~=총금액]').html('총 '+currencyFormatter(dataInfo.paybackCostAll)+'원');
+			내역.find('span[class~=총금액]').html('입금 '+currencyFormatter(dataInfo.finishCost)+'원 / 총 '+currencyFormatter(dataInfo.paybackCostAll)+'원');
 			내역.show();
 
 			$('#paging').show();
@@ -207,7 +207,8 @@
         <ul>
           <li><a href="${pageContext.request.contextPath}/com/com0002.do">Home<br></a></li>
 		  <li><a href="${pageContext.request.contextPath}/gnr/not0001.do">공지사항</a></li>
-		  <li><a href="${pageContext.request.contextPath}/gnr/inq0001.do" class="active">1:1문의</a></li>
+		  <li><a href="${pageContext.request.contextPath}/gnr/inq0001.do">1:1문의</a></li>
+		  <li><a href="${pageContext.request.contextPath}/gnr/pay0004.do" class="active">대여.리스</a></li>
           <li class="dropdown"><a href="#"><span>출금</span> <i class="bi bi-chevron-down toggle-dropdown"></i></a>
             <ul>
               <li><a href="${pageContext.request.contextPath}/gnr/rot0003.do?gubun=DAY">선정산 배달비</a></li>
@@ -287,11 +288,11 @@
 								</div>
 
 								<div class="row justify-content-between mb-1 mb-md-0 d-flex align-items-center lh-1">
-									<div class="col-auto">
-										<label class="text-body-tertiary fs-10 mb-md-0 me-6  mb-0">2025-07-01</label>
+									<div class="col-auto d-flex">
+										<label class="text-body-tertiary fs-10 mb-md-0 me-4  mb-0">2025-07-01</label>
 									</div>
 									<div class="col-auto d-flex">
-										<span class="fs-9 mb-2 총금액" style="">총 30,000원</span>
+										<span class="fs-9 mb-1 총금액" style="">입금 5,000원 / 총 30,000원</span>
 									</div>
 								</div>
 

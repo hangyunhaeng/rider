@@ -53,6 +53,8 @@ public class EtcVO extends Sch implements Serializable {
 	private String lastUpdusrId;
 	//대출 출금 가능여부(하루한번만 출금하도록 제한)
 	private String ableYn;
+	//대출 상환 총 금액
+	private String finishCost;
 
 	//그리드 내 유니크 키
 	private String uniq;

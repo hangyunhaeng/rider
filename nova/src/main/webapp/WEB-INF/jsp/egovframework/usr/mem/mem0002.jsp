@@ -193,21 +193,21 @@
 		{ headerName: "상환기간(일)", field: "paybackDay", minWidth: 10, maxWidth: 100, editable: (params) => {return (params.node.data.responsAt == 'Y')? false: true}
 			, cellClass: (params) => {return agGrideditClass(params, "ag-cell-right");}
 			, valueGetter:(params) => { return currencyFormatter(params.data.paybackDay);}
-//             , valueParser: (params) => { return gridWan(params);}
 		},
 		{ headerName: "일별상환금액", field: "paybackCost", minWidth: 10, maxWidth: 100, editable: (params) => {return (params.node.data.responsAt == 'Y')? false: true}
 			, cellClass: (params) => {return agGrideditClass(params, "ag-cell-right");}
 			, valueGetter:(params) => { return currencyFormatter(params.data.paybackCost);}
-//             , valueParser: (params) => { return gridWan(params);}
 		},
 		{ headerName: "총상환금액", field: "paybackCostAll", minWidth: 10, maxWidth: 100
 			, cellClass: (params) => {return agGrideditClass(params, "ag-cell-right");}
 			, valueGetter:(params) => { return currencyFormatter(params.data.paybackCostAll);}
-//             , valueParser: (params) => { return gridWan(params);}
 		},
 		{ headerName: "등록일", field: "creatDt", minWidth: 10, maxWidth: 100, valueGetter:(params) => { return getStringDate(params.data.creatDt)}},
-		{ headerName: "상환완료금액", field: "xxx", minWidth: 10, maxWidth: 100},
-		{ headerName: "상환완료여부", field: "xxx", minWidth: 10, maxWidth: 100},
+		{ headerName: "상환완료금액", field: "finishCost", minWidth: 10, maxWidth: 100
+			, cellClass: (params) => {return agGrideditClass(params, "ag-cell-right");}
+			, valueGetter:(params) => { return currencyFormatter(params.data.finishCost);}
+		},
+		{ headerName: "상환완료여부", field: "finishAt", minWidth: 10, maxWidth: 100},
 		{ headerName: "승인요청일", field: "authRequestDt", minWidth: 10, maxWidth: 100, valueGetter:(params) => { return getStringDate(params.data.authRequestDt)}},
 		{ headerName: "라이더<br/>승인일", field: "authResponsDt", minWidth: 10, maxWidth: 100, valueGetter:(params) => { return getStringDate(params.data.authResponsDt)}},
 		{ headerName: "라이더<br/>승인여부", field: "responsAt", minWidth: 10, maxWidth: 100}
@@ -215,7 +215,7 @@
 
 	//onLoad
 	document.addEventListener('DOMContentLoaded', function() {
-
+		debugger;
 		if('${loginVO.authorCode}' =='ROLE_ADMIN'){
 			$('nav > ul').find('li:hidden').show();
 		}
@@ -315,6 +315,16 @@
 		// 로딩 시작
         $('.loading-wrap--js').show();
         axios.post('${pageContext.request.contextPath}/usr/mem0002_0004.do',params).then(function(response) {
+
+        	//todo 세션종료로 오류 났을경우 어떻게 캐치하나??? 애매함.
+        	if(typeof response.data == 'string'){
+				alert('로그인이 종료 되었습니다');
+
+				$('#myForm').attr("action", "<c:url value='/com/com0002.do'/>");
+				$('#myForm').submit();
+				return;
+        	}
+
         	// 로딩 종료
             $('.loading-wrap--js').hide();
         	if(response.data.resultCode == "success"){
@@ -485,7 +495,6 @@
 		setTimeout(function(){
 			var updateItem = getChkRows(grid2);
 
-			debugger;
 			if(updateItem.length <=0 ){
 				alert("승인요청할 항목을 체크해주세요");
 				return;

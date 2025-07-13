@@ -456,17 +456,21 @@
 			FROM (
 		</if>
 
-			SELECT @ROWNUM:=@ROWNUM+1 AS UNIQ, ETC_ID, COOPERATOR_ID, MBER_ID, GUBUN, PAYBACK_DAY, PAYBACK_COST, PAYBACK_COST_ALL, DATE_FORMAT(AUTH_REQUEST_DT, '%Y%m%d') AUTH_REQUEST_DT
-			, DATE_FORMAT(AUTH_RESPONS_DT, '%Y%m%d') AUTH_RESPONS_DT, RESPONS_AT, FINISH_AT, USE_AT, DATE_FORMAT(CREAT_DT, '%Y%m%d') CREAT_DT, CREAT_ID, LAST_UPDT_PNTTM, LAST_UPDUSR_ID
-			, 'false' chk
-			FROM RD_ETC, (SELECT @ROWNUM:=0) AS R
-			WHERE COOPERATOR_ID = #{cooperatorId} AND MBER_ID = #{mberId}
+			SELECT @ROWNUM:=@ROWNUM+1 AS UNIQ, a.ETC_ID, a.COOPERATOR_ID, a.MBER_ID, a.GUBUN, a.PAYBACK_DAY, a.PAYBACK_COST, a.PAYBACK_COST_ALL, DATE_FORMAT(a.AUTH_REQUEST_DT, '%Y%m%d') AUTH_REQUEST_DT
+			, DATE_FORMAT(a.AUTH_RESPONS_DT, '%Y%m%d') AUTH_RESPONS_DT, a.RESPONS_AT, a.FINISH_AT, a.USE_AT, DATE_FORMAT(a.CREAT_DT, '%Y%m%d') CREAT_DT, a.CREAT_ID, a.LAST_UPDT_PNTTM, a.LAST_UPDUSR_ID
+			, 'false' chk, nvl(SUM(b.SEND_PRICE), 0) + nvl(SUM(c.SEND_PRICE), 0) AS FINISH_COST
+			FROM RD_ETC a
+			LEFT JOIN RD_DAY_PAY b ON a.COOPERATOR_ID = b.COOPERATOR_ID AND a.MBER_ID = b.MBER_ID AND a.ETC_ID = b.ETC_ID and b.USE_AT = 'Y' AND b.WEEK_YN !='Y'
+			LEFT JOIN RD_WEEK_PAY c ON a.COOPERATOR_ID = c.COOPERATOR_ID AND a.MBER_ID = c.MBER_ID AND a.ETC_ID = c.ETC_ID AND c.USE_AT = 'Y'
+			, (SELECT @ROWNUM:=0) AS R
+			WHERE a.COOPERATOR_ID = #{cooperatorId} AND a.MBER_ID = #{mberId}
 				<if test="searchGubun == 'RIDER_ALERT'">
-				AND use_at ='Y' AND auth_request_dt IS NOT NULL AND auth_respons_dt IS NULL	/*요청했으나 승인을 않한건*/
+				AND a.use_at ='Y' AND a.auth_request_dt IS NOT NULL AND a.auth_respons_dt IS NULL	/*요청했으나 승인을 않한건*/
 				</if>
 				<if test="searchGubun == 'RIDER_LIST'">
-				AND use_at ='Y' AND auth_request_dt IS NOT NULL
+				AND a.use_at ='Y' AND a.auth_request_dt IS NOT NULL
 				</if>
+			GROUP BY a.etc_id
 
 		<if test="schIdx !=0 and schPagePerCnt != 0">
 			) m
