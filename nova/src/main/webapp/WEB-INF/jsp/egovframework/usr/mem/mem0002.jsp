@@ -176,7 +176,7 @@
 	];
 
 	var columnDefs2= [
-		{ headerName: "chk", field: "chk", minWidth: 10, maxWidth: 60, cellDataType: 'boolean', editable:true },
+		{ headerName: "chk", field: "chk", minWidth: 10, maxWidth: 60, cellDataType: 'boolean', editable: (params) => {return (params.node.data.responsAt == 'Y')? false: true} },
 		{ headerName: "NO", field: "no", minWidth: 10, maxWidth: 60, valueGetter:(params) => { return params.node.rowIndex + 1} },
 		{ headerName: "uniq", field: "uniq", minWidth: 70, hide:true},
 		{ headerName: "crud", field: "crud", minWidth: 90, hide:true},
@@ -184,18 +184,18 @@
 		{ headerName: "ID", field: "mberId", minWidth: 90, maxWidth: 130},
 
 		//대여:D, 리스,:R 기타:E
-		{ headerName: "구분", field: "gubun", minWidth: 10, maxWidth: 80, editable: true
+		{ headerName: "구분", field: "gubun", minWidth: 10, maxWidth: 80, editable: (params) => {return (params.node.data.responsAt == 'Y')? false: true}
 			, valueGetter:(params) => { return (params.node.data.gubun=='D')?"대여": (params.node.data.gubun=='R')?"리스":"기타"}
 			, cellEditor: 'agSelectCellEditor'
 			, cellEditorParams: params => { return {values: ['D', 'R', 'E']}; }
 			, cellClass: (params) => {return agGrideditClass(params)}
 		},
-		{ headerName: "상환기간(일)", field: "paybackDay", minWidth: 10, maxWidth: 100, editable: true
+		{ headerName: "상환기간(일)", field: "paybackDay", minWidth: 10, maxWidth: 100, editable: (params) => {return (params.node.data.responsAt == 'Y')? false: true}
 			, cellClass: (params) => {return agGrideditClass(params, "ag-cell-right");}
 			, valueGetter:(params) => { return currencyFormatter(params.data.paybackDay);}
 //             , valueParser: (params) => { return gridWan(params);}
 		},
-		{ headerName: "일별상환금액", field: "paybackCost", minWidth: 10, maxWidth: 100, editable: true
+		{ headerName: "일별상환금액", field: "paybackCost", minWidth: 10, maxWidth: 100, editable: (params) => {return (params.node.data.responsAt == 'Y')? false: true}
 			, cellClass: (params) => {return agGrideditClass(params, "ag-cell-right");}
 			, valueGetter:(params) => { return currencyFormatter(params.data.paybackCost);}
 //             , valueParser: (params) => { return gridWan(params);}
@@ -210,7 +210,7 @@
 		{ headerName: "상환완료여부", field: "xxx", minWidth: 10, maxWidth: 100},
 		{ headerName: "승인요청일", field: "authRequestDt", minWidth: 10, maxWidth: 100, valueGetter:(params) => { return getStringDate(params.data.authRequestDt)}},
 		{ headerName: "라이더<br/>승인일", field: "authResponsDt", minWidth: 10, maxWidth: 100, valueGetter:(params) => { return getStringDate(params.data.authResponsDt)}},
-		{ headerName: "라이더<br/>승인여부", field: "xxxx", minWidth: 10, maxWidth: 100}
+		{ headerName: "라이더<br/>승인여부", field: "responsAt", minWidth: 10, maxWidth: 100}
 	];
 
 	//onLoad
@@ -478,16 +478,6 @@
 		}, 100);
 
 	}
-	//체크된 노드 가져오기
-	function getChkRows(gridObj){
-		var updateRows = [];
-		gridObj.forEachNode( function(rowNode, index) {
-			if(rowNode.data.chk == true || rowNode.data.chk == 'true' ){
-				updateRows.push(rowNode.data);
-			}
-		});
-		return updateRows;
-	}
 
 	function requestEtc(){
 		grid1.stopEditing();
@@ -495,13 +485,14 @@
 		setTimeout(function(){
 			var updateItem = getChkRows(grid2);
 
+			debugger;
 			if(updateItem.length <=0 ){
 				alert("승인요청할 항목을 체크해주세요");
 				return;
 			}
 			// 로딩 시작
 	        $('.loading-wrap--js').show();
-	        axios.post('${pageContext.request.contextPath}/usr/mem0002_0006.do',getEditRows(grid2)).then(function(response) {        	// 로딩 종료
+	        axios.post('${pageContext.request.contextPath}/usr/mem0002_0006.do',updateItem).then(function(response) {        	// 로딩 종료
 	            $('.loading-wrap--js').hide();
 	        	if(response.data.resultCode == "success"){
 

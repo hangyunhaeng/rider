@@ -248,58 +248,61 @@ public class DtyServiceImpl extends EgovAbstractServiceImpl implements DtyServic
 
     	//대출 입금 대상 조회 후 출금이력 생성
     	List<EtcVO> etcList = dtyDAO.selectEtcList(inVo);
+		String tranDay = Util.getDay();
     	for(int i = 0 ; i<etcList.size() ; i++) {
     		EtcVO one = etcList.get(i);
-    		one.setLastUpdusrId(user.getId());
+    		if("Y".equals(one.getAbleYn())) {
+	    		one.setLastUpdusrId(user.getId());
 
-    		//1.출금 가능금액 내의 금액인지 확인
-    		MyInfoVO myInfoVO = new MyInfoVO();
-    		myInfoVO.setMberId(one.getMberId());
-    		myInfoVO.setSearchCooperatorId(one.getCooperatorId());
-    		MyInfoVO ablePrice = rotService.selectAblePrice(myInfoVO);
-    		if(one.getPaybackCost() <= ablePrice.getWeekAblePrice()) {
+	    		//1.출금 가능금액 내의 금액인지 확인
+	    		MyInfoVO myInfoVO = new MyInfoVO();
+	    		myInfoVO.setMberId(one.getMberId());
+	    		myInfoVO.setSearchCooperatorId(one.getCooperatorId());
+	    		MyInfoVO ablePrice = rotService.selectAblePrice(myInfoVO);
+	    		if(one.getPaybackCost() <= ablePrice.getWeekAblePrice()) {
 
-    			WeekPayVO insertVo = new WeekPayVO();
-    			insertVo.setWkpId(egovWkpIdGnrService.getNextStringId());
-    			insertVo.setMberId(one.getMberId());
-    			insertVo.setCooperatorId(one.getCooperatorId());
-    			insertVo.setDwGubun("WEK");
-    			insertVo.setIoGubun("2");
-    			insertVo.setFee(0);
-    			insertVo.setSendPrice(new BigDecimal(one.getPaybackCost()));
-    			insertVo.setEtcId(one.getEtcId());
-//    			insertVo.setTranDay(tranDay);
-//    			insertVo.setTelegramNo(telegramNo);
-    			insertVo.setUseAt("Y");
-    			insertVo.setCreatId(user.getId());
+	    			WeekPayVO insertVo = new WeekPayVO();
+	    			insertVo.setWkpId(egovWkpIdGnrService.getNextStringId());
+	    			insertVo.setMberId(one.getMberId());
+	    			insertVo.setCooperatorId(one.getCooperatorId());
+	    			insertVo.setDwGubun("WEK");
+	    			insertVo.setIoGubun("2");
+	    			insertVo.setFee(0);
+	    			insertVo.setSendPrice(new BigDecimal(one.getPaybackCost()));
+	    			insertVo.setEtcId(one.getEtcId());
+	    			insertVo.setTranDay(tranDay);
+	//    			insertVo.setTelegramNo(telegramNo);
+	    			insertVo.setUseAt("Y");
+	    			insertVo.setCreatId(user.getId());
 
-    			dtyDAO.insertWeekPay(insertVo);
-    			dtyDAO.finishEtc(one);
-    		} else if(one.getPaybackCost() <= ablePrice.getDayAblePrice() ) {	//출금 가능금액 체크
+	    			dtyDAO.insertWeekPay(insertVo);
+	    			dtyDAO.finishEtc(one);
+	    		} else if(one.getPaybackCost() <= ablePrice.getDayAblePrice() ) {	//출금 가능금액 체크
 
-    			DayPayVO insertVo = new DayPayVO();
-    			int dayFee = (int)Math.ceil(one.getPaybackCost()*0.011);
-    			int insurance = (int)Math.ceil(one.getPaybackCost()*0.05);
+	    			DayPayVO insertVo = new DayPayVO();
+	    			int dayFee = (int)Math.ceil(one.getPaybackCost()*0.011);
+	    			int insurance = (int)Math.ceil(one.getPaybackCost()*0.05);
 
-    			insertVo.setDypId(egovDypIdGnrService.getNextStringId());
-    			insertVo.setMberId(one.getMberId());
-    			insertVo.setCooperatorId(one.getCooperatorId());
-    			insertVo.setDay(Util.getDay());
-    			insertVo.setIoGubun("2");			//출금
-    			insertVo.setDayFee(dayFee);		//선출금수수료
-    			insertVo.setInsurance(insurance);	//보험료
-    			insertVo.setSendFee(0);		//이체수수료
-    			insertVo.setSendPrice(one.getPaybackCost());
-    			insertVo.setWeekYn("N");			//정산완료
-    			insertVo.setEtcId(one.getEtcId());
-//    			insertVo.setTranDay(tranDay);
-//    			insertVo.setTelegramNo(telegramNo);
-    			insertVo.setUseAt("Y");
-    			insertVo.setCreatId(user.getId());
-    			dtyDAO.insertDayPay(insertVo);
-    			dtyDAO.finishEtc(one);
+	    			insertVo.setDypId(egovDypIdGnrService.getNextStringId());
+	    			insertVo.setMberId(one.getMberId());
+	    			insertVo.setCooperatorId(one.getCooperatorId());
+	    			insertVo.setDay(Util.getDay());
+	    			insertVo.setIoGubun("2");			//출금
+	    			insertVo.setDayFee(dayFee);		//선출금수수료
+	    			insertVo.setInsurance(insurance);	//보험료
+	    			insertVo.setSendFee(0);		//이체수수료
+	    			insertVo.setSendPrice(one.getPaybackCost());
+	    			insertVo.setWeekYn("N");			//정산완료
+	    			insertVo.setEtcId(one.getEtcId());
+	    			insertVo.setTranDay(tranDay);
+	//    			insertVo.setTelegramNo(telegramNo);
+	    			insertVo.setUseAt("Y");
+	    			insertVo.setCreatId(user.getId());
+	    			dtyDAO.insertDayPay(insertVo);
+	    			dtyDAO.finishEtc(one);
 
-    		}
+	    		}
+    		}// end if("Y".equals(one.getAbleYn())) {
 
     	}
 

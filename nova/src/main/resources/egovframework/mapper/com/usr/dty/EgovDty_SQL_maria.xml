@@ -230,9 +230,9 @@
 	<insert id="insertWeekPay" parameterType="egovframework.com.rd.usr.service.vo.WeekPayVO">
 		INSERT INTO RD_WEEK_PAY
 		(WKP_ID, COOPERATOR_ID, MBER_ID, DW_GUBUN, IO_GUBUN, ABLE_PRICE, FEE, SEND_PRICE, ACCOUNTS_ST_DT
-		, ACCOUNTS_ED_DT, DYP_ID, ATCH_FILE_ID, WEEK_ID, TRAN_DAY, TELEGRAM_NO, USE_AT, CREAT_DT, CREAT_ID, ETC_ID)
+		, ACCOUNTS_ED_DT, DYP_ID, ATCH_FILE_ID, WEEK_ID, TRAN_DAY, TELEGRAM_NO, ETC_ID, USE_AT, CREAT_DT, CREAT_ID)
 		VALUE(#{wkpId}, #{cooperatorId}, #{mberId}, #{dwGubun}, #{ioGubun}, #{ablePrice}, #{fee}, #{sendPrice}
-		, #{accountsStDt}, #{accountsEdDt}, #{dypId}, #{atchFileId}, #{weekId}, #{tranDay}, #{telegramNo},#{useAt}, SYSDATE(), #{creatId}, #{etcId})
+		, #{accountsStDt}, #{accountsEdDt}, #{dypId}, #{atchFileId}, #{weekId}, #{tranDay}, #{telegramNo}, #{etcId},#{useAt}, SYSDATE(), #{creatId})
 	</insert>
 
 	<select id="selectDayPay" parameterType="egovframework.com.rd.usr.service.vo.DayPayVO" resultType="egovframework.com.rd.usr.service.vo.DayPayVO">
@@ -295,7 +295,8 @@
 		AND COOPERATOR_ID = #{cooperatorId}
 	</update>
 	<select id="selectDayPayIoGubn2List" parameterType="egovframework.com.rd.usr.service.vo.WeekInfoVO" resultType="egovframework.com.rd.usr.service.vo.WeekPayVO">
-		SELECT COOPERATOR_ID, MBER_ID, 'DAY' DW_GUBUN, '2', IO_GUBUN, NVL(DAY_FEE, 0)+NVL(INSURANCE,0)+NVL(SEND_FEE,0) AS FEE, SEND_PRICE, DYP_ID, TRAN_DAY, TELEGRAM_NO,'Y' AS USE_AT
+		SELECT COOPERATOR_ID, MBER_ID, 'DAY' DW_GUBUN, '2', IO_GUBUN, NVL(DAY_FEE, 0)+NVL(INSURANCE,0)+NVL(SEND_FEE,0) AS FEE
+		, SEND_PRICE, DYP_ID, TRAN_DAY, TELEGRAM_NO,'Y' AS USE_AT, ETC_ID
 		from RD_DAY_PAY
 		WHERE WEEK_YN = 'N'
 		AND USE_AT = 'Y'
@@ -438,9 +439,12 @@
 	<select id="selectEtcList" parameterType="egovframework.com.rd.usr.service.vo.DayPayVO" resultType="egovframework.com.rd.usr.service.vo.EtcVO">
 			SELECT b.ETC_ID, b.COOPERATOR_ID, b.MBER_ID, b.GUBUN, b.PAYBACK_DAY, b.PAYBACK_COST, b.PAYBACK_COST_ALL, DATE_FORMAT(b.AUTH_REQUEST_DT, '%Y%m%d') AUTH_REQUEST_DT
 			, DATE_FORMAT(b.AUTH_RESPONS_DT, '%Y%m%d') AUTH_RESPONS_DT, b.RESPONS_AT, b.USE_AT, DATE_FORMAT(b.CREAT_DT, '%Y%m%d') CREAT_DT, b.CREAT_ID, b.LAST_UPDT_PNTTM, b.LAST_UPDUSR_ID
+			, if(c.ETC_ID IS NULL AND d.ETC_ID IS NULL, 'Y', 'N') as ABLE_YN /*하루에 한번만 출금할수 있도록 */
 			FROM RD_DELIVERY_INFO a
 			JOIN RD_ETC b on a.COOPERATOR_ID = b.COOPERATOR_ID AND a.MBER_ID = b.MBER_ID AND b.finish_at ='N' AND AUTH_RESPONS_DT IS NOT NULL AND RESPONS_AT ='Y'
-			WHERE ATCH_FILE_ID = #{dayAtchFileId}
+			LEFT JOIN RD_DAY_PAY c ON b.COOPERATOR_ID = c.COOPERATOR_ID AND b.MBER_ID = c.MBER_ID  AND b.ETC_ID = c.ETC_ID AND c.IO_GUBUN ='2' AND c.day = DATE_FORMAT(SYSDATE(), '%Y%m%d')
+			LEFT JOIN RD_WEEK_PAY d ON b.COOPERATOR_ID = d.COOPERATOR_ID AND b.MBER_ID = d.MBER_ID  AND b.ETC_ID = d.ETC_ID AND d.IO_GUBUN = '2' AND d.TRAN_DAY = DATE_FORMAT(SYSDATE(), '%Y%m%d')
+			WHERE a.ATCH_FILE_ID = #{dayAtchFileId}
 			GROUP BY b.etc_id
 	</select>
 	<update id="finishEtc" parameterType="egovframework.com.rd.usr.service.vo.EtcVO">
@@ -452,9 +456,14 @@
 		AND 'true' = (
 			<![CDATA[SELECT if(payback_cost_all <= send_price, 'true', 'false')]]>
 			FROM RD_ETC a,
-			(SELECT send_price FROM RD_DAY_PAY WHERE etc_id = #{etcId}
-				UNION ALL
-				SELECT send_price FROM RD_WEEK_PAY WHERE etc_id = #{etcId}) b
+			(
+				SELECT NVL(SUM(send_price), 0)  as send_price
+				FROM(
+					SELECT send_price FROM RD_DAY_PAY WHERE etc_id = #{etcId} AND week_yn !='Y'/* 정산완료된 일정산건은 주정산으로 이동되었으니 제외*/
+					UNION ALL
+					SELECT send_price FROM RD_WEEK_PAY WHERE etc_id = #{etcId}
+				) c
+			) b
 			WHERE etc_id = #{etcId}
 		)
 	</update>

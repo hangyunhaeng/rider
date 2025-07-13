@@ -113,19 +113,20 @@ public class EgovRotController {
 		model.addAttribute("cooperatorList", cooperatorListJson);
 		model.addAttribute("cooperatorId", selectCooperId);
 
+		//대출
 		EtcVO etcVO = new EtcVO();
 		etcVO.setSearchGubun("RIDER_ALERT");
 		etcVO.setMberId(user.getId());
 		etcVO.setCooperatorId(selectCooperId);
 		model.addAttribute("requestCnt", memService.selectEtcList(etcVO).size());
 
-		//공지사항
 
         //라이더 권한
 		NoticeVO noticeVO = new NoticeVO();
         noticeVO.setSchUserSe(user.getUserSe());
         noticeVO.setSchAuthorCode(user.getAuthorCode());
 
+        //공지사항
         noticeVO.setSearchId(user.getId());
         noticeVO.setSearchGubun("gongji");
     	Map<String, Object> gonjiList = new HashMap<String, Object>();
@@ -197,6 +198,15 @@ public class EgovRotController {
 
 		myInfoVO.setMberId(user.getId());
 
+
+
+		//대출
+		EtcVO etcVO = new EtcVO();
+		etcVO.setSearchGubun("RIDER_ALERT");
+		etcVO.setMberId(user.getId());
+		etcVO.setCooperatorId(myInfoVO.getSearchCooperatorId());
+
+		map.put("requestCnt", memService.selectEtcList(etcVO).size());
         map.put("ablePrice", rotService.selectAblePrice(myInfoVO));
         map.put("resultCode", "success");
         return ResponseEntity.ok(map);

@@ -39,6 +39,8 @@ public class EtcVO extends Sch implements Serializable {
 	private String authResponsDt;
 	//라이더승인여부
 	private String responsAt;
+	//입금완료여부
+	private String finishAt;
 	//사용여부
 	private String useAt;
 	//등록일
@@ -49,7 +51,8 @@ public class EtcVO extends Sch implements Serializable {
 	private String lastUpdtPnttm;
 	//최종수정자ID
 	private String lastUpdusrId;
-
+	//대출 출금 가능여부(하루한번만 출금하도록 제한)
+	private String ableYn;
 
 	//그리드 내 유니크 키
 	private String uniq;

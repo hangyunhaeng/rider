@@ -172,6 +172,8 @@
 	    const params = new URLSearchParams();
 	    params.append("searchCooperatorId", $('#cooperatorId').val());
 
+
+	    $('#div대출').hide();
 		// 로딩 시작
         $('.loading-wrap--js').show();
 	    axios.post('${pageContext.request.contextPath}/gnr/rot0001_0002.do', params)
@@ -189,6 +191,9 @@
 					}
 
 					document.cookie = "cooperatorId = "+$('#cooperatorId').val();
+
+					if(response.data.requestCnt > 0)$('#div대출').show();
+
 				} else {
 					if(response.data.resultMsg != '' && response.data.resultMsg != null)
 						alert(response.data.resultMsg);

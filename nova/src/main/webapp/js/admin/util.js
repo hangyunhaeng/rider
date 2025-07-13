@@ -311,7 +311,7 @@ function findRowNode(gridObj, fileId, value){
 //필드를 수정하면 crud 값을 변경 해준다.
 function changeCrud(params, gridObj, key){
 	const colId = params.column.getId();
-	if(colId != 'crud'){
+	if(colId != 'crud' && colId != 'chk'){
 		if(params.data.crud != 'c'){
 			var nodeObj = findRowNode(gridObj, key, params.data[key]);
 			if(colId == 'useAt' && params.data.useAt == 'N'){
@@ -334,6 +334,16 @@ function getEditRows(gridObj){
 	var updateRows = [];
 	gridObj.forEachNode( function(rowNode, index) {
 		if(rowNode.data.crud == 'c' || rowNode.data.crud == 'u'|| rowNode.data.crud == 'd'){
+			updateRows.push(rowNode.data);
+		}
+	});
+	return updateRows;
+}
+//체크된 노드 가져오기
+function getChkRows(gridObj){
+	var updateRows = [];
+	gridObj.forEachNode( function(rowNode, index) {
+		if(rowNode.data.chk == true || rowNode.data.chk == 'true' ){
 			updateRows.push(rowNode.data);
 		}
 	});

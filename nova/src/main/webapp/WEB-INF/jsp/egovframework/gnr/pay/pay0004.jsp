@@ -167,7 +167,11 @@
 			if(nullToString(dataInfo.authRequestDt) != null && nullToString(dataInfo.authResponsDt) == ''){
 				내역.find('button').show();
 			} else{
-				내역.find('label:eq(0)').html("진행중");
+				if(dataInfo.finishAt == 'Y'){
+					내역.find('label:eq(0)').html("정산종료");
+				} else {
+					내역.find('label:eq(0)').html("진행중");
+				}
 				내역.find('label:eq(0)').show();
 			}
 			내역.find('label[class~=form-check-label]:eq(1)').html(dataInfo.paybackDay+'일동안 '+currencyFormatter(dataInfo.paybackCost)+'원 출금');
