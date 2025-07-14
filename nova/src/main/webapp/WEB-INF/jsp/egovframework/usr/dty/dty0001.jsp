@@ -508,7 +508,8 @@
 			<!-- grid  -->
 			<div style="height: 0px;" >
 				<span class="pagetotal" style='margin-right:20px;'>업로드 성공<em id="TT_CNT0" >0</em></span>
-				<span class="pagetotal">업로드 실패<em id="TT_CNT1">0</em></span>
+				<span class="pagetotal"style='margin-right:20px;'>업로드 실패<em id="TT_CNT1">0</em></span>
+				<span class="pagetotal"> 운영사,협력사 수익은 모두 일정산 파일에서 계산됩니다</span>
 			</div>
 
 			<br>

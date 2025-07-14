@@ -65,6 +65,18 @@ public class DayPayVO extends Sch implements Serializable {
 	//최종수정자ID
 	private String lastUpdusrId;
 	private String mberNm;
+	//시간제보험 최대 금액(7,000)
+	private int timeInsuranceMaxFee;
+	//콜수수료(원)
+	private int feeCallCost;
+	//배달건수
+	private int DeliveryCnt;
+	//수수료ID
+	private String feeId;
+	//수수료ID
+	private String riderFeeId;
+	//협력사 콜수수료
+	private int feeCooperatorCallCost;
 
 	//입력된 출금요청액
 	private int inputPrice;

@@ -37,6 +37,8 @@ public class CooperatorFeeVO extends Sch implements Serializable {
 	private int feeTimeInsurance;
 	//콜수수료(원)
 	private int feeCall;
+	//콜수수료(원)
+	private float feeCooperatorCall;
 
 //	private String startDt;
 //	private String endDt;

@@ -14,6 +14,7 @@ import egovframework.com.rd.usr.service.vo.DoszSchAccoutVO;
 import egovframework.com.rd.usr.service.vo.DoszTransferVO;
 import egovframework.com.rd.usr.service.vo.EtcVO;
 import egovframework.com.rd.usr.service.vo.HistoryVO;
+import egovframework.com.rd.usr.service.vo.ProfitVO;
 import egovframework.com.rd.usr.service.vo.SearchKeyVO;
 import egovframework.com.rd.usr.service.vo.UploadStateVO;
 import egovframework.com.rd.usr.service.vo.WeekInfoVO;
@@ -298,6 +299,25 @@ public class DtyDAO extends EgovComAbstractDAO {
 	 */
 	public int finishEtc(EtcVO vo) throws Exception {
 		return update("dtyDAO.finishEtc", vo);
+	}
+	/**
+	 * 수익 등록
+	 * @param vo
+	 * @return
+	 * @throws Exception
+	 */
+	public int insertProfit(ProfitVO vo) throws Exception {
+		return insert("dtyDAO.insertProfit", vo);
+	}
+
+	/**
+	 * 협력사 수익 등록
+	 * @param vo
+	 * @return
+	 * @throws Exception
+	 */
+	public int insertCooperatorProfit(ProfitVO vo) throws Exception {
+		return update("dtyDAO.insertCooperatorProfit", vo);
 	}
 
 }

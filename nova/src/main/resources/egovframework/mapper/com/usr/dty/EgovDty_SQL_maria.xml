@@ -237,14 +237,35 @@
 
 	<select id="selectDayPay" parameterType="egovframework.com.rd.usr.service.vo.DayPayVO" resultType="egovframework.com.rd.usr.service.vo.DayPayVO">
 		SELECT COOPERATOR_ID, MBER_ID, DAY, '1' AS IO_GUBUN, DELIVERY_PRICE, DAY_FEE, INSURANCE, DELIVERY_PRICE-DAY_FEE-INSURANCE AS ABLE_PRICE
-		, 'N' AS WEEK_YN, 'Y' AS USE_AT, ATCH_FILE_ID AS DAY_ATCH_FILE_ID
+		, 'N' AS WEEK_YN, 'Y' AS USE_AT, ATCH_FILE_ID AS DAY_ATCH_FILE_ID, FEE_CALL_COST, DELIVERY_CNT, FEE_ID, RIDER_FEE_ID
+		/*협력사 수익: 콜수수료*/
+		, FLOOR(FEE_CALL_COST*FEE_COOPERATOR_CALL) AS FEE_COOPERATOR_CALL_COST
 		FROM
 		(
-			SELECT COOPERATOR_ID, MBER_ID,RUN_DE AS DAY, SUM(DELIVERY_PRICE) AS DELIVERY_PRICE
-			, CEILING(SUM(DELIVERY_PRICE)*0.011) AS DAY_FEE, CEILING(SUM(DELIVERY_PRICE)*0.05) AS INSURANCE, ATCH_FILE_ID
-			FROM RD_DELIVERY_INFO
-			WHERE ATCH_FILE_ID = #{dayAtchFileId}
-			GROUP BY COOPERATOR_ID, MBER_ID, RUN_DE
+			SELECT sub_tab.*
+				/*선지급수수료(%) + 건당 콜수수료(원)  =  수익*/
+				, CEILING(DELIVERY_PRICE*FEE_ADMINSTRATOR) + DELIVERY_CNT*FEE_CALL AS DAY_FEE
+				/* 고용보험(%)+ 산재보험(%)+ 원천세(%) + 시간제보험(원 최대7,000)  =  보험료 */
+				, CEILING(DELIVERY_PRICE*(FEE_EMPLOYMENT_INSURANCE+FEE_INDUSTRIAL_INSURANCE+FEE_WITHHOLDING_TAX)) + if(DELIVERY_CNT*FEE_TIME_INSURANCE > #{timeInsuranceMaxFee}, #{timeInsuranceMaxFee}, DELIVERY_CNT*FEE_TIME_INSURANCE) AS INSURANCE
+				/* 콜수수료 */
+				, DELIVERY_CNT*FEE_CALL AS FEE_CALL_COST
+			FROM (
+				SELECT b.FEE_ADMINSTRATOR*0.01 AS FEE_ADMINSTRATOR /* 선지급수수료(%) */
+				, nvl(c.FEE_EMPLOYMENT_INSURANCE, b.FEE_EMPLOYMENT_INSURANCE)*0.01 AS FEE_EMPLOYMENT_INSURANCE/* 고용보험(%) */
+				, nvl(c.FEE_INDUSTRIAL_INSURANCE, b.FEE_INDUSTRIAL_INSURANCE)*0.01 AS FEE_INDUSTRIAL_INSURANCE/* 산재보험(%) */
+				, nvl(c.FEE_WITHHOLDING_TAX, b.FEE_WITHHOLDING_TAX)*0.01 AS FEE_WITHHOLDING_TAX/* 원천세(%) */
+				, nvl(c.FEE_TIME_INSURANCE, b.FEE_TIME_INSURANCE) AS FEE_TIME_INSURANCE/* 시간제보험(원 최대7,000) */
+				, nvl(c.FEE_CALL, b.FEE_CALL) AS FEE_CALL/* 건당 콜수수료(원) */
+				, a.COOPERATOR_ID, a.MBER_ID,a.RUN_DE AS DAY, SUM(a.DELIVERY_PRICE) AS DELIVERY_PRICE, COUNT(1) DELIVERY_CNT
+				, b.FEE_ID, c.RIDER_FEE_ID, b.FEE_COOPERATOR_CALL*0.01 AS FEE_COOPERATOR_CALL
+				, a.ATCH_FILE_ID
+				FROM RD_DELIVERY_INFO a
+				LEFT JOIN RD_COOPERATOR_FEE b ON a.COOPERATOR_ID = b.COOPERATOR_ID AND b.use_at ='Y'
+				LEFT JOIN RD_RIDER_FEE c ON a.COOPERATOR_ID = c.COOPERATOR_ID  AND a.MBER_ID = c.MBER_ID AND  c.use_at ='Y'
+				WHERE ATCH_FILE_ID = #{dayAtchFileId}
+				GROUP BY a.COOPERATOR_ID, a.MBER_ID, a.RUN_DE
+			) sub_tab
+
 		) tab
 	</select>
 	<insert id="insertDayPay" parameterType="egovframework.com.rd.usr.service.vo.DayPayVO">
@@ -467,4 +488,17 @@
 			WHERE etc_id = #{etcId}
 		)
 	</update>
+
+	<insert id="insertProfit" parameterType="egovframework.com.rd.usr.service.vo.ProfitVO">
+		INSERT INTO RD_PROFIT
+		(PROFIT_ID, COOPERATOR_ID, MBER_ID, GUBUN, COST, DELIVERY_CNT, DELIVERY_DAY, DYP_ID, FEE_ID, RIDER_FEE_ID, CREAT_DT, CREAT_ID)
+		VALUES(#{profitId}, #{cooperatorId}, #{mberId}, #{gubun}, #{cost}, #{deliveryCnt}, #{deliveryDay}, #{dypId}, #{feeId}, #{riderFeeId}, SYSDATE(), #{creatId})
+	</insert>
+
+	<insert id="insertCooperatorProfit" parameterType="egovframework.com.rd.usr.service.vo.ProfitVO">
+		INSERT INTO RD_COOPERATOR_PROFIT
+		(COOFIT_ID, PROFIT_ID, COOPERATOR_ID, MBER_ID, GUBUN, COST, DELIVERY_CNT, DELIVERY_DAY, DYP_ID, FEE_ID, RIDER_FEE_ID, CREAT_DT, CREAT_ID)
+		VALUES(#{coofitId}, #{profitId}, #{cooperatorId}, #{mberId}, #{gubun}, #{cost}, #{deliveryCnt}, #{deliveryDay}, #{dypId}, #{feeId}, #{riderFeeId}, SYSDATE(), #{creatId})
+	</insert>
+
 </mapper>

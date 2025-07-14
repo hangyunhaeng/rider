@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Repository;
 
 import egovframework.com.cmm.service.impl.EgovComAbstractDAO;
+import egovframework.com.rd.usr.service.vo.DayPayVO;
 import egovframework.com.rd.usr.service.vo.MyInfoVO;
 import egovframework.com.rd.usr.service.vo.NoticeVO;
 import egovframework.com.uat.uia.web.EgoRDLoginController;
@@ -118,8 +119,17 @@ public class RotDAO extends EgovComAbstractDAO {
 	 * @return
 	 * @throws Exception
 	 */
-	public List<MyInfoVO> selectMyCooperatorList(MyInfoVO vo)throws Exception {
+	public List<MyInfoVO> selectMyCooperatorList(MyInfoVO vo) throws Exception {
 		return selectList("rotDAO.selectMyCooperatorList", vo);
+	}
+	/**
+	 * 라이더 출금시 선지급수수료 계산
+	 * @param vo
+	 * @return
+	 * @throws Exception
+	 */
+	public DayPayVO selectDayFee(DayPayVO vo) throws Exception {
+		return selectOne("rotDAO.selectDayFee", vo);
 	}
 }
 

@@ -150,5 +150,25 @@
 			) B
 		) TAB
 	</select>
+	<select id="selectDayFee" parameterType="egovframework.com.rd.usr.service.vo.DayPayVO" resultType="egovframework.com.rd.usr.service.vo.DayPayVO">
+			SELECT sub_tab.*
+				/*선지급수수료(%)  =  수익*/
+				, CEILING(#{inputPrice}*FEE_ADMINSTRATOR) AS DAY_FEE
+				, floor(CEILING(#{inputPrice}*FEE_ADMINSTRATOR) * FEE_COOPERATOR_CALL) FEE_COOPERATOR_CALL_COST
+			FROM (
+				SELECT b.FEE_ADMINSTRATOR*0.01 AS FEE_ADMINSTRATOR /* 선지급수수료(%) */
+				, nvl(c.FEE_EMPLOYMENT_INSURANCE, b.FEE_EMPLOYMENT_INSURANCE)*0.01 AS FEE_EMPLOYMENT_INSURANCE/* 고용보험(%) */
+				, nvl(c.FEE_INDUSTRIAL_INSURANCE, b.FEE_INDUSTRIAL_INSURANCE)*0.01 AS FEE_INDUSTRIAL_INSURANCE/* 산재보험(%) */
+				, nvl(c.FEE_WITHHOLDING_TAX, b.FEE_WITHHOLDING_TAX)*0.01 AS FEE_WITHHOLDING_TAX/* 원천세(%) */
+				, nvl(c.FEE_TIME_INSURANCE, b.FEE_TIME_INSURANCE) AS FEE_TIME_INSURANCE/* 시간제보험(원 최대7,000) */
+				, nvl(c.FEE_CALL, b.FEE_CALL) AS FEE_CALL/* 건당 콜수수료(원) */
+				, b.FEE_COOPERATOR_CALL*0.01 AS FEE_COOPERATOR_CALL
+				, b.FEE_ID, c.RIDER_FEE_ID
+				from COMTNGNRLMBER a
+				LEFT JOIN RD_COOPERATOR_FEE b ON b.COOPERATOR_ID = #{cooperatorId} AND b.use_at ='Y'
+				LEFT JOIN RD_RIDER_FEE c ON b.COOPERATOR_ID = c.COOPERATOR_ID  AND a.MBER_ID = c.MBER_ID AND  c.use_at ='Y'
+				WHERE a.MBER_ID = #{mberId} AND b.COOPERATOR_ID = #{cooperatorId}
+			) sub_tab
+	</select>
 
 </mapper>

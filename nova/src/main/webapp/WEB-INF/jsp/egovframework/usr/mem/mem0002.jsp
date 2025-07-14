@@ -98,7 +98,7 @@
 		{ headerName: "사용여부", field: "useAt", minWidth: 90, hide:true, valueGetter:(params) => { return (params.node.data.useAt=='Y')?"사용": "미사용"}},
 		{ headerName: "생성자", field: "creatId", minWidth: 90, hide:true},
 
-		{ headerName: "운영사<br/>선지급수수료(%)", field: "feeAdminstrator", minWidth: 90},
+		{ headerName: "선지급수수료(%)", field: "feeAdminstrator", minWidth: 90},
 		{ headerName: "협력사<br/>선지급수수료(%)", field: "feeCooperator", minWidth: 90},
 		{ headerName: "고용보험(%)", field: "feeEmploymentInsurance", minWidth: 90},
 		{ headerName: "산재보험(%)", field: "feeIndustrialInsurance", minWidth: 90},

@@ -86,7 +86,7 @@
 		{ headerName: "소속<br/>라이더", field: "rdcnt", minWidth: 80, cellClass: 'ag-cell-right'},
 		{ headerName: "출금가능금액", field: "xxx", minWidth: 90, cellClass: 'ag-cell-right'},
 		{ headerName: "feeId", field: "feeId", minWidth: 90, hide:true},
-		{ headerName: "운영사<br/>선지급수수료(%)", field: "feeAdminstrator", minWidth: 90, editable: true
+		{ headerName: "선지급수수료(%)", field: "feeAdminstrator", minWidth: 90, editable: true
 			, cellClass: (params) => {return agGrideditClass(params, "ag-cell-right");}
 			, valueGetter:(params) => { return currencyFormatter(params.data.feeAdminstrator);}
             , valueParser: (params) => { return gridPercent(params);}
@@ -120,6 +120,11 @@
 			, cellClass: (params) => {return agGrideditClass(params, "ag-cell-right");}
 			, valueGetter:(params) => { return currencyFormatter(params.data.feeCall);}
             , valueParser: (params) => { return gridWan(params);}
+		},
+		{ headerName: "협력사<br/>콜수수료(%)", field: "feeCooperatorCall", minWidth: 90, editable: true
+			, cellClass: (params) => {return agGrideditClass(params, "ag-cell-right");}
+			, valueGetter:(params) => { return currencyFormatter(params.data.feeCooperatorCall);}
+            , valueParser: (params) => { return gridPercent(params);}
 		},
 		{ headerName: "사용여부", field: "useAt", minWidth: 90, editable: (params) => {return ('${loginVO.authorCode}' == 'ROLE_ADMIN')? true: false}
 		, valueGetter:(params) => { return (params.node.data.useAt=='Y')?"사용": "미사용"}
