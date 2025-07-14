@@ -404,6 +404,7 @@
 			WHERE week_yn ='N'
 				AND IO_GUBUN ='2'
 				AND COOPERATOR_ID = #{searchCooperatorId}
+				AND a.ETC_ID IS null	/*대출 제외*/
 				AND MBER_ID = #{schId}
 				AND a.TRAN_DAY BETWEEN #{searchFromDate} AND #{searchToDate}
 
@@ -418,6 +419,7 @@
 			WHERE a.USE_AT ='Y'
 				AND IO_GUBUN ='2'
 				AND COOPERATOR_ID = #{searchCooperatorId}
+				AND a.ETC_ID IS null	/*대출 제외*/
 				AND MBER_ID = #{schId}
 				AND a.TRAN_DAY BETWEEN #{searchFromDate} AND #{searchToDate}
 		) tab

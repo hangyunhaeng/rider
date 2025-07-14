@@ -12,10 +12,20 @@
 		SELECT * FROM(
 			SELECT a.cooperator_id,'DAY' AS dw_gubun,'선정산' AS gubun, DYP_ID AS ID, if(a.io_gubun=1, a.ABLE_PRICE, a.send_price) as send_price, a.day_fee+a.insurance+a.send_fee AS fee
 			, b.tran_day, b.TELEGRAM_NO, b.rv_account, b.status, b.status_cd
-			, case when b.status='200' then '성공' when io_gubun=2 AND b.STATUS= '400' AND b.error_code='VTIM' then '처리중' when io_gubun=2 AND b.STATUS= '400' AND b.error_code='0011' then '처리중'  when io_gubun=2 then '실패' ELSE '' end AS status_nm
+			, case when a.etc_id is not null then '' when b.status='200' then '성공' when io_gubun=2 AND b.STATUS= '400' AND b.error_code='VTIM' then '처리중' when io_gubun=2 AND b.STATUS= '400' AND b.error_code='0011' then '처리중'  when io_gubun=2 then '실패' ELSE '' end AS status_nm
 			, b.send_dt, b.send_tm, b.ERROR_MESSAGE
-			, case when io_gubun='1' then DATE_FORMAT(a.CREAT_DT, '%Y%m%d%H%i%s') when io_gubun = '2' then if(b.STATUS_CD = '0000', concat(b.send_dt,b.send_tm), DATE_FORMAT(b.creat_dt, '%Y%m%d%H%i%s')) ELSE '' END  AS CREAT_DT
-			, c.MBER_NM, d.COOPERATOR_NM, io_gubun, if(io_gubun='1', '입금', '출금') AS io_gubun_nm, DAY_ATCH_FILE_ID, WEK_ATCH_FILE_ID
+			, case when io_gubun='1' then DATE_FORMAT(a.CREAT_DT, '%Y%m%d%H%i%s')
+					when io_gubun = '2' AND a.etc_id IS NOT NULL then DATE_FORMAT(a.CREAT_DT, '%Y%m%d%H%i%s')
+					when io_gubun = '2' then if(b.STATUS_CD = '0000', concat(b.send_dt,b.send_tm), DATE_FORMAT(b.creat_dt, '%Y%m%d%H%i%s')) ELSE '' END  AS CREAT_DT
+			, c.MBER_NM, d.COOPERATOR_NM, io_gubun
+			, case when io_gubun = '1' then '입금'
+						when io_gubun ='2' AND a.etc_id IS NULL then '출금'
+						when io_gubun ='2' AND a.etc_id IS NOT NULL AND g.gubun ='D' then '대여'
+						when io_gubun ='2' AND a.etc_id IS NOT NULL AND g.gubun ='R' then '리스'
+						when io_gubun ='2' AND a.etc_id IS NOT NULL AND g.gubun ='E' then '기타'
+						ELSE  ''
+						end AS io_gubun_nm
+			, DAY_ATCH_FILE_ID, WEK_ATCH_FILE_ID
 			, week_yn, case when week_yn = 'Y' then '정산완료' ELSE '선입금' END week_NM
 			, a.DAY AS ACCOUNTS_ST_DT, '' AS ACCOUNTS_ED_DT, e.CD_NM AS RV_BANK_NM, a.mber_id, DATE_FORMAT(f.CREAT_DT, '%Y%m%d') AS FILE_DATE
 			FROM RD_DAY_PAY a
@@ -24,6 +34,7 @@
 			LEFT JOIN RD_COOPERATOR d ON a.COOPERATOR_ID= d.COOPERATOR_ID
 			LEFT JOIN RD_CD e ON b.RV_BANK_CODE = e.CD AND e.CD_GROUP ='BANK_CD'
 			LEFT JOIN COMTNFILE f ON a.DAY_ATCH_FILE_ID = f.ATCH_FILE_ID
+			LEFT JOIN RD_ETC g ON a.etc_id = g.ETC_ID AND g.USE_AT ='Y'
 			WHERE 1=1
 			AND (week_yn ='N' or io_gubun ='1')	/*정산완료된 출금이력은 주정산으로 넘어가기때문에 제외한다*/
 			<if test="searchGubun != 'all'">
@@ -46,10 +57,20 @@
 
 			SELECT a.cooperator_id, dw_gubun, if(dw_gubun='DAY', '선정산', '정산') AS gubun, wkp_id AS ID, if(a.io_gubun=1, a.ABLE_PRICE, a.send_price) as send_price, a.fee
 			, b.tran_day, b.TELEGRAM_NO, b.rv_account, b.status, b.status_cd
-			, case when b.status='200' then '성공' when io_gubun=2 AND b.STATUS= '400' AND b.error_code='VTIM' then '처리중' when io_gubun=2 AND b.STATUS= '400' AND b.error_code='0011' then '처리중'  when io_gubun=2 then '실패' ELSE '' end AS status_nm
+			, case when a.etc_id is not null then '' when b.status='200' then '성공' when io_gubun=2 AND b.STATUS= '400' AND b.error_code='VTIM' then '처리중' when io_gubun=2 AND b.STATUS= '400' AND b.error_code='0011' then '처리중'  when io_gubun=2 then '실패' ELSE '' end AS status_nm
 			, b.send_dt, b.send_tm, b.ERROR_MESSAGE
-			, case when io_gubun='1' then DATE_FORMAT(a.CREAT_DT, '%Y%m%d%H%i%s') when io_gubun = '2' then if(b.STATUS_CD = '0000', concat(b.send_dt,b.send_tm), DATE_FORMAT(b.creat_dt, '%Y%m%d%H%i%s')) ELSE '' END  AS CREAT_DT
-			, c.MBER_NM, d.COOPERATOR_NM, io_gubun, if(io_gubun='1', '입금', '출금') AS io_gubun_nm, '' as DAY_ATCH_FILE_ID, a.atch_file_id AS WEK_ATCH_FILE_ID
+			, case when io_gubun='1' then DATE_FORMAT(a.CREAT_DT, '%Y%m%d%H%i%s')
+					when io_gubun = '2' AND a.etc_id IS NOT NULL then DATE_FORMAT(a.CREAT_DT, '%Y%m%d%H%i%s')
+					when io_gubun = '2' then if(b.STATUS_CD = '0000', concat(b.send_dt,b.send_tm), DATE_FORMAT(b.creat_dt, '%Y%m%d%H%i%s')) ELSE '' END  AS CREAT_DT
+			, c.MBER_NM, d.COOPERATOR_NM, io_gubun
+			, case when io_gubun = '1' then '입금'
+						when io_gubun ='2' AND a.etc_id IS NULL then '출금'
+						when io_gubun ='2' AND a.etc_id IS NOT NULL AND g.gubun ='D' then '대여'
+						when io_gubun ='2' AND a.etc_id IS NOT NULL AND g.gubun ='R' then '리스'
+						when io_gubun ='2' AND a.etc_id IS NOT NULL AND g.gubun ='E' then '기타'
+						ELSE  ''
+						end AS io_gubun_nm
+			, '' as DAY_ATCH_FILE_ID, a.atch_file_id AS WEK_ATCH_FILE_ID
 			, '' week_yn, '정산완료' AS week_NM
 			, ACCOUNTS_ST_DT, ACCOUNTS_ED_DT, e.CD_NM AS RV_BANK_NM, a.mber_id, DATE_FORMAT(f.CREAT_DT, '%Y%m%d') AS FILE_DATE
 			FROM RD_WEEK_PAY a
@@ -58,6 +79,7 @@
 			LEFT JOIN RD_COOPERATOR d ON a.COOPERATOR_ID= d.COOPERATOR_ID
 			LEFT JOIN RD_CD e ON b.RV_BANK_CODE = e.CD AND e.CD_GROUP ='BANK_CD'
 			LEFT JOIN COMTNFILE f ON a.ATCH_FILE_ID = f.ATCH_FILE_ID
+			LEFT JOIN RD_ETC g ON a.etc_id = g.ETC_ID AND g.USE_AT ='Y'
 			WHERE a.use_at ='Y'
 			<if test="searchGubun != 'all'">
 			AND io_gubun = #{searchGubun}
@@ -159,5 +181,62 @@
 		SELECT DS_DT, DS_TM, PAYMENT_SUCC_CNT, PAYMENT_SUCC_AMOUNT, PAYMENT_FAIL_CNT, PAYMENT_FAIL_AMOUNT, DEPOSITOR_SUCC_CNT, DEPOSITOR_TIME_CNT, DEPOSITOR_FAIL_CNT
 			, DAON_SUCC_CNT, DAON_SUCC_AMOUNT, DAON_FAIL_CNT, DAON_FAIL_AMOUNT, CREAT_DT
 		FROM RD_DOZN_DS;
+	</select>
+	<select id="selectProfitList" parameterType="egovframework.com.rd.usr.service.vo.ProfitVO" resultType="egovframework.com.rd.usr.service.vo.ProfitVO">
+
+		SELECT a.PROFIT_ID, a.COOPERATOR_ID, a.MBER_ID, a.GUBUN, a.COST, a.DELIVERY_CNT, a.DELIVERY_DAY, a.DYP_ID, a.WKP_ID, a.FEE_ID, a.RIDER_FEE_ID
+		, DATE_FORMAT(a.CREAT_DT, '%Y%m%d') AS CREAT_DT, a.CREAT_ID
+		, b.MBER_NM, c.COOPERATOR_NM
+		, case when a.gubun = 'C' then '콜수수료' when a.gubun ='E' then '기타수수료' when a.gubun ='D' then '선지급수수료' ELSE '' END GUBUN_NM
+		FROM RD_PROFIT a
+		LEFT JOIN COMTNGNRLMBER b ON a.mber_id = b.mber_id
+		LEFT JOIN RD_COOPERATOR c ON a.cooperator_id = c.COOPERATOR_ID
+		where 1=1
+
+			<if test="searchGubun != 'all'">
+			AND a.gubun = #{searchGubun}
+			</if>
+			<if test='searchCooperatorId != null and searchCooperatorId != "all"'>
+			AND a.cooperator_id = #{searchCooperatorId}
+			</if>
+			<if test="searchNm != null and searchNm != ''">
+			AND b.mber_nm like '%' #{searchNm} '%'
+			</if>
+			AND DATE_FORMAT(a.CREAT_DT,'%Y%m%d') BETWEEN #{searchFromDate} AND #{searchToDate}
+			<if test="searchRegistrationSn != null and searchRegistrationSn != ''">
+			AND a.COOPERATOR_ID IN (
+				SELECT COOPERATOR_ID from rd_cooperator
+				WHERE REGISTRATION_SN = #{searchRegistrationSn}
+			)
+			</if>
+	</select>
+
+	<select id="selectCooperatorProfitList" parameterType="egovframework.com.rd.usr.service.vo.ProfitVO" resultType="egovframework.com.rd.usr.service.vo.ProfitVO">
+
+		SELECT a.PROFIT_ID, a.COOPERATOR_ID, a.MBER_ID, a.GUBUN, a.COST, a.DELIVERY_CNT, a.DELIVERY_DAY, a.DYP_ID, a.WKP_ID, a.FEE_ID, a.RIDER_FEE_ID
+		, DATE_FORMAT(a.CREAT_DT, '%Y%m%d') AS CREAT_DT, a.CREAT_ID
+		, b.MBER_NM, c.COOPERATOR_NM
+		, case when a.gubun = 'C' then '콜수수료' when a.gubun ='E' then '기타수수료' when a.gubun ='D' then '선지급수수료' ELSE '' END GUBUN_NM
+		FROM RD_COOPERATOR_PROFIT a
+		LEFT JOIN COMTNGNRLMBER b ON a.mber_id = b.mber_id
+		LEFT JOIN RD_COOPERATOR c ON a.cooperator_id = c.COOPERATOR_ID
+		where 1=1
+
+			<if test="searchGubun != 'all'">
+			AND a.gubun = #{searchGubun}
+			</if>
+			<if test='searchCooperatorId != null and searchCooperatorId != "all"'>
+			AND a.cooperator_id = #{searchCooperatorId}
+			</if>
+			<if test="searchNm != null and searchNm != ''">
+			AND b.mber_nm like '%' #{searchNm} '%'
+			</if>
+			AND DATE_FORMAT(a.CREAT_DT,'%Y%m%d') BETWEEN #{searchFromDate} AND #{searchToDate}
+			<if test="searchRegistrationSn != null and searchRegistrationSn != ''">
+			AND a.COOPERATOR_ID IN (
+				SELECT COOPERATOR_ID from rd_cooperator
+				WHERE REGISTRATION_SN = #{searchRegistrationSn}
+			)
+			</if>
 	</select>
 </mapper>

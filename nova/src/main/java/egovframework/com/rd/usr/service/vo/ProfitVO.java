@@ -47,4 +47,7 @@ public class ProfitVO extends Sch implements Serializable {
 	private String creatDt;
 	//생성자 ID
 	private String creatId;
+	private String mberNm;
+	private String cooperatorNm;
+	private String gubunNm;
 }

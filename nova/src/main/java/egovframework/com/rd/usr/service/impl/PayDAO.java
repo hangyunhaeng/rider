@@ -12,6 +12,7 @@ import egovframework.com.rd.usr.service.vo.DoszDSResultVO;
 import egovframework.com.rd.usr.service.vo.DoszResultVO;
 import egovframework.com.rd.usr.service.vo.DoznHistoryVO;
 import egovframework.com.rd.usr.service.vo.HistoryVO;
+import egovframework.com.rd.usr.service.vo.ProfitVO;
 import egovframework.com.uat.uia.web.EgoRDLoginController;
 
 
@@ -103,6 +104,24 @@ public class PayDAO extends EgovComAbstractDAO {
 	 */
 	public List<DoszDSResultVO> selectDoznDs(DoszDSResultVO vo) throws Exception {
 		return selectList("payDAO.selectDoznDs", vo);
+	}
+	/**
+	 * 운영사 수익 조회
+	 * @param vo
+	 * @return
+	 * @throws Exception
+	 */
+	public List<ProfitVO> selectProfitList(ProfitVO vo) throws Exception {
+		return selectList("payDAO.selectProfitList", vo);
+	}
+	/**
+	 * 협력사 수익 조회
+	 * @param vo
+	 * @return
+	 * @throws Exception
+	 */
+	public List<ProfitVO> selectCooperatorProfitList(ProfitVO vo) throws Exception {
+		return selectList("payDAO.selectCooperatorProfitList", vo);
 	}
 }
 

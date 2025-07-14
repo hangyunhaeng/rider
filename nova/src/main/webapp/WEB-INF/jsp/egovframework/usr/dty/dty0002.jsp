@@ -396,7 +396,12 @@
 		  <li><a href="${pageContext.request.contextPath}/usr/inq0001.do">1:1문의<br></a></li>
 		  <li><a href="${pageContext.request.contextPath}/usr/pay0001.do">입출금내역<br></a></li>
 		  <li style="display:none;"><a href="${pageContext.request.contextPath}/usr/pay0002.do">대사<br></a></li>
-          <li><a href="#" onclick="alert('준비중')">수익현황</a></li>
+          <li class="dropdown"><a href="" onclick="javascript:return false;"><span>수익현황</span> <i class="bi bi-chevron-down toggle-dropdown"></i></a>
+          	<ul>
+              <li style="display:none;"><a href="${pageContext.request.contextPath}/usr/pay0003.do">운영사수익현황</a></li>
+			  <li><a href="${pageContext.request.contextPath}/usr/pay0004.do">협력사수익현황</a></li>
+            </ul>
+          </li>
           <li><a href="${pageContext.request.contextPath}/usr/dty0004.do">배달정보 조회</a></li>
           <li class="dropdown"><a href="" onclick="javascript:return false;"><span>라이더/협력사 현황</span> <i class="bi bi-chevron-down toggle-dropdown"></i></a>
             <ul>

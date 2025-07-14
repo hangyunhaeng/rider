@@ -23,6 +23,7 @@ import egovframework.com.rd.Util;
 import egovframework.com.rd.usr.service.PayService;
 import egovframework.com.rd.usr.service.vo.DoszDSResultVO;
 import egovframework.com.rd.usr.service.vo.HistoryVO;
+import egovframework.com.rd.usr.service.vo.ProfitVO;
 
 /**
  * 게시판
@@ -165,6 +166,130 @@ public class PayController {
 //        doszDSResultVO.setSchIhidNum(user.getIhidNum());
 
         List<DoszDSResultVO> list = payService.selectDoznDs(doszDSResultVO);
+        //return value
+        Map<String, Object> map =  new HashMap<String, Object>();
+
+        map.put("list", list);
+        map.put("resultCode", "success");
+        return ResponseEntity.ok(map);
+	}
+
+	/**
+	 * 운영사 수익조회 페이지
+	 * @param request
+	 * @param model
+	 * @return
+	 * @throws Exception
+	 */
+    @RequestMapping("/usr/pay0003.do")
+    public String pay0003(@ModelAttribute("ProfitVO") ProfitVO profitVO, HttpServletRequest request,ModelMap model) throws Exception {
+
+    	//로그인 체크
+        LoginVO user = (LoginVO)EgovUserDetailsHelper.getAuthenticatedUser();
+        Boolean isAuthenticated = EgovUserDetailsHelper.isAuthenticated();
+
+        if(!isAuthenticated) {
+        	return "egovframework/com/cmm/error/accessDenied";
+        }
+
+        if(!Util.isUsr()) {
+        	return "egovframework/com/cmm/error/accessDenied";
+        }
+        return "egovframework/usr/pay/pay0003";
+	}
+
+
+	/**
+	 * 운영사 수익조회 리스트 가져오기
+	 * @param request
+	 * @param sessionVO
+	 * @param model
+	 * @param status
+	 * @return
+	 * @throws Exception
+	 */
+	@RequestMapping("/usr/pay0003_0001.do")
+	public ResponseEntity<?> pay0003_0001(@ModelAttribute("ProfitVO") ProfitVO profitVO, HttpServletRequest request, SessionVO sessionVO, ModelMap model, SessionStatus status) throws Exception{
+
+    	//로그인 체크
+        LoginVO user = (LoginVO)EgovUserDetailsHelper.getAuthenticatedUser();
+        Boolean isAuthenticated = EgovUserDetailsHelper.isAuthenticated();
+
+        if(!isAuthenticated) {
+        	return ResponseEntity.status(401).body("Unauthorized");
+        }
+
+        if(!Util.isUsr()) {
+        	return ResponseEntity.status(401).body("Unauthorized");
+        }
+
+        //총판 or 협력사
+        profitVO.setSchAuthorCode(user.getAuthorCode());
+        profitVO.setSchIhidNum(user.getIhidNum());
+
+        List<ProfitVO> list = payService.selectProfitList(profitVO);
+        //return value
+        Map<String, Object> map =  new HashMap<String, Object>();
+
+        map.put("list", list);
+        map.put("resultCode", "success");
+        return ResponseEntity.ok(map);
+	}
+
+	/**
+	 * 협력사 수익조회 페이지
+	 * @param request
+	 * @param model
+	 * @return
+	 * @throws Exception
+	 */
+    @RequestMapping("/usr/pay0004.do")
+    public String pay0004(@ModelAttribute("ProfitVO") ProfitVO profitVO, HttpServletRequest request,ModelMap model) throws Exception {
+
+    	//로그인 체크
+        LoginVO user = (LoginVO)EgovUserDetailsHelper.getAuthenticatedUser();
+        Boolean isAuthenticated = EgovUserDetailsHelper.isAuthenticated();
+
+        if(!isAuthenticated) {
+        	return "egovframework/com/cmm/error/accessDenied";
+        }
+
+        if(!Util.isUsr()) {
+        	return "egovframework/com/cmm/error/accessDenied";
+        }
+        return "egovframework/usr/pay/pay0004";
+	}
+
+
+	/**
+	 * 협력사 수익조회 리스트 가져오기
+	 * @param request
+	 * @param sessionVO
+	 * @param model
+	 * @param status
+	 * @return
+	 * @throws Exception
+	 */
+	@RequestMapping("/usr/pay0004_0001.do")
+	public ResponseEntity<?> pay0004_0001(@ModelAttribute("ProfitVO") ProfitVO profitVO, HttpServletRequest request, SessionVO sessionVO, ModelMap model, SessionStatus status) throws Exception{
+
+    	//로그인 체크
+        LoginVO user = (LoginVO)EgovUserDetailsHelper.getAuthenticatedUser();
+        Boolean isAuthenticated = EgovUserDetailsHelper.isAuthenticated();
+
+        if(!isAuthenticated) {
+        	return ResponseEntity.status(401).body("Unauthorized");
+        }
+
+        if(!Util.isUsr()) {
+        	return ResponseEntity.status(401).body("Unauthorized");
+        }
+
+        //총판 or 협력사
+        profitVO.setSchAuthorCode(user.getAuthorCode());
+        profitVO.setSchIhidNum(user.getIhidNum());
+
+        List<ProfitVO> list = payService.selectCooperatorProfitList(profitVO);
         //return value
         Map<String, Object> map =  new HashMap<String, Object>();
 

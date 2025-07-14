@@ -17,10 +17,10 @@
 <!-- Vendor CSS Files -->
 <link href="<c:url value='/vendor/admin/bootstrap/css/bootstrap.min.css' />" rel="stylesheet">
 <link href="<c:url value='/vendor/admin/bootstrap-icons/bootstrap-icons.css' />" rel="stylesheet">
-<%-- <link href="<c:url value='/vendor/admin/aos/aos.css' />" rel="stylesheet"> --%>
-<%-- <link href="<c:url value='/vendor/admin/fontawesome-free/css/all.min.css' />" rel="stylesheet"> --%>
-<%-- <link href="<c:url value='/vendor/admin/glightbox/css/glightbox.min.css' />" rel="stylesheet"> --%>
-<%-- <link href="<c:url value='/vendor/admin/swiper/swiper-bundle.min.css' />" rel="stylesheet"> --%>
+<link href="<c:url value='/vendor/admin/aos/aos.css' />" rel="stylesheet">
+<link href="<c:url value='/vendor/admin/fontawesome-free/css/all.min.css' />" rel="stylesheet">
+<link href="<c:url value='/vendor/admin/glightbox/css/glightbox.min.css' />" rel="stylesheet">
+<link href="<c:url value='/vendor/admin/swiper/swiper-bundle.min.css' />" rel="stylesheet">
 
 <!-- Main CSS File -->
 <link href="<c:url value='/css/admin/main.css' />" rel="stylesheet">
@@ -54,6 +54,7 @@
 <script src="<c:url value='/js/xlsx.full.min.js' />"></script>
 <script src="<c:url value='/js/xlsx-populate.min.js' />"></script>
 <script src="<c:url value='/js/axios.min.js' />"></script>
+
 	<link href="<c:url value='/vendor/admin/bootstrap/3.4.1/bootstrap.min.css' />" rel="stylesheet">
 <!-- 	<script src="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script> -->
 
@@ -61,31 +62,33 @@
 	<script type="text/javaScript">
 
 
+	var pageInit = true;
 	let gridOptions="";
 	var grid="";
-	var grid1="";
 	let data;
 	var columnDefs= [
 		{ headerName: "NO", field: "no", minWidth: 70, valueGetter:(params) => { return params.node.rowIndex + 1} },
-		{ headerName: "협력사아이디", field: "cooperatorId", minWidth: 120},
-		{ headerName: "협력사이름", field: "cooperatorNm", minWidth: 90},
-		{ headerName: "정산시작일", field: "accountsStDt", minWidth: 90},
-		{ headerName: "정산종료일", field: "accountsEdDt", minWidth: 90},
-		{ headerName: "파일명", field: "orignlFileNm", minWidth: 400, cellClass: 'ag-cell-left tdul'},
-		{ headerName: "등록일", field: "creatDt", minWidth: 90, valueGetter:(params) => { return getStringDate(params.node.data.creatDt)} },
-		{ headerName: "atchFileId", field: "atchFileId", minWidth: 90, hide:true},
-		{ headerName: "weekId", field: "weekId", minWidth: 90, hide:true}
+		{ headerName: "오류", field: "err", minWidth: 120, hide:true},
+		{ headerName: "profitId", field: "profitId", minWidth: 120, hide:true},
+		{ headerName: "배달건수", field: "deliveryCnt", minWidth: 70, valueGetter:(params) => { return params.data.deliveryCnt > 0 ? params.data.deliveryCnt: ''}},
+		{ headerName: "배달일", field: "deliveryDay", minWidth: 120},
+		{ headerName: "dypId", field: "dypId", minWidth: 120, hide:true},
+		{ headerName: "wkpId", field: "wkpId", minWidth: 120, hide:true},
+		{ headerName: "feeId", field: "feeId", minWidth: 120, hide:true},
+		{ headerName: "riderFeeId", field: "riderFeeId", minWidth: 120, hide:true},
+		{ headerName: "협력사아이디", field: "cooperatorId", minWidth: 140},
+		{ headerName: "협력사명", field: "cooperatorNm", minWidth: 140},
+		{ headerName: "라이더ID", field: "mberId", minWidth: 140},
+		{ headerName: "라이더명", field: "mberNm", minWidth: 140},
+		{ headerName: "구분", field: "gubun", minWidth: 140, hide:true},
+		{ headerName: "구분", field: "gubunNm", minWidth: 140},
+		{ headerName: "금액", field: "cost", minWidth: 80
+			, cellClass: (params) => {return agGridUnderBarClass(params, 'ag-cell-right')}
+			, valueGetter:(params) => { return currencyFormatter(params.data.cost)}
+		},
+		{ headerName: "등록일", field: "creatDt", minWidth: 140, valueGetter:(params) => { return getStringDate(params.data.creatDt)}}
 	];
 
-	var columnDefs1= [
-		{ headerName: "NO", field: "no", minWidth: 70, valueGetter:(params) => { return params.node.rowIndex + 1} },
-		{ headerName: "협력사아이디", field: "cooperatorId", minWidth: 120},
-		{ headerName: "협력사이름", field: "cooperatorNm", minWidth: 90},
-		{ headerName: "배달건수", field: "cnt", minWidth: 90},
-		{ headerName: "파일명", field: "orignlFileNm", minWidth: 400, cellClass: 'ag-cell-left tdul'},
-		{ headerName: "등록일", field: "creatDt", minWidth: 90, valueGetter:(params) => { return getStringDate(params.node.data.creatDt)} },
-		{ headerName: "atchFileId", field: "atchFileId", minWidth: 90, hide:true}
-	];
 
 	//onLoad
 	document.addEventListener('DOMContentLoaded', function() {
@@ -96,36 +99,37 @@
 
 		//업로드일 세팅
 		var today = new Date();
-		var serchDate = flatpickr("#searchDate", {
+		var now = new Date();
+		var oneMonthAgo = new Date(now.setMonth(now.getMonth()-1));
+		var searchFromDate = flatpickr("#searchFromDate", {
 			locale: "ko",
 			allowInput: false,
 		    altInput: true,              // 기존 입력을 숨기고 새 입력을 만듦
 		    altFormat: 'Y-m-d',      // 날짜 선택 후 표시 형태
 		    dateFormat: 'Y-m-d',     // date format 형식
 		    disableMobile: true          // 모바일 지원
-		    ,plugins: [
-		        new monthSelectPlugin({
-		          shorthand: true, //defaults to false
-		          dateFormat: "Y-m", //defaults to "F Y"
-		          altFormat: "Y-m", //defaults to "F Y"
-		          theme: "dark" // defaults to "light"
-		        })
-		    ]
 
 		});
-		serchDate.setDate(today.getFullYear()+"-"+(today.getMonth()+1));
+		var searchToDate = flatpickr("#searchToDate", {
+			"locale": "ko",
+			allowInput: false,
+		    altInput: true,              // 기존 입력을 숨기고 새 입력을 만듦
+		    altFormat: 'Y-m-d',      // 날짜 선택 후 표시 형태
+		    dateFormat: 'Y-m-d',     // date format 형식
+		    disableMobile: true          // 모바일 지원
+		});
 
-		//이벤트 설정
-		// 2. 조회버튼
+		// 1. 조회버튼
 		$('#loadDataBtn').on("click", function(){
 			doSearch();
 		});
 
-		loadCooperatorList();
+		searchFromDate.setDate(oneMonthAgo.getFullYear()+"-"+(oneMonthAgo.getMonth()+1)+"-"+oneMonthAgo.getDate());
+		searchToDate.setDate(today.getFullYear()+"-"+(today.getMonth()+1)+"-"+today.getDate());
 
+		loadCooperatorList();
 		//그리드 설정
 		setGrid();
-		setGrid1();
 	});
 
 
@@ -149,39 +153,38 @@
         });
 	}
 
-	//파일별 업로드 내역 조회
+	//내역 조회
 	function doSearch(){
+		if($('#searchRegistrationSn').val().trim() != '' && getOnlyNumber($('#searchRegistrationSn').val().trim()).length != 10){
+			alert("사업자번호는 10자리입니다");
+			$('#searchRegistrationSn').focus()
+			return ;
+		}
 
 		const params = new URLSearchParams();
-	    var regex = /[^0-9]/g;
-		params.append('searchDate', $($('#searchDate')[0]).val().replace(regex, ""));
 		params.append('searchCooperatorId', $('#searchCooperatorId').val());
+		params.append('searchFromDate', getOnlyNumber($('#searchFromDate').val()));
+		params.append('searchToDate', getOnlyNumber($('#searchToDate').val()));
+		params.append('searchNm', $('#searchNm').val().trim());
+		params.append('searchRegistrationSn', getOnlyNumber($('#searchRegistrationSn').val().trim()));
+		params.append('searchGubun', $('#searchGubun').val());
 
 		// 로딩 시작
         $('.loading-wrap--js').show();
-        axios.post('${pageContext.request.contextPath}/usr/dty0003_0001.do',params).then(function(response) {
+        axios.post('${pageContext.request.contextPath}/usr/pay0003_0001.do',params).then(function(response) {
         	// 로딩 종료
             $('.loading-wrap--js').hide();
 			if(response.data.resultCode == "success"){
 
-	        	if (response.data.resultWeek.length == 0) {
+	            document.getElementById('TT_CNT0').textContent = currencyFormatter(response.data.list.length);
+
+	        	if (response.data.list.length == 0) {
 	        		grid.setGridOption('rowData',[]);  	// 데이터가 없는 경우 빈 배열 설정
 	        		grid.showNoRowsOverlay();  			// 데이터가 없는 경우
 	            } else {
-
-					var lst = response.data.resultWeek;	//정상데이터
+					var lst = response.data.list;	//정상데이터
 	                grid.setGridOption('rowData', lst);
 	            }
-
-	        	if (response.data.resultDay.length == 0) {
-	        		grid1.setGridOption('rowData',[]);  	// 데이터가 없는 경우 빈 배열 설정
-	        		grid1.showNoRowsOverlay();  			// 데이터가 없는 경우
-	            } else {
-
-					var lst = response.data.resultDay;	//정상데이터
-	                grid1.setGridOption('rowData', lst);
-	            }
-
 			}
 
         })
@@ -191,18 +194,7 @@
         	// 로딩 종료
             $('.loading-wrap--js').hide();
         });
-	}
-	function selcetRow(params, gubun){
-		if(params.column.colId == "orignlFileNm"){
-			if(gubun == "day")
-				$('#myForm').attr("action", "/usr/dty0001.do");
-			else if(gubun == "week")
-				$('#myForm').attr("action", "/usr/dty0002.do");
-			$('#myForm').append($("<input/>", {type:"hidden", name:"searchDate", value:params.node.data.creatDt}));
-			$('#myForm').append($("<input/>", {type:"hidden", name:"searchId", value:params.node.data.atchFileId}));
- 			$('#myForm').submit();
-		}
-
+        pageInit = false;
 	}
 
 	function setGrid(){
@@ -226,7 +218,7 @@
 				overlayLoadingTemplate: '<span class="ag-overlay-loading-center">로딩 중</span>',
 				overlayNoRowsTemplate: '<span class="ag-overlay-loading-center">데이터가 없습니다</span>',
 				onCellClicked : function (event) { //onSelectionChanged  :row가 바뀌었을때 발생하는 이벤트인데 잘 안됨.
-			    	selcetRow(event, 'week');
+			    	selcetRow(event);
 			    }
             };
         const gridDiv = document.querySelector('#myGrid');
@@ -236,35 +228,43 @@
 
 	}
 
-	function setGrid1(){
-		// 사용자 정의 컴포넌트를 글로벌 네임스페이스에 추가
-		window.CustomHeader = CustomHeader;
-    	gridOptions = {
-                columnDefs: columnDefs1,
-                rowData: [], // 초기 행 데이터를 빈 배열로 설정
-                defaultColDef: { headerComponent: 'CustomHeader'}, //
-                components: { CustomHeader: CustomHeader },
-                enableCellTextSelection: true, // 셀 텍스트 선택을 활성화합니다.
-                rowHeight: 35,
-                headerHeight: 35,
-                alwaysShowHorizontalScroll : true,
-                alwaysShowVerticalScroll: true,
-                onGridReady: function(params) {
-                    //loadData(params.api); // 그리드가 준비된 후 데이터 로드
-                    params.api.sizeColumnsToFit();
-                },
-                rowClassRules: {'ag-cell-err ': (params) => { return params.data.err === true; }},
-				overlayLoadingTemplate: '<span class="ag-overlay-loading-center">로딩 중</span>',
-				overlayNoRowsTemplate: '<span class="ag-overlay-loading-center">데이터가 없습니다</span>',
-				onCellClicked : function (event) { //onSelectionChanged  :row가 바뀌었을때 발생하는 이벤트인데 잘 안됨.
-			    	selcetRow(event, 'day');
-			    }
-            };
-        const gridDiv = document.querySelector('#myGrid1');
-        grid1 = agGrid.createGrid(gridDiv, gridOptions);
+	function selcetRow(params){
+		if(params.column.colId == "sendPrice"){
+			debugger;
+			if(params.node.data.dwGubun == 'DAY'){
+				if(params.node.data.ioGubun == '1'){
+					$('#myForm').attr("action", "/usr/dty0001.do");
+					$('#myForm').append($("<input/>", {type:"hidden", name:"searchDate", value:params.node.data.fileDate}));
+					$('#myForm').append($("<input/>", {type:"hidden", name:"searchId", value:params.node.data.dayAtchFileId}));
+					$('#myForm').append($("<input/>", {type:"hidden", name:"searchMberId", value:params.node.data.mberId}));
+					$('#myForm').append($("<input/>", {type:"hidden", name:"searchRunDeDate", value:params.node.data.accountsStDt}));
+					$('#myForm').append($("<input/>", {type:"hidden", name:"searchError", value:"false"}));
 
-        grid1.hideOverlay();
+					$('#myForm').submit();
+				}
+			}
+			if(params.node.data.dwGubun == 'WEK'){
+				if(params.node.data.ioGubun == '1'){
+					$('#myForm').attr("action", "/usr/dty0002.do");
+					$('#myForm').append($("<input/>", {type:"hidden", name:"searchDate", value:params.node.data.fileDate}));
+					$('#myForm').append($("<input/>", {type:"hidden", name:"searchId", value:params.node.data.wekAtchFileId}));
+					$('#myForm').append($("<input/>", {type:"hidden", name:"searchMberId", value:params.node.data.mberId}));
+					$('#myForm').submit();
+				}
+			}
+		}
+	}
 
+
+	function agGridUnderBarClass(params, addClass){
+		var pAddClass = (addClass =='undefined')? "" : addClass;
+		if(params.node.data.ioGubun == '1' && params.node.data.dwGubun == 'DAY')	//입금 && 일정산
+			return pAddClass+" tdul";
+		if(params.node.data.ioGubun == '1' && params.node.data.dwGubun == 'WEK')	//입금 && 일정산
+			return pAddClass+" tdul";
+
+		else
+			return pAddClass;
 	}
 
 	</script>
@@ -291,9 +291,9 @@
 		  <li><a href="${pageContext.request.contextPath}/usr/inq0001.do">1:1문의<br></a></li>
 		  <li><a href="${pageContext.request.contextPath}/usr/pay0001.do">입출금내역<br></a></li>
 		  <li style="display:none;"><a href="${pageContext.request.contextPath}/usr/pay0002.do">대사<br></a></li>
-          <li class="dropdown"><a href="" onclick="javascript:return false;"><span>수익현황</span> <i class="bi bi-chevron-down toggle-dropdown"></i></a>
+          <li class="dropdown"><a href="" onclick="javascript:return false;" class="active"><span>수익현황</span> <i class="bi bi-chevron-down toggle-dropdown"></i></a>
           	<ul>
-              <li style="display:none;"><a href="${pageContext.request.contextPath}/usr/pay0003.do">운영사수익현황</a></li>
+              <li style="display:none;"><a href="${pageContext.request.contextPath}/usr/pay0003.do" class="active">운영사수익현황</a></li>
 			  <li><a href="${pageContext.request.contextPath}/usr/pay0004.do">협력사수익현황</a></li>
             </ul>
           </li>
@@ -306,7 +306,7 @@
 			  <li><a href="${pageContext.request.contextPath}/usr/mem0004.do">내정보관리</a></li>
             </ul>
           </li>
-          <li class="dropdown" style="display:none;"><a href="" onclick="javascript:return false;"  class="active"><span>자료 업로드</span> <i class="bi bi-chevron-down toggle-dropdown"></i></a>
+          <li class="dropdown" style="display:none;"><a href="" onclick="javascript:return false;"><span>자료 업로드</span> <i class="bi bi-chevron-down toggle-dropdown"></i></a>
             <ul>
               <li><a href="${pageContext.request.contextPath}/usr/dty0001.do">일별 자료 업로드</a></li>
               <li><a href="${pageContext.request.contextPath}/usr/dty0002.do">주별 자료 업로드</a></li>
@@ -343,7 +343,7 @@
 	</form>
 
 	<div class="keit-header-body innerwrap clearfix">
-		<p class="tit">자료 업로드 이력</p>
+		<p class="tit">운영사수익현황</p>
 
 			<input name="pageUnit" type="hidden" value="1000"/>
 			<input name="pageSize" type="hidden" value="1000"/>
@@ -352,20 +352,44 @@
 				<table>
 					<colgroup>
 						<col style="width: 13%">
-						<col style="width: 17%">
+						<col style="width: 37%">
 						<col style="width: 13%">
-						<col style="width: 13%">
-						<col style="width: 13%">
-						<col style="width: *">
+						<col style="width: 37%">
 					</colgroup>
+
 					<tr>
-						<th>정산일</th>
-						<td>
-							<input id="searchDate" class="form-control search fs-9" type="date" placeholder="Search" aria-label="Search" _mstplaceholder="181961" _mstaria-label="74607">
-						</td>
 						<th>협력사</th>
-						<td colspan='3'>
-							<select name='searchCooperatorId' style='width: 100%' id='searchCooperatorId'></select>
+						<td>
+							<select id="searchCooperatorId" name='searchCooperatorId' style='width: 100%'></select>
+						</td>
+						<th>라이더명</th>
+						<td>
+							<input id="searchNm" type="text" >
+						</td>
+					</tr>
+					<tr>
+						<th>등록일</th>
+						<td>
+							<div>
+								<input id="searchFromDate" class="form-control search fs-9 float-start w40p"" type="date" placeholder="Search" aria-label="Search" _mstplaceholder="181961" _mstaria-label="74607">
+								<sm class="float-start">&nbsp;~&nbsp;</sm>
+								<input id="searchToDate" class="form-control search fs-9 float-start w40p" type="date" placeholder="Search" aria-label="Search" _mstplaceholder="181961" _mstaria-label="74607">
+							</div>
+						</td>
+						<th>사업자번호</th>
+						<td>
+							<input id="searchRegistrationSn" type="text" oninput="this.value = this.value.replace(/[^0-9-]/g, '').replace(/(\..*)\./g, '$1');">
+						</td>
+					</tr>
+					<tr>
+						<th>구분</th>
+						<td colspan="3">
+							<select id="searchGubun" name='searchGubun' style='width: 100%'>
+								<option value="all">전체</option>
+								<option value="C">콜수수료</option>
+								<option value="E">기타수수료</option>
+								<option value="D">선출금수수료</option>
+							</select>
 						</td>
 					</tr>
 				</table>
@@ -375,38 +399,15 @@
 
 				</div>
 
-<!-- 				<div id="ajaxUp2" class="btnwrap"> -->
-<!-- 				<p> ajax파일 : <input type="file" name="fileName" multiple="multiple"/> -->
-<!-- 				<button id="uploadBtn" class="btn btn-primary" >ajax업르드</button> -->
-<!-- 				</div> -->
-
-<!-- 				<div id="ajaxUp3" class="btnwrap"> -->
-<!-- 				<p> 업로드 후 에러건만 화면 표기 : <input type="file" name="uploadAfterErrorOut" multiple="multiple"/> -->
-<!-- 				<button id="uploadAfterErrorOutBtn" class="btn btn-primary" >업로드</button> -->
-<!-- 				</div> -->
-
-<!-- 				<div id="ajaxUp3" class="btnwrap"> -->
-<!-- 				<p><input type="file" name="uploadAsync" multiple="multiple" class="btn ty2"/> -->
-<!-- 				<button id="uploadAsyncBtn" class="btn btn-primary" >업로드</button> -->
-<!-- 				</div> -->
 			<!-- grid  -->
-
 			<div style="height: 0px;" >
-				<span class="pagetotal" style='margin-right:20px;'>주정산</span>
+				<span class="pagetotal" style='margin-right:20px;'><em id="TT_CNT0" >0</em>건</span>
 			</div>
+
+			<br>
 			<div id="loadingOverlay" style="display: none;">Loading...</div>
 			<div  class="ib_product">
-				<div id="myGrid" class="ag-theme-alpine" style="height: 200px; width: 100%;"></div>
-			</div>
-
-
-			<!-- grid  -->
-
-			<div style="height: 0px;" >
-				<span class="pagetotal" style='margin-right:20px;'>일정산</span>
-			</div>
-			<div  class="ib_product">
-				<div id="myGrid1" class="ag-theme-alpine" style="height: 330px; width: 100%;"></div>
+				<div id="myGrid" class="ag-theme-alpine" style="height: 550px; width: 100%;"></div>
 			</div>
 			</div>
 

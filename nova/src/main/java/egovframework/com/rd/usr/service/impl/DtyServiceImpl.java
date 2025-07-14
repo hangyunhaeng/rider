@@ -264,7 +264,7 @@ public class DtyServiceImpl extends EgovAbstractServiceImpl implements DtyServic
     		fitVo.setCooperatorId(one.getCooperatorId());//협력사
     		fitVo.setMberId(one.getMberId());			//라이더ID
     		fitVo.setGubun("C");						//콜수수료
-    		fitVo.setCost(one.getFeeCallCost()); 		//금액
+    		fitVo.setCost(one.getFeeCallCost()-one.getFeeCooperatorCallCost()); 		//금액
     		fitVo.setDeliveryCnt(one.getDeliveryCnt());	//배달건수
     		fitVo.setDeliveryDay(one.getDay());			//배달일
     		fitVo.setDypId(one.getDypId());				//DYP_ID
@@ -326,18 +326,18 @@ public class DtyServiceImpl extends EgovAbstractServiceImpl implements DtyServic
 	    			dtyDAO.finishEtc(one);
 
 
-	        		//수익 등록(기타수수료) - 기타수수료를 주정산에서 출금할때는 수수료가 없음
+	        		//수익 등록(기타수수료)
 	        		ProfitVO fitVo = new ProfitVO();
 	        		fitVo.setProfitId(egovFitIdGnrService.getNextStringId());
 	        		fitVo.setCooperatorId(one.getCooperatorId());//협력사
 	        		fitVo.setMberId(one.getMberId());			//라이더ID
 	        		fitVo.setGubun("E");						//기타수수료
-	        		fitVo.setCost(one.getPaybackCost()); 		//금액
+	        		fitVo.setCost(0); 		//금액
 	        		fitVo.setWkpId(insertVo.getWkpId());		//WKP_ID
 	        		fitVo.setCreatId(user.getId());
 	        		dtyDAO.insertProfit(fitVo);
 
-	        		//협력사 수익등록(콜수수료) - 기타수수료를 주정산에서 출금할때는 수수료가 없음
+	        		//협력사 수익등록(기타수수료)
 	        		ProfitVO citVo = new ProfitVO();
 	        		citVo.setCoofitId(egovCitIdGnrService.getNextStringId());
 	        		citVo.setProfitId(fitVo.getProfitId());
@@ -370,7 +370,7 @@ public class DtyServiceImpl extends EgovAbstractServiceImpl implements DtyServic
 	    			insertVo.setCooperatorId(one.getCooperatorId());
 	    			insertVo.setDay(Util.getDay());
 	    			insertVo.setIoGubun("2");			//출금
-	    			insertVo.setDayFee(dayFee);			//선출금수수료
+	    			insertVo.setDayFee(0);				//선출금수수료
 	    			insertVo.setInsurance(insurance);	//보험료
 	    			insertVo.setSendFee(0);		//이체수수료
 	    			insertVo.setSendPrice(one.getPaybackCost());
@@ -391,7 +391,7 @@ public class DtyServiceImpl extends EgovAbstractServiceImpl implements DtyServic
 	        		fitVo.setCooperatorId(one.getCooperatorId());//협력사
 	        		fitVo.setMberId(one.getMberId());			//라이더ID
 	        		fitVo.setGubun("E");						//기타수수료
-	        		fitVo.setCost(one.getPaybackCost()+dayFee); 		//금액
+	        		fitVo.setCost(0); 		//금액
 	        		fitVo.setDypId(insertVo.getDypId());				//DYP_ID
 	        		fitVo.setFeeId(resultFee.getFeeId());				//FEE_ID
 	        		fitVo.setRiderFeeId(resultFee.getRiderFeeId());	//RIDER_FEE_ID
@@ -405,7 +405,7 @@ public class DtyServiceImpl extends EgovAbstractServiceImpl implements DtyServic
 	        		citVo.setCooperatorId(one.getCooperatorId());//협력사
 	        		citVo.setMberId(one.getMberId());			//라이더ID
 	        		citVo.setGubun("E");						//기타수수료
-	        		citVo.setCost(one.getPaybackCost()+resultFee.getFeeCooperatorCallCost());//금액
+	        		citVo.setCost(one.getPaybackCost());//금액
 	        		citVo.setDypId(insertVo.getDypId());				//DYP_ID
 	        		citVo.setFeeId(resultFee.getFeeId());				//FEE_ID
 	        		citVo.setRiderFeeId(resultFee.getRiderFeeId());	//RIDER_FEE_ID
@@ -1266,7 +1266,7 @@ public class DtyServiceImpl extends EgovAbstractServiceImpl implements DtyServic
 		fitVo.setCooperatorId(vo.getCooperatorId());//협력사
 		fitVo.setMberId(user.getId());				//라이더ID
 		fitVo.setGubun("D");						//선지급수수료
-		fitVo.setCost(dayFee); 						//금액
+		fitVo.setCost(dayFee-resultFee.getFeeCooperatorCallCost()); 						//금액
 		fitVo.setDypId(vo.getDypId());				//DYP_ID
 		fitVo.setFeeId(resultFee.getFeeId());		//FEE_ID
 		fitVo.setRiderFeeId(resultFee.getRiderFeeId());	//RIDER_FEE_ID

@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import egovframework.com.rd.usr.service.PayService;
 import egovframework.com.rd.usr.service.vo.DoszDSResultVO;
 import egovframework.com.rd.usr.service.vo.HistoryVO;
+import egovframework.com.rd.usr.service.vo.ProfitVO;
 
 /**
  * @Class Name : DtyServiceImpl.java
@@ -57,5 +58,26 @@ public class PayServiceImpl extends EgovAbstractServiceImpl implements PayServic
 	 */
 	public List<DoszDSResultVO> selectDoznDs(DoszDSResultVO vo) throws Exception {
 		return payDAO.selectDoznDs(vo);
+	}
+
+
+	/**
+	 * 운영사 수익 조회
+	 * @param vo
+	 * @return
+	 * @throws Exception
+	 */
+	public List<ProfitVO> selectProfitList(ProfitVO vo) throws Exception {
+		return payDAO.selectProfitList(vo);
+	}
+
+	/**
+	 * 협력사 수익 조회
+	 * @param vo
+	 * @return
+	 * @throws Exception
+	 */
+	public List<ProfitVO> selectCooperatorProfitList(ProfitVO vo) throws Exception {
+		return payDAO.selectCooperatorProfitList(vo);
 	}
 }
