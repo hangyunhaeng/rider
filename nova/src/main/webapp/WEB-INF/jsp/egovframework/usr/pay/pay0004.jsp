@@ -343,7 +343,7 @@
 	</form>
 
 	<div class="keit-header-body innerwrap clearfix">
-		<p class="tit">운영사수익현황</p>
+		<p class="tit">협력사수익현황</p>
 
 			<input name="pageUnit" type="hidden" value="1000"/>
 			<input name="pageSize" type="hidden" value="1000"/>
