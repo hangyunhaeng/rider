@@ -68,29 +68,37 @@
 	let data;
 	var columnDefs= [
 		{ headerName: "NO", field: "no", minWidth: 70, valueGetter:(params) => { return params.node.rowIndex + 1} },
-		{ headerName: "기준일", field: "dsDt", minWidth: 120, valueGetter:(params) => { return getStringDate(params.data.dsDt)}},
-		{ headerName: "dsTm", field: "dsTm", minWidth: 120, hide:true},
-		{
-		    headerName: 'DOZN',
-		    children: [
-		    	{ headerName: "이체성공<br/>건수", field: "paymentSuccCnt", minWidth: 80},
-				{ headerName: "이체성공<br/>금액", field: "paymentSuccAmount", minWidth: 120, cellClass: 'ag-cell-right', valueGetter:(params) => { return currencyFormatter(params.data.paymentSuccAmount)}},
-				{ headerName: "이체실패<br/>건수", field: "paymentFailCnt", minWidth: 80},
-				{ headerName: "이체실패<br/>금액", field: "paymentFailAmount", minWidth: 120, cellClass: 'ag-cell-right', valueGetter:(params) => { return currencyFormatter(params.data.paymentFailAmount)}}
-		    ]
+		{ headerName: "오류", field: "err", minWidth: 120, hide:true},
+		{ headerName: "etcId", field: "dypId", minWidth: 120, hide:true},
+		{ headerName: "협력사아이디", field: "cooperatorId", minWidth: 120},
+		{ headerName: "협력사명", field: "cooperatorNm", minWidth: 120},
+		{ headerName: "라이더ID", field: "mberId", minWidth: 90},
+		{ headerName: "라이더명", field: "mberNm", minWidth: 90},
+		{ headerName: "구분", field: "gubun", minWidth: 140, hide:true},
+		{ headerName: "구분", field: "gubunNm", minWidth: 90
+			, valueGetter:(params) => { return (params.node.data.gubun=='D')?"대여": (params.node.data.gubun=='R')?"리스":"기타"}
 		},
-		{
-		    headerName: '다온플랜',
-		    children: [
-				{ headerName: "이체성공<br/>건수", field: "daonSuccCnt", minWidth: 80},
-				{ headerName: "이체성공<br/>금액", field: "daonSuccAmount", minWidth: 120, cellClass: 'ag-cell-right', valueGetter:(params) => { return currencyFormatter(params.data.daonSuccAmount)}},
-				{ headerName: "이체실패<br/>건수", field: "daonFailCnt", minWidth: 80},
-				{ headerName: "이체실패<br/>금액", field: "daonFailAmount", minWidth: 120, cellClass: 'ag-cell-right', valueGetter:(params) => { return currencyFormatter(params.data.daonFailAmount)}}
-			 ]
+		{ headerName: "상환기간(일)", field: "paybackDay", minWidth: 80
+			, cellClass: (params) => {return agGrideditClass(params, "ag-cell-right");}
+			, valueGetter:(params) => { return currencyFormatter(params.data.paybackDay);}
 		},
-		{ headerName: "예금주조회<br/>성공", field: "depositorSuccCnt", minWidth: 80},
-		{ headerName: "예금주조회<br/>TimeOut", field: "depositorTimeCnt", minWidth: 80},
-		{ headerName: "예금주조회<br/>실패", field: "depositorFailCnt", minWidth: 80},
+		{ headerName: "일별상환금액", field: "paybackCost", minWidth: 80
+			, cellClass: (params) => {return agGrideditClass(params, "ag-cell-right");}
+			, valueGetter:(params) => { return currencyFormatter(params.data.paybackCost);}
+		},
+		{ headerName: "총상환금액", field: "paybackCostAll", minWidth: 80
+			, cellClass: (params) => {return agGrideditClass(params, "ag-cell-right");}
+			, valueGetter:(params) => { return currencyFormatter(params.data.paybackCostAll);}
+		},
+		{ headerName: "상환완료금액", field: "finishCost", minWidth: 80
+			, cellClass: (params) => {return agGrideditClass(params, "ag-cell-right");}
+			, valueGetter:(params) => { return currencyFormatter(params.data.finishCost);}
+		},
+		{ headerName: "상환완료여부", field: "finishAt", minWidth: 80},
+		{ headerName: "승인요청일", field: "authRequestDt", minWidth: 90, valueGetter:(params) => { return getStringDate(params.data.authRequestDt)}},
+		{ headerName: "라이더<br/>승인일", field: "authResponsDt", minWidth: 90, valueGetter:(params) => { return getStringDate(params.data.authResponsDt)}},
+		{ headerName: "라이더<br/>승인여부", field: "responsAt", minWidth: 80},
+		{ headerName: "등록일", field: "creatDt", minWidth: 90, valueGetter:(params) => { return getStringDate(params.data.creatDt)}}
 	];
 
 
@@ -134,25 +142,53 @@
 		searchFromDate.setDate(oneMonthAgo.getFullYear()+"-"+(oneMonthAgo.getMonth()+1)+"-"+oneMonthAgo.getDate());
 		searchToDate.setDate(today.getFullYear()+"-"+(today.getMonth()+1)+"-"+today.getDate());
 
+		loadCooperatorList();
 		//그리드 설정
 		setGrid();
 	});
 
 
-
-	//내역 조회
-	function doSearch(){
+	//협력사 정보 가져오기 (정산기준 union 협력사 정보)
+	function loadCooperatorList(){
 
 		const params = new URLSearchParams();
-		params.append('searchFromDate', getOnlyNumber($('#searchFromDate').val()));
-		params.append('searchToDate', getOnlyNumber($('#searchToDate').val()));
 
 		// 로딩 시작
         $('.loading-wrap--js').show();
-		axios.post('${pageContext.request.contextPath}/usr/pay0002_0001.do',params).then(function(response) {
+        axios.post('${pageContext.request.contextPath}/usr/dty0000_0001.do',params).then(function(response) {
         	// 로딩 종료
             $('.loading-wrap--js').hide();
+        	populateSelectOptions('searchCooperatorId', response.data.list,'', {opt:"all"});
+        })
+        .catch(function(error) {
+            console.error('There was an error fetching the data:', error);
+        }).finally(function() {
+        	// 로딩 종료
+            $('.loading-wrap--js').hide();
+        });
+	}
 
+	//내역 조회
+	function doSearch(){
+		if($('#searchRegistrationSn').val().trim() != '' && getOnlyNumber($('#searchRegistrationSn').val().trim()).length != 10){
+			alert("사업자번호는 10자리입니다");
+			$('#searchRegistrationSn').focus()
+			return ;
+		}
+
+		const params = new URLSearchParams();
+		params.append('searchCooperatorId', $('#searchCooperatorId').val());
+		params.append('searchFromDate', getOnlyNumber($('#searchFromDate').val()));
+		params.append('searchToDate', getOnlyNumber($('#searchToDate').val()));
+		params.append('searchNm', $('#searchNm').val().trim());
+		params.append('searchRegistrationSn', getOnlyNumber($('#searchRegistrationSn').val().trim()));
+		params.append('searchGubun', $('#searchGubun').val());
+
+		// 로딩 시작
+        $('.loading-wrap--js').show();
+        axios.post('${pageContext.request.contextPath}/usr/pay0005_0001.do',params).then(function(response) {
+        	// 로딩 종료
+            $('.loading-wrap--js').hide();
 			if(response.data.resultCode == "success"){
 
 	            document.getElementById('TT_CNT0').textContent = currencyFormatter(response.data.list.length);
@@ -195,7 +231,10 @@
                 },
                 rowClassRules: {'ag-cell-err ': (params) => { return params.data.err === true; }},
 				overlayLoadingTemplate: '<span class="ag-overlay-loading-center">로딩 중</span>',
-				overlayNoRowsTemplate: '<span class="ag-overlay-loading-center">데이터가 없습니다</span>'
+				overlayNoRowsTemplate: '<span class="ag-overlay-loading-center">데이터가 없습니다</span>',
+				onCellClicked : function (event) { //onSelectionChanged  :row가 바뀌었을때 발생하는 이벤트인데 잘 안됨.
+			    	selcetRow(event);
+			    }
             };
         const gridDiv = document.querySelector('#myGrid');
         grid = agGrid.createGrid(gridDiv, gridOptions);
@@ -204,7 +243,44 @@
 
 	}
 
+	function selcetRow(params){
+		if(params.column.colId == "sendPrice"){
+			debugger;
+			if(params.node.data.dwGubun == 'DAY'){
+				if(params.node.data.ioGubun == '1'){
+					$('#myForm').attr("action", "/usr/dty0001.do");
+					$('#myForm').append($("<input/>", {type:"hidden", name:"searchDate", value:params.node.data.fileDate}));
+					$('#myForm').append($("<input/>", {type:"hidden", name:"searchId", value:params.node.data.dayAtchFileId}));
+					$('#myForm').append($("<input/>", {type:"hidden", name:"searchMberId", value:params.node.data.mberId}));
+					$('#myForm').append($("<input/>", {type:"hidden", name:"searchRunDeDate", value:params.node.data.accountsStDt}));
+					$('#myForm').append($("<input/>", {type:"hidden", name:"searchError", value:"false"}));
 
+					$('#myForm').submit();
+				}
+			}
+			if(params.node.data.dwGubun == 'WEK'){
+				if(params.node.data.ioGubun == '1'){
+					$('#myForm').attr("action", "/usr/dty0002.do");
+					$('#myForm').append($("<input/>", {type:"hidden", name:"searchDate", value:params.node.data.fileDate}));
+					$('#myForm').append($("<input/>", {type:"hidden", name:"searchId", value:params.node.data.wekAtchFileId}));
+					$('#myForm').append($("<input/>", {type:"hidden", name:"searchMberId", value:params.node.data.mberId}));
+					$('#myForm').submit();
+				}
+			}
+		}
+	}
+
+
+	function agGridUnderBarClass(params, addClass){
+		var pAddClass = (addClass =='undefined')? "" : addClass;
+		if(params.node.data.ioGubun == '1' && params.node.data.dwGubun == 'DAY')	//입금 && 일정산
+			return pAddClass+" tdul";
+		if(params.node.data.ioGubun == '1' && params.node.data.dwGubun == 'WEK')	//입금 && 일정산
+			return pAddClass+" tdul";
+
+		else
+			return pAddClass;
+	}
 
 	</script>
 <body class="index-page">
@@ -232,18 +308,18 @@
 						  <li><a href="${pageContext.request.contextPath}/usr/inq0001.do">1:1문의</a></li>
 			            </ul>
 					</li>
-		            <li class="dropdown"><a href="" onclick="javascript:return false;"><span>수익현황</span> <i class="bi bi-chevron-down toggle-dropdown"></i></a>
+		            <li class="dropdown"><a href="" onclick="javascript:return false;" class="active"><span>수익현황</span> <i class="bi bi-chevron-down toggle-dropdown"></i></a>
 			          	<ul>
 			              <li style="display:none;"><a href="${pageContext.request.contextPath}/usr/pay0003.do">운영사수익현황</a></li>
 						  <li><a href="${pageContext.request.contextPath}/usr/pay0004.do">협력사수익현황</a></li>
-						  <li><a href="${pageContext.request.contextPath}/usr/pay0005.do">협력사 기타(대여, 리스) 현황</a></li>
+						  <li><a href="${pageContext.request.contextPath}/usr/pay0005.do" class="active">협력사 기타(대여, 리스) 현황</a></li>
 						  <li><a href="${pageContext.request.contextPath}/usr/pay0001.do">입출금내역<br></a></li>
 			            </ul>
 		            </li>
-		            <li class="dropdown" style="display:none;"><a href="" onclick="javascript:return false;" class="active"><span>관리</span> <i class="bi bi-chevron-down toggle-dropdown"></i></a>
+		            <li class="dropdown" style="display:none;"><a href="" onclick="javascript:return false;"><span>관리</span> <i class="bi bi-chevron-down toggle-dropdown"></i></a>
 			          	<ul>
 						  <li><a href="${pageContext.request.contextPath}/usr/dty0004.do">배달정보 조회</a></li>
-						  <li style="display:none;"><a href="${pageContext.request.contextPath}/usr/pay0002.do" class="active">입출금 대사<br></a></li>
+						  <li style="display:none;"><a href="${pageContext.request.contextPath}/usr/pay0002.do">입출금 대사<br></a></li>
 			            </ul>
 		            </li>
 
@@ -293,7 +369,7 @@
 	</form>
 
 	<div class="keit-header-body innerwrap clearfix">
-		<p class="tit">입출금 대사</p>
+		<p class="tit">협력사 기타(대여, 리스) 현황</p>
 
 			<input name="pageUnit" type="hidden" value="1000"/>
 			<input name="pageSize" type="hidden" value="1000"/>
@@ -308,13 +384,38 @@
 					</colgroup>
 
 					<tr>
-						<th>이체일</th>
+						<th>협력사</th>
+						<td>
+							<select id="searchCooperatorId" name='searchCooperatorId' style='width: 100%'></select>
+						</td>
+						<th>라이더명</th>
+						<td>
+							<input id="searchNm" type="text" >
+						</td>
+					</tr>
+					<tr>
+						<th>등록일</th>
 						<td>
 							<div>
 								<input id="searchFromDate" class="form-control search fs-9 float-start w40p"" type="date" placeholder="Search" aria-label="Search" _mstplaceholder="181961" _mstaria-label="74607">
 								<sm class="float-start">&nbsp;~&nbsp;</sm>
 								<input id="searchToDate" class="form-control search fs-9 float-start w40p" type="date" placeholder="Search" aria-label="Search" _mstplaceholder="181961" _mstaria-label="74607">
 							</div>
+						</td>
+						<th>사업자번호</th>
+						<td>
+							<input id="searchRegistrationSn" type="text" oninput="this.value = this.value.replace(/[^0-9-]/g, '').replace(/(\..*)\./g, '$1');">
+						</td>
+					</tr>
+					<tr>
+						<th>상환완료여부</th>
+						<td colspan="3">
+							<select id="searchGubun" name='searchGubun' style='width: 100%'>
+								<option value="all">전체</option>
+								<option value="END">완료</option>
+								<option value="ING">진행중</option>
+								<option value="NO">미승인</option>
+							</select>
 						</td>
 					</tr>
 				</table>

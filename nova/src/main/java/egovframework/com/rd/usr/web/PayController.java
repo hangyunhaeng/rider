@@ -20,8 +20,10 @@ import egovframework.com.cmm.LoginVO;
 import egovframework.com.cmm.SessionVO;
 import egovframework.com.cmm.util.EgovUserDetailsHelper;
 import egovframework.com.rd.Util;
+import egovframework.com.rd.usr.service.MemService;
 import egovframework.com.rd.usr.service.PayService;
 import egovframework.com.rd.usr.service.vo.DoszDSResultVO;
+import egovframework.com.rd.usr.service.vo.EtcVO;
 import egovframework.com.rd.usr.service.vo.HistoryVO;
 import egovframework.com.rd.usr.service.vo.ProfitVO;
 
@@ -45,6 +47,8 @@ public class PayController {
 
 	@Resource(name="PayService")
 	private PayService payService;
+	@Resource(name="MemService")
+	private MemService memService;
 
 
 
@@ -290,6 +294,69 @@ public class PayController {
         profitVO.setSchIhidNum(user.getIhidNum());
 
         List<ProfitVO> list = payService.selectCooperatorProfitList(profitVO);
+        //return value
+        Map<String, Object> map =  new HashMap<String, Object>();
+
+        map.put("list", list);
+        map.put("resultCode", "success");
+        return ResponseEntity.ok(map);
+	}
+
+	/**
+	 * 협력사 기타(대여, 리스) 현황 페이지
+	 * @param request
+	 * @param model
+	 * @return
+	 * @throws Exception
+	 */
+    @RequestMapping("/usr/pay0005.do")
+    public String pay0004(@ModelAttribute("EtcVO") EtcVO etcVO, HttpServletRequest request,ModelMap model) throws Exception {
+
+    	//로그인 체크
+        LoginVO user = (LoginVO)EgovUserDetailsHelper.getAuthenticatedUser();
+        Boolean isAuthenticated = EgovUserDetailsHelper.isAuthenticated();
+
+        if(!isAuthenticated) {
+        	return "egovframework/com/cmm/error/accessDenied";
+        }
+
+        if(!Util.isUsr()) {
+        	return "egovframework/com/cmm/error/accessDenied";
+        }
+        return "egovframework/usr/pay/pay0005";
+	}
+
+
+	/**
+	 * 협력사 기타(대여, 리스) 현황 리스트 가져오기
+	 * @param request
+	 * @param sessionVO
+	 * @param model
+	 * @param status
+	 * @return
+	 * @throws Exception
+	 */
+	@RequestMapping("/usr/pay0005_0001.do")
+	public ResponseEntity<?> pay0005_0001(@ModelAttribute("EtcVO") EtcVO etcVO, HttpServletRequest request, SessionVO sessionVO, ModelMap model, SessionStatus status) throws Exception{
+
+    	//로그인 체크
+        LoginVO user = (LoginVO)EgovUserDetailsHelper.getAuthenticatedUser();
+        Boolean isAuthenticated = EgovUserDetailsHelper.isAuthenticated();
+
+        if(!isAuthenticated) {
+        	return ResponseEntity.status(401).body("Unauthorized");
+        }
+
+        if(!Util.isUsr()) {
+        	return ResponseEntity.status(401).body("Unauthorized");
+        }
+
+        //총판 or 협력사
+        etcVO.setSchUserSe(user.getUserSe());
+        etcVO.setSchAuthorCode(user.getAuthorCode());
+        etcVO.setSchIhidNum(user.getIhidNum());
+
+        List<EtcVO> list = memService.selectEtcList(etcVO);
         //return value
         Map<String, Object> map =  new HashMap<String, Object>();
 

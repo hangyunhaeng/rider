@@ -56,6 +56,9 @@ public class EtcVO extends Sch implements Serializable {
 	//대출 상환 총 금액
 	private String finishCost;
 
+	private String mberNm;
+	private String cooperatorNm;
+
 	//그리드 내 유니크 키
 	private String uniq;
 
