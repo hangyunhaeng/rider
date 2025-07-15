@@ -5,6 +5,7 @@ import java.util.List;
 import egovframework.com.cmm.LoginVO;
 import egovframework.com.rd.usr.service.vo.CooperatorFeeVO;
 import egovframework.com.rd.usr.service.vo.CooperatorVO;
+import egovframework.com.rd.usr.service.vo.DayPayVO;
 import egovframework.com.rd.usr.service.vo.DeliveryInfoVO;
 import egovframework.com.rd.usr.service.vo.EtcVO;
 import egovframework.com.uss.umt.service.MberManageVO;
@@ -161,4 +162,12 @@ public interface MemService {
 	 * @throws Exception
 	 */
 	public int responseEtc(EtcVO vo) throws Exception ;
+
+	/**
+	 * 대출 입금 리스트 조회
+	 * @param vo
+	 * @return
+	 * @throws Exception
+	 */
+	public List<DayPayVO> selectEtcInputList(DayPayVO vo) throws Exception ;
 }

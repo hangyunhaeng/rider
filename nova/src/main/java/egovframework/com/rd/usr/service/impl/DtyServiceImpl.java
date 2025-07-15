@@ -1813,7 +1813,7 @@ public class DtyServiceImpl extends EgovAbstractServiceImpl implements DtyServic
     		MberManageVO voMem = new MberManageVO();
             voMem.setMberId(id);
             voMem.setMberNm(nm);
-            voMem.setPassword("hanma!@1234");
+            voMem.setPassword("Daon2025!");
             voMem.setMberSttus("P");
             voMem.setMberConfirmAt("N");
     		String uniqId = mberManageService.insertMber(voMem);

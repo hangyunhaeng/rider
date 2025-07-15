@@ -129,7 +129,10 @@
 	document.addEventListener('DOMContentLoaded', function() {
 
 		if('${loginVO.authorCode}' =='ROLE_ADMIN'){
-			$('nav > ul').find('li:hidden').show();
+			$('nav > ul').find('li[class!=cooperator]:hidden').show();
+		}
+		if('${loginVO.authorCode}' =='ROLE_USER'){
+			$('nav > ul').find('li[class~=cooperator]:hidden').show();
 		}
 
 		//업로드일 세팅
@@ -396,37 +399,47 @@
       </a>
 
 
-      <nav id="navmenu" class="navmenu">
-        <ul>
-          <li><a href="${pageContext.request.contextPath}/usr/not0001.do">공지사항<br></a></li>
-		  <li><a href="${pageContext.request.contextPath}/usr/inq0001.do">1:1문의<br></a></li>
-		  <li><a href="${pageContext.request.contextPath}/usr/pay0001.do">입출금내역<br></a></li>
-		  <li style="display:none;"><a href="${pageContext.request.contextPath}/usr/pay0002.do">대사<br></a></li>
-          <li class="dropdown"><a href="" onclick="javascript:return false;"><span>수익현황</span> <i class="bi bi-chevron-down toggle-dropdown"></i></a>
-          	<ul>
-              <li style="display:none;"><a href="${pageContext.request.contextPath}/usr/pay0003.do">운영사수익현황</a></li>
-			  <li><a href="${pageContext.request.contextPath}/usr/pay0004.do">협력사수익현황</a></li>
-            </ul>
-          </li>
-          <li><a href="${pageContext.request.contextPath}/usr/dty0004.do">배달정보 조회</a></li>
-          <li class="dropdown"><a href="" onclick="javascript:return false;"><span>라이더/협력사 현황</span> <i class="bi bi-chevron-down toggle-dropdown"></i></a>
-            <ul>
-              <li style="display:none;"><a href="${pageContext.request.contextPath}/usr/mem0001.do">협력사관리</a></li>
-              <li style="display:none;"><a href="${pageContext.request.contextPath}/usr/mem0003.do">협력사계정관리</a></li>
-              <li><a href="${pageContext.request.contextPath}/usr/mem0002.do">라이더관리</a></li>
-			  <li><a href="${pageContext.request.contextPath}/usr/mem0004.do">내정보관리</a></li>
-            </ul>
-          </li>
-          <li class="dropdown" style="display:none;"><a href="" onclick="javascript:return false;"  class="active"><span>자료 업로드</span> <i class="bi bi-chevron-down toggle-dropdown"></i></a>
-            <ul>
-              <li><a href="${pageContext.request.contextPath}/usr/dty0001.do"  class="active">일별 자료 업로드</a></li>
-              <li><a href="${pageContext.request.contextPath}/usr/dty0002.do">주별 자료 업로드</a></li>
-              <li><a href="${pageContext.request.contextPath}/usr/dty0003.do">자료 업로드 이력</a></li>
-            </ul>
-          </li>
-        </ul>
-        <i class="mobile-nav-toggle d-xl-none bi bi-list"></i>
-      </nav>
+			<nav id="navmenu" class="navmenu">
+				<ul>
+					<li class="dropdown"><a href="" onclick="javascript:return false;"><span>공지사항&문의</span> <i class="bi bi-chevron-down toggle-dropdown"></i></a>
+			          	<ul>
+			              <li><a href="${pageContext.request.contextPath}/usr/not0001.do">공지사항</a></li>
+						  <li><a href="${pageContext.request.contextPath}/usr/inq0001.do">1:1문의</a></li>
+			            </ul>
+					</li>
+		            <li class="dropdown"><a href="" onclick="javascript:return false;"><span>수익현황</span> <i class="bi bi-chevron-down toggle-dropdown"></i></a>
+			          	<ul>
+			              <li style="display:none;"><a href="${pageContext.request.contextPath}/usr/pay0003.do">운영사수익현황</a></li>
+						  <li><a href="${pageContext.request.contextPath}/usr/pay0004.do">협력사수익현황</a></li>
+						  <li><a href="${pageContext.request.contextPath}/usr/pay0001.do">입출금내역<br></a></li>
+			            </ul>
+		            </li>
+		            <li class="dropdown" style="display:none;"><a href="" onclick="javascript:return false;"><span>관리</span> <i class="bi bi-chevron-down toggle-dropdown"></i></a>
+			          	<ul>
+						  <li><a href="${pageContext.request.contextPath}/usr/dty0004.do">배달정보 조회</a></li>
+						  <li style="display:none;"><a href="${pageContext.request.contextPath}/usr/pay0002.do">입출금 대사<br></a></li>
+			            </ul>
+		            </li>
+
+					<li class="dropdown" style="display:none;"><a href="" onclick="javascript:return false;"><span>협력사/라이더 현황</span><i class="bi bi-chevron-down toggle-dropdown"></i></a>
+						<ul>
+							<li><a href="${pageContext.request.contextPath}/usr/mem0001.do">협력사 관리</a></li>
+              				<li><a href="${pageContext.request.contextPath}/usr/mem0003.do">협력사계정 관리</a></li>
+							<li><a href="${pageContext.request.contextPath}/usr/mem0002.do">라이더관리</a></li>
+						</ul></li>
+					<li class="dropdown" style="display:none;"><a href="" onclick="javascript:return false;" class="active"><span>자료 업로드</span> <i class="bi bi-chevron-down toggle-dropdown"></i></a>
+						<ul>
+							<li><a href="${pageContext.request.contextPath}/usr/dty0001.do" class="active">일별 자료 업로드</a></li>
+							<li><a href="${pageContext.request.contextPath}/usr/dty0002.do">주별 자료 업로드</a></li>
+							<li><a href="${pageContext.request.contextPath}/usr/dty0003.do">자료 업로드 이력</a></li>
+						</ul>
+					</li>
+					<li class="cooperator" style="display:none;"><a href="${pageContext.request.contextPath}/usr/dty0004.do">배달정보 조회</a></li>
+					<li class="cooperator" style="display:none;"><a href="${pageContext.request.contextPath}/usr/mem0002.do">라이더관리</a></li>
+					<li><a href="${pageContext.request.contextPath}/usr/mem0004.do">MyPage</a></li>
+				</ul>
+				<i class="mobile-nav-toggle d-xl-none bi bi-list"></i>
+			</nav>
 	<a class="btn-getstarted" href="${pageContext.request.contextPath }/uat/uia/actionLogout.do" style="height: 37px;"><spring:message code="comCmm.unitContent.3"/></a>
 
 

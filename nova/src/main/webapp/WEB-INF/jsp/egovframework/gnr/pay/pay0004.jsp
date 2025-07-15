@@ -160,7 +160,7 @@
 
 		response.data.list.forEach(function(dataInfo, idx){
 
-			var 내역 = $('#반복부').find('[repeatObj=true]:hidden').clone();
+			var 내역 = $('#반복부').find('[repeatObj=true]:hidden:eq(0)').clone();
 			$('#반복부').append(내역);
 			내역.find('input[name=etcId]').val(dataInfo.etcId);
 			내역.find('h3[class~=text-body-emphasis]').html(dataInfo.gubun == "D" ? "대여" :dataInfo.gubun == "R" ? "리스" :"기타" );
@@ -177,6 +177,11 @@
 			내역.find('label[class~=form-check-label]:eq(1)').html(dataInfo.paybackDay+'일동안 '+currencyFormatter(dataInfo.paybackCost)+'원 출금');
 			내역.find('label[class~=text-body-tertiary]').html(getStringDate(dataInfo.authRequestDt));
 			내역.find('span[class~=총금액]').html('입금 '+currencyFormatter(dataInfo.finishCost)+'원 / 총 '+currencyFormatter(dataInfo.paybackCostAll)+'원');
+
+			내역.find('div[data-bs-toggle=collapse]').attr("data-bs-target", ".collapseExample"+dataInfo.etcId);
+			내역.find('div[class~=collapse]:eq(0)').addClass("collapseExample"+dataInfo.etcId);
+			//대출 입금이력 붙일 div세팅
+			내역.find('.card').addClass(dataInfo.etcId);
 			내역.show();
 
 			$('#paging').show();
@@ -185,6 +190,64 @@
 
 
     	paging.setPageing(schIdx, response.data.cnt);
+	}
+	function 리스트(obj){
+
+		if($('#반복부 .' + $(obj).closest('.card').find('[name=etcId]').val()).children().length > 0){
+// 			alert('닫는다');
+			setTimeout(function(){
+				$('#반복부 .'+$(obj).closest('.card').find('[name=etcId]').val()).children().remove();
+			}, 500);
+			return false;
+		}
+// 		if($('.collapseExample'+$(obj).closest('.card').find('[name=etcId]').val()).attr('class').indexOf('show') >= 0){
+// 			alert('리턴')
+// 			return false;
+// 		}
+
+// 		debugger;
+		$('.collapseExample'+$(obj).closest('.card').find('[name=etcId]').val()).collapse('hide');
+	    const params = new URLSearchParams();
+		params.append("etcId", $(obj).closest('.card').find('[name=etcId]').val());
+
+
+		//내역삭제
+		$('#반복부 .'+$(obj).closest('.card').find('[name=etcId]').val()).children().remove();
+// 		$('#반복부 .'+$(obj).closest('.card').find('[name=etcId]').val()).hide();
+		// 로딩 시작
+        $('.loading-wrap--js').show();
+	    axios.post('${pageContext.request.contextPath}/gnr/pay0004_003.do', params)
+	        .then(response => {
+
+	        	// 로딩 종료
+	            $('.loading-wrap--js').hide();
+				if(response.data.resultCode == "success"){
+
+					var a = "";
+					response.data.list.forEach(function(dataInfo, idx){
+						var 내역 = $('#반복부').find('[repeatObj=true]:hidden:eq(1)').clone();
+						내역.find('p:eq(0)').html(getStringDate(dataInfo.day));
+						내역.find('p:eq(1)').html(currencyFormatter(dataInfo.sendPrice));
+						내역.find('p:eq(2)').html(dataInfo.rnum+'회차');
+						$('#반복부').find('.'+dataInfo.etcId).append(내역);
+						$('#반복부').find('.'+dataInfo.etcId).show();
+						내역.show();
+// 						a = dataInfo.etcId;
+					});
+// 					$('.collapseExample'+a).collapse('show');
+
+				} else {
+					if(response.data.resultMsg != '' && response.data.resultMsg != null)
+						alert(response.data.resultMsg);
+					else alert("조회에 실패하였습니다");
+					return ;
+				}
+	        })
+	        .catch(error => {
+	        	// 로딩 종료
+	            $('.loading-wrap--js').hide();
+	            console.error('Error fetching data:', error);
+	        });
 	}
 	</script>
 
@@ -279,8 +342,8 @@
 							<div class="col-12">
 
 								<div class="row justify-content-between mb-1 mb-md-0 d-flex align-items-center lh-1">
-									<div class="col-auto">
-										<label class="form-check-label mb-2 mb-md-0 fs-9 me-2 line-clamp-1 text-body cursor-pointer">30일간 10,000원 출금</label>
+									<div class="col-auto" data-bs-toggle="collapse" data-bs-target="" aria-expanded="false" onclick="리스트(this);">
+										<label class="form-check-label mb-2 mb-md-0 fs-9 me-2 line-clamp-1 text-body cursor-pointer" >30일간 10,000원 출금</label>
 									</div>
 									<div class="col-auto d-flex">
 										<span class="fs-9 mb-2" style=""></span>
@@ -299,11 +362,33 @@
 							</div>
 						</div>
 					</div>
+
+					<!-- 대출입금리스트 여기 하단에 붙여야함 -->
+					<div class="collapse py-2">
+						<div class="collapse card col-12 col-md-auto col-xl-12 col-xxl-auto pt-2 mb-3 px-2" style="display:none !important;">
+						</div>
+					</div>
+
+
 				</div>
+
             </div>
 			<!-- 대여.리스 end -->
 
 
+			<!-- 대출 입금 리스트 start -->
+			<div repeatObj="true" class="row justify-content-between mb-1 mb-md-0 d-flex align-items-center lh-1" style="display:none !important;">
+				<div class="col-auto">
+					<p class="fs-9 mb-1">2025-07-14</p>
+				</div>
+				<div class="col-auto">
+					<p class="fs-9 mb-1">30,000원</p>
+				</div>
+				<div class="col-auto">
+					<p class="fs-9 mb-1">2회차</p>
+				</div>
+			</div>
+			<!-- 대출 입금 리스트 end -->
 
 
           </div>

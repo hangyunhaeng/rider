@@ -329,4 +329,36 @@ public class EgovPayController {
         map.put("resultCode", "success");
     	return ResponseEntity.ok(map);
 	}
+
+	/**
+	 * 대출 입금 리스트 조회
+	 * @param request
+	 * @param sessionVO
+	 * @param model
+	 * @return
+	 */
+	@RequestMapping("/gnr/pay0004_003.do")
+	public ResponseEntity<?> pay0004_003(@ModelAttribute("DayPayVO") DayPayVO dayPayVO, HttpServletRequest request) throws Exception{
+
+    	//로그인 체크
+        LoginVO user = (LoginVO)EgovUserDetailsHelper.getAuthenticatedUser();
+        Boolean isAuthenticated = EgovUserDetailsHelper.isAuthenticated();
+
+        if(!isAuthenticated) {
+        	return ResponseEntity.status(401).body("Unauthorized");
+        }
+
+        //return value
+        Map<String, Object> map =  new HashMap<String, Object>();
+
+
+        //라이더 권한
+        dayPayVO.setSchAuthorCode(user.getAuthorCode());
+        dayPayVO.setSchId(user.getId());
+
+        map.put("list", memService.selectEtcInputList(dayPayVO));
+        map.put("resultCode", "success");
+    	return ResponseEntity.ok(map);
+	}
+
 }

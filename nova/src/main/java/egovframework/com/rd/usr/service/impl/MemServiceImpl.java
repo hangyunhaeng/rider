@@ -17,6 +17,7 @@ import egovframework.com.rd.Util;
 import egovframework.com.rd.usr.service.MemService;
 import egovframework.com.rd.usr.service.vo.CooperatorFeeVO;
 import egovframework.com.rd.usr.service.vo.CooperatorVO;
+import egovframework.com.rd.usr.service.vo.DayPayVO;
 import egovframework.com.rd.usr.service.vo.DeliveryInfoVO;
 import egovframework.com.rd.usr.service.vo.EtcVO;
 import egovframework.com.sec.rgm.service.AuthorGroup;
@@ -220,7 +221,7 @@ public class MemServiceImpl extends EgovAbstractServiceImpl implements MemServic
                 UserManageVO voMem = new UserManageVO();
                 voMem.setEmplyrId(vo.getMberId());
                 voMem.setEmplyrNm(vo.getUserNm());
-                voMem.setPassword(Util.isEmpty(vo.getPassword())? "hanma!@1234" : vo.getPassword());
+                voMem.setPassword(Util.isEmpty(vo.getPassword())? "Daon2025!" : vo.getPassword());
                 voMem.setMoblphonNo(vo.getMbtlnum());
                 // 협력사는 자신의 관련 사업자 사용자만 등록한다.
                 if("ROLE_USER".equals(user.getAuthorCode())) {
@@ -302,7 +303,7 @@ public class MemServiceImpl extends EgovAbstractServiceImpl implements MemServic
         		MberManageVO voMem = new MberManageVO();
                 voMem.setMberId(vo.getMberId());
                 voMem.setMberNm(vo.getMberNm());
-                voMem.setPassword("hanma!@1234");
+                voMem.setPassword("Daon2025!");
                 voMem.setMoblphonNo(vo.getMbtlnum());
                 voMem.setMberSttus("P");
                 voMem.setMberConfirmAt("N");
@@ -599,5 +600,16 @@ public class MemServiceImpl extends EgovAbstractServiceImpl implements MemServic
 	 */
 	public int responseEtc(EtcVO vo) throws Exception {
 		return memDAO.responseEtc(vo);
+	}
+
+
+	/**
+	 * 대출 입금 리스트 조회
+	 * @param vo
+	 * @return
+	 * @throws Exception
+	 */
+	public List<DayPayVO> selectEtcInputList(DayPayVO vo) throws Exception {
+		return memDAO.selectEtcInputList(vo);
 	}
 }

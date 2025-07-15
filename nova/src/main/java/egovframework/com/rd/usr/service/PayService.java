@@ -2,6 +2,7 @@ package egovframework.com.rd.usr.service;
 
 import java.util.List;
 
+import egovframework.com.rd.usr.service.vo.DayPayVO;
 import egovframework.com.rd.usr.service.vo.DoszDSResultVO;
 import egovframework.com.rd.usr.service.vo.HistoryVO;
 import egovframework.com.rd.usr.service.vo.ProfitVO;

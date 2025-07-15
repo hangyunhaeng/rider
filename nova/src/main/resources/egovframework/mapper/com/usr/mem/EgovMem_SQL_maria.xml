@@ -527,5 +527,15 @@
 			, LAST_UPDT_PNTTM = #{lastUpdtPnttm}, LAST_UPDUSR_ID = SYSDATE()
 		WHERE ETC_ID = #{etcId} and MBER_ID = #{mberId}
 	</update>
+	<select id="selectEtcInputList" parameterType="egovframework.com.rd.usr.service.vo.DayPayVO" resultType="egovframework.com.rd.usr.service.vo.DayPayVO">
+		SELECT * FROM (
+			SELECT @ROWNUM:=@ROWNUM+1 AS RNUM, a.*
+			FROM RD_DAY_PAY a, (SELECT @ROWNUM:=0) AS R
+			WHERE IO_GUBUN = '2'
+				AND ETC_ID = #{etcId}
+			ORDER BY DAY ASC
+		) sub_tab
+		ORDER BY rnum desc
+	</select>
 
 </mapper>
