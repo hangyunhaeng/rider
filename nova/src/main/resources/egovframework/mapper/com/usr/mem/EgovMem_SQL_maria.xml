@@ -222,6 +222,7 @@
 			WHERE COOPERATOR_ID = #{cooperatorId}
 			GROUP BY MBER_ID
 		)*/
+		ORDER BY cte.CREAT_DT
 	</select>
 
 	<select id="selectCooperatorRiderConnect" parameterType="egovframework.com.rd.usr.service.vo.CooperatorVO" resultType="egovframework.com.rd.usr.service.vo.CooperatorVO">

@@ -164,6 +164,58 @@ function currencyFormatter(params) {
 }
 
 /**
+ * 수수료 퍼센트 검사
+ */
+function chkPercent(str) {
+
+	var inputDate = str;
+
+
+    if (new RegExp(/[^0-9.,]/).test(inputDate)) {
+        alert('숫자만 입력하세요');
+        return false;
+    }
+
+    var arrInputData = inputDate.split('.');
+    if(arrInputData.length > 2){
+		alert("정확한 숫자를 입력하세요");
+        return false;
+	}
+
+    if(arrInputData[1] != undefined && arrInputData[1].length > 3){
+		alert("소수점 이하 3자리까지만 허용됩니다");
+        return false;
+	}
+	if(arrInputData[0] != undefined && arrInputData[0].length > 2){
+		alert("100%이상은 적용할 수 없습니다");
+        return false;
+	}
+
+    return true;
+}
+
+/**
+ * 수수료 금액 검사
+ */
+function chkWan(str) {
+
+	var inputDate = str;
+
+    if (new RegExp(/[^0-9,]/).test(inputDate)) {
+        alert('숫자만 입력하세요');
+        return false;
+    }
+
+    inputDate = getOnlyNumber(inputDate);
+    if(inputDate.length > 10){
+		alert("10자리 이상 적용할 수 없습니다");
+        return false;
+	}
+
+    return true;
+}
+
+/**
  * 그리드 - 사업자번호
  */
 function gridRegistrationSn(params){

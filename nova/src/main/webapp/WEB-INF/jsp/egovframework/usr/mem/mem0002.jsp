@@ -701,6 +701,62 @@
 
 	}
 
+
+	function onInputVal(obj){
+
+		//빈값이면 0으로
+		if(obj.value == "") obj.value = 0;
+
+		//모두 숫자로 변환
+		obj.value = obj.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');
+
+		//콤마 붙여서 리턴
+		obj.value = currencyFormatter(obj.value);
+	}
+
+
+	function 고용보험일괄(){
+		if(!chkPercent($('#일괄숫자').val())){
+			return false;
+		}
+		grid1.forEachNode( function(rowNode, index) {
+			rowNode.setDataValue('feeEmploymentInsurance', $('#일괄숫자').val());
+		});
+	}
+	function 산재보험일괄(){
+		if(!chkPercent($('#일괄숫자').val())){
+			return false;
+		}
+		grid1.forEachNode( function(rowNode, index) {
+			rowNode.setDataValue('feeIndustrialInsurance', $('#일괄숫자').val());
+		});
+	}
+	function 원천세일괄(){
+		if(!chkPercent($('#일괄숫자').val())){
+			return false;
+		}
+		grid1.forEachNode( function(rowNode, index) {
+			rowNode.setDataValue('feeWithholdingTax', $('#일괄숫자').val());
+		});
+
+	}
+	function 시간쪠보험일괄(){
+		if(!chkWan($('#일괄숫자').val())){
+			return false;
+		}
+		grid1.forEachNode( function(rowNode, index) {
+			rowNode.setDataValue('feeTimeInsurance', $('#일괄숫자').val());
+		});
+	}
+	function 콜수수료일괄(){
+		if(!chkWan($('#일괄숫자').val())){
+			return false;
+		}
+		grid1.forEachNode( function(rowNode, index) {
+			rowNode.setDataValue('feeCall', $('#일괄숫자').val());
+		});
+	}
+
 	</script>
 <body class="index-page">
 
@@ -886,6 +942,13 @@
 				<div style="height: 0px;">
 					<span class="pagetotal" style='margin-right: 20px;'>ID : 미사용으로 변경시 or 종료일 이후 라이더 출금이 막힘</span>
 					<div class="btnwrap">
+						<sm>일괄적용 : </sm>
+						<input type="text" size='10' id="일괄숫자" oninput="onInputVal(this)"/>
+						<button class="btn btn-primary" onclick="고용보험일괄()">고용보험</button>
+						<button class="btn btn-primary" onclick="산재보험일괄()">산재보험</button>
+						<button class="btn btn-primary" onclick="원천세일괄()">원천세</button>
+						<button class="btn btn-primary" onclick="시간쪠보험일괄()">시간쪠보험</button>
+						<button class="btn btn-primary me-md-4" onclick="콜수수료일괄()">콜수수료</button>
 						<button id="아이디추가버튼" class="btn btn-primary">추가</button>
 						<button id="아이디저장버튼" class="btn ty1">저장</button>
 					</div>
