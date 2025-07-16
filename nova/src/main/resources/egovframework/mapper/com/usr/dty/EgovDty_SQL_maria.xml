@@ -22,7 +22,7 @@
 			WHERE 1=1
 			<if test="schAuthorCode == 'ROLE_USER'">
 			/* 협력사 조건 */
-			AND a.REGISTRATION_SN = #{schIhidNum} AND use_at ='Y'
+			AND a.REGISTRATION_SN = #{schIhidNum} AND a.use_at ='Y'
 			</if>
 			AND a.COOPERATOR_ID = #{cooperatorId}
 			LIMIT 1
