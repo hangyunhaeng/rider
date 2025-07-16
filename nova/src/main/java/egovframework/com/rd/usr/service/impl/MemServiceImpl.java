@@ -592,6 +592,45 @@ public class MemServiceImpl extends EgovAbstractServiceImpl implements MemServic
 
 	}
 
+
+	/**
+	 * 협력사,라이더별 대출 삭제
+	 * @param etcVO
+	 * @return
+	 * @throws Exception
+	 */
+	public EtcVO deleteEtcList(List<EtcVO> list) throws Exception {
+		EtcVO returnVo = new EtcVO();
+		LoginVO user = (LoginVO)EgovUserDetailsHelper.getAuthenticatedUser();
+		for( int i =0 ; i < list.size() ; i++ ) {
+			EtcVO one = list.get(i);
+			one.setLastUpdusrId(user.getId());
+
+
+
+
+			//총판 or 협력사
+			// 협력사가 권한이 없는 cooperatorId를 등록하려 할 경우 오류 처리
+			if("ROLE_USER".equals(user.getAuthorCode())) {
+	        	CooperatorVO authChkByCoop =  new CooperatorVO();
+	        	authChkByCoop.setMberId(user.getId());
+	        	authChkByCoop.setCooperatorId(one.getCooperatorId());
+	        	if(!memDAO.selectAuthChkByCoop(authChkByCoop)) {
+	        		throw new IllegalArgumentException("권한이 없는 협력사데이터는 등록되지 않습니다.") ;
+	        	}
+			}
+
+			//기존데이터 삭제
+			if(!Util.isEmpty(one.getEtcId())) {
+				memDAO.deletetEtc(one);
+			}
+
+			returnVo = one;
+		}
+
+		return returnVo;
+
+	}
 	/**
 	 * 협력사,라이더별 대출 승인
 	 * @param etcVO

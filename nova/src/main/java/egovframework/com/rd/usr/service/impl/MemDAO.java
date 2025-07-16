@@ -376,7 +376,15 @@ public class MemDAO extends EgovComAbstractDAO {
 	public int requestEtc(EtcVO vo) throws Exception {
 		return insert("memDAO.requestEtc", vo);
 	}
-
+	/**
+	 * 협력사,라이더별 대출 삭제
+	 * @param etcVO
+	 * @return
+	 * @throws Exception
+	 */
+	public int deletetEtc(EtcVO vo) throws Exception {
+		return insert("memDAO.deletetEtc", vo);
+	}
 	/**
 	 * 협력사,라이더별 대출 승인
 	 * @param etcVO
@@ -395,5 +403,6 @@ public class MemDAO extends EgovComAbstractDAO {
 	public List<DayPayVO> selectEtcInputList(DayPayVO vo) throws Exception {
 		return selectList("memDAO.selectEtcInputList", vo);
 	}
+
 }
 

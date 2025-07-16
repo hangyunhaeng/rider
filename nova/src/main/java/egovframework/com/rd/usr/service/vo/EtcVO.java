@@ -58,6 +58,7 @@ public class EtcVO extends Sch implements Serializable {
 
 	private String mberNm;
 	private String cooperatorNm;
+	private String day;
 
 	//그리드 내 유니크 키
 	private String uniq;

@@ -469,6 +469,7 @@
 			LEFT JOIN RD_COOPERATOR e ON a.COOPERATOR_ID = e.COOPERATOR_ID
 			, (SELECT @ROWNUM:=0) AS R
 			WHERE 1=1
+				AND a.use_at ='Y'
 				<if test="cooperatorId != null and cooperatorId != ''">
 				AND a.COOPERATOR_ID = #{cooperatorId}
 				</if>
@@ -476,10 +477,10 @@
 				AND a.MBER_ID = #{mberId}
 				</if>
 				<if test="searchGubun == 'RIDER_ALERT'">
-				AND a.use_at ='Y' AND a.auth_request_dt IS NOT NULL AND a.auth_respons_dt IS NULL	/*요청했으나 승인을 않한건*/
+				AND a.auth_request_dt IS NOT NULL AND a.auth_respons_dt IS NULL	/*요청했으나 승인을 않한건*/
 				</if>
 				<if test="searchGubun == 'RIDER_LIST'">
-				AND a.use_at ='Y' AND a.auth_request_dt IS NOT NULL
+				AND a.auth_request_dt IS NOT NULL
 				</if>
 
 
@@ -565,6 +566,17 @@
 		SET AUTH_REQUEST_DT = SYSDATE()
 			, LAST_UPDT_PNTTM = #{lastUpdtPnttm}, LAST_UPDUSR_ID = SYSDATE()
 		WHERE ETC_ID = #{etcId}
+			AND RESPONS_AT !='Y'
+			AND USE_AT = 'Y'
+	</update>
+
+	<update id="deletetEtc" parameterType="egovframework.com.rd.usr.service.vo.EtcVO">
+		UPDATE RD_ETC
+		SET USE_AT = 'N'
+			, LAST_UPDT_PNTTM = #{lastUpdtPnttm}, LAST_UPDUSR_ID = SYSDATE()
+		WHERE ETC_ID = #{etcId}
+			AND RESPONS_AT !='Y'
+			AND USE_AT = 'Y'
 	</update>
 	<update id="responseEtc" parameterType="egovframework.com.rd.usr.service.vo.EtcVO">
 		UPDATE RD_ETC

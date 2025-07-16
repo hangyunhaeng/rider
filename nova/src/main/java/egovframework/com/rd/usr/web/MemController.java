@@ -536,6 +536,43 @@ public class MemController {
         return ResponseEntity.ok(map);
     }
 
+    /**
+     * 협력사,라이더별 대출 삭제
+     * @param request
+     * @param model
+     * @return
+     * @throws Exception
+     */
+    @RequestMapping("/usr/mem0002_0007.do")
+    public ResponseEntity<?> mem0002_0007(HttpServletRequest request,ModelMap model, @RequestBody List<EtcVO> list) throws Exception {
+
+    	//로그인 체크
+        LoginVO user = (LoginVO)EgovUserDetailsHelper.getAuthenticatedUser();
+        Boolean isAuthenticated = EgovUserDetailsHelper.isAuthenticated();
+
+        if(!isAuthenticated) {
+        	return ResponseEntity.status(401).body("Unauthorized");
+        }
+
+        if(!Util.isUsr()) {
+        	return ResponseEntity.status(401).body("Unauthorized");
+        }
+        //return value
+        Map<String, Object> map =  new HashMap<String, Object>();
+
+        try {
+        	EtcVO vo = memService.deleteEtcList(list);
+
+	        map.put("list", memService.selectEtcList(vo));
+	        map.put("resultCode", "success");
+	    } catch(IllegalArgumentException e) {
+	    	map.put("resultCode", "fail");
+	    	map.put("resultMsg", e.getMessage());
+	    	return ResponseEntity.ok(map);
+	    }
+        return ResponseEntity.ok(map);
+    }
+
 	/**
 	 * 라이더 관리
 	 * @param request

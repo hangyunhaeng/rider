@@ -156,6 +156,13 @@ public interface MemService {
 	 */
 	public EtcVO requestEtcList(List<EtcVO> list) throws Exception ;
 	/**
+	 * 협력사,라이더별 대출 삭제
+	 * @param etcVO
+	 * @return
+	 * @throws Exception
+	 */
+	public EtcVO deleteEtcList(List<EtcVO> list) throws Exception ;
+	/**
 	 * 협력사,라이더별 대출 승인
 	 * @param etcVO
 	 * @return

@@ -241,6 +241,10 @@
 		$("#기타요청버튼").on("click", function(e){
  			requestEtc();
 		});
+		$("#기타삭제버튼").on("click", function(e){
+			deleteEtc();
+		});
+
 
 
 
@@ -450,7 +454,7 @@
 	}
 
 	function saveEtc(){
-		grid1.stopEditing();
+		grid2.stopEditing();
 
 		setTimeout(function(){
 			var updateItem = getEditRows(grid2);
@@ -488,12 +492,12 @@
 	        	// 로딩 종료
 	            $('.loading-wrap--js').hide();
 	        });
-		}, 100);
+		}, 500);
 
 	}
 
 	function requestEtc(){
-		grid1.stopEditing();
+		grid2.stopEditing();
 
 		setTimeout(function(){
 			var updateItem = getChkRows(grid2);
@@ -521,7 +525,49 @@
 	        		if(response.data.resultMsg != null && response.data.resultMsg != ''){
 	        			alert(response.data.resultMsg);
 	        		} else {
-	        			alert("저장에 실패하였습니다");
+	        			alert("요청에 실패하였습니다");
+	        		}
+	        	}
+	        })
+	        .catch(function(error) {
+	            console.error('There was an error fetching the data:', error);
+	        }).finally(function() {
+	        	// 로딩 종료
+	            $('.loading-wrap--js').hide();
+	        });
+		}, 100);
+	}
+
+	function deleteEtc(){
+		grid2.stopEditing();
+
+		setTimeout(function(){
+			var updateItem = getChkRows(grid2);
+
+			if(updateItem.length <=0 ){
+				alert("삭제할 항목을 체크해주세요");
+				return;
+			}
+			// 로딩 시작
+	        $('.loading-wrap--js').show();
+	        axios.post('${pageContext.request.contextPath}/usr/mem0002_0007.do',updateItem).then(function(response) {        	// 로딩 종료
+	            $('.loading-wrap--js').hide();
+	        	if(response.data.resultCode == "success"){
+
+		        	if (response.data.list.length == 0) {
+		        		grid2.setGridOption('rowData',[]);  	// 데이터가 없는 경우 빈 배열 설정
+		        		grid2.showNoRowsOverlay();  			// 데이터가 없는 경우
+		            } else {
+
+						var lst = response.data.list;	//정상데이터
+						grid2.setGridOption("rowData", lst);
+		            }
+
+	        	} else {
+	        		if(response.data.resultMsg != null && response.data.resultMsg != ''){
+	        			alert(response.data.resultMsg);
+	        		} else {
+	        			alert("삭제에 실패하였습니다");
 	        		}
 	        	}
 	        })
@@ -882,6 +928,7 @@
 											<button id="기타추가버튼" class="btn btn-primary">추가</button>
 											<button id="기타저장버튼" class="btn ty1">저장</button>
 											<button id="기타요청버튼" class="btn ty1">승인요청</button>
+											<button id="기타삭제버튼" class="btn ty1">삭제</button>
 										</div>
 									</div>
 									<div class="ib_product">

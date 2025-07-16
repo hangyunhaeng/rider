@@ -176,7 +176,7 @@ function 비밀번호찾기페이지이동(){
 <!-- 			</div> -->
 			<div class="sectionrow gy-4">
 				<div class="col-lg-4 col-md-6 d-flex" data-aos="" data-aos-delay="100">
-					<a href="javascript:비밀번호찾기페이지이동();" class="" style="color:#ffffff"><span>비밀번호 찾기</span><i class="bi bi-arrow-right"></i></a>
+					<a href="javascript:비밀번호찾기페이지이동();" class="" style="color:#ffffff"><span>비밀번호 변경</span><i class="bi bi-arrow-right"></i></a>
 				</div>
 			</div>
 

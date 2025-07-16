@@ -317,7 +317,7 @@ public class DtyServiceImpl extends EgovAbstractServiceImpl implements DtyServic
 	    			insertVo.setFee(0);
 	    			insertVo.setSendPrice(new BigDecimal(one.getPaybackCost()));
 	    			insertVo.setEtcId(one.getEtcId());
-	    			insertVo.setTranDay(tranDay);
+	    			insertVo.setTranDay(one.getDay());
 	//    			insertVo.setTelegramNo(telegramNo);
 	    			insertVo.setUseAt("Y");
 	    			insertVo.setCreatId(user.getId());
@@ -368,7 +368,7 @@ public class DtyServiceImpl extends EgovAbstractServiceImpl implements DtyServic
 	    			insertVo.setDypId(egovDypIdGnrService.getNextStringId());
 	    			insertVo.setMberId(one.getMberId());
 	    			insertVo.setCooperatorId(one.getCooperatorId());
-	    			insertVo.setDay(Util.getDay());
+	    			insertVo.setDay(one.getDay());
 	    			insertVo.setIoGubun("2");			//출금
 	    			insertVo.setDayFee(0);				//선출금수수료
 	    			insertVo.setInsurance(insurance);	//보험료
@@ -1266,21 +1266,21 @@ public class DtyServiceImpl extends EgovAbstractServiceImpl implements DtyServic
 		fitVo.setCooperatorId(vo.getCooperatorId());//협력사
 		fitVo.setMberId(user.getId());				//라이더ID
 		fitVo.setGubun("D");						//선지급수수료
-		fitVo.setCost(dayFee-resultFee.getFeeCooperatorCallCost()); 						//금액
+		fitVo.setCost(dayFee-resultFee.getFeeCooperatorCost()); //금액
 		fitVo.setDypId(vo.getDypId());				//DYP_ID
 		fitVo.setFeeId(resultFee.getFeeId());		//FEE_ID
 		fitVo.setRiderFeeId(resultFee.getRiderFeeId());	//RIDER_FEE_ID
 		fitVo.setCreatId(user.getId());
 		dtyDAO.insertProfit(fitVo);
 
-		//협력사 수익등록(콜수수료)
+		//협력사 수익등록(선지급)
 		ProfitVO citVo = new ProfitVO();
 		citVo.setCoofitId(egovCitIdGnrService.getNextStringId());
 		citVo.setProfitId(fitVo.getProfitId());
 		citVo.setCooperatorId(vo.getCooperatorId());		//협력사
 		citVo.setMberId(user.getId());						//라이더ID
 		citVo.setGubun("D");								//선지급수수료
-		citVo.setCost(resultFee.getFeeCooperatorCallCost());//금액
+		citVo.setCost(resultFee.getFeeCooperatorCost());	//금액
 		citVo.setDypId(vo.getDypId());						//DYP_ID
 		citVo.setFeeId(resultFee.getFeeId());				//FEE_ID
 		citVo.setRiderFeeId(resultFee.getRiderFeeId());		//RIDER_FEE_ID
