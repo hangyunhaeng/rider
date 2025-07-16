@@ -76,10 +76,10 @@
             }
             , cellClass: (params) => {return agGrideditClass(params)}
         },
-		{ headerName: "상호", field: "companyNm", minWidth: 90, editable: true
+		{ headerName: "상호", field: "companyNm", minWidth: 160, editable: true
         	, cellClass: (params) => {return agGrideditClass(params)}},
 		{ headerName: "사업자이름", field: "registrationNm", minWidth: 90, editable: true
-			, cellClass: (params) => {return agGrideditClass(params, "ag-cell-left")} },
+			, cellClass: (params) => {return agGrideditClass(params, "ag-cell-left")} , hide:true},
 		{ headerName: "대표자명", field: "ceoNm", minWidth: 90, editable: true, cellClass: (params) => {return agGrideditClass(params)}},
 // 		{ headerName: "사용여부", field: "useAt", minWidth: 90, valueGetter:(params) => { return (params.node.data.useAt=='Y')?"사용": "미사용"}},
 

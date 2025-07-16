@@ -17,13 +17,15 @@
 			#{distance},#{addDeliveryReason},#{addDeliveryDesc},#{pickupLawDong},#{basicPrice},#{weatherPrimage},#{addPrimage},
 			#{peakPrimageEtc},#{deliveryPrice},#{riderCauseYn},#{addPrimageDesc},#{note},#{atchFileId},SYSDATE(),#{creatId}
 
+			FROM 	RD_COOPERATOR a
+			JOIN RD_COOPERATOR_FEE b ON a.COOPERATOR_ID = b.COOPERATOR_ID AND b.use_at ='Y'
+			WHERE 1=1
 			<if test="schAuthorCode == 'ROLE_USER'">
 			/* 협력사 조건 */
-			FROM 	RD_COOPERATOR a
-			WHERE a.REGISTRATION_SN = #{schIhidNum} AND use_at ='Y'
+			AND a.REGISTRATION_SN = #{schIhidNum} AND use_at ='Y'
+			</if>
 			AND a.COOPERATOR_ID = #{cooperatorId}
 			LIMIT 1
-			</if>
 
 	</insert>
 	<select id="selectDeliveryInfoByAtchFileId" parameterType="egovframework.com.rd.usr.service.vo.DeliveryInfoVO" resultType="egovframework.com.rd.usr.service.vo.DeliveryInfoVO">
