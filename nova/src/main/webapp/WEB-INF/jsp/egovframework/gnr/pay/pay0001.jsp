@@ -268,13 +268,13 @@
 		  <li><a href="${pageContext.request.contextPath}/gnr/not0001.do">공지사항</a></li>
 		  <li><a href="${pageContext.request.contextPath}/gnr/inq0001.do">1:1문의</a></li>
 		  <li><a href="${pageContext.request.contextPath}/gnr/pay0004.do">대여.리스</a></li>
-          <li class="dropdown"><a href="#" class="active"><span>출금</span> <i class="bi bi-chevron-down toggle-dropdown"></i></a>
+          <li class="dropdown"><a href="#" class="active"><span>입금</span> <i class="bi bi-chevron-down toggle-dropdown"></i></a>
             <ul>
-              <li><a href="${pageContext.request.contextPath}/gnr/rot0003.do?gubun=DAY">선정산 배달비</a></li>
+              <li><a href="${pageContext.request.contextPath}/gnr/rot0003.do?gubun=DAY">선지급 배달비</a></li>
               <li><a href="${pageContext.request.contextPath}/gnr/rot0003.do?gubun=WEK">확정 배달비</a></li>
             </ul>
           </li>
-          <li><a href="${pageContext.request.contextPath}/gnr/pay0003.do">출금 내역</a></li>
+          <li><a href="${pageContext.request.contextPath}/gnr/pay0003.do">입금 내역</a></li>
           <li><a href="${pageContext.request.contextPath}/gnr/pay0002.do">배달 정보 조회</a></li>
           <li><a href="${pageContext.request.contextPath}/gnr/rot0002.do">내정보관리</a></li>
         </ul>
@@ -296,7 +296,7 @@
                 <div class="card-header border-bottom-0 pb-0">
                   <div class="row justify-content-between align-items-center mb-4">
                     <div class="col-auto">
-                      <h3 class="text-body-emphasis">선정산 배달비</h3>
+                      <h3 class="text-body-emphasis">선지급 배달비</h3>
                       <p class="mb-2 mb-md-0 mb-lg-2 text-body-tertiary fs-9 "><font class="text-primary fw-bold">배달처리비<br/></font>(기본단가+기상할증+추가할증+피크할증)</p>
                     </div>
                     <div class="col-auto w-100 w-md-auto">
@@ -322,7 +322,7 @@
                         </div>
                         <div class="col-auto d-flex">
                         	<button class="btn btn-phoenix-secondary" type="button" onclick="serchList();">조회</button>
-                        	<button class="btn btn-primary mb-2 mb-sm-0 mx-1 fs-9" type="submit" onclick="출금신청();">출금신청</button>
+                        	<button class="btn btn-primary mb-2 mb-sm-0 mx-1 fs-9" type="submit" onclick="출금신청();">입금신청</button>
                         </div>
                       </div>
                     </div>
@@ -410,7 +410,7 @@
 	                	</a>
 					</div>
                     <div class="col-auto d-flex">
-                    	<button class="btn btn-primary mb-2 mb-sm-0 mx-1 fs-9" type="submit" onclick="출금신청();" style="order:2">출금신청</button>
+                    	<button class="btn btn-primary mb-2 mb-sm-0 mx-1 fs-9" type="submit" onclick="출금신청();" style="order:2">입금신청</button>
                     </div>
                 </div>
               </div>

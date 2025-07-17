@@ -258,7 +258,7 @@
 					/*, CEILING(DELIVERY_PRICE*FEE_ADMINSTRATOR) + DELIVERY_CNT*FEE_CALL AS DAY_FEE*/
 
 					/* 고용보험(%)+ 산재보험(%)+ 원천세(%) + 시간제보험(원 최대7,000)  =  보험료 */
-					, CEILING(DELIVERY_PRICE*(FEE_EMPLOYMENT_INSURANCE+FEE_INDUSTRIAL_INSURANCE+FEE_WITHHOLDING_TAX)) + if(DELIVERY_CNT*FEE_TIME_INSURANCE > '7000', '7000', DELIVERY_CNT*FEE_TIME_INSURANCE) AS INSURANCE
+					, CEILING(DELIVERY_PRICE*(FEE_EMPLOYMENT_INSURANCE+FEE_INDUSTRIAL_INSURANCE+FEE_WITHHOLDING_TAX)) + if(DELIVERY_CNT*FEE_TIME_INSURANCE > #{timeInsuranceMaxFee}, #{timeInsuranceMaxFee}, DELIVERY_CNT*FEE_TIME_INSURANCE) AS INSURANCE
 					/* 콜수수료 */
 					, DELIVERY_CNT*FEE_CALL AS FEE_CALL_COST
 				FROM (
@@ -268,7 +268,7 @@
 					, nvl(nvl(c.FEE_WITHHOLDING_TAX, b.FEE_WITHHOLDING_TAX)*0.01, 0) AS FEE_WITHHOLDING_TAX/* 원천세(%) */
 					, nvl(nvl(c.FEE_TIME_INSURANCE, b.FEE_TIME_INSURANCE), 0) AS FEE_TIME_INSURANCE/* 시간제보험(원 최대7,000) */
 					, nvl(nvl(c.FEE_CALL, b.FEE_CALL), 0) AS FEE_CALL/* 건당 콜수수료(원) */
-					, a.COOPERATOR_ID, a.MBER_ID,a.RUN_DE AS DAY, SUM(a.DELIVERY_PRICE) AS DELIVERY_PRICE, COUNT(1) DELIVERY_CNT
+					, a.COOPERATOR_ID, a.MBER_ID,a.RUN_DE AS DAY, SUM(a.DELIVERY_PRICE) AS DELIVERY_PRICE, SUM(if(a.DELIVERY_STATE = TRIM('전달완료'), 1, 0)) DELIVERY_CNT
 					, b.FEE_ID, c.RIDER_FEE_ID, b.FEE_COOPERATOR_CALL*0.01 AS FEE_COOPERATOR_CALL
 					, a.ATCH_FILE_ID
 					FROM RD_DELIVERY_INFO a
@@ -425,7 +425,7 @@
 	<select id="selectHistory" parameterType="egovframework.com.rd.usr.service.vo.HistoryVO" resultType="egovframework.com.rd.usr.service.vo.HistoryVO">
 
 		SELECT * FROM(
-			SELECT COOPERATOR_ID,'DAY' AS DW_GUBUN,'선정산' AS GUBUN, DYP_ID AS ID, a.SEND_PRICE, a.DAY_FEE+a.INSURANCE+a.SEND_FEE AS FEE
+			SELECT COOPERATOR_ID,'DAY' AS DW_GUBUN,'선지급' AS GUBUN, DYP_ID AS ID, a.SEND_PRICE, a.DAY_FEE+a.INSURANCE+a.SEND_FEE AS FEE
 			, b.TRAN_DAY , b.RV_ACCOUNT, b.STATUS, b.STATUS_cd, b.error_code
 			, case when b.STATUS='200' then '이체' when b.STATUS= '400' AND b.error_code='VTIM' then '처리중' when b.STATUS= '400' AND b.error_code='0011' then '처리중' ELSE '실패' end  AS STATUS_NM
 			, b.SEND_DT, b.SEND_TM, b.CREAT_DT, b.error_message
@@ -440,7 +440,7 @@
 
 			UNION all
 
-			SELECT COOPERATOR_ID, DW_GUBUN, if(DW_GUBUN='DAY', '선정산', '정산') AS GUBUN, WKP_ID AS ID, a.SEND_PRICE, a.FEE
+			SELECT COOPERATOR_ID, DW_GUBUN, if(DW_GUBUN='DAY', '선지급', '정산') AS GUBUN, WKP_ID AS ID, a.SEND_PRICE, a.FEE
 			, b.TRAN_DAY , b.RV_ACCOUNT, b.STATUS, b.STATUS_cd, b.error_code
 			, case when b.STATUS='200' then '이체' when b.STATUS= '400' AND b.error_code='VTIM' then '처리중' when b.STATUS= '400' AND b.error_code='0011' then '처리중' ELSE '실패' end  AS STATUS_NM
 			, b.SEND_DT, b.SEND_TM, b.CREAT_DT, b.error_message
@@ -493,6 +493,7 @@
 			SELECT b.ETC_ID, b.COOPERATOR_ID, b.MBER_ID, b.GUBUN, a.RUN_DE AS DAY, b.PAYBACK_DAY, b.PAYBACK_COST, b.PAYBACK_COST_ALL, DATE_FORMAT(b.AUTH_REQUEST_DT, '%Y%m%d') AUTH_REQUEST_DT
 			, DATE_FORMAT(b.AUTH_RESPONS_DT, '%Y%m%d') AUTH_RESPONS_DT, b.RESPONS_AT, b.USE_AT, DATE_FORMAT(b.CREAT_DT, '%Y%m%d') CREAT_DT, b.CREAT_ID, b.LAST_UPDT_PNTTM, b.LAST_UPDUSR_ID
 			, if(c.ETC_ID IS NULL AND d.ETC_ID IS NULL, 'Y', 'N') as ABLE_YN /*하루에 한번만 출금할수 있도록 */
+			, NVL(c.SEND_PRICE, 0) + NVL(d.SEND_PRICE, 0) AS SUM_ETC_COST
 			FROM RD_DELIVERY_INFO a
 			JOIN RD_ETC b on a.COOPERATOR_ID = b.COOPERATOR_ID AND a.MBER_ID = b.MBER_ID AND b.finish_at ='N' AND AUTH_RESPONS_DT IS NOT NULL AND RESPONS_AT ='Y'
 			LEFT JOIN RD_DAY_PAY c ON b.COOPERATOR_ID = c.COOPERATOR_ID AND b.MBER_ID = c.MBER_ID  AND b.ETC_ID = c.ETC_ID AND c.IO_GUBUN ='2' AND c.day = a.RUN_DE
@@ -523,14 +524,14 @@
 
 	<insert id="insertProfit" parameterType="egovframework.com.rd.usr.service.vo.ProfitVO">
 		INSERT INTO RD_PROFIT
-		(PROFIT_ID, COOPERATOR_ID, MBER_ID, GUBUN, COST, DELIVERY_CNT, DELIVERY_DAY, DYP_ID, FEE_ID, RIDER_FEE_ID, CREAT_DT, CREAT_ID)
-		VALUES(#{profitId}, #{cooperatorId}, #{mberId}, #{gubun}, #{cost}, #{deliveryCnt}, #{deliveryDay}, #{dypId}, #{feeId}, #{riderFeeId}, SYSDATE(), #{creatId})
+		(PROFIT_ID, COOPERATOR_ID, MBER_ID, GUBUN, COST, DELIVERY_COST, DELIVERY_CNT, DELIVERY_DAY, DYP_ID, FEE_ID, RIDER_FEE_ID, CREAT_DT, CREAT_ID)
+		VALUES(#{profitId}, #{cooperatorId}, #{mberId}, #{gubun}, #{cost}, #{deliveryCost}, #{deliveryCnt}, #{deliveryDay}, #{dypId}, #{feeId}, #{riderFeeId}, SYSDATE(), #{creatId})
 	</insert>
 
 	<insert id="insertCooperatorProfit" parameterType="egovframework.com.rd.usr.service.vo.ProfitVO">
 		INSERT INTO RD_COOPERATOR_PROFIT
-		(COOFIT_ID, PROFIT_ID, COOPERATOR_ID, MBER_ID, GUBUN, COST, DELIVERY_CNT, DELIVERY_DAY, DYP_ID, FEE_ID, RIDER_FEE_ID, CREAT_DT, CREAT_ID)
-		VALUES(#{coofitId}, #{profitId}, #{cooperatorId}, #{mberId}, #{gubun}, #{cost}, #{deliveryCnt}, #{deliveryDay}, #{dypId}, #{feeId}, #{riderFeeId}, SYSDATE(), #{creatId})
+		(COOFIT_ID, PROFIT_ID, COOPERATOR_ID, MBER_ID, GUBUN, COST, DELIVERY_COST, DELIVERY_CNT, DELIVERY_DAY, DYP_ID, FEE_ID, RIDER_FEE_ID, CREAT_DT, CREAT_ID)
+		VALUES(#{coofitId}, #{profitId}, #{cooperatorId}, #{mberId}, #{gubun}, #{cost}, #{deliveryCost}, #{deliveryCnt}, #{deliveryDay}, #{dypId}, #{feeId}, #{riderFeeId}, SYSDATE(), #{creatId})
 	</insert>
 
 </mapper>

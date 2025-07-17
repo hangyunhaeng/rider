@@ -10,7 +10,7 @@
 
 	<select id="selectPayList" parameterType="egovframework.com.rd.usr.service.vo.HistoryVO" resultType="egovframework.com.rd.usr.service.vo.HistoryVO">
 		SELECT * FROM(
-			SELECT a.cooperator_id,'DAY' AS dw_gubun,'선정산' AS gubun, DYP_ID AS ID, if(a.io_gubun=1, a.ABLE_PRICE, a.send_price) as send_price, a.day_fee+a.insurance+a.send_fee AS fee
+			SELECT a.cooperator_id,'DAY' AS dw_gubun,'선지급' AS gubun, DYP_ID AS ID, if(a.io_gubun=1, a.ABLE_PRICE, a.send_price) as send_price, a.day_fee+a.insurance+a.send_fee AS fee
 			, b.tran_day, b.TELEGRAM_NO, b.rv_account, b.status, b.status_cd
 			, case when a.etc_id is not null then '' when b.status='200' then '성공' when io_gubun=2 AND b.STATUS= '400' AND b.error_code='VTIM' then '처리중' when io_gubun=2 AND b.STATUS= '400' AND b.error_code='0011' then '처리중'  when io_gubun=2 then '실패' ELSE '' end AS status_nm
 			, b.send_dt, b.send_tm, b.ERROR_MESSAGE
@@ -26,7 +26,7 @@
 						ELSE  ''
 						end AS io_gubun_nm
 			, DAY_ATCH_FILE_ID, WEK_ATCH_FILE_ID
-			, week_yn, case when week_yn = 'Y' then '정산완료' ELSE '선입금' END week_NM
+			, week_yn, case when week_yn = 'Y' then '정산완료' ELSE '선지급' END week_NM
 			, a.DAY AS ACCOUNTS_ST_DT, '' AS ACCOUNTS_ED_DT, e.CD_NM AS RV_BANK_NM, a.mber_id, DATE_FORMAT(f.CREAT_DT, '%Y%m%d') AS FILE_DATE
 			FROM RD_DAY_PAY a
 			LEFT JOIN RD_TRANSFER b ON a.tran_day = b.tran_day AND a.TELEGRAM_NO = b.TELEGRAM_NO
@@ -55,7 +55,7 @@
 			</if>
 			UNION all
 
-			SELECT a.cooperator_id, dw_gubun, if(dw_gubun='DAY', '선정산', '정산') AS gubun, wkp_id AS ID, if(a.io_gubun=1, a.ABLE_PRICE, a.send_price) as send_price, a.fee
+			SELECT a.cooperator_id, dw_gubun, if(dw_gubun='DAY', '선지급', '정산') AS gubun, wkp_id AS ID, if(a.io_gubun=1, a.ABLE_PRICE, a.send_price) as send_price, a.fee
 			, b.tran_day, b.TELEGRAM_NO, b.rv_account, b.status, b.status_cd
 			, case when a.etc_id is not null then '' when b.status='200' then '성공' when io_gubun=2 AND b.STATUS= '400' AND b.error_code='VTIM' then '처리중' when io_gubun=2 AND b.STATUS= '400' AND b.error_code='0011' then '처리중'  when io_gubun=2 then '실패' ELSE '' end AS status_nm
 			, b.send_dt, b.send_tm, b.ERROR_MESSAGE
@@ -184,7 +184,7 @@
 	</select>
 	<select id="selectProfitList" parameterType="egovframework.com.rd.usr.service.vo.ProfitVO" resultType="egovframework.com.rd.usr.service.vo.ProfitVO">
 
-		SELECT a.PROFIT_ID, a.COOPERATOR_ID, a.MBER_ID, a.GUBUN, a.COST, a.DELIVERY_CNT, a.DELIVERY_DAY, a.DYP_ID, a.WKP_ID, a.FEE_ID, a.RIDER_FEE_ID
+		SELECT a.PROFIT_ID, a.COOPERATOR_ID, a.MBER_ID, a.GUBUN, a.COST, a.DELIVERY_COST, a.DELIVERY_CNT, a.DELIVERY_DAY, a.DYP_ID, a.WKP_ID, a.FEE_ID, a.RIDER_FEE_ID
 		, DATE_FORMAT(a.CREAT_DT, '%Y%m%d') AS CREAT_DT, a.CREAT_ID
 		, b.MBER_NM, c.COOPERATOR_NM
 		, case when a.gubun = 'C' then '콜수수료' when a.gubun ='E' then '기타수수료' when a.gubun ='D' then '선지급수수료' ELSE '' END GUBUN_NM
@@ -213,7 +213,7 @@
 
 	<select id="selectCooperatorProfitList" parameterType="egovframework.com.rd.usr.service.vo.ProfitVO" resultType="egovframework.com.rd.usr.service.vo.ProfitVO">
 
-		SELECT a.PROFIT_ID, a.COOPERATOR_ID, a.MBER_ID, a.GUBUN, a.COST, a.DELIVERY_CNT, a.DELIVERY_DAY, a.DYP_ID, a.WKP_ID, a.FEE_ID, a.RIDER_FEE_ID
+		SELECT a.PROFIT_ID, a.COOPERATOR_ID, a.MBER_ID, a.GUBUN, a.COST, a.DELIVERY_COST, a.DELIVERY_CNT, a.DELIVERY_DAY, a.DYP_ID, a.WKP_ID, a.FEE_ID, a.RIDER_FEE_ID
 		, DATE_FORMAT(a.CREAT_DT, '%Y%m%d') AS CREAT_DT, a.CREAT_ID
 		, b.MBER_NM, c.COOPERATOR_NM
 		, case when a.gubun = 'C' then '콜수수료' when a.gubun ='E' then '기타수수료' when a.gubun ='D' then '선지급수수료' ELSE '' END GUBUN_NM

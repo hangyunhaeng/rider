@@ -189,13 +189,13 @@
 		  <li><a href="${pageContext.request.contextPath}/gnr/not0001.do">공지사항</a></li>
 		  <li><a href="${pageContext.request.contextPath}/gnr/inq0001.do">1:1문의</a></li>
 		  <li><a href="${pageContext.request.contextPath}/gnr/pay0004.do">대여.리스</a></li>
-          <li class="dropdown"><a href="#"><span>출금</span> <i class="bi bi-chevron-down toggle-dropdown"></i></a>
+          <li class="dropdown"><a href="#"><span>입금</span> <i class="bi bi-chevron-down toggle-dropdown"></i></a>
             <ul>
-              <li><a href="${pageContext.request.contextPath}/gnr/rot0003.do?gubun=DAY">선정산 배달비</a></li>
+              <li><a href="${pageContext.request.contextPath}/gnr/rot0003.do?gubun=DAY">선지급 배달비</a></li>
               <li><a href="${pageContext.request.contextPath}/gnr/rot0003.do?gubun=WEK">확정 배달비</a></li>
             </ul>
           </li>
-          <li><a href="${pageContext.request.contextPath}/gnr/pay0003.do" class="active">출금 내역</a></li>
+          <li><a href="${pageContext.request.contextPath}/gnr/pay0003.do" class="active">입금 내역</a></li>
           <li><a href="${pageContext.request.contextPath}/gnr/pay0002.do">배달 정보 조회</a></li>
           <li><a href="${pageContext.request.contextPath}/gnr/rot0002.do">내정보관리</a></li>
         </ul>
@@ -219,7 +219,7 @@
                 <div class="card-header border-bottom-0 pb-0">
                   <div class="row justify-content-between align-items-center mb-2">
                     <div class="col-auto">
-                      <h3 class="text-body-emphasis">출금 내역</h3>
+                      <h3 class="text-body-emphasis">입금 내역</h3>
                     </div>
 <!--                        <div class="col-auto d-flex"> -->
 <!--                        	<button class="btn btn-primary mb-2 mb-sm-0 mx-1 fs-9" type="submit" onclick="go선출금();">출금</button> -->
@@ -250,7 +250,7 @@
                       	<div class="col-auto mb-2 d-flex">
                           <p class="mb-0 ms-sm-3 fs-9 text-body-tertiary fw-bold">
 <!--                           <svg class="svg-inline--fa fa-filter me-1 fw-extra-bold fs-10" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="filter" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" data-fa-i2svg=""><path fill="currentColor" d="M3.9 54.9C10.5 40.9 24.5 32 40 32H472c15.5 0 29.5 8.9 36.1 22.9s4.6 30.5-5.2 42.5L320 320.9V448c0 12.1-6.8 23.2-17.7 28.6s-23.8 4.3-33.5-3l-64-48c-8.1-6-12.8-15.5-12.8-25.6V320.9L9 97.3C-.7 85.4-2.8 68.8 3.9 54.9z"></path></svg> -->
-                          <font _mstmutation="1">출금 총액</font></p>
+                          <font _mstmutation="1">입금 총액</font></p>
                       	</div>
                       	<div class="col-auto mb-2 d-flex">
                       		<font class="p-0 ms-3 fs-9 text-primary fw-bold" id="총금액" _mstmutation="1">0원</font>
@@ -273,7 +273,7 @@
                     <table class="table table-sm fs-9 mb-0">
                       <thead>
                         <tr>
-                          <th class="white-space-nowrap align-middle ps-0 pe-0 py-3"" scope="col" data-sort="order" style="width:28%;text-align:center;background-color:#0f1d33;color:white;" _msttexthash="9666644" _msthash="429">출금일</th>
+                          <th class="white-space-nowrap align-middle ps-0 pe-0 py-3"" scope="col" data-sort="order" style="width:28%;text-align:center;background-color:#0f1d33;color:white;" _msttexthash="9666644" _msthash="429">입금일</th>
                           <th class="white-space-nowrap align-middle text-center pe-0 py-3"" scope="col" data-sort="total" style="width:25%;text-align:center;background-color:#0f1d33;color:white;" _msttexthash="9571315" _msthash="430">정산</th>
                           <th class="white-space-nowrap align-middle white-space-nowrap pe-0 py-3"" scope="col" data-sort="payment_status" style="width:30%;text-align:center;background-color:#0f1d33;color:white;" _msttexthash="22057685" _msthash="431">금액</th>
                           <th class="white-space-nowrap align-middle white-space-nowrap pe-0 py-3" scope="col" data-sort="fulfilment_status" style="width:17%;text-align:center;background-color:#0f1d33;color:white;" _msttexthash="37371139" _msthash="432">상태</th>
@@ -283,7 +283,7 @@
 
                         <tr repeatObj="true" class="hover-actions-trigger btn-reveal-trigger position-static" style="display:none;">
                           <td class="white-space-nowrap order align-middle ps-0 py-3 text-center tranDay">2025-05-05</td>
-                          <td class="white-space-nowrap total align-middle text-center fw-semibold pe-0 text-body-highlight py-3 text-center gubun" _msttexthash="11490804" _msthash="436">선정산</td>
+                          <td class="white-space-nowrap total align-middle text-center fw-semibold pe-0 text-body-highlight py-3 text-center gubun" _msttexthash="11490804" _msthash="436">선지급</td>
                           <td class="white-space-nowrap total align-middle fw-bold text-body-highlight text-end py-3 sendPrice">1,522,555</td>
                           <td class="white-space-nowrap total align-middle fw-bold text-body-highlight text-center py-3 statusNm">성공</td>
                         </tr>

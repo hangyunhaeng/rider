@@ -29,7 +29,7 @@ public class DayPayVO extends Sch implements Serializable {
 	//입출금구분
 	private String ioGubun;
 	//배달처리비
-	private String deliveryPrice;
+	private int deliveryPrice;
 	//선지급수수료
 	private int dayFee;
 	//보험료

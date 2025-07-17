@@ -75,6 +75,10 @@
 			, cellClass: 'ag-cell-right'
 		},
 		{ headerName: "배달일", field: "deliveryDay", minWidth: 120},
+		{ headerName: "배달비", field: "deliveryCost", minWidth: 120
+			, valueGetter:(params) => { return params.data.deliveryCnt > 0 ? currencyFormatter(params.data.deliveryCost): ''}
+			, cellClass: 'ag-cell-right'
+		},
 		{ headerName: "dypId", field: "dypId", minWidth: 120, hide:true},
 		{ headerName: "wkpId", field: "wkpId", minWidth: 120, hide:true},
 		{ headerName: "feeId", field: "feeId", minWidth: 120, hide:true},

@@ -151,6 +151,7 @@
 		$('#반복부').find('div:visible').remove();
 
 		if(response.data.list == null || response.data.list.length == 0){
+			debugger;
 			var 내역없음 = $('#반복부').find('[repeatObj=no]:hidden').clone();
 			$('#반복부').append(내역없음);
 			내역없음.show();
@@ -272,13 +273,13 @@
 		  <li><a href="${pageContext.request.contextPath}/gnr/not0001.do">공지사항</a></li>
 		  <li><a href="${pageContext.request.contextPath}/gnr/inq0001.do">1:1문의</a></li>
 		  <li><a href="${pageContext.request.contextPath}/gnr/pay0004.do" class="active">대여.리스</a></li>
-          <li class="dropdown"><a href="#"><span>출금</span> <i class="bi bi-chevron-down toggle-dropdown"></i></a>
+          <li class="dropdown"><a href="#"><span>입금</span> <i class="bi bi-chevron-down toggle-dropdown"></i></a>
             <ul>
-              <li><a href="${pageContext.request.contextPath}/gnr/rot0003.do?gubun=DAY">선정산 배달비</a></li>
+              <li><a href="${pageContext.request.contextPath}/gnr/rot0003.do?gubun=DAY">선지급 배달비</a></li>
               <li><a href="${pageContext.request.contextPath}/gnr/rot0003.do?gubun=WEK">확정 배달비</a></li>
             </ul>
           </li>
-          <li><a href="${pageContext.request.contextPath}/gnr/pay0003.do">출금 내역</a></li>
+          <li><a href="${pageContext.request.contextPath}/gnr/pay0003.do">입금 내역</a></li>
           <li><a href="${pageContext.request.contextPath}/gnr/pay0002.do">배달 정보 조회</a></li>
           <li><a href="${pageContext.request.contextPath}/gnr/rot0002.do">내정보관리</a></li>
         </ul>
@@ -308,7 +309,7 @@
 
                   </div>
                 </div>
-					<div repeatObj="no" class="d-flex hover-actions-trigger py-1 border-translucent border-top" style="">
+					<div class="d-flex hover-actions-trigger py-1 border-translucent border-top" style="">
 						<div class="row justify-content-between align-items-md-center btn-reveal-trigger border-translucent gx-0 flex-1 cursor-pointer" data-bs-toggle="modal" data-bs-target="#exampleModal">
 							<div class="col-12 col-md-auto col-xl-12 col-xxl-auto">
 								<div class="mb-1 mb-md-0 d-flex align-items-center lh-1 justify-content-center">

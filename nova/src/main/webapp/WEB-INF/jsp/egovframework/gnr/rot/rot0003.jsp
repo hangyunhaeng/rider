@@ -87,7 +87,7 @@
 
 		if("${myInfoVOData.gubun}" == "DAY"){
 			$('#divDay').show();
-			$('#title').html("선출금");
+			$('#title').html("선지급");
 			$('#선정산메뉴').addClass("active");
 		}
 		if("${myInfoVOData.gubun}" == "WEK"){
@@ -103,9 +103,9 @@
 			$('.mx-lg-n4').find('input').attr('disabled', true);
 		}
 
-
-		$('#dayAblePrice').html(currencyFormatter(${ablePrice.dayAblePrice-sendFee})+"원");
-		$('#weekAblePrice').html(currencyFormatter(${ablePrice.weekAblePrice-sendFee})+"원");
+		debugger;
+		$('#dayAblePrice').html(currencyFormatter(minWon0(${ablePrice.dayAblePrice-sendFee}))+"원");
+		$('#weekAblePrice').html(currencyFormatter(minWon0(${ablePrice.weekAblePrice-sendFee}))+"원");
 		$('#sendFee').html(currencyFormatter(sendFee));
 		$("#dayPrice").on("propertychange change keyup paste input", function(e) {
 			calPrice();
@@ -123,10 +123,10 @@
 
 		//빈값이면 0으로
 		if(obj.value == "") obj.value = 0;
-
 		//모두 숫자로 변환
 		obj.value = obj.value.replace(/[^0-9]/g, '').replace(/(\..*)\./g, '$1');
-		maxInt = String(maxInt).replace(/[^0-9]/g, '').replace(/(\..*)\./g, '$1');
+		maxInt = String(maxInt).replace(/[^0-9-]/g, '').replace(/(\..*)\./g, '$1');
+		maxInt = minWon0(maxInt);	//-는 없음
 
 		//최대값보다 큰값이 들어오면 최대값으로 변환
 		if(typeof(maxInt) != 'undefined'){
@@ -184,21 +184,21 @@
 
 		if("${myInfoVOData.gubun}" == "DAY"){
 			if(Number($('#dayPrice').val().replace(/[^0-9]-/g, '').replace(/(\..*)\./g, '$1'), 10) <= 0){
-				alert('출금금액을 입력하세요');
+				alert('입금금액을 입력하세요');
 				$('#dayPrice').focus();
 				return;
 			}
 		}
 		if("${myInfoVOData.gubun}" == "WEK"){
 			if(Number($('#weekPrice').val().replace(/[^0-9]-/g, '').replace(/(\..*)\./g, '$1'), 10) <= 0){
-				alert('출금금액을 입력하세요');
+				alert('입금금액을 입력하세요');
 				$('#weekPrice').focus();
 				return;
 			}
 		}
 
 
-		if(confirm("출금하시겠습니까?")){
+		if(confirm("입금하시겠습니까?")){
 
 			if(${doNice} != true){
 				goActStep2();
@@ -259,7 +259,7 @@
 					} else{
 						if(response.data.resultMsg != '' && response.data.resultMsg != null)
 							alert(response.data.resultMsg);
-						else alert("출금에 실패하였습니다");
+						else alert("입금에 실패하였습니다");
 						return ;
 					}
 		        })
@@ -299,13 +299,13 @@
 		  <li><a href="${pageContext.request.contextPath}/gnr/not0001.do">공지사항</a></li>
 		  <li><a href="${pageContext.request.contextPath}/gnr/inq0001.do">1:1문의</a></li>
 		  <li><a href="${pageContext.request.contextPath}/gnr/pay0004.do">대여.리스</a></li>
-          <li class="dropdown"><a href="#" class="active"><span>출금</span> <i class="bi bi-chevron-down toggle-dropdown"></i></a>
+          <li class="dropdown"><a href="#" class="active"><span>입금</span> <i class="bi bi-chevron-down toggle-dropdown"></i></a>
             <ul>
-              <li><a id="선정산메뉴" href="${pageContext.request.contextPath}/gnr/rot0003.do?gubun=DAY">선정산 배달비</a></li>
+              <li><a id="선정산메뉴" href="${pageContext.request.contextPath}/gnr/rot0003.do?gubun=DAY">선지급 배달비</a></li>
               <li><a id="확정메뉴" href="${pageContext.request.contextPath}/gnr/rot0003.do?gubun=WEK">확정 배달비</a></li>
             </ul>
           </li>
-          <li><a href="${pageContext.request.contextPath}/gnr/pay0003.do">출금 내역</a></li>
+          <li><a href="${pageContext.request.contextPath}/gnr/pay0003.do">입금 내역</a></li>
           <li><a href="${pageContext.request.contextPath}/gnr/pay0002.do">배달 정보 조회</a></li>
           <li><a href="${pageContext.request.contextPath}/gnr/rot0002.do">내정보관리</a></li>
         </ul>
@@ -328,7 +328,7 @@
 <!-- 							<div class="card-header border-bottom-0 pb-0"> -->
 <!-- 								<div class="row justify-content-between align-items-center mb-2"> -->
 <!-- 									<div class="col-auto"> -->
-<!-- 										<h3 class="text-body-emphasis">출금</h3> -->
+<!-- 										<h3 class="text-body-emphasis">입금</h3> -->
 <!-- 									</div> -->
 <!-- 									                       <div class="col-auto d-flex"> -->
 <!-- 									                       	<button class="btn btn-primary mb-2 mb-sm-0 mx-1 fs-9" type="submit" onclick="$('.collapseExample1').collapse('hide');" data-bs-toggle="collapse" data-bs-target=".collapseExample0" aria-expanded="false">변경</button> -->
@@ -340,7 +340,7 @@
                 <div class="card-header border-bottom-0 pb-0">
                   <div class="row justify-content-between align-items-center mb-2">
                     <div class="col-auto">
-                      <h3 id="title" class="text-body-emphasis">출금</h3>
+                      <h3 id="title" class="text-body-emphasis">입금</h3>
                     </div>
                   </div>
                 </div>
@@ -356,7 +356,7 @@
 							<div id="divDay" class="d-flex hover-actions-trigger py-2 border-translucent position-relative" style="display:none !important;">
 								<div class="col-12">
 									<div class="form-floating">
-									<input id="dayPrice" class="form-control" id="1" type="text" maxlength="15" oninput="onInputVal(this, ${ablePrice.dayAblePrice-sendFee});" placeholder="선출금가능금액" value="0"><label for="floatingInputZipcode">선출금가능금액<em id="dayAblePrice" style="color:red;"> 0원</em></label>
+									<input id="dayPrice" class="form-control" id="1" type="text" maxlength="15" oninput="onInputVal(this, ${ablePrice.dayAblePrice-sendFee});" placeholder="선지급가능금액" value="0"><label for="floatingInputZipcode">선지급가능금액<em id="dayAblePrice" style="color:red;"> 0원</em></label>
 									</div>
 								</div>
 							</div>
@@ -365,14 +365,14 @@
 							<div id="divWek" class="d-flex hover-actions-trigger py-2 border-translucent position-relative" style="display:none !important;">
 								<div class="col-12">
 									<div class="form-floating">
-									<input id="weekPrice" class="form-control" id="2" type="text" maxlength="15" oninput="onInputVal(this, ${ablePrice.weekAblePrice-sendFee});" placeholder="정산완료출금가능금액" value="0"><label for="floatingInputZipcode">정산완료출금가능금액<em id="weekAblePrice" style="color:red;"> 0원</em></label>
+									<input id="weekPrice" class="form-control" id="2" type="text" maxlength="15" oninput="onInputVal(this, ${ablePrice.weekAblePrice-sendFee});" placeholder="정산완료입금가능금액" value="0"><label for="floatingInputZipcode">정산완료입금가능금액<em id="weekAblePrice" style="color:red;"> 0원</em></label>
 									</div>
 								</div>
 							</div>
 
 											<div class="row justify-content-between mb-1 mb-md-0 d-flex align-items-center lh-1  border-top pt-3">
 												<div class="col-auto">
-													<label class="form-check-label mb-2 mb-md-0 fs-9 me-2 line-clamp-1 text-body cursor-pointer"> - 출금 내역</label>
+													<label class="form-check-label mb-2 mb-md-0 fs-9 me-2 line-clamp-1 text-body cursor-pointer"> - 입금 내역</label>
 												</div>
 												<div class="col-auto d-flex">
 													<span class="fs-9 mb-2" style=""></span>
@@ -381,7 +381,7 @@
 
 											<div class="row justify-content-between mb-1 mb-md-0 d-flex align-items-center lh-1">
 												<div class="col-auto">
-													<label class="form-check-label mb-2 mb-md-0 fs-9 me-2 line-clamp-1 text-body cursor-pointer">출금 신청 금액</label>
+													<label class="form-check-label mb-2 mb-md-0 fs-9 me-2 line-clamp-1 text-body cursor-pointer">입금 신청 금액</label>
 												</div>
 												<div class="col-auto d-flex">
 													<span id="sumPrice" class="fs-9 mb-2" style="">100</span><span class="fs-9 mb-2" style="">원</span>
@@ -390,7 +390,7 @@
 
 <!-- 											<div class="row justify-content-between mb-1 mb-md-0 d-flex align-items-center lh-1"> -->
 <!-- 												<div class="col-auto"> -->
-<!-- 													<label class="form-check-label mb-2 mb-md-0 fs-9 me-2 line-clamp-1 text-body cursor-pointer">선출금 수수료</label> -->
+<!-- 													<label class="form-check-label mb-2 mb-md-0 fs-9 me-2 line-clamp-1 text-body cursor-pointer">선지급 수수료</label> -->
 <!-- 												</div> -->
 <!-- 												<div class="col-auto d-flex"> -->
 <!-- 													<span id="dayFee" class="fs-9 mb-2" style="">500</span><span class="fs-9 mb-2" style="">원</span> -->
@@ -408,7 +408,7 @@
 
 
 
-											<div class="row justify-content-between mb-1 mb-md-0 d-flex align-items-center lh-1">
+											<div class="row justify-content-between mb-1 mb-md-0 d-flex align-items-center lh-1" style="display:none !important;">
 												<div class="col-auto">
 													<label class="form-check-label mb-2 mb-md-0 fs-9 me-2 line-clamp-1 text-body cursor-pointer">차감 금액</label>
 												</div>
@@ -422,7 +422,7 @@
 
 											<div class="row justify-content-between mb-1 mb-md-0 d-flex align-items-center lh-1  border-top pt-3">
 												<div class="col-auto">
-													<label class="form-check-label mb-2 mb-md-0 fs-9 me-2 line-clamp-1 text-body cursor-pointer"> - 출금 계좌 정보</label>
+													<label class="form-check-label mb-2 mb-md-0 fs-9 me-2 line-clamp-1 text-body cursor-pointer"> - 입금 계좌 정보</label>
 												</div>
 												<div class="col-auto d-flex">
 													<span class="fs-9 mb-2" style=""></span>
@@ -472,7 +472,7 @@
 				<div class="row justify-content-between">
 					<div class="col-auto"></div>
                        <div class="col-auto d-flex">
-                       	<button class="btn btn-primary mb-2 mb-sm-0 mx-1 fs-9" type="submit" onclick="goAct();" >출금하기</button>
+                       	<button class="btn btn-primary mb-2 mb-sm-0 mx-1 fs-9" type="submit" onclick="goAct();" >입금하기</button>
                        </div>
                 </div>
 

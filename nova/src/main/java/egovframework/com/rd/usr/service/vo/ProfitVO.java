@@ -31,6 +31,8 @@ public class ProfitVO extends Sch implements Serializable {
 	private String gubun;
 	//수익금액
 	private int cost;
+	//배달금액
+	private int deliveryCost;
 	//배달건수
 	private int deliveryCnt;
 	//배달일

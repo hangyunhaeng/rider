@@ -29,6 +29,13 @@ function getOnlyNumber(str){
 	 var regex = /[^0-9]/g;
 	 return str.replace(regex, "");
 }
+/**
+ * -포함한 숫자만 반환
+ */
+function getOnlyMNumber(str){
+	 var regex = /[^0-9-]/g;
+	 return str.replace(regex, "");
+}
 
 /**
  * 핸드폰 번호 하이픈 처리
@@ -160,8 +167,24 @@ function currencyFormatter(params) {
         inputDataArr = params.toString().split(".");
     }
 
-    return getOnlyNumber(inputDataArr[0]).replace(/\B(?=(\d{3})+(?!\d))/g, ",")+(inputDataArr[1] != undefined ? "."+inputDataArr[1] : "");
+    return getOnlyMNumber(inputDataArr[0]).replace(/\B(?=(\d{3})+(?!\d))/g, ",")+(inputDataArr[1] != undefined ? "."+inputDataArr[1] : "");
 }
+
+/**
+ * 최소금액 0원
+ */
+function minWon0(num){
+    if (num === null || num === undefined) {
+        return '0'; // null 또는 undefined인 경우 빈 문자열 반환
+    }
+    if (typeof num === 'string' || typeof num === 'number') {
+		if(Number(num.toString(), 10) < 0 ){
+			return 0;
+		}
+	}
+	return num;
+}
+
 
 /**
  * 수수료 퍼센트 검사

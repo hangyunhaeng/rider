@@ -260,34 +260,40 @@ public class DtyServiceImpl extends EgovAbstractServiceImpl implements DtyServic
 
     		//수익 등록(콜수수료)
     		ProfitVO fitVo = new ProfitVO();
-    		fitVo.setProfitId(egovFitIdGnrService.getNextStringId());
-    		fitVo.setCooperatorId(one.getCooperatorId());//협력사
-    		fitVo.setMberId(one.getMberId());			//라이더ID
-    		fitVo.setGubun("C");						//콜수수료
-    		fitVo.setCost(one.getFeeCallCost()-one.getFeeCooperatorCallCost()); 		//금액
-    		fitVo.setDeliveryCnt(one.getDeliveryCnt());	//배달건수
-    		fitVo.setDeliveryDay(one.getDay());			//배달일
-    		fitVo.setDypId(one.getDypId());				//DYP_ID
-    		fitVo.setFeeId(one.getFeeId());				//FEE_ID
-    		fitVo.setRiderFeeId(one.getRiderFeeId());	//RIDER_FEE_ID
-    		fitVo.setCreatId(user.getId());
-    		dtyDAO.insertProfit(fitVo);
+    		if(one.getFeeCallCost()-one.getFeeCooperatorCallCost() > 0) {
+	    		fitVo.setProfitId(egovFitIdGnrService.getNextStringId());
+	    		fitVo.setCooperatorId(one.getCooperatorId());//협력사
+	    		fitVo.setMberId(one.getMberId());			//라이더ID
+	    		fitVo.setGubun("C");						//콜수수료
+	    		fitVo.setCost(one.getFeeCallCost()-one.getFeeCooperatorCallCost()); 		//금액
+	    		fitVo.setDeliveryCost(one.getDeliveryPrice());	//배달비
+	    		fitVo.setDeliveryCnt(one.getDeliveryCnt());	//배달건수
+	    		fitVo.setDeliveryDay(one.getDay());			//배달일
+	    		fitVo.setDypId(one.getDypId());				//DYP_ID
+	    		fitVo.setFeeId(one.getFeeId());				//FEE_ID
+	    		fitVo.setRiderFeeId(one.getRiderFeeId());	//RIDER_FEE_ID
+	    		fitVo.setCreatId(user.getId());
+	    		dtyDAO.insertProfit(fitVo);
+    		}
 
     		//협력사 수익등록(콜수수료)
-    		ProfitVO citVo = new ProfitVO();
-    		citVo.setCoofitId(egovCitIdGnrService.getNextStringId());
-    		citVo.setProfitId(fitVo.getProfitId());
-    		citVo.setCooperatorId(one.getCooperatorId());//협력사
-    		citVo.setMberId(one.getMberId());			//라이더ID
-    		citVo.setGubun("C");						//콜수수료
-    		citVo.setCost(one.getFeeCooperatorCallCost());//금액
-    		citVo.setDeliveryCnt(one.getDeliveryCnt());	//배달건수
-    		citVo.setDeliveryDay(one.getDay());			//배달일
-    		citVo.setDypId(one.getDypId());				//DYP_ID
-    		citVo.setFeeId(one.getFeeId());				//FEE_ID
-    		citVo.setRiderFeeId(one.getRiderFeeId());	//RIDER_FEE_ID
-    		citVo.setCreatId(user.getId());
-    		dtyDAO.insertCooperatorProfit(citVo);
+    		if(one.getFeeCooperatorCallCost() > 0) {
+	    		ProfitVO citVo = new ProfitVO();
+	    		citVo.setCoofitId(egovCitIdGnrService.getNextStringId());
+	    		citVo.setProfitId(fitVo.getProfitId());
+	    		citVo.setCooperatorId(one.getCooperatorId());//협력사
+	    		citVo.setMberId(one.getMberId());			//라이더ID
+	    		citVo.setGubun("C");						//콜수수료
+	    		citVo.setCost(one.getFeeCooperatorCallCost());//금액
+	    		citVo.setDeliveryCost(one.getDeliveryPrice());	//배달비
+	    		citVo.setDeliveryCnt(one.getDeliveryCnt());	//배달건수
+	    		citVo.setDeliveryDay(one.getDay());			//배달일
+	    		citVo.setDypId(one.getDypId());				//DYP_ID
+	    		citVo.setFeeId(one.getFeeId());				//FEE_ID
+	    		citVo.setRiderFeeId(one.getRiderFeeId());	//RIDER_FEE_ID
+	    		citVo.setCreatId(user.getId());
+	    		dtyDAO.insertCooperatorProfit(citVo);
+    		}
 
     	}
 
@@ -326,21 +332,21 @@ public class DtyServiceImpl extends EgovAbstractServiceImpl implements DtyServic
 	    			dtyDAO.finishEtc(one);
 
 
-	        		//수익 등록(기타수수료)
-	        		ProfitVO fitVo = new ProfitVO();
-	        		fitVo.setProfitId(egovFitIdGnrService.getNextStringId());
-	        		fitVo.setCooperatorId(one.getCooperatorId());//협력사
-	        		fitVo.setMberId(one.getMberId());			//라이더ID
-	        		fitVo.setGubun("E");						//기타수수료
-	        		fitVo.setCost(0); 		//금액
-	        		fitVo.setWkpId(insertVo.getWkpId());		//WKP_ID
-	        		fitVo.setCreatId(user.getId());
-	        		dtyDAO.insertProfit(fitVo);
+	        		//수익 등록(기타수수료) 운영사는 기타수수료가 발생하지 않음
+//	        		ProfitVO fitVo = new ProfitVO();
+//	        		fitVo.setProfitId(egovFitIdGnrService.getNextStringId());
+//	        		fitVo.setCooperatorId(one.getCooperatorId());//협력사
+//	        		fitVo.setMberId(one.getMberId());			//라이더ID
+//	        		fitVo.setGubun("E");						//기타수수료
+//	        		fitVo.setCost(0); 		//금액
+//	        		fitVo.setWkpId(insertVo.getWkpId());		//WKP_ID
+//	        		fitVo.setCreatId(user.getId());
+//	        		dtyDAO.insertProfit(fitVo);
 
 	        		//협력사 수익등록(기타수수료)
 	        		ProfitVO citVo = new ProfitVO();
 	        		citVo.setCoofitId(egovCitIdGnrService.getNextStringId());
-	        		citVo.setProfitId(fitVo.getProfitId());
+	        		citVo.setProfitId(egovFitIdGnrService.getNextStringId());
 	        		citVo.setCooperatorId(one.getCooperatorId());//협력사
 	        		citVo.setMberId(one.getMberId());			//라이더ID
 	        		citVo.setGubun("E");						//기타수수료
@@ -385,23 +391,23 @@ public class DtyServiceImpl extends EgovAbstractServiceImpl implements DtyServic
 
 
 
-	        		//수익 등록(기타수수료)
-	        		ProfitVO fitVo = new ProfitVO();
-	        		fitVo.setProfitId(egovFitIdGnrService.getNextStringId());
-	        		fitVo.setCooperatorId(one.getCooperatorId());//협력사
-	        		fitVo.setMberId(one.getMberId());			//라이더ID
-	        		fitVo.setGubun("E");						//기타수수료
-	        		fitVo.setCost(0); 		//금액
-	        		fitVo.setDypId(insertVo.getDypId());				//DYP_ID
-	        		fitVo.setFeeId(resultFee.getFeeId());				//FEE_ID
-	        		fitVo.setRiderFeeId(resultFee.getRiderFeeId());	//RIDER_FEE_ID
-	        		fitVo.setCreatId(user.getId());
-	        		dtyDAO.insertProfit(fitVo);
+	        		//수익 등록(기타수수료) 운영사는 기타수수료가 발생하지 않음
+//	        		ProfitVO fitVo = new ProfitVO();
+//	        		fitVo.setProfitId(egovFitIdGnrService.getNextStringId());
+//	        		fitVo.setCooperatorId(one.getCooperatorId());//협력사
+//	        		fitVo.setMberId(one.getMberId());			//라이더ID
+//	        		fitVo.setGubun("E");						//기타수수료
+//	        		fitVo.setCost(0); 		//금액
+//	        		fitVo.setDypId(insertVo.getDypId());				//DYP_ID
+//	        		fitVo.setFeeId(resultFee.getFeeId());				//FEE_ID
+//	        		fitVo.setRiderFeeId(resultFee.getRiderFeeId());	//RIDER_FEE_ID
+//	        		fitVo.setCreatId(user.getId());
+//	        		dtyDAO.insertProfit(fitVo);
 
 	        		//협력사 수익등록(기타수수료)
 	        		ProfitVO citVo = new ProfitVO();
 	        		citVo.setCoofitId(egovCitIdGnrService.getNextStringId());
-	        		citVo.setProfitId(fitVo.getProfitId());
+	        		citVo.setProfitId(egovFitIdGnrService.getNextStringId());
 	        		citVo.setCooperatorId(one.getCooperatorId());//협력사
 	        		citVo.setMberId(one.getMberId());			//라이더ID
 	        		citVo.setGubun("E");						//기타수수료

@@ -233,13 +233,13 @@
 		  <li><a href="${pageContext.request.contextPath}/gnr/not0001.do">공지사항</a></li>
 		  <li><a href="${pageContext.request.contextPath}/gnr/inq0001.do">1:1문의</a></li>
 		  <li><a href="${pageContext.request.contextPath}/gnr/pay0004.do">대여.리스</a></li>
-          <li class="dropdown"><a href="#"><span>출금</span> <i class="bi bi-chevron-down toggle-dropdown"></i></a>
+          <li class="dropdown"><a href="#"><span>입금</span> <i class="bi bi-chevron-down toggle-dropdown"></i></a>
             <ul>
-              <li><a href="${pageContext.request.contextPath}/gnr/rot0003.do?gubun=DAY">선정산 배달비</a></li>
+              <li><a href="${pageContext.request.contextPath}/gnr/rot0003.do?gubun=DAY">선지급 배달비</a></li>
               <li><a href="${pageContext.request.contextPath}/gnr/rot0003.do?gubun=WEK">확정 배달비</a></li>
             </ul>
           </li>
-          <li><a href="${pageContext.request.contextPath}/gnr/pay0003.do">출금 내역</a></li>
+          <li><a href="${pageContext.request.contextPath}/gnr/pay0003.do">입금 내역</a></li>
           <li><a href="${pageContext.request.contextPath}/gnr/pay0002.do">배달 정보 조회</a></li>
           <li><a href="${pageContext.request.contextPath}/gnr/rot0002.do">내정보관리</a></li>
         </ul>
@@ -285,7 +285,7 @@
                       <h3 class="text-body-emphasis">협력사</h3>
                     </div>
                        <div class="col-auto d-flex">
-<!--                        	<button class="btn btn-primary mb-2 mb-sm-0 mx-1 fs-9" type="submit" onclick="go선출금();">출금</button> -->
+<!--                        	<button class="btn btn-primary mb-2 mb-sm-0 mx-1 fs-9" type="submit" onclick="go선출금();">입금</button> -->
                        </div>
                   </div>
                 </div>
@@ -343,10 +343,10 @@
                 <div class="card-header border-bottom-0 pb-0">
                   <div class="row justify-content-between align-items-center mb-2">
                     <div class="col-auto">
-                      <h3 class="text-body-emphasis">선정산 배달비</h3>
+                      <h3 class="text-body-emphasis">선지급 배달비</h3>
                     </div>
                        <div class="col-auto d-flex">
-                       	<button class="btn btn-primary mb-2 mb-sm-0 mx-1 fs-9" type="submit" onclick="go선출금();">출금</button>
+                       	<button class="btn btn-primary mb-2 mb-sm-0 mx-1 fs-9" type="submit" onclick="go선출금();">입금</button>
                        </div>
                   </div>
                 </div>
@@ -362,7 +362,7 @@
 
 											<div class="row justify-content-between mb-1 mb-md-0 d-flex align-items-center lh-1">
 												<div class="col-auto">
-													<label class="form-check-label mb-2 mb-md-0 fs-9 me-2 line-clamp-1 text-body cursor-pointer">선출금수수료1.1% & 보험료 반영</label>
+													<label class="form-check-label mb-2 mb-md-0 fs-9 me-2 line-clamp-1 text-body cursor-pointer">선지급수수료1.1% & 보험료 반영</label>
 												</div>
 												<div class="col-auto d-flex">
 													<span class="fs-9 mb-2" style=""></span>
@@ -397,7 +397,7 @@
                       <h3 class="text-body-emphasis">확정 배달비</h3>
                     </div>
                        <div class="col-auto d-flex">
-                       	<button class="btn btn-primary mb-2 mb-sm-0 mx-1 fs-9" type="submit" onclick="go출금()">출금</button>
+                       	<button class="btn btn-primary mb-2 mb-sm-0 mx-1 fs-9" type="submit" onclick="go출금()">입금</button>
                        </div>
                   </div>
                 </div>
@@ -439,7 +439,7 @@
 <!-- 				<div class="row justify-content-between"> -->
 <!-- 					<div class="col-auto"></div> -->
 <!--                        <div class="col-auto d-flex"> -->
-<!--                        	<button class="btn btn-primary mb-2 mb-sm-0 mx-1 fs-9" type="submit" onclick="go출금()">출금</button> -->
+<!--                        	<button class="btn btn-primary mb-2 mb-sm-0 mx-1 fs-9" type="submit" onclick="go출금()">입금</button> -->
 <!--                        </div> -->
 <!--                 </div> -->
 
