@@ -230,7 +230,7 @@
 	</select>
 	<select id="selectWeekPay" parameterType="egovframework.com.rd.usr.service.vo.WeekInfoVO" resultType="egovframework.com.rd.usr.service.vo.WeekPayVO">
 		SELECT a.WEEK_ID, a.COOPERATOR_ID, b.MBER_ID, 'WEK' AS DW_GUBUN, '1' AS IO_GUBUN, b.GIVE_PAY
-		,b.GIVE_PAY - c.CALL_FEE_COST AS ABLE_PRICE, C.CALL_FEE_COST
+		,b.GIVE_PAY - c.CALL_FEE_COST AS ABLE_PRICE, c.CALL_FEE_COST
 		, 0 AS FEE, #{accountsStDt} AS ACCOUNTS_ST_DT, #{accountsEdDt} AS ACCOUNTS_ED_DT, #{atchFileId} AS ATCH_FILE_ID, 'Y' AS USE_AT
 		FROM RD_WEEK_INFO a
 			LEFT JOIN RD_WEEK_RIDER_INFO b on a.WEEK_ID = b.week_id
