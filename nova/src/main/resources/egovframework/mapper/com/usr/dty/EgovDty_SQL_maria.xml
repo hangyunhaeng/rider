@@ -228,6 +228,28 @@
 		GROUP BY a.cooperator_id
 		</if>
 	</select>
+	<select id="selectWeekPay" parameterType="egovframework.com.rd.usr.service.vo.WeekInfoVO" resultType="egovframework.com.rd.usr.service.vo.WeekPayVO">
+		SELECT a.WEEK_ID, a.COOPERATOR_ID, b.MBER_ID, 'WEK' AS DW_GUBUN, '1' AS IO_GUBUN, b.GIVE_PAY
+		,b.GIVE_PAY - c.CALL_FEE_COST AS ABLE_PRICE, C.CALL_FEE_COST
+		, 0 AS FEE, #{accountsStDt} AS ACCOUNTS_ST_DT, #{accountsEdDt} AS ACCOUNTS_ED_DT, #{atchFileId} AS ATCH_FILE_ID, 'Y' AS USE_AT
+		FROM RD_WEEK_INFO a
+			LEFT JOIN RD_WEEK_RIDER_INFO b on a.WEEK_ID = b.week_id
+			LEFT JOIN (
+				SELECT a.COOPERATOR_ID, a.mber_id, nvl(b.COST, 0)+ nvl(c.COST, 0) AS CALL_FEE_COST
+					FROM RD_DAY_PAY a
+					LEFT JOIN RD_PROFIT b ON a.COOPERATOR_ID = b.COOPERATOR_ID AND a.mber_id = b.MBER_ID AND b.gubun ='C' AND a.DYP_ID = b.DYP_ID
+					LEFT JOIN RD_COOPERATOR_PROFIT c ON a.COOPERATOR_ID = c.COOPERATOR_ID AND a.mber_id = c.MBER_ID AND c.gubun ='C' AND a.DYP_ID = c.DYP_ID
+
+						WHERE 1=1
+						AND a.WEEK_YN = 'N'
+						AND a.USE_AT ='Y'
+						AND a.IO_GUBUN = '1'
+						AND a.COOPERATOR_ID = #{cooperatorId}
+						AND a.DAY BETWEEN #{accountsStDt} AND #{accountsEdDt}
+				GROUP BY a.COOPERATOR_ID, a.mber_id
+			) c ON a.COOPERATOR_ID = c.COOPERATOR_ID AND b.MBER_ID = c.MBER_ID
+		WHERE a.ATCH_FILE_ID = #{atchFileId}
+	</select>
 
 	<insert id="insertWeekPay" parameterType="egovframework.com.rd.usr.service.vo.WeekPayVO">
 		INSERT INTO RD_WEEK_PAY
@@ -323,7 +345,7 @@
 	<update id="updateDayPayWeekConfirm" parameterType="egovframework.com.rd.usr.service.vo.WeekInfoVO">
 		UPDATE RD_DAY_PAY
 		SET WEEK_YN ='Y'
-		, WEK_ATCH_FILE_ID = #{wekAtchFileId}
+		, WEK_ATCH_FILE_ID = #{atchFileId}
 		, WEEK_ID = #{weekId}
 		,LAST_UPDT_PNTTM = SYSDATE()
 		, LAST_UPDUSR_ID = #{lastUpdusrId}
@@ -336,7 +358,7 @@
 	<update id="updateDayPayWeekConfirm2" parameterType="egovframework.com.rd.usr.service.vo.WeekInfoVO">
 		UPDATE RD_DAY_PAY
 		SET WEEK_YN ='Y'
-		, WEK_ATCH_FILE_ID = #{wekAtchFileId}
+		, WEK_ATCH_FILE_ID = #{atchFileId}
 		, WEEK_ID = #{weekId}
 		,LAST_UPDT_PNTTM = SYSDATE()
 		, LAST_UPDUSR_ID = #{lastUpdusrId}

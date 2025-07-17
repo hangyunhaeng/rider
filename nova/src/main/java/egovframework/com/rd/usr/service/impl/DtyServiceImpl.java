@@ -959,7 +959,7 @@ public class DtyServiceImpl extends EgovAbstractServiceImpl implements DtyServic
 		LoginVO user = (LoginVO)EgovUserDetailsHelper.getAuthenticatedUser();
 
 		List<WeekRiderInfoVO> insertData = new ArrayList<WeekRiderInfoVO>();
-		List<WeekPayVO> insertPayData = new ArrayList<WeekPayVO>();
+//		List<WeekPayVO> insertPayData = new ArrayList<WeekPayVO>();
 		if(weekGapji== null || weekGapji.size() != 1 ) {
 			throw new IllegalArgumentException("갑지 정산 데이터가 없거나 1개 협력사가 아닙니다.") ;
 		}
@@ -1064,26 +1064,30 @@ public class DtyServiceImpl extends EgovAbstractServiceImpl implements DtyServic
 
 			insertMber(insertVO.getMberId(), insertVO.getMberNm(), weekGapjiOne.getCooperatorId(), user);
 
-			//주정산 입금 이력 데이터 세팅
-			WeekPayVO weekPayVO = new WeekPayVO();
-			weekPayVO.setWkpId(egovWkpIdGnrService.getNextStringId());
-			weekPayVO.setCooperatorId(weekGapjiOne.getCooperatorId());
-			weekPayVO.setMberId(insertVO.getMberId());
-			weekPayVO.setDwGubun("WEK");
-			weekPayVO.setIoGubun("1");		//입금
-			weekPayVO.setAblePrice(insertVO.getGivePay());
-			weekPayVO.setAccountsStDt(weekGapjiOne.getAccountsStDt());
-			weekPayVO.setAccountsEdDt(weekGapjiOne.getAccountsEdDt());
-			weekPayVO.setAtchFileId(weekGapjiOne.getAtchFileId());
-			weekPayVO.setWeekId(weekGapjiOne.getWeekId());
-			weekPayVO.setUseAt("Y");
-			weekPayVO.setCreatId(user.getId());
-			insertPayData.add(weekPayVO);
+//			//주정산 입금 이력 데이터 세팅
+//			WeekPayVO weekPayVO = new WeekPayVO();
+//			weekPayVO.setWkpId(egovWkpIdGnrService.getNextStringId());
+//			weekPayVO.setCooperatorId(weekGapjiOne.getCooperatorId());
+//			weekPayVO.setMberId(insertVO.getMberId());
+//			weekPayVO.setDwGubun("WEK");
+//			weekPayVO.setIoGubun("1");		//입금
+//			weekPayVO.setAblePrice(insertVO.getGivePay());
+//			weekPayVO.setAccountsStDt(weekGapjiOne.getAccountsStDt());
+//			weekPayVO.setAccountsEdDt(weekGapjiOne.getAccountsEdDt());
+//			weekPayVO.setAtchFileId(weekGapjiOne.getAtchFileId());
+//			weekPayVO.setWeekId(weekGapjiOne.getWeekId());
+//			weekPayVO.setUseAt("Y");
+//			weekPayVO.setCreatId(user.getId());
+//			insertPayData.add(weekPayVO);
 		}
 
+		List<WeekPayVO> weekPayList = dtyDAO.selectWeekPay(weekGapjiOne);
 		//주정산 입금 이력 데이터를 DB에 isnert
-		for(int i = 0 ; i < insertPayData.size() ; i++) {
-			dtyDAO.insertWeekPay(insertPayData.get(i));
+		for(int i = 0 ; i < weekPayList.size() ; i++) {
+			WeekPayVO one = weekPayList.get(i);
+			one.setWkpId(egovWkpIdGnrService.getNextStringId());
+			one.setCreatId(user.getId());
+			dtyDAO.insertWeekPay(one);
 		}
 		//일정산 입금이력을 정산 완료로 세팅 -- 협력사아이디, 기간으로 (TODO - 정합성체크 - 금액은 체크 않하나?)
 		weekGapjiOne.setLastUpdusrId(user.getId());

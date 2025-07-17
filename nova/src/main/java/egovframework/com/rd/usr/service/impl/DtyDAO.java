@@ -123,7 +123,15 @@ public class DtyDAO extends EgovComAbstractDAO {
 	public List<SearchKeyVO> selectCooperatorList(WeekInfoVO vo) throws Exception {
 		return selectList("dtyDAO.selectCooperatorList", vo);
 	}
-
+	/**
+	 * 주정산 가능금액 계산
+	 * @param vo
+	 * @return
+	 * @throws Exception
+	 */
+	public List<WeekPayVO> selectWeekPay(WeekInfoVO vo) throws Exception {
+		return selectList("dtyDAO.selectWeekPay", vo);
+	}
 	/**
 	 * 주정산 입출금 insert
 	 * @param vo
