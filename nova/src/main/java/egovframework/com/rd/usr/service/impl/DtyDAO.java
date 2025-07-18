@@ -328,5 +328,24 @@ public class DtyDAO extends EgovComAbstractDAO {
 		return update("dtyDAO.insertCooperatorProfit", vo);
 	}
 
+	/**
+	 * 라이더 입금 실패서 선지급 수수료 삭제(운영사)
+	 * @param vo
+	 * @return
+	 * @throws Exception
+	 */
+	public int deleteProfit(DoszTransferVO vo) throws Exception {
+		return update("dtyDAO.deleteProfit", vo);
+	}
+	/**
+	 * 라이더 입금 실패서 선지급 수수료 삭제(협력사)
+	 * @param vo
+	 * @return
+	 * @throws Exception
+	 */
+	public int deleteCooperatorProfit(DoszTransferVO vo) throws Exception {
+		return update("dtyDAO.deleteCooperatorProfit", vo);
+	}
+
 }
 

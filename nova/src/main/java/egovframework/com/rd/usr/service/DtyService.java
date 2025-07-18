@@ -208,7 +208,7 @@ public interface DtyService {
 	 * @return
 	 * @throws Exception
 	 */
-	public int updateDayPayByTransfer(DoszTransferVO vo) throws Exception ;
+	public void updateDayPayByTransfer(DoszTransferVO vo) throws Exception ;
 
 	/**
 	 * 출금 실행된 주정산 입출금 출금건 use_at n로 세팅

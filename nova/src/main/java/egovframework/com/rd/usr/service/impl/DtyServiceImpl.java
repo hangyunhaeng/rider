@@ -1970,8 +1970,10 @@ public class DtyServiceImpl extends EgovAbstractServiceImpl implements DtyServic
 	 * @return
 	 * @throws Exception
 	 */
-	public int updateDayPayByTransfer(DoszTransferVO vo) throws Exception {
-		return dtyDAO.updateDayPayByTransfer(vo);
+	public void updateDayPayByTransfer(DoszTransferVO vo) throws Exception {
+		dtyDAO.updateDayPayByTransfer(vo);
+		dtyDAO.deleteProfit(vo);
+		dtyDAO.deleteCooperatorProfit(vo);
 	}
 
 	/**

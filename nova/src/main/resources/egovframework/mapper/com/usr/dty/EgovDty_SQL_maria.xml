@@ -235,7 +235,7 @@
 		FROM RD_WEEK_INFO a
 			LEFT JOIN RD_WEEK_RIDER_INFO b on a.WEEK_ID = b.week_id
 			LEFT JOIN (
-				SELECT a.COOPERATOR_ID, a.mber_id, nvl(b.COST, 0)+ nvl(c.COST, 0) AS CALL_FEE_COST
+				SELECT a.COOPERATOR_ID, a.mber_id, SUM(nvl(b.COST, 0)+ nvl(c.COST, 0)) AS CALL_FEE_COST
 					FROM RD_DAY_PAY a
 					LEFT JOIN RD_PROFIT b ON a.COOPERATOR_ID = b.COOPERATOR_ID AND a.mber_id = b.MBER_ID AND b.gubun ='C' AND a.DYP_ID = b.DYP_ID
 					LEFT JOIN RD_COOPERATOR_PROFIT c ON a.COOPERATOR_ID = c.COOPERATOR_ID AND a.mber_id = c.MBER_ID AND c.gubun ='C' AND a.DYP_ID = c.DYP_ID
@@ -555,5 +555,24 @@
 		(COOFIT_ID, PROFIT_ID, COOPERATOR_ID, MBER_ID, GUBUN, COST, DELIVERY_COST, DELIVERY_CNT, DELIVERY_DAY, DYP_ID, FEE_ID, RIDER_FEE_ID, CREAT_DT, CREAT_ID)
 		VALUES(#{coofitId}, #{profitId}, #{cooperatorId}, #{mberId}, #{gubun}, #{cost}, #{deliveryCost}, #{deliveryCnt}, #{deliveryDay}, #{dypId}, #{feeId}, #{riderFeeId}, SYSDATE(), #{creatId})
 	</insert>
+
+	<update id="deleteProfit" parameterType="egovframework.com.rd.usr.service.vo.DoszTransferVO">
+		UPDATE RD_PROFIT
+		SET USE_AT ='N'
+		WHERE PROFIT_ID IN (
+			SELECT b.PROFIT_ID FROM RD_DAY_PAY a
+			LEFT JOIN RD_PROFIT b ON a.DYP_ID = b.DYP_ID AND b.GUBUN = 'D' AND b.USE_AT ='Y'
+			WHERE TRAN_DAY = #{tranDay} AND TELEGRAM_NO = #{telegram_no}
+		)
+	</update>
+	<update id="deleteCooperatorProfit" parameterType="egovframework.com.rd.usr.service.vo.DoszTransferVO">
+		UPDATE RD_COOPERATOR_PROFIT
+		SET USE_AT ='N'
+		WHERE PROFIT_ID IN (
+			SELECT b.PROFIT_ID FROM RD_DAY_PAY a
+			LEFT JOIN RD_COOPERATOR_PROFIT b ON a.DYP_ID = b.DYP_ID AND b.GUBUN = 'D' AND b.use_at ='Y'
+			WHERE TRAN_DAY = #{tranDay} AND TELEGRAM_NO = #{telegram_no}
+		)
+	</update>
 
 </mapper>

@@ -479,7 +479,9 @@ public class EgovRotController {
             		// 배치에서 재처리
             	} else if("400".equals(tranResult.getStatus()) && "0011".equals(tranResult.getErrorCode())) {	//처리중
             		// 배치에서 재처리
-            	}else if("200".equals(tranResult.getStatus()) ){	//성공
+            	} else if("999".equals(tranResult.getStatus())) {	//커넥센실패
+            		// 배치에서 재처리
+            	} else if("200".equals(tranResult.getStatus()) ){	//성공
 
             	} else {
                 	dtyService.updateDayPayByTransfer(tranResult);	//실패 확정시 거래내역 삭제
@@ -559,7 +561,9 @@ public class EgovRotController {
             		// 배치에서 재처리
             	} else if("400".equals(tranResult.getStatus()) && "0011".equals(tranResult.getErrorCode())) {	//처리중
             		// 배치에서 재처리
-            	}else if("200".equals(tranResult.getStatus()) ){	//성공
+            	} else if("999".equals(tranResult.getStatus())) {	//커넥센실패
+            		// 배치에서 재처리
+            	} else if("200".equals(tranResult.getStatus()) ){	//성공
 
             	} else {
                 	dtyService.updateWeekPayByTransfer(tranResult);	//실패 확정시 거래내역 삭제
