@@ -221,7 +221,7 @@ public class Transfer extends EgovAbstractServiceImpl {
         } catch (Exception e) {
             e.printStackTrace();
         	return "{\n"
-	        + "    \"status\": \"999 \",\n"
+	        + "    \"status\": \"999\",\n"
 	        + "    \"error_code\": \"\",\n"
 	        + "    \"error_message\": \"\",\n"
 

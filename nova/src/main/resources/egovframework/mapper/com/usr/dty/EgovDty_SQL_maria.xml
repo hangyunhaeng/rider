@@ -305,9 +305,9 @@
 	</select>
 	<insert id="insertDayPay" parameterType="egovframework.com.rd.usr.service.vo.DayPayVO">
 		INSERT INTO RD_DAY_PAY
-		(DYP_ID, COOPERATOR_ID,MBER_ID, DAY, IO_GUBUN, DELIVERY_PRICE, DAY_FEE, INSURANCE, SEND_FEE, ABLE_PRICE, SEND_PRICE, WEEK_YN
+		(DYP_ID, COOPERATOR_ID,MBER_ID, DAY, IO_GUBUN, DELIVERY_PRICE, DELIVERY_CNT, DAY_FEE, INSURANCE, SEND_FEE, ABLE_PRICE, SEND_PRICE, WEEK_YN
 		, DAY_ATCH_FILE_ID, WEK_ATCH_FILE_ID, WEEK_ID, TRAN_DAY, TELEGRAM_NO, USE_AT, CREAT_DT, CREAT_ID, ETC_ID)
-		VALUES(#{dypId}, #{cooperatorId}, #{mberId}, #{day}, #{ioGubun}, #{deliveryPrice}, #{dayFee}, #{insurance}, #{sendFee}, #{ablePrice}, #{sendPrice}, #{weekYn}
+		VALUES(#{dypId}, #{cooperatorId}, #{mberId}, #{day}, #{ioGubun}, #{deliveryPrice}, #{deliveryCnt}, #{dayFee}, #{insurance}, #{sendFee}, #{ablePrice}, #{sendPrice}, #{weekYn}
 		, #{dayAtchFileId}, #{wekAtchFileId}, #{weekId}, #{tranDay}, #{telegramNo}, #{useAt}, SYSDATE(), #{creatId}, #{etcId})
 	</insert>
 
@@ -320,12 +320,12 @@
 
 	<select id="selectRiderDayPayList" parameterType="egovframework.com.rd.usr.service.vo.DayPayVO" resultType="egovframework.com.rd.usr.service.vo.DayPayVO">
 
-		SELECT MBER_ID, DAY, SUM(DELIVERY_PRICE) AS DELIVERY_PRICE, SUM(DAY_FEE)  AS DAY_FEE
+		/*SELECT MBER_ID, DAY, SUM(DELIVERY_PRICE) AS DELIVERY_PRICE, SUM(DAY_FEE)  AS DAY_FEE
 		, SUM(INSURANCE) AS INSURANCE, SUM(ABLE_PRICE) AS ABLE_PRICE, WEEK_YN, MBER_NM
 
-		FROM (
+		FROM (*/
 			/* 입금액 */
-			SELECT A.MBER_ID, A.DAY, A.DELIVERY_PRICE, A.DAY_FEE, A.INSURANCE, A.ABLE_PRICE, A.WEEK_YN, B.MBER_NM, A.ETC_ID
+			SELECT A.MBER_ID, A.DAY, A.DELIVERY_PRICE, A.DAY_FEE, A.INSURANCE, A.ABLE_PRICE, A.WEEK_YN, B.MBER_NM, A.ETC_ID, a.DELIVERY_CNT
 			FROM RD_DAY_PAY A
 			LEFT JOIN COMTNGNRLMBER B ON A.MBER_ID = B.MBER_ID
 			WHERE A.MBER_ID = #{mberId} AND A.IO_GUBUN ='1' AND A.USE_AT ='Y'
@@ -334,13 +334,13 @@
 			UNION all
 
 			/* 대여금 */
-			SELECT A.MBER_ID, A.DAY, nvl(A.DELIVERY_PRICE, 0) AS DELIVERY_PRICE, nvl(send_price,0) AS DAY_FEE, nvl(A.INSURANCE,0) AS INSURANCE, nvl(send_price,0)*-1 AS ABLE_PRICE, A.WEEK_YN, B.MBER_NM, A.ETC_ID
+			SELECT A.MBER_ID, A.DAY, nvl(A.DELIVERY_PRICE, 0) AS DELIVERY_PRICE, nvl(send_price,0) AS DAY_FEE, nvl(A.INSURANCE,0) AS INSURANCE, nvl(send_price,0)*-1 AS ABLE_PRICE, A.WEEK_YN, B.MBER_NM, A.ETC_ID, a.DELIVERY_CNT
 			FROM RD_DAY_PAY A
 			LEFT JOIN COMTNGNRLMBER B ON A.MBER_ID = B.MBER_ID
 			WHERE A.MBER_ID = #{mberId} AND A.IO_GUBUN ='2' AND etc_id is NOT NULL AND A.USE_AT ='Y'
 			AND A.DAY BETWEEN #{searchFromDate} AND #{searchToDate}
-		) tab
-		GROUP BY MBER_ID, DAY, WEEK_YN
+		/*) tab
+		GROUP BY MBER_ID, DAY, WEEK_YN*/
 	</select>
 	<update id="updateDayPayWeekConfirm" parameterType="egovframework.com.rd.usr.service.vo.WeekInfoVO">
 		UPDATE RD_DAY_PAY
@@ -453,7 +453,8 @@
 			, b.SEND_DT, b.SEND_TM, b.CREAT_DT, b.error_message
 			FROM RD_DAY_PAY a
 			LEFT JOIN RD_TRANSFER b ON a.TRAN_DAY = b.TRAN_DAY AND a.TELEGRAM_NO = b.TELEGRAM_NO
-			WHERE week_yn ='N'
+			WHERE a.USE_AT ='Y'
+				AND week_yn ='N'
 				AND IO_GUBUN ='2'
 				AND COOPERATOR_ID = #{searchCooperatorId}
 				AND a.ETC_ID IS null	/*대출 제외*/
@@ -464,7 +465,7 @@
 
 			SELECT COOPERATOR_ID, DW_GUBUN, if(DW_GUBUN='DAY', '선지급', '정산') AS GUBUN, WKP_ID AS ID, a.SEND_PRICE, a.FEE
 			, b.TRAN_DAY , b.RV_ACCOUNT, b.STATUS, b.STATUS_cd, b.error_code
-			, case when b.STATUS='200' then '이체' when b.STATUS= '400' AND b.error_code='VTIM' then '처리중' when b.STATUS= '400' AND b.error_code='0011' then '처리중' ELSE '실패' end  AS STATUS_NM
+			, case when b.STATUS='200' then '이체' when b.STATUS= '999' then '처리중' when b.STATUS= '400' AND b.error_code='VTIM' then '처리중' when b.STATUS= '400' AND b.error_code='0011' then '처리중' ELSE '실패' end  AS STATUS_NM
 			, b.SEND_DT, b.SEND_TM, b.CREAT_DT, b.error_message
 			FROM RD_WEEK_PAY a
 			LEFT JOIN RD_TRANSFER b ON a.tran_day = b.tran_day AND a.TELEGRAM_NO = b.TELEGRAM_NO
