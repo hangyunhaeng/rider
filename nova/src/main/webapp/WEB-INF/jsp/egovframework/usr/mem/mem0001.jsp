@@ -131,7 +131,7 @@
 		, cellEditor: 'agSelectCellEditor'
 		, cellEditorParams: params => { return {values: ['Y', 'N']}; }
 		, cellClass: (params) => {return agGrideditClass(params)}},
-		{ headerName: "수수료적용일", field: "creatDt", minWidth: 100
+		{ headerName: "등록일", field: "creatDt", minWidth: 100
 	        , valueGetter:(params) => { return getStringDate(params.data.creatDt)}
 	    },
 		{ headerName: "생성자", field: "creatId", minWidth: 90, hide:true},

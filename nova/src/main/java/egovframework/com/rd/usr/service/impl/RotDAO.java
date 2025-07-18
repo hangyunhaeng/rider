@@ -7,6 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Repository;
 
+import egovframework.com.cmm.service.EgovProperties;
 import egovframework.com.cmm.service.impl.EgovComAbstractDAO;
 import egovframework.com.rd.usr.service.vo.DayPayVO;
 import egovframework.com.rd.usr.service.vo.MyInfoVO;
@@ -44,8 +45,11 @@ public class RotDAO extends EgovComAbstractDAO {
 	public MyInfoVO selectMyInfo(MyInfoVO vo) throws Exception {
 		if("GNR".equals(vo.getSchUserSe()))
 			return selectOne("rotDAO.selectMyInfo", vo);
-		else if("USR".equals(vo.getSchUserSe()))
+		else if("USR".equals(vo.getSchUserSe())) {
+			vo.setAccountNum(EgovProperties.getProperty("Globals.acc"));
+			vo.setBnkCd(EgovProperties.getProperty("Globals.bnkCd"));
 			return selectOne("rotDAO.selectMyInfo2", vo);
+		}
 		return null;
 	}
 

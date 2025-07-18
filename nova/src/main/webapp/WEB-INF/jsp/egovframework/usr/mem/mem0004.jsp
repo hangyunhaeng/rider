@@ -74,6 +74,9 @@
 		$('#strMbtlnum').html(addHyphenToPhoneNumber("${myInfoVO.mbtlnum}"));
 		$('#mbtlnum').val(addHyphenToPhoneNumber("${myInfoVO.mbtlnum}"));
 
+		if('${loginVO.authorCode}' =='ROLE_ADMIN'){
+			$('#잔액조회').show();
+		}
 		if("${myInfoVO.authorCode}" == "ROLE_USER") {
 			$('#계좌정보수정버튼').show();
 		}
@@ -227,6 +230,39 @@
 		$('#div기본정보').show();
 	}
 
+	function 잔액조회(){
+
+	    const params = new URLSearchParams();
+
+		// 로딩 시작
+        $('.loading-wrap--js').show();
+	    axios.post('${pageContext.request.contextPath}/usr/mem0004_0004.do', params)
+	        .then(response => {        	// 로딩 종료
+	            $('.loading-wrap--js').hide();
+	        	debugger;
+				if(response.data.resultCode == "success"){
+					if(response.data.doszSchAccoutCostVO.status == "200"){
+						$('#잔액').show();
+					} else {
+						alert(response.data.doszSchAccoutCostVO.errorMessage);
+					}
+				} else {
+	        		if(response.data.resultMsg != null && response.data.resultMsg != ''){
+	        			alert(response.data.resultMsg);
+	        		} else {
+	        			alert("저장에 실패하였습니다");
+	        		}
+				}
+	        })
+	        .catch(function(error) {
+	            console.error('There was an error fetching the data:', error);
+	        }).finally(function() {
+	        	// 로딩 종료
+	            $('.loading-wrap--js').hide();
+
+	        });
+
+	}
 </script>
 <body class="index-page">
 
@@ -481,6 +517,8 @@
 						<th>계좌번호</th>
 						<td>
 							<sm>${myInfoVO.accountNum}</sm>
+							<button id="잔액조회" onclick="잔액조회()" class="btn btn-primary" style="display:none;">잔액조회</button>
+							<sm id="잔액" style="display:none;">0000원</sm>
 						</td>
 					</tr>
 					<tr>

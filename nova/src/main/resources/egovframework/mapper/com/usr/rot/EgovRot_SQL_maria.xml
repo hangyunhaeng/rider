@@ -20,10 +20,16 @@
 	<select id="selectMyInfo2" parameterType="egovframework.com.rd.usr.service.vo.MyInfoVO" resultType="egovframework.com.rd.usr.service.vo.MyInfoVO">
 			/* 총판 or 협력사 */
 			SELECT emplyr_id AS MBER_ID, user_nm AS MBER_NM, EMAIL_ADRES AS MBER_EMAIL_ADRES
-			, MBTLNUM, b.BNK_CD, b.ACCOUNT_NUM, b.ACCOUNT_NM, c.CD_NM AS BNK_NM, d.AUTHOR_CODE, if(d.AUTHOR_CODE ='ROLE_ADMIN', '운영사', '협력사') AS AUTHOR_CODE_NM
+			, MBTLNUM, b.BNK_CD, if(d.AUTHOR_CODE ='ROLE_ADMIN', #{accountNum}, b.ACCOUNT_NUM) AS ACCOUNT_NUM
+			, b.ACCOUNT_NM, c.CD_NM AS BNK_NM, d.AUTHOR_CODE, if(d.AUTHOR_CODE ='ROLE_ADMIN', '운영사', '협력사') AS AUTHOR_CODE_NM
 			from COMTNEMPLYRINFO usr
 					LEFT JOIN RD_BNK b ON usr.IHIDNUM = b.ESNTL_ID AND b.USE_AT ='Y'
+		<if test="schAuthorCode =='ROLE_ADMIN'">
+					LEFT JOIN RD_CD c ON #{bnkCd} = c.cd AND c.CD_GROUP ='BANK_CD'
+		</if>
+		<if test="schAuthorCode =='ROLE_USER'">
 					LEFT JOIN RD_CD c ON b.bnk_cd = c.cd AND c.CD_GROUP ='BANK_CD'
+		</if>
 					JOIN COMTNEMPLYRSCRTYESTBS d ON usr.ESNTL_ID = d.SCRTY_DTRMN_TRGET_ID
 			WHERE emplyr_id = #{mberId}
 	</select>

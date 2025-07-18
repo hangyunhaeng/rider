@@ -12,6 +12,7 @@ import egovframework.com.cmm.LoginVO;
 import egovframework.com.rd.usr.service.vo.DayPayVO;
 import egovframework.com.rd.usr.service.vo.DeliveryErrorVO;
 import egovframework.com.rd.usr.service.vo.DeliveryInfoVO;
+import egovframework.com.rd.usr.service.vo.DoszSchAccoutCostVO;
 import egovframework.com.rd.usr.service.vo.DoszSchAccoutVO;
 import egovframework.com.rd.usr.service.vo.DoszTransferVO;
 import egovframework.com.rd.usr.service.vo.HistoryVO;
@@ -187,6 +188,12 @@ public interface DtyService {
 	 * @throws Exception
 	 */
 	public DoszSchAccoutVO schAcc(MyInfoVO vo) throws Exception ;
+	/**
+	 * 모계좌잔액조회
+	 * @param vo
+	 * @throws Exception
+	 */
+	public DoszSchAccoutCostVO schAccCost(MyInfoVO vo) throws Exception ;
 	/**
 	 * 출금 내역 조회
 	 * @param vo
