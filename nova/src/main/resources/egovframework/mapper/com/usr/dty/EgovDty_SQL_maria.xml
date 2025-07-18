@@ -237,8 +237,8 @@
 			LEFT JOIN (
 				SELECT a.COOPERATOR_ID, a.mber_id, SUM(nvl(b.COST, 0)+ nvl(c.COST, 0)) AS CALL_FEE_COST
 					FROM RD_DAY_PAY a
-					LEFT JOIN RD_PROFIT b ON a.COOPERATOR_ID = b.COOPERATOR_ID AND a.mber_id = b.MBER_ID AND b.gubun ='C' AND a.DYP_ID = b.DYP_ID
-					LEFT JOIN RD_COOPERATOR_PROFIT c ON a.COOPERATOR_ID = c.COOPERATOR_ID AND a.mber_id = c.MBER_ID AND c.gubun ='C' AND a.DYP_ID = c.DYP_ID
+					LEFT JOIN RD_PROFIT b ON a.COOPERATOR_ID = b.COOPERATOR_ID AND a.mber_id = b.MBER_ID AND b.gubun ='C' AND a.DYP_ID = b.DYP_ID AND b.use_at ='Y'
+					LEFT JOIN RD_COOPERATOR_PROFIT c ON a.COOPERATOR_ID = c.COOPERATOR_ID AND a.mber_id = c.MBER_ID AND c.gubun ='C' AND a.DYP_ID = c.DYP_ID AND c.use_at ='Y'
 
 						WHERE 1=1
 						AND a.WEEK_YN = 'N'
@@ -449,7 +449,7 @@
 		SELECT * FROM(
 			SELECT COOPERATOR_ID,'DAY' AS DW_GUBUN,'선지급' AS GUBUN, DYP_ID AS ID, a.SEND_PRICE, a.DAY_FEE+a.INSURANCE+a.SEND_FEE AS FEE
 			, b.TRAN_DAY , b.RV_ACCOUNT, b.STATUS, b.STATUS_cd, b.error_code
-			, case when b.STATUS='200' then '이체' when b.STATUS= '400' AND b.error_code='VTIM' then '처리중' when b.STATUS= '400' AND b.error_code='0011' then '처리중' ELSE '실패' end  AS STATUS_NM
+			, case when b.STATUS='200' then '이체' when b.STATUS= '999' then '처리중' when b.STATUS= '400' AND b.error_code='VTIM' then '처리중' when b.STATUS= '400' AND b.error_code='0011' then '처리중' ELSE '실패' end  AS STATUS_NM
 			, b.SEND_DT, b.SEND_TM, b.CREAT_DT, b.error_message
 			FROM RD_DAY_PAY a
 			LEFT JOIN RD_TRANSFER b ON a.TRAN_DAY = b.TRAN_DAY AND a.TELEGRAM_NO = b.TELEGRAM_NO
