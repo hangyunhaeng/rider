@@ -357,6 +357,13 @@
 	function createNewRowData1() {
 	    var newData = {
     		cooperatorId: grid.getRowNode(grid.getFocusedCell().rowIndex).data.cooperatorId,
+
+    		feeEmploymentInsurance: grid.getRowNode(grid.getFocusedCell().rowIndex).data.feeEmploymentInsurance,	//고용보험
+    		feeIndustrialInsurance: grid.getRowNode(grid.getFocusedCell().rowIndex).data.feeIndustrialInsurance,	//산재보험
+    		feeWithholdingTax: grid.getRowNode(grid.getFocusedCell().rowIndex).data.feeWithholdingTax,		//원천세
+    		feeTimeInsurance: grid.getRowNode(grid.getFocusedCell().rowIndex).data.feeTimeInsurance,		//시간제보험
+    		feeCall: grid.getRowNode(grid.getFocusedCell().rowIndex).data.feeCall,							//콜수수료
+
     		useAt: 'Y',
     		crud: "c"
 	    };
@@ -408,8 +415,27 @@
 		setTimeout(function(){
 			var updateItem = getEditRows(grid1);
 
+			var err = false;
 			if(updateItem.length <=0 ){
 				alert("저장할 항목이 없습니다");
+				return;
+			}
+				debugger;
+
+			for(var i = 0 ; i < updateItem.length ; i++){
+				var one = updateItem[i];
+				if(nullToString(one.mberId) == ''){
+					alert('아이디는 필수 항목입니다\n저장을 취소합니다.');
+					err = true;
+					return ;
+				}
+				if(nullToString(one.mberNm) == ''){
+					alert('이름은 필수 항목입니다\n저장을 취소합니다.');
+					err = true;
+					return ;
+				}
+			}
+			if(err){
 				return;
 			}
 			// 로딩 시작
