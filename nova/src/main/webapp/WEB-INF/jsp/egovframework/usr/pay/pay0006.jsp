@@ -68,32 +68,27 @@
 	let data;
 	var columnDefs= [
 		{ headerName: "NO", field: "no", minWidth: 70, valueGetter:(params) => { return params.node.rowIndex + 1} },
-		{ headerName: "오류", field: "err", minWidth: 120, hide:true},
-		{ headerName: "profitId", field: "profitId", minWidth: 120, hide:true},
-		{ headerName: "배달건수", field: "deliveryCnt", minWidth: 70
-			, valueGetter:(params) => { return params.data.deliveryCnt > 0 || params.data.deliveryCnt =='합계'? params.data.deliveryCnt: ''}
-			, cellClass: 'ag-cell-right'
+		{ headerName: "copId", field: "copId", minWidth: 120, hide:true},
+		{ headerName: "협력사아이디", field: "cooperatorId", minWidth: 120},
+		{ headerName: "협력사명", field: "cooperatorNm", minWidth: 120},
+		{ headerName: "금액", field: "sendPrice", minWidth: 140
+			, cellClass : "ag-cell-right"
+			, valueGetter:(params) => { return currencyFormatter(params.data.sendPrice);}
 		},
-		{ headerName: "배달일", field: "deliveryDay", minWidth: 120},
-		{ headerName: "배달비", field: "deliveryCost", minWidth: 120
-			, valueGetter:(params) => { return params.data.deliveryCnt > 0 ? currencyFormatter(params.data.deliveryCost): ''}
-			, cellClass: 'ag-cell-right'
+		{ headerName: "수수료", field: "sendFee", minWidth: 90
+			, cellClass : "ag-cell-right"
+			, valueGetter:(params) => { return currencyFormatter(params.data.sendFee);}
 		},
-		{ headerName: "dypId", field: "dypId", minWidth: 120, hide:true},
-		{ headerName: "wkpId", field: "wkpId", minWidth: 120, hide:true},
-		{ headerName: "feeId", field: "feeId", minWidth: 120, hide:true},
-		{ headerName: "riderFeeId", field: "riderFeeId", minWidth: 120, hide:true},
-		{ headerName: "협력사아이디", field: "cooperatorId", minWidth: 140},
-		{ headerName: "협력사명", field: "cooperatorNm", minWidth: 140},
-		{ headerName: "라이더ID", field: "mberId", minWidth: 140},
-		{ headerName: "라이더명", field: "mberNm", minWidth: 140},
-		{ headerName: "구분", field: "gubun", minWidth: 140, hide:true},
-		{ headerName: "구분", field: "gubunNm", minWidth: 140},
-		{ headerName: "금액", field: "cost", minWidth: 80
-			, cellClass: (params) => {return agGridUnderBarClass(params, 'ag-cell-right')}
-			, valueGetter:(params) => { return currencyFormatter(params.data.cost)}
-		},
-		{ headerName: "등록일", field: "creatDt", minWidth: 140, valueGetter:(params) => { return getStringDate(params.data.creatDt)}}
+		{ headerName: "출금일", field: "tranDay", minWidth: 100, valueGetter:(params) => { return getStringDate(params.data.tranDay)}},
+		{ headerName: "출금은행", field: "rvBankNm", minWidth: 100},
+		{ headerName: "출금계좌", field: "rvAccount", minWidth: 140},
+		{ headerName: "status", field: "status", minWidth: 140, hide:true, hide:true},
+		{ headerName: "statusCd", field: "statusCd", minWidth: 140, hide:true},
+		{ headerName: "상태", field: "statusNm", minWidth: 140},
+		{ headerName: "오류메세지", field: "errorMessage", minWidth: 140},
+		{ headerName: "출금일", field: "sendDt", minWidth: 140, hide:true},
+		{ headerName: "출금시", field: "sendTm", minWidth: 140, hide:true}
+
 	];
 
 
@@ -137,9 +132,30 @@
 		searchFromDate.setDate(oneMonthAgo.getFullYear()+"-"+(oneMonthAgo.getMonth()+1)+"-"+oneMonthAgo.getDate());
 		searchToDate.setDate(today.getFullYear()+"-"+(today.getMonth()+1)+"-"+today.getDate());
 
+		$('#coopAblePrice').html(currencyFormatter(minWon0(${ablePrice.coopAblePrice})));
+
 		loadCooperatorList();
 		//그리드 설정
 		setGrid();
+
+		var ablePriceList = JSON.parse('${ablePriceList}');
+		ablePriceList.resultList.forEach(function(dataInfo, idx){
+			var 내역 = $('#반복부').find('[repeatObj=true]:hidden:eq(0)').clone();
+			내역.find('sm[name=coopAblePrice]').html(currencyFormatter(dataInfo.coopAblePrice)+"("+dataInfo.cooperatorNm+")");
+			내역.find('input[name=cooperatorId]').val(dataInfo.cooperatorId);
+			내역.find('input[name=cost]').on("input", function(e){
+				onInputVal(this, dataInfo.coopAblePrice-${sendFee});
+			});
+			내역.find('button').on("click", function(e){
+				doAct(this);
+			});
+			$('#반복부').append(내역);
+			내역.show();
+		});
+		if('${loginVO.authorCode}' =='ROLE_USER'){
+			$('#div출금').show();
+		}
+
 	});
 
 
@@ -165,23 +181,15 @@
 
 	//내역 조회
 	function doSearch(){
-		if($('#searchRegistrationSn').val().trim() != '' && getOnlyNumber($('#searchRegistrationSn').val().trim()).length != 10){
-			alert("사업자번호는 10자리입니다");
-			$('#searchRegistrationSn').focus()
-			return ;
-		}
 
 		const params = new URLSearchParams();
 		params.append('searchCooperatorId', $('#searchCooperatorId').val());
 		params.append('searchFromDate', getOnlyNumber($('#searchFromDate').val()));
 		params.append('searchToDate', getOnlyNumber($('#searchToDate').val()));
-		params.append('searchNm', $('#searchNm').val().trim());
-		params.append('searchRegistrationSn', getOnlyNumber($('#searchRegistrationSn').val().trim()));
-		params.append('searchGubun', $('#searchGubun').val());
 
 		// 로딩 시작
         $('.loading-wrap--js').show();
-        axios.post('${pageContext.request.contextPath}/usr/pay0004_0001.do',params).then(function(response) {
+        axios.post('${pageContext.request.contextPath}/usr/pay0006_0001.do',params).then(function(response) {
         	// 로딩 종료
             $('.loading-wrap--js').hide();
 			if(response.data.resultCode == "success"){
@@ -190,21 +198,9 @@
 
 	        	if (response.data.list.length == 0) {
 	        		grid.setGridOption('rowData',[]);  	// 데이터가 없는 경우 빈 배열 설정
-					var sum = [{deliveryCnt:"합계"
-						, cost: 0
-						}
-					];
-					grid.setGridOption('pinnedBottomRowData', sum);
 	        		grid.showNoRowsOverlay();  			// 데이터가 없는 경우
 	            } else {
 					var lst = response.data.list;	//정상데이터
-
-					var sum = [{deliveryCnt:"합계"
-						, cost: response.data.list.reduce((acc, num) => Number(acc, 10) + Number(num.cost, 10), 0)
-						}
-					];
-					grid.setGridOption('pinnedBottomRowData', sum);
-
 	                grid.setGridOption('rowData', lst);
 	            }
 			}
@@ -238,13 +234,7 @@
                 },
                 rowClassRules: {'ag-cell-err ': (params) => { return params.data.err === true; }},
 				overlayLoadingTemplate: '<span class="ag-overlay-loading-center">로딩 중</span>',
-				overlayNoRowsTemplate: '<span class="ag-overlay-loading-center">데이터가 없습니다</span>',
-				pinnedBottomRowData: [
-					{deliveryCnt:"합계", cost: 0}
-		        ],
-				onCellClicked : function (event) { //onSelectionChanged  :row가 바뀌었을때 발생하는 이벤트인데 잘 안됨.
-			    	selcetRow(event);
-			    }
+				overlayNoRowsTemplate: '<span class="ag-overlay-loading-center">데이터가 없습니다</span>'
             };
         const gridDiv = document.querySelector('#myGrid');
         grid = agGrid.createGrid(gridDiv, gridOptions);
@@ -253,45 +243,70 @@
 
 	}
 
-	function selcetRow(params){
-		if(params.column.colId == "sendPrice"){
-			debugger;
-			if(params.node.data.dwGubun == 'DAY'){
-				if(params.node.data.ioGubun == '1'){
-					$('#myForm').attr("action", "/usr/dty0001.do");
-					$('#myForm').append($("<input/>", {type:"hidden", name:"searchDate", value:params.node.data.fileDate}));
-					$('#myForm').append($("<input/>", {type:"hidden", name:"searchId", value:params.node.data.dayAtchFileId}));
-					$('#myForm').append($("<input/>", {type:"hidden", name:"searchMberId", value:params.node.data.mberId}));
-					$('#myForm').append($("<input/>", {type:"hidden", name:"searchRunDeDate", value:params.node.data.accountsStDt}));
-					$('#myForm').append($("<input/>", {type:"hidden", name:"searchError", value:"false"}));
+	function onInputVal(obj, maxInt){
+		//빈값이면 0으로
+		if(obj.value == "") obj.value = 0;
+		//모두 숫자로 변환
+		obj.value = obj.value.replace(/[^0-9]/g, '').replace(/(\..*)\./g, '$1');
+		maxInt = String(maxInt).replace(/[^0-9-]/g, '').replace(/(\..*)\./g, '$1');
+		maxInt = minWon0(maxInt);	//-는 없음
 
-					$('#myForm').submit();
-				}
-			}
-			if(params.node.data.dwGubun == 'WEK'){
-				if(params.node.data.ioGubun == '1'){
-					$('#myForm').attr("action", "/usr/dty0002.do");
-					$('#myForm').append($("<input/>", {type:"hidden", name:"searchDate", value:params.node.data.fileDate}));
-					$('#myForm').append($("<input/>", {type:"hidden", name:"searchId", value:params.node.data.wekAtchFileId}));
-					$('#myForm').append($("<input/>", {type:"hidden", name:"searchMberId", value:params.node.data.mberId}));
-					$('#myForm').submit();
-				}
+		//최대값보다 큰값이 들어오면 최대값으로 변환
+		if(typeof(maxInt) != 'undefined'){
+			if(parseInt(obj.value, 10)> parseInt(maxInt, 10)){
+				obj.value = maxInt;
 			}
 		}
+
+		//콤마 붙여서 리턴
+		obj.value = currencyFormatter(parseInt(obj.value, 10));
 	}
 
 
-	function agGridUnderBarClass(params, addClass){
-		var pAddClass = (addClass =='undefined')? "" : addClass;
-		if(params.node.data.ioGubun == '1' && params.node.data.dwGubun == 'DAY')	//입금 && 일정산
-			return pAddClass+" tdul";
-		if(params.node.data.ioGubun == '1' && params.node.data.dwGubun == 'WEK')	//입금 && 일정산
-			return pAddClass+" tdul";
+	var actObj;
+	//출금요청
+	function doAct(obj){
 
-		else
-			return pAddClass;
+		if(Number($(obj).closest('tr').find('input[name=cost]').val().replace(/[^0-9]-/g, '').replace(/(\..*)\./g, '$1'), 10) <= 0){
+			alert('출금금액을 입력하세요');
+			$(obj).closest('tr').find('input[name=cost]').focus();
+			return;
+		}
+
+
+		actObj = obj;
+
+		const params = new URLSearchParams();
+		params.append('cooperatorId', $(obj).closest('tr').find('input[name=cooperatorId]').val());
+		params.append('inputPrice', $(obj).closest('tr').find('input[name=cost]').val().replace(/[^0-9]/g, '').replace(/(\..*)\./g, '$1'));
+
+		// 로딩 시작
+        $('.loading-wrap--js').show();
+        axios.post('${pageContext.request.contextPath}/usr/pay0006_0002.do',params).then(function(response) {
+        	// 로딩 종료
+            $('.loading-wrap--js').hide();
+			if(response.data.resultCode == "success"){
+				$(actObj).closest('tr').find('sm[name=coopAblePrice]').html(currencyFormatter(response.data.ablePrice.coopAblePrice)+"("+response.data.ablePrice.cooperatorNm+")");
+				$(actObj).closest('tr').find('input[name=cost]').on("input", function(e){
+					onInputVal(this, response.data.ablePrice.coopAblePrice-${sendFee});
+				});
+				$(actObj).closest('tr').find('input[name=cost]').val(0);
+				doSearch();
+			} else{
+				if(response.data.resultMsg != '' && response.data.resultMsg != null)
+					alert(response.data.resultMsg);
+				else alert("출금에 실패하였습니다");
+				return ;
+			}
+        })
+        .catch(function(error) {
+            console.error('There was an error fetching the data:', error);
+        }).finally(function() {
+        	// 로딩 종료
+            $('.loading-wrap--js').hide();
+        });
+        pageInit = false;
 	}
-
 	</script>
 <body class="index-page">
 
@@ -321,9 +336,10 @@
 		            <li class="dropdown"><a href="" onclick="javascript:return false;" class="active"><span>수익현황</span> <i class="bi bi-chevron-down toggle-dropdown"></i></a>
 			          	<ul>
 			              <li style="display:none;"><a href="${pageContext.request.contextPath}/usr/pay0003.do">운영사수익현황</a></li>
-						  <li><a href="${pageContext.request.contextPath}/usr/pay0004.do" class="active">협력사수익현황</a></li>
+						  <li><a href="${pageContext.request.contextPath}/usr/pay0004.do">협력사수익현황</a></li>
 						  <li><a href="${pageContext.request.contextPath}/usr/pay0005.do">협력사 기타(대여, 리스) 현황</a></li>
 						  <li><a href="${pageContext.request.contextPath}/usr/pay0001.do">입출금내역<br></a></li>
+						  <li><a href="${pageContext.request.contextPath}/usr/pay0006.do" class="active">협력사 출금내역<br></a></li>
 			            </ul>
 		            </li>
 		            <li class="dropdown" style="display:none;"><a href="" onclick="javascript:return false;"><span>관리</span> <i class="bi bi-chevron-down toggle-dropdown"></i></a>
@@ -379,12 +395,49 @@
 	</form>
 
 	<div class="keit-header-body innerwrap clearfix">
-		<p class="tit">협력사수익현황</p>
+		<p class="tit">협력사 출금내역 현황</p>
 
 			<input name="pageUnit" type="hidden" value="1000"/>
 			<input name="pageSize" type="hidden" value="1000"/>
 			<!--과제관리_목록 -->
 			<div class="search_box ty2">
+
+			<div id="div출금" style="display:none;">
+				<table id="반복부">
+					<colgroup>
+						<col style="width: 13%">
+						<col style="width: 37%">
+						<col style="width: 13%">
+						<col style="width: *">
+					</colgroup>
+
+					<tr repeatObj="true" style="display:none;">
+						<th>출금가능금액</th>
+						<td>
+							<sm name="coopAblePrice"></sm>
+						</td>
+						<th>출금금액</th>
+						<td>
+							<input name="cooperatorId" type="hidden"/>
+							<input name="cost" type="text" style="width:calc(100% - 100px);" maxlength="15" oninput="">
+							<button class="btn ty1">출금요청</button>
+						</td>
+					</tr>
+					<tr>
+						<th>은행</th>
+						<td>
+							<sm>${myInfoVO.bnkNm}</sm>
+						</td>
+						<th>계좌번호</th>
+						<td>
+							<sm>${myInfoVO.accountNum} / ${myInfoVO.accountNm}</sm>
+						</td>
+					</tr>
+				</table>
+
+				<br/>
+				<br/>
+			</div>
 				<table>
 					<colgroup>
 						<col style="width: 13%">
@@ -398,13 +451,7 @@
 						<td>
 							<select id="searchCooperatorId" name='searchCooperatorId' style='width: 100%'></select>
 						</td>
-						<th>라이더명</th>
-						<td>
-							<input id="searchNm" type="text" >
-						</td>
-					</tr>
-					<tr>
-						<th>등록일</th>
+						<th>출금일</th>
 						<td>
 							<div>
 								<input id="searchFromDate" class="form-control search fs-9 float-start w40p"" type="date" placeholder="Search" aria-label="Search" _mstplaceholder="181961" _mstaria-label="74607">
@@ -412,21 +459,9 @@
 								<input id="searchToDate" class="form-control search fs-9 float-start w40p" type="date" placeholder="Search" aria-label="Search" _mstplaceholder="181961" _mstaria-label="74607">
 							</div>
 						</td>
-						<th>사업자번호</th>
-						<td>
-							<input id="searchRegistrationSn" type="text" oninput="this.value = this.value.replace(/[^0-9-]/g, '').replace(/(\..*)\./g, '$1');">
-						</td>
 					</tr>
 					<tr>
-						<th>구분</th>
-						<td colspan="3">
-							<select id="searchGubun" name='searchGubun' style='width: 100%'>
-								<option value="all">전체</option>
-								<option value="C">콜수수료</option>
-								<option value="E">기타수수료</option>
-								<option value="D">선출금수수료</option>
-							</select>
-						</td>
+
 					</tr>
 				</table>
 
@@ -443,7 +478,7 @@
 			<br>
 			<div id="loadingOverlay" style="display: none;">Loading...</div>
 			<div  class="ib_product">
-				<div id="myGrid" class="ag-theme-alpine" style="height: 550px; width: 100%;"></div>
+				<div id="myGrid" class="ag-theme-alpine" style="height: 410px; width: 100%;"></div>
 			</div>
 			</div>
 

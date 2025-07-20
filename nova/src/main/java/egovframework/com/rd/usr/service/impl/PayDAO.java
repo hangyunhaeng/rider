@@ -8,10 +8,13 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Repository;
 
 import egovframework.com.cmm.service.impl.EgovComAbstractDAO;
+import egovframework.com.rd.usr.service.vo.CooperatorPayVO;
 import egovframework.com.rd.usr.service.vo.DoszDSResultVO;
 import egovframework.com.rd.usr.service.vo.DoszResultVO;
+import egovframework.com.rd.usr.service.vo.DoszTransferVO;
 import egovframework.com.rd.usr.service.vo.DoznHistoryVO;
 import egovframework.com.rd.usr.service.vo.HistoryVO;
+import egovframework.com.rd.usr.service.vo.MyInfoVO;
 import egovframework.com.rd.usr.service.vo.ProfitVO;
 import egovframework.com.uat.uia.web.EgoRDLoginController;
 
@@ -122,6 +125,55 @@ public class PayDAO extends EgovComAbstractDAO {
 	 */
 	public List<ProfitVO> selectCooperatorProfitList(ProfitVO vo) throws Exception {
 		return selectList("payDAO.selectCooperatorProfitList", vo);
+	}
+	/**
+	 * 협력사별 출금 가능금액 리스트
+	 * @param vo
+	 * @return
+	 * @throws Exception
+	 */
+	public List<MyInfoVO> cooperatorAblePrice(MyInfoVO vo) throws Exception {
+		return selectList("payDAO.cooperatorAblePrice", vo);
+	}
+
+	/**
+	 * 협력사별 출금 가능금액 one
+	 * @param vo
+	 * @return
+	 * @throws Exception
+	 */
+	public MyInfoVO cooperatorAblePriceByCoopId(MyInfoVO vo) throws Exception {
+		return selectOne("payDAO.cooperatorAblePrice", vo);
+	}
+	/**
+	 * 협력사 출금 이력생성
+	 * @param vo
+	 * @return
+	 * @throws Exception
+	 */
+	public int isnertCooperatorPay(CooperatorPayVO vo) throws Exception {
+		return insert("payDAO.isnertCooperatorPay", vo);
+	}
+
+	/**
+	 * 출금 실행된 협력사 출금건 use_at n로 세팅
+	 * @param vo
+	 * @return
+	 * @throws Exception
+	 */
+	public int updateCooperatorPayByTransfer(DoszTransferVO vo) throws Exception {
+		return update("payDAO.updateCooperatorPayByTransfer", vo);
+	}
+
+
+	/**
+	 * 협력사 출금 리스트
+	 * @param vo
+	 * @return
+	 * @throws Exception
+	 */
+	public List<CooperatorPayVO> selectCooperatorPayList(CooperatorPayVO vo) throws Exception {
+		return selectList("payDAO.selectCooperatorPayList", vo);
 	}
 }
 

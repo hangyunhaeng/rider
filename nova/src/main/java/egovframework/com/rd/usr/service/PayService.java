@@ -1,10 +1,13 @@
 package egovframework.com.rd.usr.service;
 
 import java.util.List;
+import java.util.Map;
 
-import egovframework.com.rd.usr.service.vo.DayPayVO;
+import egovframework.com.rd.usr.service.vo.CooperatorPayVO;
 import egovframework.com.rd.usr.service.vo.DoszDSResultVO;
+import egovframework.com.rd.usr.service.vo.DoszTransferVO;
 import egovframework.com.rd.usr.service.vo.HistoryVO;
+import egovframework.com.rd.usr.service.vo.MyInfoVO;
 import egovframework.com.rd.usr.service.vo.ProfitVO;
 
 public interface PayService {
@@ -39,5 +42,41 @@ public interface PayService {
 	 * @throws Exception
 	 */
 	public List<ProfitVO> selectCooperatorProfitList(ProfitVO vo) throws Exception ;
+	/**
+	 * 협력사 출금 가능
+	 * @param vo
+	 * @return
+	 * @throws Exception
+	 */
+	public Map<String, Object> cooperatorAblePrice(MyInfoVO vo) throws Exception ;
+	/**
+	 * 협력사 출금 실행
+	 * @param vo
+	 * @return
+	 * @throws Exception
+	 */
+	public DoszTransferVO cooperatorPay(CooperatorPayVO vo) throws Exception ;
+	/**
+	 * 출금 실행된 협력사 출금건 use_at n로 세팅
+	 * @param vo
+	 * @return
+	 * @throws Exception
+	 */
+	public void updateCooperatorPayByTransfer(DoszTransferVO vo) throws Exception ;
 
+	/**
+	 * 협력사별 출금 가능금액 one
+	 * @param vo
+	 * @return
+	 * @throws Exception
+	 */
+	public MyInfoVO cooperatorAblePriceByCoopId(MyInfoVO vo) throws Exception ;
+
+	/**
+	 * 협력사 출금 리스트
+	 * @param vo
+	 * @return
+	 * @throws Exception
+	 */
+	public List<CooperatorPayVO> selectCooperatorPayList(CooperatorPayVO vo) throws Exception ;
 }

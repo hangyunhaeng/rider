@@ -13,18 +13,27 @@ import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.support.SessionStatus;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import egovframework.com.cmm.LoginVO;
 import egovframework.com.cmm.SessionVO;
+import egovframework.com.cmm.service.EgovProperties;
 import egovframework.com.cmm.util.EgovUserDetailsHelper;
 import egovframework.com.rd.Util;
+import egovframework.com.rd.usr.service.DtyService;
 import egovframework.com.rd.usr.service.MemService;
 import egovframework.com.rd.usr.service.PayService;
+import egovframework.com.rd.usr.service.RotService;
+import egovframework.com.rd.usr.service.vo.CooperatorPayVO;
 import egovframework.com.rd.usr.service.vo.DoszDSResultVO;
+import egovframework.com.rd.usr.service.vo.DoszTransferVO;
 import egovframework.com.rd.usr.service.vo.EtcVO;
 import egovframework.com.rd.usr.service.vo.HistoryVO;
+import egovframework.com.rd.usr.service.vo.MyInfoVO;
 import egovframework.com.rd.usr.service.vo.ProfitVO;
 
 /**
@@ -49,6 +58,11 @@ public class PayController {
 	private PayService payService;
 	@Resource(name="MemService")
 	private MemService memService;
+    @Resource(name = "RotService")
+    private RotService rotService;
+    @Resource(name = "DtyService")
+    private DtyService dtyService;
+
 
 
 
@@ -310,7 +324,7 @@ public class PayController {
 	 * @throws Exception
 	 */
     @RequestMapping("/usr/pay0005.do")
-    public String pay0004(@ModelAttribute("EtcVO") EtcVO etcVO, HttpServletRequest request,ModelMap model) throws Exception {
+    public String pay0005(@ModelAttribute("EtcVO") EtcVO etcVO, HttpServletRequest request,ModelMap model) throws Exception {
 
     	//로그인 체크
         LoginVO user = (LoginVO)EgovUserDetailsHelper.getAuthenticatedUser();
@@ -362,6 +376,167 @@ public class PayController {
 
         map.put("list", list);
         map.put("resultCode", "success");
+        return ResponseEntity.ok(map);
+	}
+
+	/**
+	 * 협력사 출금내역 페이지
+	 * @param request
+	 * @param model
+	 * @return
+	 * @throws Exception
+	 */
+    @RequestMapping("/usr/pay0006.do")
+    public String pay0006(@ModelAttribute("MyInfoVO") MyInfoVO myInfoVO, HttpServletRequest request,ModelMap model) throws Exception {
+
+    	//로그인 체크
+        LoginVO user = (LoginVO)EgovUserDetailsHelper.getAuthenticatedUser();
+        Boolean isAuthenticated = EgovUserDetailsHelper.isAuthenticated();
+
+        if(!isAuthenticated) {
+        	return "egovframework/com/cmm/error/accessDenied";
+        }
+
+        if(!Util.isUsr()) {
+        	return "egovframework/com/cmm/error/accessDenied";
+        }
+
+
+
+        //총판 or 협력사
+        myInfoVO.setSchAuthorCode(user.getAuthorCode());
+        myInfoVO.setSchIhidNum(user.getIhidNum());
+
+		myInfoVO.setMberId(user.getId());
+		myInfoVO.setSchUserSe(user.getUserSe());
+
+
+
+	    // taxInvInfo를 JSON으로 변환하여 뷰에 전달
+	    ObjectMapper objectMapper = new ObjectMapper();
+	    Map<String, Object> ablePriceList = payService.cooperatorAblePrice(myInfoVO);
+	    String ablePriceListJson = objectMapper.writeValueAsString(ablePriceList);
+
+		model.addAttribute("sendFee", EgovProperties.getProperty("Globals.sendFee"));
+		model.addAttribute("ablePriceList", ablePriceListJson);
+
+		model.addAttribute("myInfoVO", rotService.selectMyInfo(myInfoVO));
+        return "egovframework/usr/pay/pay0006";
+	}
+
+
+	/**
+	 * 협력사 출금내역 리스트 가져오기
+	 * @param request
+	 * @param sessionVO
+	 * @param model
+	 * @param status
+	 * @return
+	 * @throws Exception
+	 */
+	@RequestMapping("/usr/pay0006_0001.do")
+	public ResponseEntity<?> pay0006_0001(@ModelAttribute("CooperatorPayVO") CooperatorPayVO cooperatorPayVO, HttpServletRequest request, SessionVO sessionVO, ModelMap model, SessionStatus status) throws Exception{
+
+    	//로그인 체크
+        LoginVO user = (LoginVO)EgovUserDetailsHelper.getAuthenticatedUser();
+        Boolean isAuthenticated = EgovUserDetailsHelper.isAuthenticated();
+
+        if(!isAuthenticated) {
+        	return ResponseEntity.status(401).body("Unauthorized");
+        }
+
+        if(!Util.isUsr()) {
+        	return ResponseEntity.status(401).body("Unauthorized");
+        }
+
+        //총판 or 협력사
+        cooperatorPayVO.setSchUserSe(user.getUserSe());
+        cooperatorPayVO.setSchAuthorCode(user.getAuthorCode());
+        cooperatorPayVO.setSchIhidNum(user.getIhidNum());
+
+        //return value
+        Map<String, Object> map =  new HashMap<String, Object>();
+
+        List<CooperatorPayVO> list = payService.selectCooperatorPayList(cooperatorPayVO);
+        map.put("list", list);
+        map.put("resultCode", "success");
+        return ResponseEntity.ok(map);
+	}
+
+
+	/**
+	 * 협력사 출금
+	 * @param request
+	 * @param sessionVO
+	 * @param model
+	 * @param status
+	 * @return
+	 * @throws Exception
+	 */
+	@RequestMapping("/usr/pay0006_0002.do")
+	public ResponseEntity<?> pay0006_0002(@ModelAttribute("CooperatorPayVO") CooperatorPayVO cooperatorPayVO, HttpServletRequest request, SessionVO sessionVO, ModelMap model, SessionStatus status) throws Exception{
+
+    	//로그인 체크
+        LoginVO user = (LoginVO)EgovUserDetailsHelper.getAuthenticatedUser();
+        Boolean isAuthenticated = EgovUserDetailsHelper.isAuthenticated();
+
+        if(!isAuthenticated) {
+        	return ResponseEntity.status(401).body("Unauthorized");
+        }
+
+        if(!Util.isUsr()) {
+        	return ResponseEntity.status(401).body("Unauthorized");
+        }
+        //return value
+        Map<String, Object> map =  new HashMap<String, Object>();
+
+        //총판 or 협력사
+        cooperatorPayVO.setSchUserSe(user.getUserSe());
+        cooperatorPayVO.setSchAuthorCode(user.getAuthorCode());
+        cooperatorPayVO.setSchIhidNum(user.getIhidNum());
+
+        try {
+
+            DoszTransferVO tran = payService.cooperatorPay(cooperatorPayVO);
+
+            // 이체 실행
+            DoszTransferVO tranResult = dtyService.transfer(tran);
+
+            if(Util.isEmpty(tranResult.getStatus())){	//응답없음
+//            	dtyService.updateDayPayByTransfer(tranResult);
+            }
+            else {
+            	if("400".equals(tranResult.getStatus()) && "VTIM".equals(tranResult.getErrorCode())) {	//은행timeout
+            		// 배치에서 재처리
+            	} else if("400".equals(tranResult.getStatus()) && "0011".equals(tranResult.getErrorCode())) {	//처리중
+            		// 배치에서 재처리
+            	} else if("999".equals(tranResult.getStatus())) {	//커넥센실패
+            		// 배치에서 재처리
+            	} else if("200".equals(tranResult.getStatus()) ){	//성공
+
+            	} else {
+            		payService.updateCooperatorPayByTransfer(tranResult);	//실패 확정시 거래내역 삭제
+            	}
+            }
+
+
+    		//출금 가능금액 재조회
+    		MyInfoVO myInfoVO = new MyInfoVO();
+    		myInfoVO.setMberId(user.getId());
+    		myInfoVO.setSearchCooperatorId(cooperatorPayVO.getCooperatorId());
+    		myInfoVO.setSchUserSe(user.getUserSe());
+    		myInfoVO.setSchIhidNum(user.getIhidNum());
+    		myInfoVO.setSchAuthorCode(user.getAuthorCode());
+
+    		map.put("ablePrice", payService.cooperatorAblePriceByCoopId(myInfoVO));
+        	map.put("resultCode", "success");
+        }catch(IllegalArgumentException e) {
+			map.put("resultMsg", e.getMessage());
+        	map.put("resultCode", "fail");
+        }catch(Exception e) {
+			map.put("resultMsg", e.toString());
+        	map.put("resultCode", "fail");
+        }
         return ResponseEntity.ok(map);
 	}
 }

@@ -219,6 +219,17 @@
 
 	        	if (response.data.list.length == 0 && response.data.listE.length == 0) {
 	        		grid.setGridOption('rowData',[]);  	// 데이터가 없는 경우 빈 배열 설정
+					var sum = [{cooperatorId:"합계"
+						, goodsPrice: 0
+						, distance: 0
+						, basicPrice: 0
+						, weatherPrimage: 0
+						, addPrimage: 0
+						, peakPrimageEtc: 0
+						, deliveryPrice: 0
+						}
+					];
+					grid.setGridOption('pinnedBottomRowData', sum);
 	        		grid.showNoRowsOverlay();  			// 데이터가 없는 경우
 	            } else {
 
@@ -413,6 +424,7 @@
 						  <li><a href="${pageContext.request.contextPath}/usr/pay0004.do">협력사수익현황</a></li>
 						  <li><a href="${pageContext.request.contextPath}/usr/pay0005.do">협력사 기타(대여, 리스) 현황</a></li>
 						  <li><a href="${pageContext.request.contextPath}/usr/pay0001.do">입출금내역<br></a></li>
+						  <li><a href="${pageContext.request.contextPath}/usr/pay0006.do">협력사 출금내역<br></a></li>
 			            </ul>
 		            </li>
 		            <li class="dropdown" style="display:none;"><a href="" onclick="javascript:return false;"><span>관리</span> <i class="bi bi-chevron-down toggle-dropdown"></i></a>
