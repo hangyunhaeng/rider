@@ -95,7 +95,7 @@
 			$('#divWek').show();
 			$('#title').html("확정 배달비 입금");
 			$('#확정메뉴').addClass("active");
-			$('#ablePrice').html(currencyFormatter(minWon0(${ablePrice.weeㄴkAblePrice})));
+			$('#ablePrice').html(currencyFormatter(minWon0(${ablePrice.weekAblePrice})));
 		}
 		if('${ablePrice.useAt}' == 'Y'){
 			$('.mx-lg-n4').find('button').attr('disabled', false);
