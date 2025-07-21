@@ -586,11 +586,25 @@
 	</update>
 	<select id="selectEtcInputList" parameterType="egovframework.com.rd.usr.service.vo.DayPayVO" resultType="egovframework.com.rd.usr.service.vo.DayPayVO">
 		SELECT * FROM (
-			SELECT @ROWNUM:=@ROWNUM+1 AS RNUM, a.*
-			FROM RD_DAY_PAY a, (SELECT @ROWNUM:=0) AS R
-			WHERE IO_GUBUN = '2'
-				AND ETC_ID = #{etcId}
-			ORDER BY DAY ASC
+			SELECT @ROWNUM:=@ROWNUM+1 AS RNUM, order_tab.*
+			FROM(
+				SELECT a.day, a.send_price, a.etc_id
+				FROM RD_DAY_PAY a, (SELECT @ROWNUM:=0) AS R
+				WHERE IO_GUBUN = '2' AND WEEK_YN ='N'
+					AND a.USE_AT = 'Y'
+					AND ETC_ID = #{etcId}
+
+
+				UNION ALL
+
+
+				SELECT a.TRAN_DAY AS day, a.send_price, a.etc_id
+				FROM RD_WEEK_PAY a, (SELECT @ROWNUM:=0) AS R
+				WHERE IO_GUBUN = '2'
+					AND a.USE_AT = 'Y'
+					AND ETC_ID = #{etcId}
+			) order_tab
+			ORDER BY  DAY ASC
 		) sub_tab
 		ORDER BY rnum desc
 	</select>

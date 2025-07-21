@@ -397,7 +397,7 @@ public class DtyServiceImpl extends EgovAbstractServiceImpl implements DtyServic
 		    			insertVo.setSendPrice(one.getPaybackCost());
 		    			insertVo.setWeekYn("N");			//정산완료
 		    			insertVo.setEtcId(one.getEtcId());
-		    			insertVo.setTranDay(tranDay);
+		    			insertVo.setTranDay(one.getDay());
 		//    			insertVo.setTelegramNo(telegramNo);
 		    			insertVo.setUseAt("Y");
 		    			insertVo.setCreatId(user.getId());
