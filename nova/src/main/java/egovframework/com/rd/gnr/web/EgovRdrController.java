@@ -237,9 +237,14 @@ public class EgovRdrController {
 
 		// 2. 기등록된 사용자면 알림 후 로그인 페이지로 이동 (패스워드를 찾을 수 있도록 이동?)
 		MberManageVO member = memService.selectMemberInfo(mberId);
-		if(member == null || "".equals(member.getMberId().trim())) {
+		if(member == null || Util.isEmpty(member.getMberId())) {
 			map.put("resultCode", "failReg");
 			map.put("resultMessage", "등록되지 않은 사용자입니다.<br/><br/>등록된 라이더만 사용하실 수 있습니다<br/>협력사에 문의하시기 바랍니다");
+			return ResponseEntity.ok(map);
+		}
+		if(member == null || Util.isEmpty(member.getMbtlnum())) {
+			map.put("resultCode", "failReg");
+			map.put("resultMessage", "핸드폰번호가 등록되어 있지 않습니다<br/>협력사에 문의하시기 바랍니다");
 			return ResponseEntity.ok(map);
 		}
 
