@@ -69,6 +69,7 @@ public class EgovRDComIndexController {
 		if(rootUrl == null)
 			return "egovframework/com/cmm/error/accessDenied";
 
+		model.addAttribute("isReal", Util.isReal());
 		return "egovframework/"+rootUrl+"/com/com0001";
 	}
 

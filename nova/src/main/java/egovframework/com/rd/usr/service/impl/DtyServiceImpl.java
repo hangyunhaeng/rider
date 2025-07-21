@@ -1432,7 +1432,7 @@ public class DtyServiceImpl extends EgovAbstractServiceImpl implements DtyServic
         // 토큰 생성 end
 
         // enc_data 생성 start
-        String returnURL = "http://"+request.getServerName()+EgovProperties.getProperty("Globals.niceReturnUrl").trim();
+        String returnURL = "https://"+request.getServerName()+EgovProperties.getProperty("Globals.niceReturnUrl").trim();
 
 
         SimpleDateFormat TestDate = new SimpleDateFormat("yyyyMMddhhmmss");
