@@ -23,8 +23,10 @@ public class DoszSchAccoutCostVO implements Serializable {
 	private String org_code;
 	//거래고유번호 :거래일별 Unique 해야 하며1~950000번까지 사용. 이용기관에서 거래번호를 채번.
 	private String telegram_no;
-	//은행코드
+	//출금 은행코드
 	private String drw_bank_code;
+	//출금 계좌번호
+	private String drw_account;
 	//전문API사용여부
 	private String res_all_yn;
 

@@ -17,12 +17,6 @@ iframe {    width: 100%;    border: none;}
 </style>
 <script language="javascript">
 
-	//https : Spring Security 활용: Spring Security와 같은 프레임워크를 사용하면 보다 정교한 접근 제어를 구현할 수 있습니다. @Secured 어노테이션이나 XML 설정을 통해 특정 URL에 대한 접근 권한을 설정할 수 있습니다.
-	if(${isReal}){
-		if (document.location.protocol == 'http:') {
-		    document.location.href = document.location.href.replace('http:', 'https:');
-		}
-	}
     function ifmHeight(){
     }
 </script>

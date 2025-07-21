@@ -243,6 +243,7 @@
 				if(response.data.resultCode == "success"){
 					if(response.data.doszSchAccoutCostVO.status == "200"){
 						$('#잔액').show();
+						$('#잔액').html( response.data.doszSchAccoutCostVO.trAfterSign!='+'?response.data.doszSchAccoutCostVO.trAfterSign:"" + currencyFormatter(response.data.doszSchAccoutCostVO.trAfterBac)+"원")
 					} else {
 						alert(response.data.doszSchAccoutCostVO.errorMessage);
 					}
@@ -305,12 +306,15 @@
 			            </ul>
 		            </li>
 
-					<li class="dropdown" style="display:none;"><a href="" onclick="javascript:return false;"><span>협력사/라이더 현황</span><i class="bi bi-chevron-down toggle-dropdown"></i></a>
+					<li class="cooperator" style="display:none;"><a href="${pageContext.request.contextPath}/usr/dty0004.do">배달정보 조회</a></li>
+
+					<li class="dropdown"><a href="" onclick="javascript:return false;"><span>협력사/라이더 현황</span><i class="bi bi-chevron-down toggle-dropdown"></i></a>
 						<ul>
 							<li><a href="${pageContext.request.contextPath}/usr/mem0001.do">협력사 관리</a></li>
-              				<li><a href="${pageContext.request.contextPath}/usr/mem0003.do">협력사계정 관리</a></li>
+              				<li style="display:none;"><a href="${pageContext.request.contextPath}/usr/mem0003.do">협력사계정 관리</a></li>
 							<li><a href="${pageContext.request.contextPath}/usr/mem0002.do">라이더관리</a></li>
-						</ul></li>
+						</ul>
+					</li>
 					<li class="dropdown" style="display:none;"><a href="" onclick="javascript:return false;"><span>자료 업로드</span> <i class="bi bi-chevron-down toggle-dropdown"></i></a>
 						<ul>
 							<li><a href="${pageContext.request.contextPath}/usr/dty0001.do">일별 자료 업로드</a></li>
@@ -318,8 +322,6 @@
 							<li><a href="${pageContext.request.contextPath}/usr/dty0003.do">자료 업로드 이력</a></li>
 						</ul>
 					</li>
-					<li class="cooperator" style="display:none;"><a href="${pageContext.request.contextPath}/usr/dty0004.do">배달정보 조회</a></li>
-					<li class="cooperator" style="display:none;"><a href="${pageContext.request.contextPath}/usr/mem0002.do">라이더관리</a></li>
 					<li><a href="${pageContext.request.contextPath}/usr/mem0004.do" class="active">MyPage</a></li>
 				</ul>
 				<i class="mobile-nav-toggle d-xl-none bi bi-list"></i>

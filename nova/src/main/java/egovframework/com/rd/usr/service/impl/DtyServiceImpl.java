@@ -1979,6 +1979,7 @@ public class DtyServiceImpl extends EgovAbstractServiceImpl implements DtyServic
 		doszSchAccoutCostVO.setOrg_code(EgovProperties.getProperty("Globals.orgCode"));
 		doszSchAccoutCostVO.setTelegram_no(telegramNo);
 		doszSchAccoutCostVO.setDrw_bank_code(EgovProperties.getProperty("Globals.bnkCd"));					//은행 코드
+		doszSchAccoutCostVO.setDrw_account(EgovProperties.getProperty("Globals.acc"));						//은행 계좌
 		doszSchAccoutCostVO.setRes_all_yn("y");
 		doszSchAccoutCostVO.setCreatId(user.getId());
 

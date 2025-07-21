@@ -417,7 +417,7 @@
 
 											<div class="row justify-content-between mb-1 mb-md-0 d-flex align-items-center lh-1">
 												<div class="col-auto">
-													<label class="form-check-label mb-2 mb-md-0 fs-9 me-2 line-clamp-1 text-body cursor-pointer">입금 신청 금액</label>
+													<label class="form-check-label mb-2 mb-md-0 fs-9 me-2 line-clamp-1 text-body cursor-pointer">계좌 입금 금액</label>
 												</div>
 												<div class="col-auto d-flex">
 													<span id="sumPrice" class="fs-9 mb-2" style="">100</span><span class="fs-9 mb-2" style="">원</span>
@@ -453,9 +453,9 @@
 
 
 
-											<div class="row justify-content-between mb-1 mb-md-0 d-flex align-items-center lh-1">
+											<div class="row justify-content-between mb-1 mb-md-0 d-flex align-items-center lh-1" style="display:none !important;">
 												<div class="col-auto">
-													<label class="form-check-label mb-2 mb-md-0 fs-9 me-2 line-clamp-1 text-body cursor-pointer">지급액</label>
+													<label class="form-check-label mb-2 mb-md-0 fs-9 me-2 line-clamp-1 text-body cursor-pointer">차감액</label>
 												</div>
 												<div class="col-auto d-flex">
 													<span id="inputPrice" class="fs-9 mb-2" style="">300</span><span class="fs-9 mb-2" style="">원</span>

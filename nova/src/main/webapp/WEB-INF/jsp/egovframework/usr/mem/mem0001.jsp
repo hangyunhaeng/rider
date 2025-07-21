@@ -68,7 +68,7 @@
 		{ headerName: "crud", field: "crud", minWidth: 90, hide:true},
 		{ headerName: "협력사아이디", field: "cooperatorId", minWidth: 120, editable: (params) => {return (params.node.data.crud == 'c')? true: false}
 			, cellClass: (params) => {return agGrideditClass(params)}},
-		{ headerName: "협력사이름", field: "cooperatorNm", minWidth: 120, editable: true
+		{ headerName: "협력사이름", field: "cooperatorNm", minWidth: 120, editable: (params) => {return ('${loginVO.authorCode}' =='ROLE_ADMIN')? true: false}
 			, cellClass: (params) => {return agGrideditClass(params)}},
 		{ headerName: "사업자등록번호", field: "registrationSn", minWidth: 110, editable: (params) => {return ('${loginVO.authorCode}' == 'ROLE_ADMIN')? true: false}
             , valueParser: (params) => {
@@ -76,22 +76,23 @@
             }
             , cellClass: (params) => {return agGrideditClass(params)}
         },
-		{ headerName: "상호", field: "companyNm", minWidth: 160, editable: true
+		{ headerName: "상호", field: "companyNm", minWidth: 160, editable: (params) => {return ('${loginVO.authorCode}' =='ROLE_ADMIN')? true: false}
         	, cellClass: (params) => {return agGrideditClass(params)}},
-		{ headerName: "사업자이름", field: "registrationNm", minWidth: 90, editable: true
+		{ headerName: "사업자이름", field: "registrationNm", minWidth: 90, editable: (params) => {return ('${loginVO.authorCode}' =='ROLE_ADMIN')? true: false}
 			, cellClass: (params) => {return agGrideditClass(params, "ag-cell-left")} , hide:true},
-		{ headerName: "대표자명", field: "ceoNm", minWidth: 90, editable: true, cellClass: (params) => {return agGrideditClass(params)}},
+		{ headerName: "대표자명", field: "ceoNm", minWidth: 90, editable: (params) => {return ('${loginVO.authorCode}' =='ROLE_ADMIN')? true: false}
+			, cellClass: (params) => {return agGrideditClass(params)}},
 // 		{ headerName: "사용여부", field: "useAt", minWidth: 90, valueGetter:(params) => { return (params.node.data.useAt=='Y')?"사용": "미사용"}},
 
 		{ headerName: "소속<br/>라이더", field: "rdcnt", minWidth: 80, cellClass: 'ag-cell-right'},
 		{ headerName: "출금가능금액", field: "xxx", minWidth: 90, cellClass: 'ag-cell-right'},
 		{ headerName: "feeId", field: "feeId", minWidth: 90, hide:true},
-		{ headerName: "선지급수수료(%)", field: "feeAdminstrator", minWidth: 90, editable: true
+		{ headerName: "선지급수수료(%)", field: "feeAdminstrator", minWidth: 90, editable: (params) => {return ('${loginVO.authorCode}' =='ROLE_ADMIN')? true: false}
 			, cellClass: (params) => {return agGrideditClass(params, "ag-cell-right");}
 			, valueGetter:(params) => { return currencyFormatter(params.data.feeAdminstrator);}
             , valueParser: (params) => { return gridPercent(params);}
 		},
-		{ headerName: "협력사<br/>선지급수수료(%)", field: "feeCooperator", minWidth: 90, editable: true
+		{ headerName: "협력사<br/>선지급수수료(%)", field: "feeCooperator", minWidth: 90, editable: (params) => {return ('${loginVO.authorCode}' =='ROLE_ADMIN')? true: false}
 			, cellClass: (params) => {return agGrideditClass(params, "ag-cell-right");}
 			, valueGetter:(params) => { return currencyFormatter(params.data.feeCooperator);}
             , valueParser: (params) => { return gridPercent(params);}
@@ -121,7 +122,7 @@
 			, valueGetter:(params) => { return currencyFormatter(params.data.feeCall);}
             , valueParser: (params) => { return gridWan(params);}
 		},
-		{ headerName: "협력사<br/>콜수수료(%)", field: "feeCooperatorCall", minWidth: 90, editable: true
+		{ headerName: "협력사<br/>콜수수료(%)", field: "feeCooperatorCall", minWidth: 90, editable: (params) => {return ('${loginVO.authorCode}' =='ROLE_ADMIN')? true: false}
 			, cellClass: (params) => {return agGrideditClass(params, "ag-cell-right");}
 			, valueGetter:(params) => { return currencyFormatter(params.data.feeCooperatorCall);}
             , valueParser: (params) => { return gridPercent(params);}
@@ -569,12 +570,15 @@
 			            </ul>
 		            </li>
 
-					<li class="dropdown" style="display:none;"><a href="" onclick="javascript:return false;" class="active"><span>협력사/라이더 현황</span><i class="bi bi-chevron-down toggle-dropdown"></i></a>
+					<li class="cooperator" style="display:none;"><a href="${pageContext.request.contextPath}/usr/dty0004.do">배달정보 조회</a></li>
+
+					<li class="dropdown"><a href="" onclick="javascript:return false;" class="active"><span>협력사/라이더 현황</span><i class="bi bi-chevron-down toggle-dropdown"></i></a>
 						<ul>
 							<li><a href="${pageContext.request.contextPath}/usr/mem0001.do" class="active">협력사 관리</a></li>
-              				<li><a href="${pageContext.request.contextPath}/usr/mem0003.do">협력사계정 관리</a></li>
+              				<li style="display:none;"><a href="${pageContext.request.contextPath}/usr/mem0003.do">협력사계정 관리</a></li>
 							<li><a href="${pageContext.request.contextPath}/usr/mem0002.do">라이더관리</a></li>
-						</ul></li>
+						</ul>
+					</li>
 					<li class="dropdown" style="display:none;"><a href="" onclick="javascript:return false;"><span>자료 업로드</span> <i class="bi bi-chevron-down toggle-dropdown"></i></a>
 						<ul>
 							<li><a href="${pageContext.request.contextPath}/usr/dty0001.do">일별 자료 업로드</a></li>
@@ -582,8 +586,6 @@
 							<li><a href="${pageContext.request.contextPath}/usr/dty0003.do">자료 업로드 이력</a></li>
 						</ul>
 					</li>
-					<li class="cooperator" style="display:none;"><a href="${pageContext.request.contextPath}/usr/dty0004.do">배달정보 조회</a></li>
-					<li class="cooperator" style="display:none;"><a href="${pageContext.request.contextPath}/usr/mem0002.do">라이더관리</a></li>
 					<li><a href="${pageContext.request.contextPath}/usr/mem0004.do">MyPage</a></li>
 				</ul>
 				<i class="mobile-nav-toggle d-xl-none bi bi-list"></i>

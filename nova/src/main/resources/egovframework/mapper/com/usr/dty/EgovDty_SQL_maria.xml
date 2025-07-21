@@ -531,7 +531,7 @@
 			, if(c.ETC_ID IS NULL AND d.ETC_ID IS NULL, 'Y', 'N') as ABLE_YN /*하루에 한번만 출금할수 있도록 */
 			, (
 					SELECT COUNT(DYP_ID) FROM RD_DAY_PAY sub_c
-					WHERE b.COOPERATOR_ID = sub_c.COOPERATOR_ID AND b.MBER_ID = sub_c.MBER_ID  AND b.ETC_ID = sub_c.ETC_ID AND sub_c.IO_GUBUN ='2' AND sub_c.use_at ='Y'
+					WHERE b.COOPERATOR_ID = sub_c.COOPERATOR_ID AND b.MBER_ID = sub_c.MBER_ID  AND b.ETC_ID = sub_c.ETC_ID AND sub_c.IO_GUBUN ='2' AND sub_c.use_at ='Y' AND sub_c.week_yn ='N'
 			)
 			+ (
 					SELECT COUNT(WKP_ID) FROM RD_WEEK_PAY sub_d
