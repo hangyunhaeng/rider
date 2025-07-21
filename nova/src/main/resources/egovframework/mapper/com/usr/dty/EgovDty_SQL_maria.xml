@@ -456,7 +456,7 @@
 			, b.SEND_DT, b.SEND_TM, b.CREAT_DT, b.error_message
 			FROM RD_DAY_PAY a
 			LEFT JOIN RD_TRANSFER b ON a.TRAN_DAY = b.TRAN_DAY AND a.TELEGRAM_NO = b.TELEGRAM_NO
-			WHERE a.USE_AT ='Y'
+			WHERE 1=1/*a.USE_AT ='Y'*/
 				AND week_yn ='N'
 				AND IO_GUBUN ='2'
 				AND COOPERATOR_ID = #{searchCooperatorId}

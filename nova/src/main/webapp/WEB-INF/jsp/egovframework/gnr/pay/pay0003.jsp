@@ -141,7 +141,11 @@
 							var 내역 = $('#customer-order-table-body').find('[repeatObj=true]:hidden').clone();
 							$('#customer-order-table-body').append(내역);
 
-							내역.find('.tranDay').html(getStringDate(dataInfo.tranDay));
+							if(nullToString(dataInfo.sendDt) == ''){
+								내역.find('.tranDay').html(dataInfo.creatDt.substr(0, 10)+'<br/>'+dataInfo.creatDt.substr(11));
+							}else {
+								내역.find('.tranDay').html(getStringDate(dataInfo.sendDt)+'<br/>'+getStringTime(dataInfo.sendTm));
+							}
 							내역.find('.gubun').html(dataInfo.gubun);
 							내역.find('.sendPrice').html(currencyFormatter(dataInfo.sendPrice));
 							내역.find('.statusNm').html(dataInfo.statusNm);
@@ -273,7 +277,7 @@
                     <table class="table table-sm fs-9 mb-0">
                       <thead>
                         <tr>
-                          <th class="white-space-nowrap align-middle ps-0 pe-0 py-3"" scope="col" data-sort="order" style="width:28%;text-align:center;background-color:#0f1d33;color:white;" _msttexthash="9666644" _msthash="429">입금일</th>
+                          <th class="white-space-nowrap align-middle ps-0 pe-0 py-3"" scope="col" data-sort="order" style="width:28%;text-align:center;background-color:#0f1d33;color:white;" _msttexthash="9666644" _msthash="429">입금일시</th>
                           <th class="white-space-nowrap align-middle text-center pe-0 py-3"" scope="col" data-sort="total" style="width:25%;text-align:center;background-color:#0f1d33;color:white;" _msttexthash="9571315" _msthash="430">정산</th>
                           <th class="white-space-nowrap align-middle white-space-nowrap pe-0 py-3"" scope="col" data-sort="payment_status" style="width:30%;text-align:center;background-color:#0f1d33;color:white;" _msttexthash="22057685" _msthash="431">금액</th>
                           <th class="white-space-nowrap align-middle white-space-nowrap pe-0 py-3" scope="col" data-sort="fulfilment_status" style="width:17%;text-align:center;background-color:#0f1d33;color:white;" _msttexthash="37371139" _msthash="432">상태</th>

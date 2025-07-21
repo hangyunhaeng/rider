@@ -85,4 +85,6 @@ public class DayPayVO extends Sch implements Serializable {
 	private int rnum;
 	//입력된 출금요청액
 	private int inputPrice;
+
+	private float feeAdminstrator;
 }

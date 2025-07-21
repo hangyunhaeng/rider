@@ -8,6 +8,16 @@ function getStringDate(str){
 	return str.substr(0, 4)+"-"+str.substr(4, 2)+"-"+str.substr(6, 2);
 
 }
+/** 시간 */
+function getStringTime(str){
+	if(str == null)
+		return null;
+	if(str.length < 6 )
+		return null;
+
+	return str.substr(0, 2)+":"+str.substr(2, 2)+":"+str.substr(4, 2);
+
+}
 /**
  * null을 ""반환
  */

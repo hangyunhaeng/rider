@@ -135,6 +135,15 @@ public class RotDAO extends EgovComAbstractDAO {
 	public DayPayVO selectDayFee(DayPayVO vo) throws Exception {
 		return selectOne("rotDAO.selectDayFee", vo);
 	}
+	/**
+	 * 각종 수수료 조회(아이디 기준)
+	 * @param vo
+	 * @return
+	 * @throws Exception
+	 */
+	public DayPayVO selectFeeByMberId(MyInfoVO vo) throws Exception {
+		return selectOne("rotDAO.selectFeeByMberId", vo);
+	}
 }
 
 

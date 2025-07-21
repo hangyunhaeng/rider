@@ -84,12 +84,13 @@
 	var sendFee = ${sendFee};
 	//onLoad
 	document.addEventListener('DOMContentLoaded', function() {
-
 		if("${myInfoVOData.gubun}" == "DAY"){
 			$('#divDay').show();
+			$('#divdDayFee').show();		//선지긊 수수료
 			$('#title').html("선지급 배달비 입금");
 			$('#선정산메뉴').addClass("active");
 			$('#ablePrice').html(currencyFormatter(minWon0(${ablePrice.dayAblePrice})));
+
 		}
 		if("${myInfoVOData.gubun}" == "WEK"){
 			$('#divWek').show();
@@ -147,6 +148,12 @@
 		var inputPrice = parseInt(dayPrice, 10) + parseInt(weekPrice, 10) + parseInt(sendFee, 10);//차감 금액
 		$('#sumPrice').html(currencyFormatter(sumPrice));
 		$('#inputPrice').html(currencyFormatter(inputPrice));
+
+
+		//선지급수수료
+		if("${myInfoVOData.gubun}" == "DAY"){
+			$('#dayFee').html(currencyFormatter(Math.ceil(dayPrice*${fee.feeAdminstrator})));
+		}
 	}
 
     window.name="Parent_window";
@@ -432,6 +439,15 @@
 												</div>
 												<div class="col-auto d-flex">
 													<span id="sendFee" class="fs-9 mb-2" style="">300</span><span class="fs-9 mb-2" style="">원</span>
+												</div>
+											</div>
+
+											<div id="divdDayFee" class="row justify-content-between mb-1 mb-md-0 d-flex align-items-center lh-1" style="display:none !important;">
+												<div class="col-auto">
+													<label class="form-check-label mb-2 mb-md-0 fs-9 me-2 line-clamp-1 text-body cursor-pointer">선지급 수수료</label>
+												</div>
+												<div class="col-auto d-flex">
+													<span id="dayFee" class="fs-9 mb-2" style="">0</span><span class="fs-9 mb-2" style="">원</span>
 												</div>
 											</div>
 

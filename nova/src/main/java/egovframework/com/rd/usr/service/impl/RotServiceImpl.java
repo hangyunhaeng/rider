@@ -14,6 +14,7 @@ import egovframework.com.cmm.LoginVO;
 import egovframework.com.cmm.util.EgovUserDetailsHelper;
 import egovframework.com.rd.Util;
 import egovframework.com.rd.usr.service.RotService;
+import egovframework.com.rd.usr.service.vo.DayPayVO;
 import egovframework.com.rd.usr.service.vo.MyInfoVO;
 import egovframework.com.uat.uia.service.EgovLoginService;
 import egovframework.com.uss.umt.service.EgovUserManageService;
@@ -196,5 +197,15 @@ public class RotServiceImpl extends EgovAbstractServiceImpl implements RotServic
 	 */
 	public List<MyInfoVO> selectMyCooperatorList1(MyInfoVO vo)throws Exception {
     	return  rotDAO.selectMyCooperatorList(vo);
+	}
+
+	/**
+	 * 각종 수수료 조회(아이디 기준)
+	 * @param vo
+	 * @return
+	 * @throws Exception
+	 */
+	public DayPayVO selectFeeByMberId(MyInfoVO vo) throws Exception {
+    	return  rotDAO.selectFeeByMberId(vo);
 	}
 }

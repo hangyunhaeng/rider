@@ -416,6 +416,7 @@ public class EgovRotController {
 		model.addAttribute("myInfoVOData", myInfoVO);
 		model.addAttribute("sendFee", EgovProperties.getProperty("Globals.sendFee"));
 		model.addAttribute("doNice", Util.isReal());
+		model.addAttribute("fee", rotService.selectFeeByMberId(myInfoVO));
         return "egovframework/gnr/rot/rot0003";
 	}
 	/**
