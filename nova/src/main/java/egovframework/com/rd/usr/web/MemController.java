@@ -29,6 +29,7 @@ import egovframework.com.rd.usr.service.MemService;
 import egovframework.com.rd.usr.service.RotService;
 import egovframework.com.rd.usr.service.vo.CooperatorFeeVO;
 import egovframework.com.rd.usr.service.vo.CooperatorVO;
+import egovframework.com.rd.usr.service.vo.DoszSchAccoutCostVO;
 import egovframework.com.rd.usr.service.vo.DoszSchAccoutVO;
 import egovframework.com.rd.usr.service.vo.EtcVO;
 import egovframework.com.rd.usr.service.vo.MyInfoVO;
@@ -954,6 +955,50 @@ public class MemController {
 
         try {
         	rotService.updatePasswordByEsntlId(myInfoVO);
+        } catch (Exception e) {
+			map.put("resultCode", "fail");
+			map.put("resultMsg", e.getMessage());
+			return ResponseEntity.ok(map);
+		}
+        map.put("resultCode", "success");
+        return ResponseEntity.ok(map);
+	}
+
+	/**
+	 * 모계좌 잔액조회
+	 * @param request
+	 * @param model
+	 * @return
+	 * @throws Exception
+	 */
+    @RequestMapping("/usr/mem0004_0004.do")
+    public ResponseEntity<?> mem0004_0004(@ModelAttribute("MyInfoVO") MyInfoVO myInfoVO, HttpServletRequest request,ModelMap model) throws Exception {
+    	//로그인 체크
+        LoginVO user = (LoginVO)EgovUserDetailsHelper.getAuthenticatedUser();
+        Boolean isAuthenticated = EgovUserDetailsHelper.isAuthenticated();
+
+        if(!isAuthenticated) {
+        	return ResponseEntity.status(401).body("Unauthorized");
+        }
+
+        if(!Util.isUsr()) {
+        	return ResponseEntity.status(401).body("Unauthorized");
+        }
+        //return value
+        Map<String, Object> map =  new HashMap<String, Object>();
+
+
+        //총판 or 협력사
+        myInfoVO.setSchAuthorCode(user.getAuthorCode());
+        myInfoVO.setSchIhidNum(user.getIhidNum());
+
+		myInfoVO.setMberId(user.getId());
+		myInfoVO.setSchUserSe(user.getUserSe());
+        myInfoVO.setSchId(user.getId());
+
+        try {
+        	DoszSchAccoutCostVO doszSchAccoutCostVO = dtyService.schAccCost(myInfoVO);
+        	map.put("doszSchAccoutCostVO", doszSchAccoutCostVO);
         } catch (Exception e) {
 			map.put("resultCode", "fail");
 			map.put("resultMsg", e.getMessage());

@@ -38,8 +38,15 @@ public class MyInfoVO extends Sch implements Serializable {
 	private String registrationSn;
 	private String ceoNm;
 
+
+	private String cooperatorId;
+
+	//선지급가능금액
 	private int dayAblePrice;
+	//정산확정지급 가능금액
 	private int weekAblePrice;
+	//협력사 지급가능금액
+	private int coopAblePrice;
 	private String useAt;
 	private String gubun;
 	private String authorCode;

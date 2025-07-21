@@ -87,13 +87,15 @@
 
 		if("${myInfoVOData.gubun}" == "DAY"){
 			$('#divDay').show();
-			$('#title').html("선지급");
+			$('#title').html("선지급 배달비 입금");
 			$('#선정산메뉴').addClass("active");
+			$('#ablePrice').html(currencyFormatter(minWon0(${ablePrice.dayAblePrice})));
 		}
 		if("${myInfoVOData.gubun}" == "WEK"){
 			$('#divWek').show();
-			$('#title').html("정산완료출금");
+			$('#title').html("확정 배달비 입금");
 			$('#확정메뉴').addClass("active");
+			$('#ablePrice').html(currencyFormatter(minWon0(${ablePrice.weekAblePrice})));
 		}
 		if('${ablePrice.useAt}' == 'Y'){
 			$('.mx-lg-n4').find('button').attr('disabled', false);
@@ -104,8 +106,8 @@
 		}
 
 		debugger;
-		$('#dayAblePrice').html(currencyFormatter(minWon0(${ablePrice.dayAblePrice-sendFee}))+"원");
-		$('#weekAblePrice').html(currencyFormatter(minWon0(${ablePrice.weekAblePrice-sendFee}))+"원");
+		$('#dayAblePrice').html(currencyFormatter(minWon0(${ablePrice.dayAblePrice}))+"원");
+		$('#weekAblePrice').html(currencyFormatter(minWon0(${ablePrice.weekAblePrice}))+"원");
 		$('#sendFee').html(currencyFormatter(sendFee));
 		$("#dayPrice").on("propertychange change keyup paste input", function(e) {
 			calPrice();
@@ -370,6 +372,33 @@
 								</div>
 							</div>
 
+
+
+
+											<div class="row justify-content-between mb-1 mb-md-0 d-flex align-items-center lh-1  border-top pt-3">
+												<div class="col-auto">
+													<label class="form-check-label mb-2 mb-md-0 fs-9 me-2 line-clamp-1 text-body cursor-pointer"> - 지급가능금액</label>
+												</div>
+												<div class="col-auto d-flex">
+													<span class="fs-9 mb-2" style=""></span>
+												</div>
+											</div>
+
+
+
+
+											<div class="row justify-content-between mb-1 mb-md-0 d-flex align-items-center lh-1">
+												<div class="col-auto">
+													<label class="form-check-label mb-2 mb-md-0 fs-9 me-2 line-clamp-1 text-body cursor-pointer">지급가능금액</label>
+												</div>
+												<div class="col-auto d-flex">
+													<span id="ablePrice" class="fs-9 mb-2" style="color:red;">300</span><span class="fs-9 mb-2" style="">원</span>
+												</div>
+											</div>
+
+
+
+
 											<div class="row justify-content-between mb-1 mb-md-0 d-flex align-items-center lh-1  border-top pt-3">
 												<div class="col-auto">
 													<label class="form-check-label mb-2 mb-md-0 fs-9 me-2 line-clamp-1 text-body cursor-pointer"> - 입금 내역</label>
@@ -408,9 +437,9 @@
 
 
 
-											<div class="row justify-content-between mb-1 mb-md-0 d-flex align-items-center lh-1" style="display:none !important;">
+											<div class="row justify-content-between mb-1 mb-md-0 d-flex align-items-center lh-1">
 												<div class="col-auto">
-													<label class="form-check-label mb-2 mb-md-0 fs-9 me-2 line-clamp-1 text-body cursor-pointer">차감 금액</label>
+													<label class="form-check-label mb-2 mb-md-0 fs-9 me-2 line-clamp-1 text-body cursor-pointer">지급액</label>
 												</div>
 												<div class="col-auto d-flex">
 													<span id="inputPrice" class="fs-9 mb-2" style="">300</span><span class="fs-9 mb-2" style="">원</span>

@@ -144,7 +144,8 @@
 							$('#customer-order-table-body').append(내역);
 
 							내역.find('.day').html(getStringDate(dataInfo.day));
-							내역.find('.weekYn').html(dataInfo.weekYn == "Y" ? "완료":"미정산");
+							내역.find('.weekYn').html( nullToString(dataInfo.etcId)!='' ? "대여" : dataInfo.weekYn == "Y" ? "완료":"미정산");
+							내역.find('.deliveryCnt').html(currencyFormatter(dataInfo.deliveryCnt));
 							내역.find('.deliveryPrice').html(currencyFormatter(dataInfo.deliveryPrice));
 							내역.find('.ablePrice').html(currencyFormatter(dataInfo.ablePrice));
 							내역.show();
@@ -271,10 +272,11 @@
                     <table class="table table-sm fs-9 mb-0">
                       <thead>
                         <tr>
-                          <th class="white-space-nowrap align-middle ps-0 pe-0 py-3"" scope="col" data-sort="order" style="width:25%;text-align:center;background-color:#0f1d33;color:white;" _msttexthash="9666644" _msthash="429">배달일</th>
-                          <th class="white-space-nowrap align-middle text-center pe-0 py-3"" scope="col" data-sort="total" style="width:15%;text-align:center;background-color:#0f1d33;color:white;" _msttexthash="9571315" _msthash="430">정산</th>
-                          <th class="white-space-nowrap align-middle white-space-nowrap pe-0 py-3"" scope="col" data-sort="payment_status" style="width:30%;text-align:center;background-color:#0f1d33;color:white;" _msttexthash="22057685" _msthash="431">배달비</th>
-                          <th class="white-space-nowrap align-middle white-space-nowrap pe-0 py-3" scope="col" data-sort="fulfilment_status" style="width:30%;text-align:center;background-color:#0f1d33;color:white;" _msttexthash="37371139" _msthash="432">선지급가능금</th>
+                          <th class="white-space-nowrap align-middle ps-0 pe-0 py-3"" scope="col" data-sort="order" style="text-align:center;background-color:#0f1d33;color:white;" _msttexthash="9666644" _msthash="429">배달일</th>
+                          <th class="white-space-nowrap align-middle text-center pe-0 py-3"" scope="col" data-sort="total" style="text-align:center;background-color:#0f1d33;color:white;" _msttexthash="9571315" _msthash="430">구분</th>
+                          <th class="white-space-nowrap align-middle white-space-nowrap pe-0 py-3"" scope="col" data-sort="payment_status" style="text-align:center;background-color:#0f1d33;color:white;" _msttexthash="22057685" _msthash="431">건수</th>
+                          <th class="white-space-nowrap align-middle white-space-nowrap pe-0 py-3"" scope="col" data-sort="payment_status" style="text-align:center;background-color:#0f1d33;color:white;" _msttexthash="22057685" _msthash="431">배달비</th>
+                          <th class="white-space-nowrap align-middle white-space-nowrap pe-0 py-3" scope="col" data-sort="fulfilment_status" style="text-align:center;background-color:#0f1d33;color:white;" _msttexthash="37371139" _msthash="432">선지급가능금</th>
                         </tr>
                       </thead>
                       <tbody class="list" id="customer-order-table-body">
@@ -282,12 +284,13 @@
                         <tr repeatObj="true" class="hover-actions-trigger btn-reveal-trigger position-static" style="display:none;">
                           <td class="white-space-nowrap order align-middle ps-0 py-3 day">2025-05-05</td>
                           <td class="white-space-nowrap total align-middle text-center fw-semibold pe-0 text-body-highlight py-3 weekYn" _msttexthash="11490804" _msthash="436">완료</td>
+                          <td class="white-space-nowrap total align-middle fw-bold text-body-highlight text-end py-3 deliveryCnt">0</td>
                           <td class="white-space-nowrap total align-middle fw-bold text-body-highlight text-end py-3 deliveryPrice">1,522,555</td>
                           <td class="white-space-nowrap total align-middle fw-bold text-body-highlight text-end py-3 ablePrice">1,522,555</td>
                         </tr>
 
                         <tr repeatObj="no" class="hover-actions-trigger btn-reveal-trigger position-static" style="display:none;">
-                          <td class="order align-middle white-space-nowrap ps-0 py-3 text-center" colspan="4">조회된 내역이 없습니다</td>
+                          <td class="order align-middle white-space-nowrap ps-0 py-3 text-center" colspan="5">조회된 내역이 없습니다</td>
                         </tr>
 
                         </tbody>

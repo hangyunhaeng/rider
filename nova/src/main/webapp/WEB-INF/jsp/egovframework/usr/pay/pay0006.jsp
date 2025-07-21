@@ -54,6 +54,7 @@
 <script src="<c:url value='/js/xlsx.full.min.js' />"></script>
 <script src="<c:url value='/js/xlsx-populate.min.js' />"></script>
 <script src="<c:url value='/js/axios.min.js' />"></script>
+
 	<link href="<c:url value='/vendor/admin/bootstrap/3.4.1/bootstrap.min.css' />" rel="stylesheet">
 <!-- 	<script src="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script> -->
 
@@ -67,42 +68,27 @@
 	let data;
 	var columnDefs= [
 		{ headerName: "NO", field: "no", minWidth: 70, valueGetter:(params) => { return params.node.rowIndex + 1} },
-		{ headerName: "오류", field: "err", minWidth: 120, hide:true},
-// 		{ headerName: "chk", field: "chk", minWidth: 70, cellDataType: 'boolean', editable:true },
+		{ headerName: "copId", field: "copId", minWidth: 120, hide:true},
 		{ headerName: "협력사아이디", field: "cooperatorId", minWidth: 120},
-		{ headerName: "협력사명", field: "cooperatorNm", minWidth: 140, cellClass: 'ag-cell-left'},
-		{ headerName: "사업자등록번호", field: "registrationSn", minWidth: 120},
-		{ headerName: "사업자명", field: "registrationNm", minWidth: 140, cellClass: 'ag-cell-left'},
-		{ headerName: "운행일", field: "runDe", minWidth: 90},
-		{ headerName: "배달번호", field: "deliverySn", minWidth: 100},
-		{ headerName: "배달상태", field: "deliveryState", minWidth: 90},
-		{ headerName: "서비스타입", field: "serviceType", minWidth: 90},
-		{ headerName: "배달방식", field: "deliveryType", minWidth: 90},
-		{ headerName: "라이더ID", field: "riderId", minWidth: 150},
-		{ headerName: "User ID", field: "mberId", minWidth: 100},
-		{ headerName: "라이더명", field: "riderNm", minWidth: 90},
-		{ headerName: "배달수단", field: "deliveryMethod", minWidth: 90},
-		{ headerName: "가게번호", field: "shopSn", minWidth: 90},
-		{ headerName: "가게이름", field: "shopNm", minWidth: 200, cellClass: 'ag-cell-left'},
-		{ headerName: "상품가격", field: "goodsPrice", minWidth: 90},
-		{ headerName: "픽업 주소", field: "pickupAddr", minWidth: 200, cellClass: 'ag-cell-left'},
-		{ headerName: "전달지 주소", field: "destinationAddr", minWidth: 200, cellClass: 'ag-cell-left'},
-		{ headerName: "주문시간", field: "orderDt", minWidth: 150},
-		{ headerName: "배차완료", field: "operateRiderDt", minWidth: 150},
-		{ headerName: "가게도착", field: "shopComeinDt", minWidth: 150},
-		{ headerName: "픽업완료", field: "pickupFinistDt", minWidth: 150},
-		{ headerName: "전달완료", field: "deliveryFinistDt", minWidth: 150},
-		{ headerName: "거리", field: "distance", minWidth: 80},
-		{ headerName: "추가배달사유", field: "addDeliveryReason", minWidth: 200},
-		{ headerName: "추가배달상세내용", field: "addDeliveryDesc", minWidth: 200},
-		{ headerName: "픽업지 법정동 ", field: "pickupLawDong", minWidth: 90},
-		{ headerName: "기본단가", field: "basicPrice", minWidth: 90},
-		{ headerName: "기상할증", field: "weatherPrimage", minWidth: 90},
-		{ headerName: "추가할증", field: "addPrimage", minWidth: 90},
-		{ headerName: "피크할증 등 ", field: "peakPrimageEtc", minWidth: 90},
-		{ headerName: "배달처리비", field: "deliveryPrice", minWidth: 90},
-		{ headerName: "라이더귀책여부", field: "riderCauseYn", minWidth: 90},
-		{ headerName: "추가할증사유", field: "addPrimageDesc", minWidth: 90}
+		{ headerName: "협력사명", field: "cooperatorNm", minWidth: 120},
+		{ headerName: "금액", field: "sendPrice", minWidth: 140
+			, cellClass : "ag-cell-right"
+			, valueGetter:(params) => { return currencyFormatter(params.data.sendPrice);}
+		},
+		{ headerName: "수수료", field: "sendFee", minWidth: 90
+			, cellClass : "ag-cell-right"
+			, valueGetter:(params) => { return currencyFormatter(params.data.sendFee);}
+		},
+		{ headerName: "출금일", field: "tranDay", minWidth: 100, valueGetter:(params) => { return getStringDate(params.data.tranDay)}},
+		{ headerName: "출금은행", field: "rvBankNm", minWidth: 100},
+		{ headerName: "출금계좌", field: "rvAccount", minWidth: 140},
+		{ headerName: "status", field: "status", minWidth: 140, hide:true, hide:true},
+		{ headerName: "statusCd", field: "statusCd", minWidth: 140, hide:true},
+		{ headerName: "상태", field: "statusNm", minWidth: 140},
+		{ headerName: "오류메세지", field: "errorMessage", minWidth: 140},
+		{ headerName: "출금일", field: "sendDt", minWidth: 140, hide:true},
+		{ headerName: "출금시", field: "sendTm", minWidth: 140, hide:true}
+
 	];
 
 
@@ -146,9 +132,30 @@
 		searchFromDate.setDate(oneMonthAgo.getFullYear()+"-"+(oneMonthAgo.getMonth()+1)+"-"+oneMonthAgo.getDate());
 		searchToDate.setDate(today.getFullYear()+"-"+(today.getMonth()+1)+"-"+today.getDate());
 
+		$('#coopAblePrice').html(currencyFormatter(minWon0(${ablePrice.coopAblePrice})));
+
 		loadCooperatorList();
 		//그리드 설정
 		setGrid();
+
+		var ablePriceList = JSON.parse('${ablePriceList}');
+		ablePriceList.resultList.forEach(function(dataInfo, idx){
+			var 내역 = $('#반복부').find('[repeatObj=true]:hidden:eq(0)').clone();
+			내역.find('sm[name=coopAblePrice]').html(currencyFormatter(dataInfo.coopAblePrice)+"("+dataInfo.cooperatorNm+")");
+			내역.find('input[name=cooperatorId]').val(dataInfo.cooperatorId);
+			내역.find('input[name=cost]').on("input", function(e){
+				onInputVal(this, dataInfo.coopAblePrice-${sendFee});
+			});
+			내역.find('button').on("click", function(e){
+				doAct(this);
+			});
+			$('#반복부').append(내역);
+			내역.show();
+		});
+		if('${loginVO.authorCode}' =='ROLE_USER'){
+			$('#div출금').show();
+		}
+
 	});
 
 
@@ -156,6 +163,7 @@
 	function loadCooperatorList(){
 
 		const params = new URLSearchParams();
+
 		// 로딩 시작
         $('.loading-wrap--js').show();
         axios.post('${pageContext.request.contextPath}/usr/dty0000_0001.do',params).then(function(response) {
@@ -171,24 +179,17 @@
         });
 	}
 
-	//파일별 업로드 내역 조회
+	//내역 조회
 	function doSearch(){
-		if($('#searchRegistrationSn').val().trim() != '' && getOnlyNumber($('#searchRegistrationSn').val().trim()).length != 10){
-			alert("사업자번호는 10자리입니다");
-			$('#searchRegistrationSn').focus()
-			return ;
-		}
 
 		const params = new URLSearchParams();
 		params.append('searchCooperatorId', $('#searchCooperatorId').val());
 		params.append('searchFromDate', getOnlyNumber($('#searchFromDate').val()));
 		params.append('searchToDate', getOnlyNumber($('#searchToDate').val()));
-		params.append('searchNm', $('#searchNm').val().trim());
-		params.append('searchRegistrationSn', getOnlyNumber($('#searchRegistrationSn').val().trim()));
 
 		// 로딩 시작
         $('.loading-wrap--js').show();
-        axios.post('${pageContext.request.contextPath}/usr/dty0004_0001.do',params).then(function(response) {
+        axios.post('${pageContext.request.contextPath}/usr/pay0006_0001.do',params).then(function(response) {
         	// 로딩 종료
             $('.loading-wrap--js').hide();
 			if(response.data.resultCode == "success"){
@@ -242,6 +243,70 @@
 
 	}
 
+	function onInputVal(obj, maxInt){
+		//빈값이면 0으로
+		if(obj.value == "") obj.value = 0;
+		//모두 숫자로 변환
+		obj.value = obj.value.replace(/[^0-9]/g, '').replace(/(\..*)\./g, '$1');
+		maxInt = String(maxInt).replace(/[^0-9-]/g, '').replace(/(\..*)\./g, '$1');
+		maxInt = minWon0(maxInt);	//-는 없음
+
+		//최대값보다 큰값이 들어오면 최대값으로 변환
+		if(typeof(maxInt) != 'undefined'){
+			if(parseInt(obj.value, 10)> parseInt(maxInt, 10)){
+				obj.value = maxInt;
+			}
+		}
+
+		//콤마 붙여서 리턴
+		obj.value = currencyFormatter(parseInt(obj.value, 10));
+	}
+
+
+	var actObj;
+	//출금요청
+	function doAct(obj){
+
+		if(Number($(obj).closest('tr').find('input[name=cost]').val().replace(/[^0-9]-/g, '').replace(/(\..*)\./g, '$1'), 10) <= 0){
+			alert('출금금액을 입력하세요');
+			$(obj).closest('tr').find('input[name=cost]').focus();
+			return;
+		}
+
+
+		actObj = obj;
+
+		const params = new URLSearchParams();
+		params.append('cooperatorId', $(obj).closest('tr').find('input[name=cooperatorId]').val());
+		params.append('inputPrice', $(obj).closest('tr').find('input[name=cost]').val().replace(/[^0-9]/g, '').replace(/(\..*)\./g, '$1'));
+
+		// 로딩 시작
+        $('.loading-wrap--js').show();
+        axios.post('${pageContext.request.contextPath}/usr/pay0006_0002.do',params).then(function(response) {
+        	// 로딩 종료
+            $('.loading-wrap--js').hide();
+			if(response.data.resultCode == "success"){
+				$(actObj).closest('tr').find('sm[name=coopAblePrice]').html(currencyFormatter(response.data.ablePrice.coopAblePrice)+"("+response.data.ablePrice.cooperatorNm+")");
+				$(actObj).closest('tr').find('input[name=cost]').on("input", function(e){
+					onInputVal(this, response.data.ablePrice.coopAblePrice-${sendFee});
+				});
+				$(actObj).closest('tr').find('input[name=cost]').val(0);
+				doSearch();
+			} else{
+				if(response.data.resultMsg != '' && response.data.resultMsg != null)
+					alert(response.data.resultMsg);
+				else alert("출금에 실패하였습니다");
+				return ;
+			}
+        })
+        .catch(function(error) {
+            console.error('There was an error fetching the data:', error);
+        }).finally(function() {
+        	// 로딩 종료
+            $('.loading-wrap--js').hide();
+        });
+        pageInit = false;
+	}
 	</script>
 <body class="index-page">
 
@@ -268,18 +333,18 @@
 						  <li><a href="${pageContext.request.contextPath}/usr/inq0001.do">1:1문의</a></li>
 			            </ul>
 					</li>
-		            <li class="dropdown"><a href="" onclick="javascript:return false;"><span>수익현황</span> <i class="bi bi-chevron-down toggle-dropdown"></i></a>
+		            <li class="dropdown"><a href="" onclick="javascript:return false;" class="active"><span>수익현황</span> <i class="bi bi-chevron-down toggle-dropdown"></i></a>
 			          	<ul>
 			              <li style="display:none;"><a href="${pageContext.request.contextPath}/usr/pay0003.do">운영사수익현황</a></li>
 						  <li><a href="${pageContext.request.contextPath}/usr/pay0004.do">협력사수익현황</a></li>
 						  <li><a href="${pageContext.request.contextPath}/usr/pay0005.do">협력사 기타(대여, 리스) 현황</a></li>
 						  <li><a href="${pageContext.request.contextPath}/usr/pay0001.do">입출금내역<br></a></li>
-						  <li><a href="${pageContext.request.contextPath}/usr/pay0006.do">협력사 출금내역<br></a></li>
+						  <li><a href="${pageContext.request.contextPath}/usr/pay0006.do" class="active">협력사 출금내역<br></a></li>
 			            </ul>
 		            </li>
-		            <li class="dropdown" style="display:none;"><a href="" onclick="javascript:return false;" class="active"><span>관리</span> <i class="bi bi-chevron-down toggle-dropdown"></i></a>
+		            <li class="dropdown" style="display:none;"><a href="" onclick="javascript:return false;"><span>관리</span> <i class="bi bi-chevron-down toggle-dropdown"></i></a>
 			          	<ul>
-						  <li><a href="${pageContext.request.contextPath}/usr/dty0004.do" class="active">배달정보 조회</a></li>
+						  <li><a href="${pageContext.request.contextPath}/usr/dty0004.do">배달정보 조회</a></li>
 						  <li style="display:none;"><a href="${pageContext.request.contextPath}/usr/pay0002.do">입출금 대사<br></a></li>
 			            </ul>
 		            </li>
@@ -297,7 +362,7 @@
 							<li><a href="${pageContext.request.contextPath}/usr/dty0003.do">자료 업로드 이력</a></li>
 						</ul>
 					</li>
-					<li class="cooperator" style="display:none;"><a href="${pageContext.request.contextPath}/usr/dty0004.do" class="active">배달정보 조회</a></li>
+					<li class="cooperator" style="display:none;"><a href="${pageContext.request.contextPath}/usr/dty0004.do">배달정보 조회</a></li>
 					<li class="cooperator" style="display:none;"><a href="${pageContext.request.contextPath}/usr/mem0002.do">라이더관리</a></li>
 					<li><a href="${pageContext.request.contextPath}/usr/mem0004.do">MyPage</a></li>
 				</ul>
@@ -330,12 +395,49 @@
 	</form>
 
 	<div class="keit-header-body innerwrap clearfix">
-		<p class="tit">배달정보 조회</p>
+		<p class="tit">협력사 출금내역 현황</p>
 
 			<input name="pageUnit" type="hidden" value="1000"/>
 			<input name="pageSize" type="hidden" value="1000"/>
 			<!--과제관리_목록 -->
 			<div class="search_box ty2">
+
+			<div id="div출금" style="display:none;">
+				<table id="반복부">
+					<colgroup>
+						<col style="width: 13%">
+						<col style="width: 37%">
+						<col style="width: 13%">
+						<col style="width: *">
+					</colgroup>
+
+					<tr repeatObj="true" style="display:none;">
+						<th>출금가능금액</th>
+						<td>
+							<sm name="coopAblePrice"></sm>
+						</td>
+						<th>출금금액</th>
+						<td>
+							<input name="cooperatorId" type="hidden"/>
+							<input name="cost" type="text" style="width:calc(100% - 100px);" maxlength="15" oninput="">
+							<button class="btn ty1">출금요청</button>
+						</td>
+					</tr>
+					<tr>
+						<th>은행</th>
+						<td>
+							<sm>${myInfoVO.bnkNm}</sm>
+						</td>
+						<th>계좌번호</th>
+						<td>
+							<sm>${myInfoVO.accountNum} / ${myInfoVO.accountNm}</sm>
+						</td>
+					</tr>
+				</table>
+
+				<br/>
+				<br/>
+			</div>
 				<table>
 					<colgroup>
 						<col style="width: 13%">
@@ -349,13 +451,7 @@
 						<td>
 							<select id="searchCooperatorId" name='searchCooperatorId' style='width: 100%'></select>
 						</td>
-						<th>라이더명</th>
-						<td>
-							<input id="searchNm" type="text" >
-						</td>
-					</tr>
-					<tr>
-						<th>배달일</th>
+						<th>출금일</th>
 						<td>
 							<div>
 								<input id="searchFromDate" class="form-control search fs-9 float-start w40p"" type="date" placeholder="Search" aria-label="Search" _mstplaceholder="181961" _mstaria-label="74607">
@@ -363,10 +459,9 @@
 								<input id="searchToDate" class="form-control search fs-9 float-start w40p" type="date" placeholder="Search" aria-label="Search" _mstplaceholder="181961" _mstaria-label="74607">
 							</div>
 						</td>
-						<th>사업자번호</th>
-						<td>
-							<input id="searchRegistrationSn" type="text" oninput="this.value = this.value.replace(/[^0-9-]/g, '').replace(/(\..*)\./g, '$1');">
-						</td>
+					</tr>
+					<tr>
+
 					</tr>
 				</table>
 
@@ -383,7 +478,7 @@
 			<br>
 			<div id="loadingOverlay" style="display: none;">Loading...</div>
 			<div  class="ib_product">
-				<div id="myGrid" class="ag-theme-alpine" style="height: 550px; width: 100%;"></div>
+				<div id="myGrid" class="ag-theme-alpine" style="height: 410px; width: 100%;"></div>
 			</div>
 			</div>
 

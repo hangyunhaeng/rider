@@ -71,7 +71,7 @@
 		{ headerName: "오류", field: "err", minWidth: 120, hide:true},
 		{ headerName: "profitId", field: "profitId", minWidth: 120, hide:true},
 		{ headerName: "배달건수", field: "deliveryCnt", minWidth: 70
-			, valueGetter:(params) => { return params.data.deliveryCnt > 0 ? params.data.deliveryCnt: ''}
+			, valueGetter:(params) => { return params.data.deliveryCnt > 0 || params.data.deliveryCnt =='합계' ? params.data.deliveryCnt: ''}
 			, cellClass: 'ag-cell-right'
 		},
 		{ headerName: "배달일", field: "deliveryDay", minWidth: 120},
@@ -190,9 +190,21 @@
 
 	        	if (response.data.list.length == 0) {
 	        		grid.setGridOption('rowData',[]);  	// 데이터가 없는 경우 빈 배열 설정
+					var sum = [{deliveryCnt:"합계"
+						, cost: 0
+						}
+					];
+					grid.setGridOption('pinnedBottomRowData', sum);
 	        		grid.showNoRowsOverlay();  			// 데이터가 없는 경우
 	            } else {
 					var lst = response.data.list;	//정상데이터
+
+					var sum = [{deliveryCnt:"합계"
+						, cost: response.data.list.reduce((acc, num) => Number(acc, 10) + Number(num.cost, 10), 0)
+						}
+					];
+					grid.setGridOption('pinnedBottomRowData', sum);
+
 	                grid.setGridOption('rowData', lst);
 	            }
 			}
@@ -227,6 +239,9 @@
                 rowClassRules: {'ag-cell-err ': (params) => { return params.data.err === true; }},
 				overlayLoadingTemplate: '<span class="ag-overlay-loading-center">로딩 중</span>',
 				overlayNoRowsTemplate: '<span class="ag-overlay-loading-center">데이터가 없습니다</span>',
+				pinnedBottomRowData: [
+					{deliveryCnt:"합계", cost: 0}
+		        ],
 				onCellClicked : function (event) { //onSelectionChanged  :row가 바뀌었을때 발생하는 이벤트인데 잘 안됨.
 			    	selcetRow(event);
 			    }
@@ -309,6 +324,7 @@
 						  <li><a href="${pageContext.request.contextPath}/usr/pay0004.do">협력사수익현황</a></li>
 						  <li><a href="${pageContext.request.contextPath}/usr/pay0005.do">협력사 기타(대여, 리스) 현황</a></li>
 						  <li><a href="${pageContext.request.contextPath}/usr/pay0001.do">입출금내역<br></a></li>
+						  <li><a href="${pageContext.request.contextPath}/usr/pay0006.do">협력사 출금내역<br></a></li>
 			            </ul>
 		            </li>
 		            <li class="dropdown" style="display:none;"><a href="" onclick="javascript:return false;"><span>관리</span> <i class="bi bi-chevron-down toggle-dropdown"></i></a>

@@ -131,7 +131,7 @@
 		, cellEditor: 'agSelectCellEditor'
 		, cellEditorParams: params => { return {values: ['Y', 'N']}; }
 		, cellClass: (params) => {return agGrideditClass(params)}},
-		{ headerName: "수수료적용일", field: "creatDt", minWidth: 100
+		{ headerName: "등록일", field: "creatDt", minWidth: 100
 	        , valueGetter:(params) => { return getStringDate(params.data.creatDt)}
 	    },
 		{ headerName: "생성자", field: "creatId", minWidth: 90, hide:true},
@@ -559,6 +559,7 @@
 						  <li><a href="${pageContext.request.contextPath}/usr/pay0004.do">협력사수익현황</a></li>
 						  <li><a href="${pageContext.request.contextPath}/usr/pay0005.do">협력사 기타(대여, 리스) 현황</a></li>
 						  <li><a href="${pageContext.request.contextPath}/usr/pay0001.do">입출금내역<br></a></li>
+						  <li><a href="${pageContext.request.contextPath}/usr/pay0006.do">협력사 출금내역<br></a></li>
 			            </ul>
 		            </li>
 		            <li class="dropdown" style="display:none;"><a href="" onclick="javascript:return false;"><span>관리</span> <i class="bi bi-chevron-down toggle-dropdown"></i></a>
