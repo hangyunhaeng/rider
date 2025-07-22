@@ -144,7 +144,7 @@
 							$('#customer-order-table-body').append(내역);
 
 							내역.find('.day').html(getStringDate(dataInfo.day));
-							내역.find('.weekYn').html( nullToString(dataInfo.etcId)!='' ? "대여" : dataInfo.weekYn == "Y" ? "완료":"미정산");
+							내역.find('.weekYn').html( nullToString(dataInfo.etcId)!='' ? (dataInfo.dwGubun=='DAY'? "대여<br/>선지급":"대여<br/>확정") : dataInfo.weekYn == "Y" ? "완료":"미정산");
 							내역.find('.deliveryCnt').html(currencyFormatter(dataInfo.deliveryCnt));
 							내역.find('.deliveryPrice').html(currencyFormatter(dataInfo.deliveryPrice));
 							내역.find('.ablePrice').html(currencyFormatter(dataInfo.ablePrice));
@@ -226,7 +226,7 @@
                   </div>
                 </div>
 
-                <div class="card-body py-0 scrollbar to-do-list-body">
+                <div class="card-body py-0 px-2 scrollbar to-do-list-body">
                 <div class="d-flex hover-actions-trigger py-3 border-translucent border-top">
                   <div class="justify-content-between align-items-center mb-0 w-100">
                     <div class="col-auto w-100">
@@ -276,7 +276,7 @@
                           <th class="white-space-nowrap align-middle text-center pe-0 py-3"" scope="col" data-sort="total" style="text-align:center;background-color:#0f1d33;color:white;" _msttexthash="9571315" _msthash="430">구분</th>
                           <th class="white-space-nowrap align-middle white-space-nowrap pe-0 py-3"" scope="col" data-sort="payment_status" style="text-align:center;background-color:#0f1d33;color:white;" _msttexthash="22057685" _msthash="431">건수</th>
                           <th class="white-space-nowrap align-middle white-space-nowrap pe-0 py-3"" scope="col" data-sort="payment_status" style="text-align:center;background-color:#0f1d33;color:white;" _msttexthash="22057685" _msthash="431">배달비</th>
-                          <th class="white-space-nowrap align-middle white-space-nowrap pe-0 py-3" scope="col" data-sort="fulfilment_status" style="text-align:center;background-color:#0f1d33;color:white;" _msttexthash="37371139" _msthash="432">선지급가능금</th>
+                          <th class="white-space-nowrap align-middle white-space-nowrap pe-0 py-3" scope="col" data-sort="fulfilment_status" style="text-align:center;background-color:#0f1d33;color:white;" _msttexthash="37371139" _msthash="432">선지급<br/>가능금</th>
                         </tr>
                       </thead>
                       <tbody class="list" id="customer-order-table-body">

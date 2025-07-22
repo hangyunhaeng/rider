@@ -231,7 +231,7 @@
                   </div>
                 </div>
 
-                <div class="card-body py-0 scrollbar to-do-list-body">
+                <div class="card-body py-0 px-2 scrollbar to-do-list-body">
                 <div class="d-flex hover-actions-trigger py-3 border-translucent border-top">
                   <div class="justify-content-between align-items-center mb-0 w-100">
                     <div class="col-auto w-100">

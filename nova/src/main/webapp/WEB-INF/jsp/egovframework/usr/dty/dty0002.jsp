@@ -102,7 +102,7 @@
 		{ headerName: "총배달료C<br/>(A+B) ", field: "sumCost", minWidth: 120, cellClass: 'ag-cell-right', valueGetter:(params) => { return currencyFormatter(params.data.sumCost)}},
 		{ headerName: "시간제보험료", field: "timeInsurance", minWidth: 120, cellClass: 'ag-cell-right', valueGetter:(params) => { return currencyFormatter(params.data.timeInsurance)}},
 		{ headerName: "필요경비", field: "necessaryExpenses", minWidth: 120, cellClass: 'ag-cell-right', valueGetter:(params) => { return currencyFormatter(params.data.necessaryExpenses)}},
-		{ headerName: "보수액", field: "pay", minWidth: 120, cellClass: 'ag-cell-right', valueGetter:(params) => { return currencyFormatter(params.data.taxBillSum)}},
+		{ headerName: "보수액", field: "pay", minWidth: 120, cellClass: 'ag-cell-right', valueGetter:(params) => { return currencyFormatter(params.data.pay)}},
 		{ headerName: "사업주부담<br/>고용보험료(1)", field: "ownerEmploymentInsurance", minWidth: 120, cellClass: 'ag-cell-right', valueGetter:(params) => { return currencyFormatter(params.data.ownerEmploymentInsurance)}},
 		{ headerName: "라이더부담<br/>고용보험료(2)", field: "riderEmploymentInsurance", minWidth: 120, cellClass: 'ag-cell-right', valueGetter:(params) => { return currencyFormatter(params.data.riderEmploymentInsurance)}},
 		{ headerName: "사업주부담<br/>산재보험료(3)", field: "ownerIndustrialInsurance", minWidth: 120, cellClass: 'ag-cell-right', valueGetter:(params) => { return currencyFormatter(params.data.ownerIndustrialInsurance)}},

@@ -87,4 +87,5 @@ public class DayPayVO extends Sch implements Serializable {
 	private int inputPrice;
 
 	private float feeAdminstrator;
+	private String dwGubun;
 }

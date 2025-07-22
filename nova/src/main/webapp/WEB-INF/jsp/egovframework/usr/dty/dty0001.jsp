@@ -103,7 +103,7 @@
 		{ headerName: "배달수단", field: "deliveryMethod", minWidth: 90},
 		{ headerName: "가게번호", field: "shopSn", minWidth: 90},
 		{ headerName: "가게이름", field: "shopNm", minWidth: 200, cellClass: 'ag-cell-left'},
-		{ headerName: "상품가격", field: "goodsPrice", minWidth: 90, cellClass: 'ag-cell-right', valueGetter:(params) => { return currencyFormatter(params.data.distance)}},
+		{ headerName: "상품가격", field: "goodsPrice", minWidth: 90, cellClass: 'ag-cell-right', valueGetter:(params) => { return currencyFormatter(params.data.goodsPrice)}},
 		{ headerName: "픽업 주소", field: "pickupAddr", minWidth: 200, cellClass: 'ag-cell-left'},
 		{ headerName: "전달지 주소", field: "destinationAddr", minWidth: 200, cellClass: 'ag-cell-left'},
 		{ headerName: "주문시간", field: "orderDt", minWidth: 150},
