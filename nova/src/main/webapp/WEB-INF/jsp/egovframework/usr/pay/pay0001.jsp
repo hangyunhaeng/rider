@@ -73,6 +73,7 @@
 		{ headerName: "협력사아이디", field: "cooperatorId", minWidth: 140},
 		{ headerName: "협력사명", field: "cooperatorNm", minWidth: 140},
 		{ headerName: "입출금", field: "ioGubunNm", minWidth: 80},
+		{ headerName: "구분", field: "dwGubun", minWidth: 140, valueGetter:(params) => { return params.data.dwGubun== "DAY" ?"선지급":"확정"}},
 		{ headerName: "정산여부", field: "weekNm", minWidth: 90},
 		{ headerName: "발생일시", field: "creatDt", minWidth: 140},
 		{ headerName: "금액", field: "sendPrice", minWidth: 80, cellClass: (params) => {return agGridUnderBarClass(params, 'ag-cell-right')}, valueGetter:(params) => { return currencyFormatter(params.data.sendPrice)}},
@@ -81,8 +82,8 @@
 		{ headerName: "출금은행", field: "rvBankNm", minWidth: 100},
 		{ headerName: "출금계좌", field: "rvAccount", minWidth: 140},
 		{ headerName: "status", field: "status", minWidth: 140, hide:true},
-		{ headerName: "statusCd", field: "statusCd", minWidth: 140},
-		{ headerName: "statusNm", field: "statusNm", minWidth: 140},
+		{ headerName: "출금상태코드", field: "statusCd", minWidth: 140},
+		{ headerName: "출금상태", field: "statusNm", minWidth: 140},
 		{ headerName: "errorMessage", field: "errorMessage", minWidth: 140},
 		{ headerName: "출금일", field: "sendDt", minWidth: 140},
 		{ headerName: "출금시", field: "sendTm", minWidth: 140},
@@ -90,13 +91,12 @@
 		{ headerName: "라이더ID", field: "mberId", minWidth: 140},
 		{ headerName: "telegramNo", field: "telegramNo", minWidth: 140, hide:true},
 		{ headerName: "ioGubun", field: "ioGubun", minWidth: 140, hide:true},
-		{ headerName: "dayAtchFileId", field: "dayAtchFileId", minWidth: 140},
-		{ headerName: "wekAtchFileId", field: "wekAtchFileId", minWidth: 140},
+		{ headerName: "dayAtchFileId", field: "dayAtchFileId", minWidth: 140, hide:true},
+		{ headerName: "wekAtchFileId", field: "wekAtchFileId", minWidth: 140, hide:true},
 		{ headerName: "fileDate", field: "wekAtchFileId", minWidth: 140, hide:true},
 		{ headerName: "weekYn", field: "weekYn", minWidth: 140, hide:true},
-		{ headerName: "dwGubun", field: "dwGubun", minWidth: 140},
-		{ headerName: "정산기간", field: "accountsStDt", minWidth: 140},
-		{ headerName: "정산기간", field: "accountsEdDt", minWidth: 140}
+		{ headerName: "정산기간", field: "accountsStDt", minWidth: 140, hide:true},
+		{ headerName: "정산기간", field: "accountsEdDt", minWidth: 140, hide:true}
 	];
 
 
@@ -180,7 +180,7 @@
 		params.append('searchToDate', getOnlyNumber($('#searchToDate').val()));
 		params.append('searchNm', $('#searchNm').val().trim());
 		params.append('searchRegistrationSn', getOnlyNumber($('#searchRegistrationSn').val().trim()));
-		params.append('searchGubun', $('#searchGubun').val());
+// 		params.append('searchGubun', $('#searchGubun').val());
 
 		// 로딩 시작
         $('.loading-wrap--js').show();
@@ -311,7 +311,7 @@
 			              <li style="display:none;"><a href="${pageContext.request.contextPath}/usr/pay0003.do">운영사수익현황</a></li>
 						  <li><a href="${pageContext.request.contextPath}/usr/pay0004.do">협력사수익현황</a></li>
 						  <li><a href="${pageContext.request.contextPath}/usr/pay0005.do">협력사 기타(대여, 리스) 현황</a></li>
-						  <li><a href="${pageContext.request.contextPath}/usr/pay0001.do" class="active">입출금내역<br></a></li>
+						  <li><a href="${pageContext.request.contextPath}/usr/pay0001.do" class="active">라이더 출금내역<br></a></li>
 						  <li><a href="${pageContext.request.contextPath}/usr/pay0006.do">협력사 출금내역<br></a></li>
 			            </ul>
 		            </li>
@@ -369,7 +369,7 @@
 	</form>
 
 	<div class="keit-header-body innerwrap clearfix">
-		<p class="tit">입출금내역</p>
+		<p class="tit">라이더 출금내역</p>
 
 			<input name="pageUnit" type="hidden" value="1000"/>
 			<input name="pageSize" type="hidden" value="1000"/>
@@ -407,16 +407,16 @@
 							<input id="searchRegistrationSn" type="text" oninput="this.value = this.value.replace(/[^0-9-]/g, '').replace(/(\..*)\./g, '$1');">
 						</td>
 					</tr>
-					<tr>
-						<th>입출금구분</th>
-						<td colspan="3">
-							<select id="searchGubun" name='searchGubun' style='width: 100%'>
-								<option value="all">전체</option>
-								<option value="1">입금</option>
-								<option value="2">출금</option>
-							</select>
-						</td>
-					</tr>
+<!-- 					<tr> -->
+<!-- 						<th>입출금구분</th> -->
+<!-- 						<td colspan="3"> -->
+<!-- 							<select id="searchGubun" name='searchGubun' style='width: 100%'> -->
+<!-- 								<option value="all">전체</option> -->
+<!-- 								<option value="1">입금</option> -->
+<!-- 								<option value="2">출금</option> -->
+<!-- 							</select> -->
+<!-- 						</td> -->
+<!-- 					</tr> -->
 				</table>
 
 				<div class="btnwrap">

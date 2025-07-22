@@ -481,7 +481,7 @@
 
 			UNION all
 
-			SELECT COOPERATOR_ID, DW_GUBUN, if(DW_GUBUN='DAY', '선지급', '정산') AS GUBUN, WKP_ID AS ID, a.SEND_PRICE, a.FEE
+			SELECT COOPERATOR_ID, DW_GUBUN, if(DW_GUBUN='DAY', '선지급', '확정') AS GUBUN, WKP_ID AS ID, a.SEND_PRICE, a.FEE
 			, b.TRAN_DAY , b.RV_ACCOUNT, b.STATUS, b.STATUS_cd, b.error_code
 			, case when b.STATUS='200' then '이체' when b.STATUS= '999' then '처리중' when b.STATUS= '400' AND b.error_code='VTIM' then '처리중' when b.STATUS= '400' AND b.error_code='0011' then '처리중' ELSE '실패' end  AS STATUS_NM
 			, b.SEND_DT, b.SEND_TM, b.CREAT_DT, b.error_message

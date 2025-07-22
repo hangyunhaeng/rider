@@ -209,6 +209,60 @@
 		        });
 
 	}
+// 	function 계좌정보저장(){
+
+// 		if($('#bnkCd').val() == ""){
+// 			alert("은행을 선택하세요");
+// 			$("#bnkCd").focus();
+// 			return;
+// 		}
+// 		if($('#accountNum').val() == ""){
+// 			alert("계좌번호를 입력하세요");
+// 			$("#accountNum").focus();
+// 			return;
+// 		}
+// 		if(confirm("저장하시겠습니까?")){
+
+// 			if(${doNice} != true){
+// 				saveAcc();
+// 				return;
+// 			}
+
+// 			// 로딩 시작
+// 	        $('.loading-wrap--js').show();
+// 			var formData = new FormData();
+
+
+// 		    const params = new URLSearchParams();
+// 		    axios.post('${pageContext.request.contextPath}/com/com0010_0000.do', params)
+// 		        .then(response => {
+// 		        	// 로딩 종료
+// 		            $('.loading-wrap--js').hide();
+// 					if(response.data.resultCode == "success"){
+// 						document.form_chk.token_version_id.value = response.data.token_version_id;
+// 						document.form_chk.enc_data.value = response.data.enc_data;
+// 						document.form_chk.integrity_value.value = response.data.integrity;
+// 						goActStep2 = saveAcc;
+
+// 						fnPopup();
+// 					} else {
+// 						if(response.data.resultMsg != '' && response.data.resultMsg != null)
+// 							alert(response.data.resultMsg);
+// 						else alert("기본정보 저장에 실패하였습니다");
+// 						return ;
+// 					}
+// 		        })
+// 		        .catch(error => {
+// 		        	// 로딩 종료
+// 		            $('.loading-wrap--js').hide();
+// 		            console.error('Error fetching data:', error);
+// 		        });
+
+
+// 		}
+// 	}
+
+
 	function 계좌정보저장(){
 
 		if($('#bnkCd').val() == ""){
@@ -223,12 +277,40 @@
 		}
 		if(confirm("저장하시겠습니까?")){
 
+		    const params = new URLSearchParams();
+		    params.append("bnkCd", $('#bnkCd').val());								//은행코드
+		    params.append("accountNum", getOnlyNumber($('#accountNum').val()));		//계좌번호
+		    params.append("accountNm", $('#accountNm').val());		//에금주명
 
-			if(${doNice} != true){
-				saveAcc();
-				return;
-			}
+			// 로딩 시작
+	        $('.loading-wrap--js').show();
+		    axios.post('${pageContext.request.contextPath}/gnr/rot0002_0003.do', params)	//얘금주명 조회
+		        .then(response => {
+		        	// 로딩 종료
+		            $('.loading-wrap--js').hide();
+					if(response.data.resultCode == "success"){
+						//개발계는 pass 않태우고 바로 저장
+						if(${doNice} != true){
+							saveAcc();
+							return;
+						}
+						//pass 개인정보 조회
+						pass();
+					} else {
+						if(response.data.resultMsg != '' && response.data.resultMsg != null)
+							alert(response.data.resultMsg);
+						else alert("실패하였습니다");
+					}
+		        })
+		        .catch(error => {
+		        	// 로딩 종료
+		            $('.loading-wrap--js').hide();
+		            console.error('Error fetching data:', error);
+		        });
+		}
+	}
 
+	function pass(){
 			// 로딩 시작
 	        $('.loading-wrap--js').show();
 			var formData = new FormData();
@@ -249,7 +331,7 @@
 					} else {
 						if(response.data.resultMsg != '' && response.data.resultMsg != null)
 							alert(response.data.resultMsg);
-						else alert("기본정보 저장에 실패하였습니다");
+						else alert("pass인증에 실패하였습니다");
 						return ;
 					}
 		        })
@@ -258,20 +340,42 @@
 		            $('.loading-wrap--js').hide();
 		            console.error('Error fetching data:', error);
 		        });
-
-
-		}
 	}
+
+// 	function saveAcc(){
+
+// 	    const params = new URLSearchParams();
+// 	    params.append("bnkCd", $('#bnkCd').val());
+// 	    params.append("accountNum", getOnlyNumber($('#accountNum').val()));
+
+// 		// 로딩 시작
+//         $('.loading-wrap--js').show();
+// 	    axios.post('${pageContext.request.contextPath}/gnr/rot0002_0002.do', params)
+// 	        .then(response => {
+// 	        	// 로딩 종료
+// 	            $('.loading-wrap--js').hide();
+// 				if(response.data.resultCode == "success"){
+// 					goMyInfo();
+// 				} else {
+// 					if(response.data.resultMsg != '' && response.data.resultMsg != null)
+// 						alert(response.data.resultMsg);
+// 					else alert("실패하였습니다");
+// 				}
+// 	        })
+// 	        .catch(error => {
+// 	        	// 로딩 종료
+// 	            $('.loading-wrap--js').hide();
+// 	            console.error('Error fetching data:', error);
+// 	        });
+// 	}
+
 
 	function saveAcc(){
 
 	    const params = new URLSearchParams();
-	    params.append("bnkCd", $('#bnkCd').val());
-	    params.append("accountNum", getOnlyNumber($('#accountNum').val()));
-
 		// 로딩 시작
         $('.loading-wrap--js').show();
-	    axios.post('${pageContext.request.contextPath}/gnr/rot0002_0002.do', params)
+	    axios.post('${pageContext.request.contextPath}/gnr/rot0002_0004.do', params)
 	        .then(response => {
 	        	// 로딩 종료
 	            $('.loading-wrap--js').hide();
@@ -280,7 +384,7 @@
 				} else {
 					if(response.data.resultMsg != '' && response.data.resultMsg != null)
 						alert(response.data.resultMsg);
-					else alert("실패하였습니다");
+					else alert("계좌정보 저장에 실패하였습니다");
 				}
 	        })
 	        .catch(error => {
@@ -555,13 +659,14 @@
 					</div>
 				</div>
 
-<!--                 <div class="d-flex border-bottom row justify-content-between align-items-center"> -->
-<!-- 	                <div class="col-auto"> -->
-<!-- 	                </div> -->
-<!-- 	                <div class="d-flex col-auto"> -->
-<!-- 	                	<button class="btn btn-primary mb-2 mb-sm-0 mx-1 fs-9" type="submit" onclick="계좌정보저장()">계좌정보저장</button> -->
-<!-- 	                </div> -->
-<!--                 </div> -->
+				<div class="d-flex hover-actions-trigger py-2 border-translucent position-relative">
+					<div class="col-12">
+						<div class="form-floating">
+						<input id="accountNm" class="form-control" type="text" placeholder="예금주명"><label for="floatingInputZipcode">예금주명<em style="color:red;">타인명의 계좌일 경우 입력하세요</em></label>
+						</div>
+					</div>
+				</div>
+
 			</div>
 
 

@@ -383,6 +383,139 @@ public class EgovRotController {
         return ResponseEntity.ok(map);
 	}
 
+	/**
+	 * 마이페이지 - 계좌조회
+	 * @param request
+	 * @param model
+	 * @return
+	 * @throws Exception
+	 */
+    @RequestMapping("/gnr/rot0002_0003.do")
+    public ResponseEntity<?> rot0002_0003(@ModelAttribute("MyInfoVO") MyInfoVO myInfoVO, HttpServletRequest request,ModelMap model) throws Exception {
+
+    	//로그인 체크
+        LoginVO user = (LoginVO)EgovUserDetailsHelper.getAuthenticatedUser();
+        Boolean isAuthenticated = EgovUserDetailsHelper.isAuthenticated();
+
+        if(!isAuthenticated) {
+        	return ResponseEntity.status(401).body("Unauthorized");
+        }
+
+        if(!Util.isGnr()) {
+        	return ResponseEntity.status(401).body("Unauthorized");
+        }
+        //return value
+        Map<String, Object> map =  new HashMap<String, Object>();
+
+        //라이더 권한
+        myInfoVO.setSchAuthorCode(user.getAuthorCode());
+        myInfoVO.setSchId(user.getId());
+
+        myInfoVO.setMberId(user.getId());
+
+
+        try{
+
+	        DoszSchAccoutVO doszSchAccoutVO = dtyService.schAcc(myInfoVO);
+
+	        if("200".equals((doszSchAccoutVO.getStatus()))) {
+	        	String sNm = Util.isEmpty(myInfoVO.getAccountNm()) ? user.getName() : myInfoVO.getAccountNm().trim();
+	        	if(sNm.equals(doszSchAccoutVO.getDepositor())) {
+		        	request.getSession().setAttribute("doszSchAccoutVO", doszSchAccoutVO);	//더즌 정보 세션에 저장 ,pass 태우고 성공후 db저장하기!!
+		        	map.put("resultCode", "success");
+		        }else {
+		        	map.put("resultMsg", "예금주와 가입자 성명이 일치하지 않습니다\n저장을 취소합니다 \n\n예금주명 : "+doszSchAccoutVO.getDepositor());
+		        	map.put("resultCode", "fail");
+		        }
+	        } else if("999".equals(doszSchAccoutVO.getStatus())) {
+	        	map.put("resultMsg", "계좌가 조회되지 않습니다.\n\n저장을 취소합니다");
+	        	map.put("resultCode", "fail");
+	        } else {
+	        	map.put("resultMsg", doszSchAccoutVO.getErrorMessage() +"\n\n저장을 취소합니다");
+	        	map.put("resultCode", "fail");
+	        }
+	    } catch (Exception e) {
+			map.put("resultCode", "fail");
+			map.put("resultMsg", e.getMessage());
+			return ResponseEntity.ok(map);
+		}
+
+        return ResponseEntity.ok(map);
+	}
+
+
+	/**
+	 * 마이페이지 - 계좌정보저장
+	 * @param request
+	 * @param model
+	 * @return
+	 * @throws Exception
+	 */
+    @RequestMapping("/gnr/rot0002_0004.do")
+    public ResponseEntity<?> rot0002_0004(@ModelAttribute("MyInfoVO") MyInfoVO myInfoVO, HttpServletRequest request,ModelMap model) throws Exception {
+
+    	//로그인 체크
+        LoginVO user = (LoginVO)EgovUserDetailsHelper.getAuthenticatedUser();
+        Boolean isAuthenticated = EgovUserDetailsHelper.isAuthenticated();
+
+        if(!isAuthenticated) {
+        	return ResponseEntity.status(401).body("Unauthorized");
+        }
+
+        if(!Util.isGnr()) {
+        	return ResponseEntity.status(401).body("Unauthorized");
+        }
+        //return value
+        Map<String, Object> map =  new HashMap<String, Object>();
+
+        //라이더 권한
+        myInfoVO.setSchAuthorCode(user.getAuthorCode());
+        myInfoVO.setSchId(user.getId());
+
+        myInfoVO.setMberId(user.getId());
+
+
+        try{
+	    	if(Util.isReal()) {
+	        	if(Util.isEmpty((String)request.getSession().getAttribute("niceSuccess"))) {
+	    			throw new IllegalArgumentException("PASS 미인증으로 변경 불가") ;
+	        	}
+	        	if(!"success".equals((String)request.getSession().getAttribute("niceSuccess"))) {
+	    			throw new IllegalArgumentException("PASS 미인증으로 변경 불가") ;
+	        	}
+	    	}
+	        request.getSession().removeAttribute("req_no");
+	        request.getSession().removeAttribute("key");
+	        request.getSession().removeAttribute("iv");
+	        request.getSession().removeAttribute("hmac_key");
+	        request.getSession().removeAttribute("token_version_id");
+	        request.getSession().removeAttribute("niceSuccess");
+
+
+
+	        DoszSchAccoutVO doszSchAccoutVO = (DoszSchAccoutVO)request.getSession().getAttribute("doszSchAccoutVO");
+	        request.getSession().removeAttribute("doszSchAccoutVO");
+
+	        if(doszSchAccoutVO != null) {
+	        	myInfoVO.setAccountNm(doszSchAccoutVO.getDepositor());
+	        	myInfoVO.setEsntlId(user.getUniqId());
+	        	myInfoVO.setBnkCd(doszSchAccoutVO.getBank_code());
+	        	myInfoVO.setAccountNum(doszSchAccoutVO.getAccount());
+	        	myInfoVO.setAccountNm(doszSchAccoutVO.getDepositor());
+	        	rotService.saveBankByEsntlId(myInfoVO);
+	        	map.put("resultCode", "success");
+	        } else {
+				map.put("resultCode", "fail");
+				map.put("resultMsg", "예금주 조회 정보가 업습니다.");
+	        }
+	    } catch (Exception e) {
+			map.put("resultCode", "fail");
+			map.put("resultMsg", e.getMessage());
+			return ResponseEntity.ok(map);
+		}
+
+        return ResponseEntity.ok(map);
+	}
 
 	/**
 	 * 출금페이지

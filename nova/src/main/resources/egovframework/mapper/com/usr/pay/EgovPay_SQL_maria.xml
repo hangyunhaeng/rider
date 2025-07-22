@@ -36,10 +36,10 @@
 			LEFT JOIN COMTNFILE f ON a.DAY_ATCH_FILE_ID = f.ATCH_FILE_ID
 			LEFT JOIN RD_ETC g ON a.etc_id = g.ETC_ID AND g.USE_AT ='Y'
 			WHERE 1=1
-			AND (week_yn ='N' or io_gubun ='1')	/*정산완료된 출금이력은 주정산으로 넘어가기때문에 제외한다*/
-			<if test="searchGubun != 'all'">
-			AND io_gubun = #{searchGubun}
-			</if>
+			AND a.use_at ='Y'
+			AND a.week_yn ='N'	/*정산완료된 출금이력은 주정산으로 넘어가기때문에 제외한다*/
+			AND a.io_gubun = '2'
+			AND a.etc_id is null	/* 대여도 제외 */
 			<if test='searchCooperatorId != null and searchCooperatorId != "all"'>
 			AND a.cooperator_id = #{searchCooperatorId}
 			</if>
@@ -81,9 +81,8 @@
 			LEFT JOIN COMTNFILE f ON a.ATCH_FILE_ID = f.ATCH_FILE_ID
 			LEFT JOIN RD_ETC g ON a.etc_id = g.ETC_ID AND g.USE_AT ='Y'
 			WHERE a.use_at ='Y'
-			<if test="searchGubun != 'all'">
-			AND io_gubun = #{searchGubun}
-			</if>
+			AND a.io_gubun = '2'
+			AND a.etc_id is null	/* 대여도 제외 */
 			<if test='searchCooperatorId != null and searchCooperatorId != "all"'>
 			AND a.cooperator_id = #{searchCooperatorId}
 			</if>
