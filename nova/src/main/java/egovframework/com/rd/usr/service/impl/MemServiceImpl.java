@@ -7,6 +7,8 @@ import javax.annotation.Resource;
 
 import org.egovframe.rte.fdl.cmmn.EgovAbstractServiceImpl;
 import org.egovframe.rte.fdl.idgnr.EgovIdGnrService;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -14,11 +16,13 @@ import org.springframework.stereotype.Service;
 import egovframework.com.cmm.LoginVO;
 import egovframework.com.cmm.util.EgovUserDetailsHelper;
 import egovframework.com.rd.Util;
+import egovframework.com.rd.usr.service.DtyService;
 import egovframework.com.rd.usr.service.MemService;
 import egovframework.com.rd.usr.service.vo.CooperatorFeeVO;
 import egovframework.com.rd.usr.service.vo.CooperatorVO;
 import egovframework.com.rd.usr.service.vo.DayPayVO;
 import egovframework.com.rd.usr.service.vo.DeliveryInfoVO;
+import egovframework.com.rd.usr.service.vo.DoznTokenVO;
 import egovframework.com.rd.usr.service.vo.EtcVO;
 import egovframework.com.sec.rgm.service.AuthorGroup;
 import egovframework.com.sec.rgm.service.EgovAuthorGroupService;
@@ -29,6 +33,8 @@ import egovframework.com.uss.umt.service.UserDefaultVO;
 import egovframework.com.uss.umt.service.UserManageVO;
 import egovframework.com.uss.umt.service.impl.MberManageDAO;
 import egovframework.com.uss.umt.service.impl.UserManageDAO;
+import egovframework.com.utl.fcc.service.EgovStringUtil;
+import egovframework.com.utl.sim.service.EgovFileScrty;
 
 /**
  * @Class Name : DtyServiceImpl.java
@@ -61,6 +67,9 @@ public class MemServiceImpl extends EgovAbstractServiceImpl implements MemServic
 
     @Resource(name = "mberManageService")
     private EgovMberManageService mberManageService;
+
+    @Resource(name = "DtyService")
+    private DtyService dtyService;
 
     @Resource(name = "egovAuthorGroupService")
     private EgovAuthorGroupService egovAuthorGroupService;
@@ -296,6 +305,38 @@ public class MemServiceImpl extends EgovAbstractServiceImpl implements MemServic
             searchVO.setSearchKeyword(vo.getMberId());
             MberManageVO userOne = mberManageDAO.selectUserListRider(searchVO);
         	if( userOne != null ) {
+        		//핸드폰번호 최초등록 시
+        		if(Util.isEmpty(userOne.getMbtlnum())) {
+
+        			//1. 임시패스워드와 MBER_CONFIRM_AT를 N로 설정
+        			MberManageVO mberManageVO = new MberManageVO();
+        		    mberManageVO.setUniqId(userOne.getUniqId());
+        	        mberManageVO.setPassword(EgovFileScrty.encryptPassword("Daon2025!", EgovStringUtil.isNullToString(userOne.getMberId())));
+        	        mberManageVO.setMberConfirmAt("N");
+        	        mberManageService.updatePasswordSelf(mberManageVO);
+
+        	        //2. 알림톡 토큰 가져오기
+        	        String responseData = dtyService.getMsgTocken();
+        	        LOGGER.debug("responseData1 : "+responseData);
+
+
+        	        if(!Util.isEmpty(responseData)) {
+        		        JSONParser jsonParse = new JSONParser();
+        		        JSONObject jsonObj = (JSONObject) jsonParse.parse(responseData);
+        		        if("200".equals(jsonObj.get("code")) ) {
+	        		        JSONObject data = (JSONObject) jsonObj.get("data");
+	        		        DoznTokenVO doznTokenVO = new DoznTokenVO();
+	        		        doznTokenVO.setSendAccessToken(data.get("sendAccessToken").toString());
+	        		        doznTokenVO.setSendRefreshToken(data.get("sendRefreshToken").toString());
+
+	            	        //3. 성공시 메세지 발송
+	        		        dtyService.doznHttpRequestMsg("임시", data.get("sendAccessToken").toString(), data.get("sendRefreshToken").toString());
+        		        }
+
+        	        }
+
+        		}
+
         		userOne.setMberNm(vo.getMberNm());
         		userOne.setMoblphonNo(vo.getMbtlnum());
         		mberManageDAO.updateMber(userOne);

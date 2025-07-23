@@ -2011,6 +2011,148 @@ public class DtyServiceImpl extends EgovAbstractServiceImpl implements DtyServic
         }
 		return doszSchAccoutCostVO;
 	}
+
+
+
+	/**
+	 * 알림톡 토큰조회
+	 * @param vo
+	 * @throws Exception
+	 */
+	public String getMsgTocken() throws Exception {
+
+
+        HttpURLConnection connection = null;
+
+        try {
+            URL url = new URL(EgovProperties.getProperty("Globals.msgUrl")+"/api/v1/send/auth/token");
+            connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestMethod("GET");
+            connection.setRequestProperty("Content-Type","application/json");
+            connection.setRequestProperty("memberId", EgovProperties.getProperty("Globals.msgId"));
+            connection.setRequestProperty("sendApiKey", EgovProperties.getProperty("Globals.msgApiKey"));
+            connection.setDoInput(true);
+
+            connection.connect();
+
+
+            StringBuilder response = new StringBuilder();
+            // 6. 응답 처리
+            int responseCode = connection.getResponseCode();
+            if (responseCode == HttpURLConnection.HTTP_OK) {
+                BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    response.append(line);
+                }
+                reader.close();
+                System.out.println("Response: " + response.toString());
+            } else {
+                System.out.println("Error: " + responseCode);
+            }
+
+            return response.toString();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        } finally {
+            if (connection != null) {
+            connection.disconnect();
+            }
+        }
+	}
+
+	/**
+	 * DOZN 알림톡 발송
+	 * @param jsonParameters
+	 * @param sendAccessToken
+	 * @param sendRefreshToken
+	 * @return
+	 */
+	public String doznHttpRequestMsg(String jsonParameters, String sendAccessToken, String sendRefreshToken) throws Exception {
+    	HttpURLConnection connection = null;
+    	DoznHistoryVO doznHistoryVO = new DoznHistoryVO();
+        try {
+            LOGGER.debug("jsonParameters : "+jsonParameters);
+            jsonParameters = "{ "
+            		+ "  \"messageType\": \"kat\", "
+            		+ "  \"kakaoMessage\": { "
+            		+ "    \"senderKey\": \"64e98b5f16c490c13b4333fb1971fb862050389b\", "
+            		+ "    \"templateCode\": \" b6ac4b41d4f24c51aa01\", "
+            		+ "    \"body\": \"임시 패스워드가 발급되었습니다.임시패스워드 : #{임시패스워드}RADER BANK에 접속하여 로그인 후 초기패스워드를  다시 설정 하시면 됩니다.\", "
+//            		+ "    \"button1\": { "
+//            		+ "      \"name\": \"test\", "
+//            		+ "      \"type\": \"WL\", "
+//            		+ "      \"urlMobile\": \"https://riderbank.co.kr\", "
+//            		+ "      \"urlPc\": \"https://riderbank.co.kr\" "
+//            		+ "    } "
+            		+ "}, "
+            		+ "\"referenceKey\": \"2025072300001\", "
+            		+ "  \"callback\": \"010-555-6666\", "
+            		+ "  \"phoneList\": [ "
+            		+ "    { "
+            		+ "      \"phone\": \"01027428889\", "
+            		+ "      \"variables\": { "
+            		+ "        \"임시패스워드\": \"00000\" "
+            		+ "      } "
+            		+ "    } "
+            		+ "  ] "
+            		+ "} ";
+
+            URL url = new URL(EgovProperties.getProperty("Globals.msgUrl")+"/api/v1/send");
+            connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestMethod("POST");
+            connection.setRequestProperty("Content-Type","application/json");
+            connection.setRequestProperty("memberId", EgovProperties.getProperty("Globals.msgId"));
+            connection.setRequestProperty("sendAccessToken", sendAccessToken);
+            connection.setRequestProperty("sendRefreshToken", sendRefreshToken);
+            connection.setConnectTimeout(15000); // 연결 타임아웃 (15초)
+            connection.setReadTimeout(15000);    // 읽기 타임아웃 (15초)
+            connection.setDoOutput(true);
+
+
+            //거래 이력 history
+//            doznHistoryVO.setTranDay(tranDay);
+//            doznHistoryVO.setTelegramNo(telegramNo);
+//            doznHistoryVO.setUrl(targetURL);
+//            doznHistoryVO.setSendLongtxt(jsonParameters);
+//            payDAO.insertDoznHistory(doznHistoryVO);
+
+
+            connection.connect();
+
+
+            StringBuilder response = new StringBuilder();
+            // 6. 응답 처리
+            int responseCode = connection.getResponseCode();
+            if (responseCode == HttpURLConnection.HTTP_OK) {
+                BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    response.append(line);
+                }
+                reader.close();
+                System.out.println("Response: " + response.toString());
+            } else {
+                System.out.println("Error: " + responseCode);
+            }
+
+            return response.toString();
+        } catch (Exception e) {
+            e.printStackTrace();
+        	return "{\n"
+	        + "    \"status\": \"999\",\n"
+	        + "    \"error_code\": \"\",\n"
+	        + "    \"error_message\": \"\",\n"
+
+	        + "}";
+        } finally {
+            if (connection != null) {
+                connection.disconnect();
+            }
+        }
+    }
+
 	/**
 	 * 출금 내역 조회
 	 * @param vo

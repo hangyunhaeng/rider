@@ -132,6 +132,11 @@
         axios.post('${pageContext.request.contextPath}/usr/inq0001_0001.do',params).then(function(response) {
         	// 로딩 종료
             $('.loading-wrap--js').hide();
+
+            if(chkLogOut(response.data)){
+            	return;
+            }
+
         	if(response.data.resultCode == "success"){
 	        	if (response.data.list.length == 0) {
 	        		grid.setGridOption('rowData',[]);  	// 데이터가 없는 경우 빈 배열 설정
@@ -183,6 +188,11 @@
 	        axios.post('${pageContext.request.contextPath}/usr/inq0001_0004.do',inputParams).then(function(response) {
 	        	// 로딩 종료
 	            $('.loading-wrap--js').hide();
+
+	            if(chkLogOut(response.data)){
+	            	return;
+	            }
+
 	        	if(response.data.resultCode == "success"){
 	        		drawInquiry($('#inqId').val());
 	        	}
@@ -205,6 +215,10 @@
         axios.post('${pageContext.request.contextPath}/usr/inq0001_0002.do',inputParams).then(function(response) {
         	// 로딩 종료
             $('.loading-wrap--js').hide();
+
+            if(chkLogOut(response.data)){
+            	return;
+            }
 
         	if(response.data.resultCode == "success"){
         		$('#reTitle').val('');
@@ -313,6 +327,10 @@
         axios.post('${pageContext.request.contextPath}/usr/inq0001_0003.do',inputParams).then(function(response) {
         	// 로딩 종료
             $('.loading-wrap--js').hide();
+
+            if(chkLogOut(response.data)){
+            	return;
+            }
 
         	if(response.data.resultCode == "success"){
         		alert("저장되었습니다");

@@ -212,6 +212,11 @@
         axios.post('${pageContext.request.contextPath}/usr/dty0001_0004.do',params).then(function(response) {
         	// 로딩 종료
             $('.loading-wrap--js').hide();
+
+            if(chkLogOut(response.data)){
+            	return;
+            }
+
 			if(response.data.resultCode == "success"){
 
 	            document.getElementById('TT_CNT0').textContent = currencyFormatter(response.data.list.length);
@@ -341,7 +346,13 @@
 				overlayNoRowsTemplate: '<span class="ag-overlay-loading-center">데이터가 없습니다</span>',
 				pinnedBottomRowData: [
 					{cooperatorId:"합계", basicPrice: 0}
-		        ]
+		        ],
+                getRowStyle: (params) => {
+					if (params.node.rowPinned === 'bottom') {
+						return { 'background-color': 'lightblue' };
+					}
+					return null;
+				}
             };
         const gridDiv = document.querySelector('#myGrid');
         grid = agGrid.createGrid(gridDiv, gridOptions);
@@ -362,33 +373,34 @@
 		}
 
 		for(var i =0;i<files.length;i++){
-
 			formData.append("fileName", files[i]);
 		}
+
+
 		// 로딩 시작
         $('.loading-wrap--js').show();
-		$.ajax({
-			url: '${pageContext.request.contextPath}/usr/dty0001_0002.do',
-			processData : false,
-			contentType : false,
-			data : formData,
-			type : 'POST',
-			success : function(response){
-	        	// 로딩 종료
-	            $('.loading-wrap--js').hide();
-				if(response.resultCode == "success"){
-					loadFileList();
-					alert("업로드 중이니 결과는 조회 하여 확인하세요");
+        axios.post('${pageContext.request.contextPath}/usr/dty0001_0002.do',formData).then(function(response) {
+        	// 로딩 종료
+            $('.loading-wrap--js').hide();
 
-				}
-			},
-			error : function(data) {
-	        	// 로딩 종료
-	            $('.loading-wrap--js').hide();
+            if(chkLogOut(response.data)){
+            	return;
+            }
+
+			if(response.data.resultCode == "success"){
+
+				loadFileList();
+				alert("업로드 중이니 결과는 조회 하여 확인하세요");
 			}
 
+        })
+        .catch(function(error) {
+            console.error('There was an error fetching the data:', error);
+        }).finally(function() {
+        	// 로딩 종료
+            $('.loading-wrap--js').hide();
+        });
 
-		}); //$.ajax
 
 	}
 

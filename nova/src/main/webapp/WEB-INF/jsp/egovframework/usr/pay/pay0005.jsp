@@ -189,6 +189,11 @@
         axios.post('${pageContext.request.contextPath}/usr/pay0005_0001.do',params).then(function(response) {
         	// 로딩 종료
             $('.loading-wrap--js').hide();
+
+            if(chkLogOut(response.data)){
+            	return;
+            }
+
 			if(response.data.resultCode == "success"){
 
 	            document.getElementById('TT_CNT0').textContent = currencyFormatter(response.data.list.length);

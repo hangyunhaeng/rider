@@ -589,3 +589,13 @@ let paging = {
 		  return matches ? decodeURIComponent(matches[1]) : undefined;
 	}
 
+	function chkLogOut(data){
+	    //todo 세션종료로 오류 났을경우 어떻게 캐치하나??? 애매함.
+    	if(typeof data == 'string'){
+			alert('로그인이 종료 되었습니다');
+			document.location.href = "<c:url value='/com/com0002.do'/>";
+			return true;
+    	}
+    	return false;
+	}
+

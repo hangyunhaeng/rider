@@ -55,8 +55,26 @@
 <script src="<c:url value='/js/xlsx-populate.min.js' />"></script>
 <script src="<c:url value='/js/axios.min.js' />"></script>
 
-	<link href="<c:url value='/vendor/admin/bootstrap/3.4.1/bootstrap.min.css' />" rel="stylesheet">
+<%-- 	<link href="<c:url value='/vendor/admin/bootstrap/3.4.1/bootstrap.min.css' />" rel="stylesheet"> --%>
 <!-- 	<script src="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script> -->
+
+
+	<!-- phoenix -->
+	<script src="<c:url value='/vendor/admin/bootstrap/js/bootstrap.min.js' />"></script>
+    <script src="<c:url value='/js/phoenix/simplebar.min.js' />"></script>
+    <script src="<c:url value='/js/phoenix/config.js' />"></script>
+    <link href="<c:url value='/css/phoenix/choices.min.css' />" rel="stylesheet">
+    <link href="<c:url value='/css/phoenix/dhtmlxgantt.css' />" rel="stylesheet">
+    <link href="<c:url value='/css/phoenix/flatpickr.min.css' />" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com/">
+    <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin="">
+    <link href="<c:url value='/css/phoenix/css2.css' />" rel="stylesheet">
+    <link href="<c:url value='/css/phoenix/simplebar.min.css' />" rel="stylesheet">
+    <link rel="stylesheet" href="<c:url value='/css/phoenix/line.css' />">
+    <link href="<c:url value='/css/phoenix/theme-rtl.min.css' />" type="text/css" rel="stylesheet" id="style-rtl" disabled="true">
+    <link href="<c:url value='/css/phoenix/theme.min.css' />" type="text/css" rel="stylesheet" id="style-default">
+    <link href="<c:url value='/css/phoenix/user-rtl.min.css' />" type="text/css" rel="stylesheet" id="user-style-rtl" disabled="true">
+    <link href="<c:url value='/css/phoenix/user.min.css' />" type="text/css" rel="stylesheet" id="user-style-default">
 
 </head>
 	<script type="text/javaScript">
@@ -65,10 +83,13 @@
 	var pageInit = true;
 	let gridOptions="";
 	var grid="";
+	var grid2="";
+	var grid3="";
 	let data;
 	var columnDefs= [
 		{ headerName: "NO", field: "no", minWidth: 70, valueGetter:(params) => { return params.node.rowIndex + 1} },
 		{ headerName: "오류", field: "err", minWidth: 120, hide:true},
+		{ headerName: "coofitId", field: "coofitId", minWidth: 120, hide:true},
 		{ headerName: "profitId", field: "profitId", minWidth: 120, hide:true},
 		{ headerName: "배달건수", field: "deliveryCnt", minWidth: 70
 			, valueGetter:(params) => { return params.data.deliveryCnt > 0 || params.data.deliveryCnt =='합계'? params.data.deliveryCnt: ''}
@@ -92,10 +113,153 @@
 		{ headerName: "금액", field: "cost", minWidth: 80
 			, cellClass: (params) => {return agGridUnderBarClass(params, 'ag-cell-right')}
 			, valueGetter:(params) => { return currencyFormatter(params.data.cost)}
+			, cellRenderer:(params) => { return '<div data-bs-toggle="modal" data-bs-target="#exampleModal" onclick="clickFee(\''+params.data.coofitId+'\')">'+currencyFormatter(params.data.cost)+'</div>';}
 		},
 		{ headerName: "등록일", field: "creatDt", minWidth: 140, valueGetter:(params) => { return getStringDate(params.data.creatDt)}}
 	];
 
+
+	var columnDefs2= [
+		{ headerName: "crud", field: "crud", minWidth: 90, hide:true},
+		{ headerName: "협력사아이디", field: "cooperatorId", minWidth: 120, hide:true
+			, cellClass: (params) => {return agGrideditClass(params)}},
+		{ headerName: "협력사이름", field: "cooperatorNm", minWidth: 120
+			, cellClass: (params) => {return agGrideditClass(params)}},
+		{ headerName: "사업자등록번호", field: "registrationSn", minWidth: 110, hide:true
+            , valueParser: (params) => {
+                return gridRegistrationSn(params);
+            }
+            , cellClass: (params) => {return agGrideditClass(params)}
+        },
+		{ headerName: "상호", field: "companyNm", minWidth: 160, hide:true
+        	, cellClass: (params) => {return agGrideditClass(params)}},
+		{ headerName: "사업자이름", field: "registrationNm", minWidth: 90, hide:true
+			, cellClass: (params) => {return agGrideditClass(params, "ag-cell-left")} , hide:true},
+		{ headerName: "대표자명", field: "ceoNm", minWidth: 90, hide:true
+			, cellClass: (params) => {return agGrideditClass(params)}},
+// 		{ headerName: "사용여부", field: "useAt", minWidth: 90, valueGetter:(params) => { return (params.node.data.useAt=='Y')?"사용": "미사용"}},
+
+		{ headerName: "소속<br/>라이더", field: "rdcnt", minWidth: 80, cellClass: 'ag-cell-right', hide:true},
+		{ headerName: "출금가능금액", field: "xxx", minWidth: 90, cellClass: 'ag-cell-right', hide:true},
+		{ headerName: "feeId", field: "feeId", minWidth: 90, hide:true},
+		{ headerName: "선지급수수료(%)", field: "feeAdminstrator", minWidth: 90, maxWidth: 95
+			, cellClass: (params) => {return agGrideditClass(params, "ag-cell-right");}
+			, valueGetter:(params) => { return currencyFormatter(params.data.feeAdminstrator);}
+            , valueParser: (params) => { return gridPercent(params);}
+		},
+		{ headerName: "협력사<br/>선지급수수료(%)", field: "feeCooperator", minWidth: 90, maxWidth: 95
+			, cellClass: (params) => {return agGrideditClass(params, "ag-cell-right");}
+			, valueGetter:(params) => { return currencyFormatter(params.data.feeCooperator);}
+            , valueParser: (params) => { return gridPercent(params);}
+		},
+		{ headerName: "고용보험(%)", field: "feeEmploymentInsurance", minWidth: 90, maxWidth: 95
+			, cellClass: (params) => {return agGrideditClass(params, "ag-cell-right");}
+			, valueGetter:(params) => { return currencyFormatter(params.data.feeEmploymentInsurance);}
+            , valueParser: (params) => { return gridPercent(params);}
+		},
+		{ headerName: "산재보험(%)", field: "feeIndustrialInsurance", minWidth: 90, maxWidth: 95
+			, cellClass: (params) => {return agGrideditClass(params, "ag-cell-right");}
+			, valueGetter:(params) => { return currencyFormatter(params.data.feeIndustrialInsurance);}
+            , valueParser: (params) => { return gridPercent(params);}
+		},
+		{ headerName: "원천세(%)", field: "feeWithholdingTax", minWidth: 90, maxWidth: 94
+			, cellClass: (params) => {return agGrideditClass(params, "ag-cell-right");}
+			, valueGetter:(params) => { return currencyFormatter(params.data.feeWithholdingTax);}
+            , valueParser: (params) => { return gridPercent(params);}
+		},
+		{ headerName: "시간제보험(원)", field: "feeTimeInsurance", minWidth: 90, maxWidth: 93
+			, cellClass: (params) => {return agGrideditClass(params, "ag-cell-right");}
+			, valueGetter:(params) => { return currencyFormatter(params.data.feeTimeInsurance);}
+            , valueParser: (params) => { return gridWan(params);}
+		},
+		{ headerName: "콜수수료(원)", field: "feeCall", minWidth: 90, maxWidth: 93
+			, cellClass: (params) => {return agGrideditClass(params, "ag-cell-right");}
+			, valueGetter:(params) => { return currencyFormatter(params.data.feeCall);}
+            , valueParser: (params) => { return gridWan(params);}
+		},
+		{ headerName: "협력사<br/>콜수수료(%)", field: "feeCooperatorCall", minWidth: 90, maxWidth: 95
+			, cellClass: (params) => {return agGrideditClass(params, "ag-cell-right");}
+			, valueGetter:(params) => { return currencyFormatter(params.data.feeCooperatorCall);}
+            , valueParser: (params) => { return gridPercent(params);}
+		},
+		{ headerName: "사용여부", field: "useAt", minWidth: 90, hide:true
+		, valueGetter:(params) => { return (params.node.data.useAt=='Y')?"사용": "미사용"}
+		, cellEditor: 'agSelectCellEditor'
+		, cellEditorParams: params => { return {values: ['Y', 'N']}; }
+		, cellClass: (params) => {return agGrideditClass(params)}},
+		{ headerName: "등록일", field: "creatDt", minWidth: 100, maxWidth: 100
+	        , valueGetter:(params) => { return getStringDate(params.data.creatDt)}
+	    },
+		{ headerName: "생성자", field: "creatId", minWidth: 90, hide:true},
+		{ headerName: "구분", field: "gubun", minWidth: 90, hide:true}
+
+
+	];
+
+	var columnDefs3= [
+		{ headerName: "crud", field: "crud", minWidth: 90, hide:true},
+		{ headerName: "협력사아이디", field: "cooperatorId", minWidth: 120, hide:true},
+		{ headerName: "ID", field: "mberId", minWidth: 90, cellClass: (params) => {return agGrideditClass(params)}, maxWidth: 150},
+		{ headerName: "이름", field: "mberNm", minWidth: 90, cellClass: (params) => {return agGrideditClass(params)}, maxWidth: 150},
+// 		{ headerName: "수수료", field: "fee", minWidth: 90, editable: true, cellClass: (params) => {return agGrideditClass(params, 'ag-cell-right')} },
+		{ headerName: "핸드폰번호", field: "mbtlnum", minWidth: 120, hide:true
+	        , valueParser: (params) => {
+	            return gridValidPhoneNumber(params);
+	        }
+			, cellClass: (params) => {return agGrideditClass(params, 'ag-cell-left')}
+			,valueGetter:(params) => { return addHyphenToPhoneNumber(params.data.mbtlnum)}
+		},
+		{ headerName: "등록일", field: "regDt", minWidth: 100, hide:true
+	        , valueParser: (params) => {
+	            return gridValidDate(params);
+	        }
+	        , cellClass: (params) => { return agGrideditClass(params)}
+	        , valueGetter:(params) => { return getStringDate(params.data.regDt)}
+		},
+		{ headerName: "종료일", field: "endDt", minWidth: 100, hide:true
+	        , valueParser: (params) => {
+	            return gridValidDate(params);
+	        }
+	        , cellClass: (params) => {return agGrideditClass(params)}
+	        , valueGetter:(params) => { return getStringDate(params.data.endDt)}
+		},
+
+		{ headerName: "고용보험(%)", field: "feeEmploymentInsurance", minWidth: 90, maxWidth: 150
+			, cellClass: (params) => {return agGrideditClass(params, "ag-cell-right");}
+// 			, valueGetter:(params) => { return currencyFormatter(params.data.feeEmploymentInsurance);}
+            , valueParser: (params) => { return gridPercent(params);}
+		},
+		{ headerName: "산재보험(%)", field: "feeIndustrialInsurance", minWidth: 90, maxWidth: 150
+			, cellClass: (params) => {return agGrideditClass(params, "ag-cell-right");}
+// 			, valueGetter:(params) => { return currencyFormatter(params.data.feeIndustrialInsurance);}
+            , valueParser: (params) => { return gridPercent(params);}
+		},
+		{ headerName: "원천세(%)", field: "feeWithholdingTax", minWidth: 90, maxWidth: 150
+			, cellClass: (params) => {return agGrideditClass(params, "ag-cell-right");}
+// 			, valueGetter:(params) => { return currencyFormatter(params.data.feeWithholdingTax);}
+            , valueParser: (params) => { return gridPercent(params);}
+		},
+		{ headerName: "시간제보험(원)", field: "feeTimeInsurance", minWidth: 90, maxWidth: 150
+			, cellClass: (params) => {return agGrideditClass(params, "ag-cell-right");}
+			, valueGetter:(params) => { return currencyFormatter(params.data.feeTimeInsurance);}
+            , valueParser: (params) => { return gridWan(params);}
+		},
+		{ headerName: "콜수수료(원)", field: "feeCall", minWidth: 90, maxWidth: 150
+			, cellClass: (params) => {return agGrideditClass(params, "ag-cell-right");}
+			, valueGetter:(params) => { return currencyFormatter(params.data.feeCall);}
+            , valueParser: (params) => { return gridWan(params);}
+		},
+		{ headerName: "기타<br/>(대여,리스)", field: "etcCall", minWidth: 90, hide:true
+			, cellRenderer:(params) => { return '<div class="row justify-content-between align-items-md-center btn-reveal-trigger border-translucent gx-0 flex-1 cursor-pointer" data-bs-toggle="modal" data-bs-target="#exampleModal" onclick="clickEtc(\''+params.data.cooperatorId+'\', \''+params.data.mberId+'\')">관리</div>';}
+		},
+
+		{ headerName: "사용여부", field: "useAt", minWidth: 90, hide:true
+		,valueGetter:(params) => { return (params.node.data.useAt=='Y')?"사용": "미사용"}
+		,cellEditor: 'agSelectCellEditor'
+		,cellEditorParams: params => { return {values: ['Y', 'N']}; }
+		, cellClass: (params) => {return agGrideditClass(params)}},
+		{ headerName: "생성자", field: "creatId", minWidth: 90, hide:true}
+	];
 
 	//onLoad
 	document.addEventListener('DOMContentLoaded', function() {
@@ -140,6 +304,8 @@
 		loadCooperatorList();
 		//그리드 설정
 		setGrid();
+		setGrid2();
+		setGrid3();
 	});
 
 
@@ -184,6 +350,11 @@
         axios.post('${pageContext.request.contextPath}/usr/pay0004_0001.do',params).then(function(response) {
         	// 로딩 종료
             $('.loading-wrap--js').hide();
+
+            if(chkLogOut(response.data)){
+            	return;
+            }
+
 			if(response.data.resultCode == "success"){
 
 	            document.getElementById('TT_CNT0').textContent = currencyFormatter(response.data.list.length);
@@ -244,7 +415,13 @@
 		        ],
 				onCellClicked : function (event) { //onSelectionChanged  :row가 바뀌었을때 발생하는 이벤트인데 잘 안됨.
 			    	selcetRow(event);
-			    }
+			    },
+                getRowStyle: (params) => {
+					if (params.node.rowPinned === 'bottom') {
+						return { 'background-color': 'lightblue' };
+					}
+					return null;
+				}
             };
         const gridDiv = document.querySelector('#myGrid');
         grid = agGrid.createGrid(gridDiv, gridOptions);
@@ -253,6 +430,61 @@
 
 	}
 
+	function setGrid2(){
+		// 사용자 정의 컴포넌트를 글로벌 네임스페이스에 추가
+		window.CustomHeader = CustomHeader;
+    	gridOptions = {
+                columnDefs: columnDefs2,
+                rowData: [], // 초기 행 데이터를 빈 배열로 설정
+                defaultColDef: { headerComponent: 'CustomHeader'}, //
+                components: { CustomHeader: CustomHeader },
+                enableCellTextSelection: true, // 셀 텍스트 선택을 활성화합니다.
+                rowHeight: 35,
+                headerHeight: 35,
+                alwaysShowHorizontalScroll : true,
+                alwaysShowVerticalScroll: true,
+                onGridReady: function(params) {
+                    //loadData(params.api); // 그리드가 준비된 후 데이터 로드
+                    params.api.sizeColumnsToFit();
+                },
+                rowClassRules: {'ag-cell-err ': (params) => { return params.data.err === true; }},
+				overlayLoadingTemplate: '<span class="ag-overlay-loading-center">로딩 중</span>',
+				overlayNoRowsTemplate: '<span class="ag-overlay-loading-center">데이터가 없습니다</span>'
+            };
+        const gridDiv = document.querySelector('#myGrid2');
+        grid2 = agGrid.createGrid(gridDiv, gridOptions);
+
+        grid2.hideOverlay();
+
+	}
+
+	function setGrid3(){
+		// 사용자 정의 컴포넌트를 글로벌 네임스페이스에 추가
+		window.CustomHeader = CustomHeader;
+    	gridOptions = {
+                columnDefs: columnDefs3,
+                rowData: [], // 초기 행 데이터를 빈 배열로 설정
+                defaultColDef: { headerComponent: 'CustomHeader'}, //
+                components: { CustomHeader: CustomHeader },
+                enableCellTextSelection: true, // 셀 텍스트 선택을 활성화합니다.
+                rowHeight: 35,
+                headerHeight: 35,
+                alwaysShowHorizontalScroll : true,
+                alwaysShowVerticalScroll: true,
+                onGridReady: function(params) {
+                    //loadData(params.api); // 그리드가 준비된 후 데이터 로드
+                    params.api.sizeColumnsToFit();
+                },
+                rowClassRules: {'ag-cell-err ': (params) => { return params.data.err === true; }},
+				overlayLoadingTemplate: '<span class="ag-overlay-loading-center">로딩 중</span>',
+				overlayNoRowsTemplate: '<span class="ag-overlay-loading-center">데이터가 없습니다</span>'
+            };
+        const gridDiv = document.querySelector('#myGrid3');
+        grid3 = agGrid.createGrid(gridDiv, gridOptions);
+
+        grid3.hideOverlay();
+
+	}
 	function selcetRow(params){
 		if(params.column.colId == "sendPrice"){
 			debugger;
@@ -280,16 +512,58 @@
 		}
 	}
 
-
 	function agGridUnderBarClass(params, addClass){
 		var pAddClass = (addClass =='undefined')? "" : addClass;
-		if(params.node.data.ioGubun == '1' && params.node.data.dwGubun == 'DAY')	//입금 && 일정산
+		if(params.node.data.gubun == 'C' || params.node.data.gubun == 'D')
 			return pAddClass+" tdul";
-		if(params.node.data.ioGubun == '1' && params.node.data.dwGubun == 'WEK')	//입금 && 일정산
-			return pAddClass+" tdul";
-
 		else
 			return pAddClass;
+	}
+
+	function clickFee(coofitId){
+
+
+		const params = new URLSearchParams();
+		params.append('coofitId', coofitId);
+
+		// 로딩 시작
+        $('.loading-wrap--js').show();
+        axios.post('${pageContext.request.contextPath}/usr/pay0004_0002.do',params).then(function(response) {
+        	// 로딩 종료
+            $('.loading-wrap--js').hide();
+
+            if(chkLogOut(response.data)){
+            	return;
+            }
+
+			if(response.data.resultCode == "success"){
+
+	        	if (response.data.list.length == 0) {
+	        		grid2.setGridOption('rowData',[]);  	// 데이터가 없는 경우 빈 배열 설정
+	        		grid2.showNoRowsOverlay();  			// 데이터가 없는 경우
+	            } else {
+
+	            	data = response.data.list;	//정상데이터
+					grid2.setGridOption("rowData", data);
+	            }
+
+	        	if (response.data.riderList.length == 0) {
+	        		grid3.setGridOption('rowData',[]);  	// 데이터가 없는 경우 빈 배열 설정
+	        		grid3.showNoRowsOverlay();  			// 데이터가 없는 경우
+	            } else {
+
+	            	data = response.data.riderList;	//정상데이터
+					grid3.setGridOption("rowData", data);
+	            }
+			}
+
+        })
+        .catch(function(error) {
+            console.error('There was an error fetching the data:', error);
+        }).finally(function() {
+        	// 로딩 종료
+            $('.loading-wrap--js').hide();
+        });
 	}
 
 	</script>
@@ -387,6 +661,72 @@
 			<input name="pageSize" type="hidden" value="1000"/>
 			<!--과제관리_목록 -->
 			<div class="search_box ty2">
+
+
+
+			<div class="card-body py-0 scrollbar to-do-list-body" id="notList">
+				<!-- 팝업 -->
+                  <div class="modal fade" id="exampleModal" tabindex="-1" style="display: none;" aria-hidden="true">
+                    <div class="modal-dialog modal-xl">
+                      <div class="modal-content bg-body overflow-hidden">
+                        <div class="modal-header justify-content-between px-6 py-5 pe-sm-5 px-md-6 dark__bg-gray-1100">
+                          <h3 class="text-body-highlight fw-bolder mb-0">수수료 계산 근거</h3>
+                          <button style="min-width:50px!important; min-height:50px!important;" class="btn btn-phoenix-secondary btn-icon btn-icon-xl flex-shrink-0" type="button" data-bs-dismiss="modal" aria-label="Close"><svg class="svg-inline--fa fa-xmark" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="xmark" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512" data-fa-i2svg=""><path fill="currentColor" d="M342.6 150.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L192 210.7 86.6 105.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L146.7 256 41.4 361.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L192 301.3 297.4 406.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L237.3 256 342.6 150.6z"></path></svg></button>
+                        </div>
+                        <div class="modal-body bg-body-highlight px-6 py-0">
+                          <div class="row gx-14">
+                            <div class="col-12 border-end-lg">
+                              <div class="py-6">
+                                <div class="mb-7">
+
+									<div style="height: 0px;">
+										<span class="pagetotal" style='margin-right: 20px;'>협력사 수수료</span>
+									</div>
+									<div class="ib_product">
+										<div id="myGrid2" class="ag-theme-alpine" style="height: 90px; width: 100%;"></div>
+									</div>
+
+									<div style="height: 0px;">
+										<span class="pagetotal" style='margin-right: 20px;'>라이더 수수료</span>
+									</div>
+									<div class="ib_product">
+										<div id="myGrid3" class="ag-theme-alpine" style="height: 90px; width: 100%;"></div>
+									</div>
+<br/>
+
+				<table>
+					<colgroup>
+						<col style="width: 13%">
+						<col style="width: 87%">
+					</colgroup>
+
+					<tr>
+						<th>협력사</th>
+						<td>
+							<sm class="float-start">&nbsp;~&nbsp;</sm>
+						</td>
+					</tr>
+					<tr>
+						<th>등록일</th>
+						<td>
+							<sm class="float-start">&nbsp;~&nbsp;</sm>
+						</td>
+					</tr>
+				</table>
+
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+				<!-- 팝업 end -->
+                </div>
+
+
+
 				<table>
 					<colgroup>
 						<col style="width: 13%">

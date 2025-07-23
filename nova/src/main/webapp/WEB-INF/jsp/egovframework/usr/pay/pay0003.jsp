@@ -99,7 +99,7 @@
 
 	//onLoad
 	document.addEventListener('DOMContentLoaded', function() {
-
+		debugger;
 		if('${loginVO.authorCode}' =='ROLE_ADMIN'){
 			$('nav > ul').find('li[class!=cooperator]:hidden').show();
 		}
@@ -184,6 +184,11 @@
         axios.post('${pageContext.request.contextPath}/usr/pay0003_0001.do',params).then(function(response) {
         	// 로딩 종료
             $('.loading-wrap--js').hide();
+
+            if(chkLogOut(response.data)){
+            	return;
+            }
+
 			if(response.data.resultCode == "success"){
 
 	            document.getElementById('TT_CNT0').textContent = currencyFormatter(response.data.list.length);
@@ -244,7 +249,13 @@
 		        ],
 				onCellClicked : function (event) { //onSelectionChanged  :row가 바뀌었을때 발생하는 이벤트인데 잘 안됨.
 			    	selcetRow(event);
-			    }
+			    },
+                getRowStyle: (params) => {
+					if (params.node.rowPinned === 'bottom') {
+						return { 'background-color': 'lightblue' };
+					}
+					return null;
+				}
             };
         const gridDiv = document.querySelector('#myGrid');
         grid = agGrid.createGrid(gridDiv, gridOptions);
@@ -283,11 +294,8 @@
 
 	function agGridUnderBarClass(params, addClass){
 		var pAddClass = (addClass =='undefined')? "" : addClass;
-		if(params.node.data.ioGubun == '1' && params.node.data.dwGubun == 'DAY')	//입금 && 일정산
+		if(params.node.data.gubun == 'C' || params.node.data.gubun == 'D')
 			return pAddClass+" tdul";
-		if(params.node.data.ioGubun == '1' && params.node.data.dwGubun == 'WEK')	//입금 && 일정산
-			return pAddClass+" tdul";
-
 		else
 			return pAddClass;
 	}

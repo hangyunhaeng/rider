@@ -317,6 +317,44 @@ public class PayController {
 	}
 
 	/**
+	 * 협력사 수익 계산근거 조회
+	 * @param request
+	 * @param sessionVO
+	 * @param model
+	 * @param status
+	 * @return
+	 * @throws Exception
+	 */
+	@RequestMapping("/usr/pay0004_0002.do")
+	public ResponseEntity<?> pay0004_0002(@ModelAttribute("ProfitVO") ProfitVO profitVO, HttpServletRequest request, SessionVO sessionVO, ModelMap model, SessionStatus status) throws Exception{
+
+    	//로그인 체크
+        LoginVO user = (LoginVO)EgovUserDetailsHelper.getAuthenticatedUser();
+        Boolean isAuthenticated = EgovUserDetailsHelper.isAuthenticated();
+
+        if(!isAuthenticated) {
+        	return ResponseEntity.status(401).body("Unauthorized");
+        }
+
+        if(!Util.isUsr()) {
+        	return ResponseEntity.status(401).body("Unauthorized");
+        }
+
+        //총판 or 협력사
+        profitVO.setSchAuthorCode(user.getAuthorCode());
+        profitVO.setSchIhidNum(user.getIhidNum());
+
+
+        //return value
+        Map<String, Object> map =  new HashMap<String, Object>();
+
+        map.put("list", payService.selectProfitFeeCoop(profitVO));
+        map.put("riderList", payService.selectProfitFeeRider(profitVO));
+        map.put("base", payService.selectProfitBase(profitVO));
+        map.put("resultCode", "success");
+        return ResponseEntity.ok(map);
+	}
+	/**
 	 * 협력사 기타(대여, 리스) 현황 페이지
 	 * @param request
 	 * @param model

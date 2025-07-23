@@ -228,6 +228,10 @@
         	// 로딩 종료
             $('.loading-wrap--js').hide();
 
+            if(chkLogOut(response.data)){
+            	return;
+            }
+
         	if(response.data.resultCode == "success"){
 	        	if (response.data.list.length == 0) {
 	        		grid.setGridOption('rowData',[]);  	// 데이터가 없는 경우 빈 배열 설정
@@ -307,6 +311,11 @@
 		        axios.post('${pageContext.request.contextPath}/usr/mem0001_0005.do',inputData).then(function(response) {
 		        	// 로딩 종료
 		            $('.loading-wrap--js').hide();
+
+		            if(chkLogOut(response.data)){
+		            	return;
+		            }
+
 		        	if(response.data.resultCode == "success"){
 
 		        	} else {
@@ -370,6 +379,11 @@
 	        axios.post('${pageContext.request.contextPath}/usr/mem0001_0002.do',getEditRows(grid)).then(function(response) {
 	        	// 로딩 종료
 	            $('.loading-wrap--js').hide();
+
+	            if(chkLogOut(response.data)){
+	            	return;
+	            }
+
 	        	if(response.data.resultCode == "success"){
 		        	if (response.data.list.length == 0) {
 		        		grid.setGridOption('rowData',[]);  	// 데이터가 없는 경우 빈 배열 설정

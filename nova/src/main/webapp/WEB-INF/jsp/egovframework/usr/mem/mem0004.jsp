@@ -117,6 +117,10 @@
 		        	// 로딩 종료
 		            $('.loading-wrap--js').hide();
 
+		            if(chkLogOut(response.data)){
+		            	return;
+		            }
+
 					if(response.data.resultCode == "success"){
 						goMyInfo();
 					} else {
@@ -159,6 +163,11 @@
 		        .then(response => {
 		        	// 로딩 종료
 		            $('.loading-wrap--js').hide();
+
+		            if(chkLogOut(response.data)){
+		            	return;
+		            }
+
 					if(response.data.resultCode == "success"){
 						goMyInfo();
 					} else {
@@ -200,7 +209,11 @@
 		    axios.post('${pageContext.request.contextPath}/usr/mem0004_0002.do', params)
 		        .then(response => {        	// 로딩 종료
 		            $('.loading-wrap--js').hide();
-		        	debugger;
+
+		            if(chkLogOut(response.data)){
+		            	return;
+		            }
+
 					if(response.data.resultCode == "success"){
 						goMyInfo();
 					} else {
@@ -239,7 +252,11 @@
 	    axios.post('${pageContext.request.contextPath}/usr/mem0004_0004.do', params)
 	        .then(response => {        	// 로딩 종료
 	            $('.loading-wrap--js').hide();
-	        	debugger;
+
+	            if(chkLogOut(response.data)){
+	            	return;
+	            }
+
 				if(response.data.resultCode == "success"){
 					if(response.data.doszSchAccoutCostVO.status == "200"){
 						$('#잔액').show();

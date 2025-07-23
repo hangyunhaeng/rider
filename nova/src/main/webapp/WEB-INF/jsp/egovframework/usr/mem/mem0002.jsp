@@ -266,6 +266,11 @@
         axios.post('${pageContext.request.contextPath}/usr/mem0001_0000.do',params).then(function(response) {
         	// 로딩 종료
             $('.loading-wrap--js').hide();
+
+            if(chkLogOut(response.data)){
+            	return;
+            }
+
         	if(response.data.resultCode == "success"){
 	        	if (response.data.list.length == 0) {
 	        		grid.setGridOption('rowData',[]);  	// 데이터가 없는 경우 빈 배열 설정
@@ -294,6 +299,11 @@
         axios.post('${pageContext.request.contextPath}/usr/mem0002_0001.do',params).then(function(response) {
         	// 로딩 종료
             $('.loading-wrap--js').hide();
+
+            if(chkLogOut(response.data)){
+            	return;
+            }
+
         	if(response.data.resultCode == "success"){
 	        	if (response.data.list.length == 0) {
 	        		grid1.setGridOption('rowData',[]);  	// 데이터가 없는 경우 빈 배열 설정
@@ -323,14 +333,9 @@
         $('.loading-wrap--js').show();
         axios.post('${pageContext.request.contextPath}/usr/mem0002_0004.do',params).then(function(response) {
 
-        	//todo 세션종료로 오류 났을경우 어떻게 캐치하나??? 애매함.
-        	if(typeof response.data == 'string'){
-				alert('로그인이 종료 되었습니다');
-
-				$('#myForm').attr("action", "<c:url value='/com/com0002.do'/>");
-				$('#myForm').submit();
-				return;
-        	}
+            if(chkLogOut(response.data)){
+            	return;
+            }
 
         	// 로딩 종료
             $('.loading-wrap--js').hide();
@@ -442,6 +447,11 @@
 	        $('.loading-wrap--js').show();
 	        axios.post('${pageContext.request.contextPath}/usr/mem0002_0002.do',getEditRows(grid1)).then(function(response) {        	// 로딩 종료
 	            $('.loading-wrap--js').hide();
+
+	            if(chkLogOut(response.data)){
+	            	return;
+	            }
+
 	        	if(response.data.resultCode == "success"){
 
 		        	if (response.data.orglist.length == 0) {
@@ -493,6 +503,11 @@
 	        $('.loading-wrap--js').show();
 	        axios.post('${pageContext.request.contextPath}/usr/mem0002_0005.do',getEditRows(grid2)).then(function(response) {        	// 로딩 종료
 	            $('.loading-wrap--js').hide();
+
+	            if(chkLogOut(response.data)){
+	            	return;
+	            }
+
 	        	if(response.data.resultCode == "success"){
 
 		        	if (response.data.list.length == 0) {
@@ -536,6 +551,11 @@
 	        $('.loading-wrap--js').show();
 	        axios.post('${pageContext.request.contextPath}/usr/mem0002_0006.do',updateItem).then(function(response) {        	// 로딩 종료
 	            $('.loading-wrap--js').hide();
+
+	            if(chkLogOut(response.data)){
+	            	return;
+	            }
+
 	        	if(response.data.resultCode == "success"){
 
 		        	if (response.data.list.length == 0) {
@@ -578,6 +598,11 @@
 	        $('.loading-wrap--js').show();
 	        axios.post('${pageContext.request.contextPath}/usr/mem0002_0007.do',updateItem).then(function(response) {        	// 로딩 종료
 	            $('.loading-wrap--js').hide();
+
+	            if(chkLogOut(response.data)){
+	            	return;
+	            }
+
 	        	if(response.data.resultCode == "success"){
 
 		        	if (response.data.list.length == 0) {
@@ -664,6 +689,11 @@
 		        axios.post('${pageContext.request.contextPath}/usr/mem0002_0003.do',inputData).then(function(response) {
 		        	// 로딩 종료
 		            $('.loading-wrap--js').hide();
+
+		            if(chkLogOut(response.data)){
+		            	return;
+		            }
+
 		        	if(response.data.resultCode == "success"){
 
 		        		grid1.getRowNode(gridIdx).setDataValue('mberNm', response.data.userVo.mberNm);
@@ -975,6 +1005,7 @@
                       </div>
                     </div>
                   </div>
+				<!-- 팝업 end -->
                 </div>
 			<!-- 				<div id="ajaxUp2" class="btnwrap"> -->
 			<!-- 				<p> ajax파일 : <input type="file" name="fileName" multiple="multiple"/> -->

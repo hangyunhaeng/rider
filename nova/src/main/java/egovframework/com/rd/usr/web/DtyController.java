@@ -785,20 +785,21 @@ public class DtyController {
     }
 	@RequestMapping("/usr/dty0003_0001.do")
 	public ResponseEntity<?> dty0003_0001(@ModelAttribute("WeekInfoVO") WeekInfoVO weekInfoVO, HttpServletRequest request, SessionVO sessionVO, ModelMap model, SessionStatus status) throws Exception{
+		//return value
+		Map<String, Object> map =  new HashMap<String, Object>();
 
     	//로그인 체크
         LoginVO user = (LoginVO)EgovUserDetailsHelper.getAuthenticatedUser();
         Boolean isAuthenticated = EgovUserDetailsHelper.isAuthenticated();
 
         if(!isAuthenticated) {
-        	return ResponseEntity.status(401).body("Unauthorized");
+            map.put("resultCode", "logout");
+            return ResponseEntity.ok(map);
         }
 
         if(!Util.isUsr()) {
         	return ResponseEntity.status(401).body("Unauthorized");
         }
-        //return value
-        Map<String, Object> map =  new HashMap<String, Object>();
 
 
         //총판 or 협력사

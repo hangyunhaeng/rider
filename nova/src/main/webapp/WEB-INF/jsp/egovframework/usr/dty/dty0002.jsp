@@ -211,6 +211,11 @@
         axios.post('${pageContext.request.contextPath}/usr/dty0002_0004.do',params).then(function(response) {
         	// 로딩 종료
             $('.loading-wrap--js').hide();
+
+            if(chkLogOut(response.data)){
+            	return;
+            }
+
 			if(response.data.resultCode == "success"){
 	        	if (response.data.list.length == 0) {
 	        		grid.setGridOption('rowData',[]);  	// 데이터가 없는 경우 빈 배열 설정
@@ -311,53 +316,55 @@
 		for(var i =0;i<files.length;i++){
 			formData.append("fileName", files[i]);
 		}
+
+		debugger;
 		// 로딩 시작
         $('.loading-wrap--js').show();
-		$.ajax({
-// 			url: '${pageContext.request.contextPath}/usr/dty0002_0002.do',	//async
-// 			url: '${pageContext.request.contextPath}/usr/dty0002_0003.do',	//sync
-			url: '${pageContext.request.contextPath}/usr/dty0002_0005.do',	//대용량 아님
-			processData : false,
-			contentType : false,
-			data : formData,
-			type : 'POST',
-			success : function(response){
-	        	// 로딩 종료
-	            $('.loading-wrap--js').hide();
-				loadFileList();
-				if(response.resultCode != "success"){
-					if(response.resultMsg != '' && response.resultMsg != null)
-						alert(response.resultMsg);
-					else alert("주별 자료 업로드에 실패하였습니다\n엑셀 내용을 확인 후 다시 업로드 하시기 바랍니다");
-					return ;
-				}
 
-	        	if (response.list.length == 0) {
-	        		grid.setGridOption('rowData',[]);  	// 데이터가 없는 경우 빈 배열 설정
-	        		grid.showNoRowsOverlay();  			// 데이터가 없는 경우
-	            } else {
+//			url: '${pageContext.request.contextPath}/usr/dty0002_0002.do',	//async
+//			url: '${pageContext.request.contextPath}/usr/dty0002_0003.do',	//sync
+//			url: '${pageContext.request.contextPath}/usr/dty0002_0005.do',	//대용량 아님
+        axios.post('${pageContext.request.contextPath}/usr/dty0002_0005.do',formData).then(function(response) {
+        	// 로딩 종료
+            $('.loading-wrap--js').hide();
 
-					var lst = response.list;	//정상데이터
-	                grid.setGridOption('rowData', lst);
-	            }
+            if(chkLogOut(response.data)){
+            	return;
+            }
 
-	        	if (response.listRider.length == 0) {
-	        		grid1.setGridOption('rowData',[]);  	// 데이터가 없는 경우 빈 배열 설정
-	        		grid1.showNoRowsOverlay();  			// 데이터가 없는 경우
-	            } else {
-
-					var lst = response.listRider;	//정상데이터
-	                grid1.setGridOption('rowData', lst);
-	            }
-
-			},
-			error : function(xhr, status, error){
-	        	// 로딩 종료
-	            $('.loading-wrap--js').hide();
+            if(response.data.resultCode != "success"){
+				if(response.data.resultMsg != '' && response.data.resultMsg != null)
+					alert(response.data.resultMsg);
+				else alert("주별 자료 업로드에 실패하였습니다\n엑셀 내용을 확인 후 다시 업로드 하시기 바랍니다");
+				return ;
 			}
 
+        	if (response.data.list.length == 0) {
+        		grid.setGridOption('rowData',[]);  	// 데이터가 없는 경우 빈 배열 설정
+        		grid.showNoRowsOverlay();  			// 데이터가 없는 경우
+            } else {
 
-		}); //$.ajax
+				var lst = response.data.list;	//정상데이터
+                grid.setGridOption('rowData', lst);
+            }
+
+        	if (response.data.listRider.length == 0) {
+        		grid1.setGridOption('rowData',[]);  	// 데이터가 없는 경우 빈 배열 설정
+        		grid1.showNoRowsOverlay();  			// 데이터가 없는 경우
+            } else {
+
+				var lst = response.data.listRider;	//정상데이터
+                grid1.setGridOption('rowData', lst);
+            }
+        })
+        .catch(function(error) {
+            console.error('There was an error fetching the data:', error);
+        }).finally(function() {
+        	// 로딩 종료
+            $('.loading-wrap--js').hide();
+        });
+
+
 
 	}
 	function subMenuClick(obj){

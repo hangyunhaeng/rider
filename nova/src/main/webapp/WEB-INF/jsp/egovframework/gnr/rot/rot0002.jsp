@@ -193,6 +193,11 @@
 		        .then(response => {
 		        	// 로딩 종료
 		            $('.loading-wrap--js').hide();
+
+		            if(chkLogOut(response.data)){
+		            	return;
+		            }
+
 					if(response.data.resultCode == "success"){
 						goMyInfo();
 					} else {
@@ -288,6 +293,11 @@
 		        .then(response => {
 		        	// 로딩 종료
 		            $('.loading-wrap--js').hide();
+
+		            if(chkLogOut(response.data)){
+		            	return;
+		            }
+
 					if(response.data.resultCode == "success"){
 						//개발계는 pass 않태우고 바로 저장
 						if(${doNice} != true){
@@ -354,6 +364,11 @@
 // 	        .then(response => {
 // 	        	// 로딩 종료
 // 	            $('.loading-wrap--js').hide();
+
+//             if(chkLogOut(response.data)){
+//             	return;
+//             }
+
 // 				if(response.data.resultCode == "success"){
 // 					goMyInfo();
 // 				} else {
@@ -379,6 +394,11 @@
 	        .then(response => {
 	        	// 로딩 종료
 	            $('.loading-wrap--js').hide();
+
+	            if(chkLogOut(response.data)){
+	            	return;
+	            }
+
 				if(response.data.resultCode == "success"){
 					goMyInfo();
 				} else {

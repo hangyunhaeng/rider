@@ -192,6 +192,11 @@
 			// 로딩 시작
 	        $('.loading-wrap--js').show();
 	        axios.post('${pageContext.request.contextPath}/usr/not0002_0003.do',params).then(function(response) {
+
+	            if(chkLogOut(response.data)){
+	            	return;
+	            }
+
 	        	if(response.data.resultCode == "success"){
 
 	        		if('${loginVO.authorCode}' == 'ROLE_ADMIN'){
@@ -248,6 +253,10 @@
 	        	// 로딩 종료
 	            $('.loading-wrap--js').hide();
 
+	            if(chkLogOut(data)){
+	            	return;
+	            }
+
 				$(el).summernote('insertImage', "${pageContext.request.contextPath}"+"/upload/"+data.name, function($image) {
 // 					$image.css('width', "100%");
 				});
@@ -285,6 +294,10 @@
         	// 로딩 종료
             $('.loading-wrap--js').hide();
 
+            if(chkLogOut(response.data)){
+            	return;
+            }
+
         	if(response.data.resultCode == "success"){
 
         		$('#summernote').summernote('reset');
@@ -317,6 +330,10 @@
 	        axios.post('${pageContext.request.contextPath}/usr/not0002_0004.do',params).then(function(response) {
 	        	// 로딩 종료
 	            $('.loading-wrap--js').hide();
+
+	            if(chkLogOut(response.data)){
+	            	return;
+	            }
 
 	        	if(response.data.resultCode == "success"){
 	        		alert('삭제되었습니다');

@@ -79,4 +79,25 @@ public interface PayService {
 	 * @throws Exception
 	 */
 	public List<CooperatorPayVO> selectCooperatorPayList(CooperatorPayVO vo) throws Exception ;
+	/**
+	 * 협력사 수익 계산근거 조회(협력사)
+	 * @param vo
+	 * @return
+	 * @throws Exception
+	 */
+	public List<CooperatorPayVO> selectProfitFeeCoop(ProfitVO vo) throws Exception ;
+	/**
+	 * 협력사 수익 계산근거 조회(라이더)
+	 * @param vo
+	 * @return
+	 * @throws Exception
+	 */
+	public List<CooperatorPayVO> selectProfitFeeRider(ProfitVO vo) throws Exception ;
+	/**
+	 * 협력사 수익 계산근거
+	 * @param vo
+	 * @return
+	 * @throws Exception
+	 */
+	public ProfitVO selectProfitBase(ProfitVO vo) throws Exception ;
 }

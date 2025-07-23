@@ -131,6 +131,11 @@
         axios.post('${pageContext.request.contextPath}/usr/not0001_0001.do',params).then(function(response) {
         	// 로딩 종료
             $('.loading-wrap--js').hide();
+
+            if(chkLogOut(response.data)){
+            	return;
+            }
+
         	if(response.data.resultCode == "success"){
 
 	        	if (response.data.list.length == 0) {

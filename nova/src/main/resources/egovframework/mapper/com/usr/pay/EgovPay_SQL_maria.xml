@@ -12,7 +12,7 @@
 		SELECT * FROM(
 			SELECT a.cooperator_id,'DAY' AS dw_gubun,'선지급' AS gubun, DYP_ID AS ID, if(a.io_gubun=1, a.ABLE_PRICE, a.send_price) as send_price, a.day_fee+a.insurance+a.send_fee AS fee
 			, b.tran_day, b.TELEGRAM_NO, b.rv_account, b.status, b.status_cd
-			, case when a.etc_id is not null then '' when b.status='200' then '성공' when io_gubun=2 AND b.STATUS= '400' AND b.error_code='VTIM' then '처리중' when io_gubun=2 AND b.STATUS= '400' AND b.error_code='0011' then '처리중'  when io_gubun=2 then '실패' ELSE '' end AS status_nm
+			, case when a.etc_id is not null then '' when b.status='200' then '성공' when b.STATUS= '999' then '처리중' when io_gubun=2 AND b.STATUS= '400' AND b.error_code='VTIM' then '처리중' when io_gubun=2 AND b.STATUS= '400' AND b.error_code='0011' then '처리중'  when io_gubun=2 then '실패' ELSE '' end AS status_nm
 			, b.send_dt, b.send_tm, b.ERROR_MESSAGE
 			, case when io_gubun='1' then DATE_FORMAT(a.CREAT_DT, '%Y%m%d%H%i%s')
 					when io_gubun = '2' AND a.etc_id IS NOT NULL then DATE_FORMAT(a.CREAT_DT, '%Y%m%d%H%i%s')
@@ -36,7 +36,7 @@
 			LEFT JOIN COMTNFILE f ON a.DAY_ATCH_FILE_ID = f.ATCH_FILE_ID
 			LEFT JOIN RD_ETC g ON a.etc_id = g.ETC_ID AND g.USE_AT ='Y'
 			WHERE 1=1
-			AND a.use_at ='Y'
+			/* AND a.use_at ='Y' 관리자는 실패도 조회 */
 			AND a.week_yn ='N'	/*정산완료된 출금이력은 주정산으로 넘어가기때문에 제외한다*/
 			AND a.io_gubun = '2'
 			AND a.etc_id is null	/* 대여도 제외 */
@@ -57,7 +57,7 @@
 
 			SELECT a.cooperator_id, dw_gubun, if(dw_gubun='DAY', '선지급', '정산') AS gubun, wkp_id AS ID, if(a.io_gubun=1, a.ABLE_PRICE, a.send_price) as send_price, a.fee
 			, b.tran_day, b.TELEGRAM_NO, b.rv_account, b.status, b.status_cd
-			, case when a.etc_id is not null then '' when b.status='200' then '성공' when io_gubun=2 AND b.STATUS= '400' AND b.error_code='VTIM' then '처리중' when io_gubun=2 AND b.STATUS= '400' AND b.error_code='0011' then '처리중'  when io_gubun=2 then '실패' ELSE '' end AS status_nm
+			, case when a.etc_id is not null then '' when b.status='200' then '성공' when b.STATUS= '999' then '처리중' when io_gubun=2 AND b.STATUS= '400' AND b.error_code='VTIM' then '처리중' when io_gubun=2 AND b.STATUS= '400' AND b.error_code='0011' then '처리중'  when io_gubun=2 then '실패' ELSE '' end AS status_nm
 			, b.send_dt, b.send_tm, b.ERROR_MESSAGE
 			, case when io_gubun='1' then DATE_FORMAT(a.CREAT_DT, '%Y%m%d%H%i%s')
 					when io_gubun = '2' AND a.etc_id IS NOT NULL then DATE_FORMAT(a.CREAT_DT, '%Y%m%d%H%i%s')
@@ -80,7 +80,8 @@
 			LEFT JOIN RD_CD e ON b.RV_BANK_CODE = e.CD AND e.CD_GROUP ='BANK_CD'
 			LEFT JOIN COMTNFILE f ON a.ATCH_FILE_ID = f.ATCH_FILE_ID
 			LEFT JOIN RD_ETC g ON a.etc_id = g.ETC_ID AND g.USE_AT ='Y'
-			WHERE a.use_at ='Y'
+			WHERE 1=1
+			/* AND a.use_at ='Y' 관리자는 실패도 조회 */
 			AND a.io_gubun = '2'
 			AND a.etc_id is null	/* 대여도 제외 */
 			<if test='searchCooperatorId != null and searchCooperatorId != "all"'>
@@ -154,7 +155,7 @@
 	<update id="updateDoznHistory" parameterType="egovframework.com.rd.usr.service.vo.DoznHistoryVO">
 		update RD_DOZN_HISTORY
 		set RECV_LONGTXT = #{recvLongtxt}
-		where TRAN_DAY = #{tranDay} and TELEGRAM_NO = #{telegramNo}
+		where TRAN_DAY = #{tranDay} and TELEGRAM_NO = #{telegramNo} and URL = #{url}
 	</update>
 
 	<insert id="insertDoznDs" parameterType="egovframework.com.rd.usr.service.vo.DoszDSResultVO">
@@ -213,7 +214,7 @@
 
 	<select id="selectCooperatorProfitList" parameterType="egovframework.com.rd.usr.service.vo.ProfitVO" resultType="egovframework.com.rd.usr.service.vo.ProfitVO">
 
-		SELECT a.PROFIT_ID, a.COOPERATOR_ID, a.MBER_ID, a.GUBUN, a.COST, a.DELIVERY_COST, a.DELIVERY_CNT, a.DELIVERY_DAY, a.DYP_ID, a.WKP_ID, a.FEE_ID, a.RIDER_FEE_ID
+		SELECT a.coofit_id, a.PROFIT_ID, a.COOPERATOR_ID, a.MBER_ID, a.GUBUN, a.COST, a.DELIVERY_COST, a.DELIVERY_CNT, a.DELIVERY_DAY, a.DYP_ID, a.WKP_ID, a.FEE_ID, a.RIDER_FEE_ID
 		, DATE_FORMAT(a.CREAT_DT, '%Y%m%d') AS CREAT_DT, a.CREAT_ID
 		, b.MBER_NM, c.COOPERATOR_NM
 		, case when a.gubun = 'C' then '콜수수료' when a.gubun ='E' then '기타수수료' when a.gubun ='D' then '선지급수수료' ELSE '' END GUBUN_NM
@@ -333,5 +334,40 @@
 			)
 			</if>
 		ORDER BY a.CREAT_DT desc
+	</select>
+	<select id="selectProfitFeeCoop" parameterType="egovframework.com.rd.usr.service.vo.ProfitVO"  resultType="egovframework.com.rd.usr.service.vo.CooperatorVO">
+		SELECT a.COOPERATOR_ID, COOPERATOR_NM, REGISTRATION_SN, COMPANY_NM, REGISTRATION_NM, CEO_NM, a.USE_AT, DATE_FORMAT(b.CREAT_DT, '%Y%m%d') AS CREAT_DT, a.CREAT_ID, 'R' GUBUN
+		, cp.FEE_ID, FEE_ADMINSTRATOR, FEE_COOPERATOR, FEE_EMPLOYMENT_INSURANCE, FEE_INDUSTRIAL_INSURANCE, FEE_WITHHOLDING_TAX, FEE_TIME_INSURANCE, FEE_CALL, FEE_COOPERATOR_CALL
+		FROM RD_COOPERATOR_PROFIT cp
+		left join RD_COOPERATOR a ON cp.COOPERATOR_ID = a.COOPERATOR_ID
+		LEFT JOIN RD_COOPERATOR_FEE b ON cp.fee_id = b.fee_id
+		WHERE 1 = 1
+			AND cp.coofit_id = #{coofitId}
+	</select>
+
+	<select id="selectProfitFeeRider" parameterType="egovframework.com.rd.usr.service.vo.ProfitVO" resultType="egovframework.com.rd.usr.service.vo.CooperatorVO">
+
+		SELECT usr.mber_id, usr.mber_nm, usr.MBTLNUM
+		, NVL(fee.FEE_EMPLOYMENT_INSURANCE, b.FEE_EMPLOYMENT_INSURANCE) AS FEE_EMPLOYMENT_INSURANCE
+		, NVL(fee.FEE_INDUSTRIAL_INSURANCE, b.FEE_INDUSTRIAL_INSURANCE) AS FEE_INDUSTRIAL_INSURANCE
+		, NVL(fee.FEE_WITHHOLDING_TAX, b.FEE_WITHHOLDING_TAX) AS FEE_WITHHOLDING_TAX
+		, NVL(fee.FEE_TIME_INSURANCE, b.FEE_TIME_INSURANCE) AS FEE_TIME_INSURANCE
+		, NVL(fee.FEE_CALL, b.FEE_CALL) AS FEE_CALL
+
+		FROM RD_COOPERATOR_PROFIT cp
+		LEFT JOIN COMTNGNRLMBER usr ON cp.mber_id = usr.mber_id
+		LEFT JOIN RD_RIDER_FEE fee ON cp.COOPERATOR_ID = fee.COOPERATOR_ID AND cp.MBER_ID = fee.MBER_ID AND cp.RIDER_FEE_ID = fee.RIDER_FEE_ID
+		LEFT JOIN RD_COOPERATOR_FEE b ON cp.COOPERATOR_ID = b.COOPERATOR_ID AND cp.FEE_ID = b.FEE_ID
+		WHERE 1 = 1
+			AND cp.coofit_id = #{coofitId}
+	</select>
+	<select id="selectProfitBase" parameterType="egovframework.com.rd.usr.service.vo.ProfitVO" resultType="egovframework.com.rd.usr.service.vo.ProfitVO">
+		SELECT a.GUBUN
+		, case when a.gubun = 'C' then '콜수수료' when a.gubun ='E' then '기타수수료' when a.gubun ='D' then '선지급수수료' ELSE '' END GUBUN_NM
+		, case when a.GUBUN = 'C' then a.DELIVERY_COST when a.GUBUN = 'D' then b.SEND_PRICE ELSE 0 END cost
+		, a.DELIVERY_CNT, a.DELIVERY_DAY
+		FROM RD_COOPERATOR_PROFIT a
+		LEFT JOIN RD_DAY_PAY b ON a.DYP_ID = b.DYP_ID			WHERE 1 = 1
+			AND a.coofit_id = #{coofitId}
 	</select>
 </mapper>

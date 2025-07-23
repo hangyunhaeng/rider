@@ -263,6 +263,11 @@
 		        .then(response => {
 		        	// 로딩 종료
 		            $('.loading-wrap--js').hide();
+
+		            if(chkLogOut(response.data)){
+		            	return;
+		            }
+
 					if(response.data.resultCode == "success"){
 						goResult();
 					} else{

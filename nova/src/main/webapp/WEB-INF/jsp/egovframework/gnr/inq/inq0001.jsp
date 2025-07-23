@@ -106,6 +106,11 @@
 
 		        	// 로딩 종료
 		            $('.loading-wrap--js').hide();
+
+		            if(chkLogOut(response.data)){
+		            	return;
+		            }
+
 					if(response.data.resultCode == "success"){
 						//보이는 내역 모두 삭제
 						$('#반복부 > div :visible').remove();

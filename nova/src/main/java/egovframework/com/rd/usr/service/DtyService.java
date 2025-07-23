@@ -195,6 +195,20 @@ public interface DtyService {
 	 */
 	public DoszSchAccoutCostVO schAccCost(MyInfoVO vo) throws Exception ;
 	/**
+	 * 알림톡 토큰조회
+	 * @param vo
+	 * @throws Exception
+	 */
+	public String getMsgTocken() throws Exception ;
+	/**
+	 * DOZN 알림톡 발송
+	 * @param jsonParameters
+	 * @param sendAccessToken
+	 * @param sendRefreshToken
+	 * @return
+	 */
+	public String doznHttpRequestMsg(String jsonParameters, String sendAccessToken, String sendRefreshToken) throws Exception ;
+	/**
 	 * 출금 내역 조회
 	 * @param vo
 	 * @return

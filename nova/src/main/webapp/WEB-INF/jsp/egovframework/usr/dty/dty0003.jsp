@@ -165,6 +165,11 @@
         axios.post('${pageContext.request.contextPath}/usr/dty0003_0001.do',params).then(function(response) {
         	// 로딩 종료
             $('.loading-wrap--js').hide();
+
+            if(chkLogOut(response.data)){
+            	return;
+            }
+
 			if(response.data.resultCode == "success"){
 
 	        	if (response.data.resultWeek.length == 0) {
