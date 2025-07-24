@@ -555,6 +555,32 @@
 	            	data = response.data.riderList;	//정상데이터
 					grid3.setGridOption("rowData", data);
 	            }
+	        	if(response.data.base.gubun == 'C'){	//콜수수료
+	        		$('#근거금액').html("배달비 : "+currencyFormatter(response.data.base.cost)+' / 배달건수 : '+response.data.base.deliveryCnt);
+	        		$('#계산식').html(currencyFormatter(response.data.base.deliveryCnt) +" * "+currencyFormatter(grid3.getRowNode(0).data.feeCall)+" * 0.01 * "+grid2.getRowNode(0).data.feeCooperatorCall);
+
+					//협력사 수수료 색상 바꾸기
+	                const imsiColumnDefs = grid2.getColumnDefs(); // 현재 컬럼정의 가져오깅(당근 배열임)
+	                for (let colDef of imsiColumnDefs) {
+	                  if (colDef.field == "feeCall" || colDef.field == "feeCooperatorCall") {
+	                    colDef.cellClass = "edited-bg";
+	                  }
+	                }
+	                grid2.setGridOption("columnDefs", imsiColumnDefs);
+
+					//라이더 수수료 색상 바꾸기
+	                const imsiColumnDefs1 = grid3.getColumnDefs(); // 현재 컬럼정의 가져오깅(당근 배열임)
+	                for (let colDef of imsiColumnDefs1) {
+	                  if (colDef.field == "feeCall") {
+	                    colDef.cellClass = "edited-bg";
+	                    break;
+	                  }
+	                }
+	                grid3.setGridOption("columnDefs", imsiColumnDefs1);
+
+	        	} else if(response.data.base.gubun == 'D'){
+	        		$('#근거금액').html(currencyFormatter(response.data.base.cost));
+	        	}
 			}
 
         })
@@ -701,15 +727,15 @@
 					</colgroup>
 
 					<tr>
-						<th>협력사</th>
+						<th>근거금액</th>
 						<td>
-							<sm class="float-start">&nbsp;~&nbsp;</sm>
+							<sm id="근거금액" class="float-start"></sm>
 						</td>
 					</tr>
 					<tr>
-						<th>등록일</th>
+						<th>계산식</th>
 						<td>
-							<sm class="float-start">&nbsp;~&nbsp;</sm>
+							<sm id="계산식" class="float-start"></sm>
 						</td>
 					</tr>
 				</table>

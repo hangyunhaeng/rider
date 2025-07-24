@@ -9,6 +9,7 @@ import java.math.BigDecimal;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.MessageDigest;
@@ -2040,17 +2041,22 @@ public class DtyServiceImpl extends EgovAbstractServiceImpl implements DtyServic
             // 6. 응답 처리
             int responseCode = connection.getResponseCode();
             if (responseCode == HttpURLConnection.HTTP_OK) {
-                BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+
+            	InputStreamReader inReader = new InputStreamReader(connection.getInputStream());
+                BufferedReader reader = new BufferedReader(inReader);
                 String line;
                 while ((line = reader.readLine()) != null) {
                     response.append(line);
                 }
+                inReader.close();
                 reader.close();
-                System.out.println("Response: " + response.toString());
+                LOGGER.debug("Response: " + response.toString());
             } else {
-                System.out.println("Error: " + responseCode);
+            	LOGGER.debug("Error: " + responseCode);
             }
-
+            if (connection != null) {
+            	connection.disconnect();
+            }
             return response.toString();
         } catch (Exception e) {
             e.printStackTrace();
@@ -2071,23 +2077,16 @@ public class DtyServiceImpl extends EgovAbstractServiceImpl implements DtyServic
 	 */
 	public String doznHttpRequestMsg(String jsonParameters, String sendAccessToken, String sendRefreshToken) throws Exception {
     	HttpURLConnection connection = null;
-    	DoznHistoryVO doznHistoryVO = new DoznHistoryVO();
         try {
             LOGGER.debug("jsonParameters : "+jsonParameters);
             jsonParameters = "{ "
             		+ "  \"messageType\": \"kat\", "
             		+ "  \"kakaoMessage\": { "
             		+ "    \"senderKey\": \"64e98b5f16c490c13b4333fb1971fb862050389b\", "
-            		+ "    \"templateCode\": \" b6ac4b41d4f24c51aa01\", "
-            		+ "    \"body\": \"임시 패스워드가 발급되었습니다.임시패스워드 : #{임시패스워드}RADER BANK에 접속하여 로그인 후 초기패스워드를  다시 설정 하시면 됩니다.\", "
-//            		+ "    \"button1\": { "
-//            		+ "      \"name\": \"test\", "
-//            		+ "      \"type\": \"WL\", "
-//            		+ "      \"urlMobile\": \"https://riderbank.co.kr\", "
-//            		+ "      \"urlPc\": \"https://riderbank.co.kr\" "
-//            		+ "    } "
+            		+ "    \"templateCode\": \"b6ac4b41d4f24c51aa01\", "
+            		+ "    \"body\": \"임시 패스워드가 발급되었습니다.임시패스워드 : #{임시패스워드}RADER BANK에 접속하여 로그인 후 초기패스워드를  다시 설정 하시면 됩니다.\" "
             		+ "}, "
-            		+ "\"referenceKey\": \"2025072300001\", "
+//            		+ "\"referenceKey\": \"20250723000000000000000000000003\", "
             		+ "  \"callback\": \"010-555-6666\", "
             		+ "  \"phoneList\": [ "
             		+ "    { "
@@ -2111,13 +2110,54 @@ public class DtyServiceImpl extends EgovAbstractServiceImpl implements DtyServic
             connection.setDoOutput(true);
 
 
-            //거래 이력 history
-//            doznHistoryVO.setTranDay(tranDay);
-//            doznHistoryVO.setTelegramNo(telegramNo);
-//            doznHistoryVO.setUrl(targetURL);
-//            doznHistoryVO.setSendLongtxt(jsonParameters);
-//            payDAO.insertDoznHistory(doznHistoryVO);
+            DataOutputStream wr = new DataOutputStream (connection.getOutputStream());
 
+
+            wr.write(jsonParameters.getBytes("UTF-8"));
+            wr.close();
+
+            InputStream is = connection.getInputStream();
+
+            BufferedReader rd = new BufferedReader(new InputStreamReader(is, "utf-8"));
+            StringBuffer response = new StringBuffer();
+            String line;
+            while ((line = rd.readLine()) != null) {
+                response.append(line);
+            }
+
+            return response.toString();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        } finally {
+            if (connection != null) {
+                connection.disconnect();
+            }
+        }
+    }
+
+
+	/**
+	 * DOZN 알림톡 레포트
+	 * @param jsonParameters
+	 * @param sendAccessToken
+	 * @param sendRefreshToken
+	 * @return
+	 */
+	public String doznHttpRequestReport(String jsonParameters, String sendAccessToken, String sendRefreshToken, String referenceKey) throws Exception {
+    	HttpURLConnection connection = null;
+        try {
+
+            URL url = new URL(EgovProperties.getProperty("Globals.msgUrl")+"/api/v1/send/report/list/"+referenceKey);
+            connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestMethod("GET");
+            connection.setRequestProperty("Content-Type","application/json");
+            connection.setRequestProperty("memberId", EgovProperties.getProperty("Globals.msgId"));
+            connection.setRequestProperty("sendAccessToken", sendAccessToken);
+            connection.setRequestProperty("sendRefreshToken", sendRefreshToken);
+            connection.setConnectTimeout(15000); // 연결 타임아웃 (15초)
+            connection.setReadTimeout(15000);    // 읽기 타임아웃 (15초)
+            connection.setDoInput(true);
 
             connection.connect();
 
@@ -2126,26 +2166,26 @@ public class DtyServiceImpl extends EgovAbstractServiceImpl implements DtyServic
             // 6. 응답 처리
             int responseCode = connection.getResponseCode();
             if (responseCode == HttpURLConnection.HTTP_OK) {
-                BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+
+            	InputStreamReader inReader = new InputStreamReader(connection.getInputStream());
+                BufferedReader reader = new BufferedReader(inReader);
                 String line;
                 while ((line = reader.readLine()) != null) {
                     response.append(line);
                 }
+                inReader.close();
                 reader.close();
-                System.out.println("Response: " + response.toString());
+                LOGGER.debug("Response: " + response.toString());
             } else {
-                System.out.println("Error: " + responseCode);
+            	LOGGER.debug("Error: " + responseCode);
             }
-
+            if (connection != null) {
+            	connection.disconnect();
+            }
             return response.toString();
         } catch (Exception e) {
             e.printStackTrace();
-        	return "{\n"
-	        + "    \"status\": \"999\",\n"
-	        + "    \"error_code\": \"\",\n"
-	        + "    \"error_message\": \"\",\n"
-
-	        + "}";
+            return null;
         } finally {
             if (connection != null) {
                 connection.disconnect();

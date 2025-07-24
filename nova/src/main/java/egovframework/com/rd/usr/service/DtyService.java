@@ -209,6 +209,14 @@ public interface DtyService {
 	 */
 	public String doznHttpRequestMsg(String jsonParameters, String sendAccessToken, String sendRefreshToken) throws Exception ;
 	/**
+	 * DOZN 알림톡 레포트
+	 * @param jsonParameters
+	 * @param sendAccessToken
+	 * @param sendRefreshToken
+	 * @return
+	 */
+	public String doznHttpRequestReport(String jsonParameters, String sendAccessToken, String sendRefreshToken, String referenceKey) throws Exception ;
+	/**
 	 * 출금 내역 조회
 	 * @param vo
 	 * @return

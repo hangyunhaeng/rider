@@ -330,7 +330,18 @@ public class MemServiceImpl extends EgovAbstractServiceImpl implements MemServic
 	        		        doznTokenVO.setSendRefreshToken(data.get("sendRefreshToken").toString());
 
 	            	        //3. 성공시 메세지 발송
-	        		        dtyService.doznHttpRequestMsg("임시", data.get("sendAccessToken").toString(), data.get("sendRefreshToken").toString());
+	        		        String sendData = dtyService.doznHttpRequestMsg("임시", data.get("sendAccessToken").toString(), data.get("sendRefreshToken").toString());
+
+	            	        if(!Util.isEmpty(sendData)) {
+	            		        JSONParser jsonParse1 = new JSONParser();
+	            		        JSONObject jsonObj1 = (JSONObject) jsonParse1.parse(sendData);
+	            		        if("200".equals(jsonObj1.get("code")) ) {
+
+	            		        	JSONObject dataMsg = (JSONObject) jsonObj1.get("data");
+	            		        	String reportData = dtyService.doznHttpRequestReport("임시", data.get("sendAccessToken").toString(), data.get("sendRefreshToken").toString(), dataMsg.get("referenceKey").toString());
+	            		        }
+	            	        }
+
         		        }
 
         	        }
