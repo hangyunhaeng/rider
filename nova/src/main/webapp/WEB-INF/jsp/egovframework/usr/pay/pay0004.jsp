@@ -557,7 +557,8 @@
 	            }
 	        	if(response.data.base.gubun == 'C'){	//콜수수료
 	        		$('#근거금액').html("배달비 : "+currencyFormatter(response.data.base.cost)+' / 배달건수 : '+response.data.base.deliveryCnt);
-	        		$('#계산식').html(currencyFormatter(response.data.base.deliveryCnt) +" * "+currencyFormatter(grid3.getRowNode(0).data.feeCall)+" * 0.01 * "+grid2.getRowNode(0).data.feeCooperatorCall);
+	        		var iFee = Math.floor(response.data.base.deliveryCnt*grid3.getRowNode(0).data.feeCall*0.01*grid2.getRowNode(0).data.feeCooperatorCall);
+	        		$('#계산식').html(currencyFormatter(response.data.base.deliveryCnt) +" * "+currencyFormatter(grid3.getRowNode(0).data.feeCall)+" * 0.01 * "+grid2.getRowNode(0).data.feeCooperatorCall+" = "+currencyFormatter(iFee));
 
 					//협력사 수수료 색상 바꾸기
 	                const imsiColumnDefs = grid2.getColumnDefs(); // 현재 컬럼정의 가져오깅(당근 배열임)
