@@ -305,7 +305,7 @@ public class MemServiceImpl extends EgovAbstractServiceImpl implements MemServic
             searchVO.setSearchKeyword(vo.getMberId());
             MberManageVO userOne = mberManageDAO.selectUserListRider(searchVO);
         	if( userOne != null ) {
-        		//핸드폰번호 최초등록 시
+/*        		//핸드폰번호 최초등록 시
         		if(Util.isEmpty(userOne.getMbtlnum())) {
 
         			//1. 임시패스워드와 MBER_CONFIRM_AT를 N로 설정
@@ -347,7 +347,7 @@ public class MemServiceImpl extends EgovAbstractServiceImpl implements MemServic
         	        }
 
         		}
-
+*/
         		userOne.setMberNm(vo.getMberNm());
         		userOne.setMoblphonNo(vo.getMbtlnum());
         		mberManageDAO.updateMber(userOne);

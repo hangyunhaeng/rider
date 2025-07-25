@@ -561,26 +561,37 @@
 	        		$('#계산식').html(currencyFormatter(response.data.base.deliveryCnt) +" * "+currencyFormatter(grid3.getRowNode(0).data.feeCall)+" * 0.01 * "+grid2.getRowNode(0).data.feeCooperatorCall+" = "+currencyFormatter(iFee));
 
 					//협력사 수수료 색상 바꾸기
-	                const imsiColumnDefs = grid2.getColumnDefs(); // 현재 컬럼정의 가져오깅(당근 배열임)
-	                for (let colDef of imsiColumnDefs) {
-	                  if (colDef.field == "feeCall" || colDef.field == "feeCooperatorCall") {
-	                    colDef.cellClass = "edited-bg";
-	                  }
-	                }
+					const imsiColumnDefs = grid2.getColumnDefs(); // 현재 컬럼정의 가져오깅(당근 배열임)
+					for (let colDef of imsiColumnDefs) {
+						if (colDef.field == "feeCall" || colDef.field == "feeCooperatorCall") {
+							colDef.cellClass = "edited-bg";
+						}
+					}
 	                grid2.setGridOption("columnDefs", imsiColumnDefs);
 
 					//라이더 수수료 색상 바꾸기
-	                const imsiColumnDefs1 = grid3.getColumnDefs(); // 현재 컬럼정의 가져오깅(당근 배열임)
-	                for (let colDef of imsiColumnDefs1) {
-	                  if (colDef.field == "feeCall") {
-	                    colDef.cellClass = "edited-bg";
-	                    break;
-	                  }
-	                }
+					const imsiColumnDefs1 = grid3.getColumnDefs(); // 현재 컬럼정의 가져오깅(당근 배열임)
+					for (let colDef of imsiColumnDefs1) {
+						if (colDef.field == "feeCall") {
+							colDef.cellClass = "edited-bg";
+							break;
+						}
+					}
 	                grid3.setGridOption("columnDefs", imsiColumnDefs1);
 
-	        	} else if(response.data.base.gubun == 'D'){
+	        	} else if(response.data.base.gubun == 'D'){	//선지급수수료
 	        		$('#근거금액').html(currencyFormatter(response.data.base.cost));
+	        		var iFee = Math.floor(response.data.base.cost*0.01*grid2.getRowNode(0).data.feeAdminstrator*0.01*grid2.getRowNode(0).data.feeCooperator);
+	        		$('#계산식').html(currencyFormatter(response.data.base.cost)+" * 0.01 * "+grid2.getRowNode(0).data.feeAdminstrator+" * 0.01 * "+grid2.getRowNode(0).data.feeCooperator+" = "+currencyFormatter(iFee));
+
+					//협력사 수수료 색상 바꾸기
+					const imsiColumnDefs = grid2.getColumnDefs(); // 현재 컬럼정의 가져오깅(당근 배열임)
+					for (let colDef of imsiColumnDefs) {
+						if (colDef.field == "feeAdminstrator" || colDef.field == "feeCooperator") {
+							colDef.cellClass = "edited-bg";
+						}
+					}
+	                grid2.setGridOption("columnDefs", imsiColumnDefs);
 	        	}
 			}
 

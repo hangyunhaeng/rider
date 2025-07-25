@@ -335,7 +335,47 @@
 			</if>
 		ORDER BY a.CREAT_DT desc
 	</select>
+
+
 	<select id="selectProfitFeeCoop" parameterType="egovframework.com.rd.usr.service.vo.ProfitVO"  resultType="egovframework.com.rd.usr.service.vo.CooperatorVO">
+		SELECT a.COOPERATOR_ID, COOPERATOR_NM, REGISTRATION_SN, COMPANY_NM, REGISTRATION_NM, CEO_NM, a.USE_AT, DATE_FORMAT(b.CREAT_DT, '%Y%m%d') AS CREAT_DT, a.CREAT_ID, 'R' GUBUN
+		, cp.FEE_ID, FEE_ADMINSTRATOR, FEE_COOPERATOR, FEE_EMPLOYMENT_INSURANCE, FEE_INDUSTRIAL_INSURANCE, FEE_WITHHOLDING_TAX, FEE_TIME_INSURANCE, FEE_CALL, FEE_COOPERATOR_CALL
+		FROM RD_PROFIT cp
+		left join RD_COOPERATOR a ON cp.COOPERATOR_ID = a.COOPERATOR_ID
+		LEFT JOIN RD_COOPERATOR_FEE b ON cp.fee_id = b.fee_id
+		WHERE 1 = 1
+			AND cp.profit_id = #{profitId}
+	</select>
+
+	<select id="selectProfitFeeRider" parameterType="egovframework.com.rd.usr.service.vo.ProfitVO" resultType="egovframework.com.rd.usr.service.vo.CooperatorVO">
+
+		SELECT usr.mber_id, usr.mber_nm, usr.MBTLNUM
+		, NVL(fee.FEE_EMPLOYMENT_INSURANCE, b.FEE_EMPLOYMENT_INSURANCE) AS FEE_EMPLOYMENT_INSURANCE
+		, NVL(fee.FEE_INDUSTRIAL_INSURANCE, b.FEE_INDUSTRIAL_INSURANCE) AS FEE_INDUSTRIAL_INSURANCE
+		, NVL(fee.FEE_WITHHOLDING_TAX, b.FEE_WITHHOLDING_TAX) AS FEE_WITHHOLDING_TAX
+		, NVL(fee.FEE_TIME_INSURANCE, b.FEE_TIME_INSURANCE) AS FEE_TIME_INSURANCE
+		, NVL(fee.FEE_CALL, b.FEE_CALL) AS FEE_CALL
+
+		FROM RD_PROFIT cp
+		LEFT JOIN COMTNGNRLMBER usr ON cp.mber_id = usr.mber_id
+		LEFT JOIN RD_RIDER_FEE fee ON cp.COOPERATOR_ID = fee.COOPERATOR_ID AND cp.MBER_ID = fee.MBER_ID AND cp.RIDER_FEE_ID = fee.RIDER_FEE_ID
+		LEFT JOIN RD_COOPERATOR_FEE b ON cp.COOPERATOR_ID = b.COOPERATOR_ID AND cp.FEE_ID = b.FEE_ID
+		WHERE 1 = 1
+			AND cp.profit_id = #{profitId}
+	</select>
+	<select id="selectProfitBase" parameterType="egovframework.com.rd.usr.service.vo.ProfitVO" resultType="egovframework.com.rd.usr.service.vo.ProfitVO">
+		SELECT a.GUBUN
+		, case when a.gubun = 'C' then '콜수수료' when a.gubun ='E' then '기타수수료' when a.gubun ='D' then '선지급수수료' ELSE '' END GUBUN_NM
+		, case when a.GUBUN = 'C' then a.DELIVERY_COST when a.GUBUN = 'D' then b.SEND_PRICE ELSE 0 END cost
+		, a.DELIVERY_CNT, a.DELIVERY_DAY
+		FROM RD_PROFIT a
+		LEFT JOIN RD_DAY_PAY b ON a.DYP_ID = b.DYP_ID
+		WHERE 1 = 1
+			AND a.profit_id = #{profitId}
+	</select>
+
+
+	<select id="selectCoopProfitFeeCoop" parameterType="egovframework.com.rd.usr.service.vo.ProfitVO"  resultType="egovframework.com.rd.usr.service.vo.CooperatorVO">
 		SELECT a.COOPERATOR_ID, COOPERATOR_NM, REGISTRATION_SN, COMPANY_NM, REGISTRATION_NM, CEO_NM, a.USE_AT, DATE_FORMAT(b.CREAT_DT, '%Y%m%d') AS CREAT_DT, a.CREAT_ID, 'R' GUBUN
 		, cp.FEE_ID, FEE_ADMINSTRATOR, FEE_COOPERATOR, FEE_EMPLOYMENT_INSURANCE, FEE_INDUSTRIAL_INSURANCE, FEE_WITHHOLDING_TAX, FEE_TIME_INSURANCE, FEE_CALL, FEE_COOPERATOR_CALL
 		FROM RD_COOPERATOR_PROFIT cp
@@ -345,7 +385,7 @@
 			AND cp.coofit_id = #{coofitId}
 	</select>
 
-	<select id="selectProfitFeeRider" parameterType="egovframework.com.rd.usr.service.vo.ProfitVO" resultType="egovframework.com.rd.usr.service.vo.CooperatorVO">
+	<select id="selectCoopProfitFeeRider" parameterType="egovframework.com.rd.usr.service.vo.ProfitVO" resultType="egovframework.com.rd.usr.service.vo.CooperatorVO">
 
 		SELECT usr.mber_id, usr.mber_nm, usr.MBTLNUM
 		, NVL(fee.FEE_EMPLOYMENT_INSURANCE, b.FEE_EMPLOYMENT_INSURANCE) AS FEE_EMPLOYMENT_INSURANCE
@@ -361,13 +401,14 @@
 		WHERE 1 = 1
 			AND cp.coofit_id = #{coofitId}
 	</select>
-	<select id="selectProfitBase" parameterType="egovframework.com.rd.usr.service.vo.ProfitVO" resultType="egovframework.com.rd.usr.service.vo.ProfitVO">
+	<select id="selectCoopProfitBase" parameterType="egovframework.com.rd.usr.service.vo.ProfitVO" resultType="egovframework.com.rd.usr.service.vo.ProfitVO">
 		SELECT a.GUBUN
 		, case when a.gubun = 'C' then '콜수수료' when a.gubun ='E' then '기타수수료' when a.gubun ='D' then '선지급수수료' ELSE '' END GUBUN_NM
 		, case when a.GUBUN = 'C' then a.DELIVERY_COST when a.GUBUN = 'D' then b.SEND_PRICE ELSE 0 END cost
 		, a.DELIVERY_CNT, a.DELIVERY_DAY
 		FROM RD_COOPERATOR_PROFIT a
-		LEFT JOIN RD_DAY_PAY b ON a.DYP_ID = b.DYP_ID			WHERE 1 = 1
+		LEFT JOIN RD_DAY_PAY b ON a.DYP_ID = b.DYP_ID
+		WHERE 1 = 1
 			AND a.coofit_id = #{coofitId}
 	</select>
 </mapper>

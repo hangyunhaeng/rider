@@ -14,9 +14,9 @@ a{color:#333;text-decoration:none}
 a:hover, a:focus, a:active{color:#0079c2}/*keit 180525: color*/
 hr{display:none}
 table{width:100%;border-collapse:collapse;border-spacing:0;font-size:13px;}/*keit 180525:commenting because of style inherit of BODY, 180528: uncommenting for popup style */
-th, td{border:1px solid #d1d1d1;height:32px;padding:4px 10px!important;}/*keit 180509:padding-top,padding-bottom,letter-spacing, 180525: remove letter-spacing*/
+th, td{border:1px solid #d1d1d1 !important;height:32px;padding:4px 10px!important;}/*keit 180509:padding-top,padding-bottom,letter-spacing, 180525: remove letter-spacing*/
 th{padding:4px 10px!important;text-align:left;color:#333;background-color:#e2f2e1;} /*keit 180509: bg*/
-td{color:#555;background-color:#fff}
+td{color:#555 !important;background-color:#fff}
 td input[type="text"]:only-child, td input[type="email"]:only-child, td input[type="password"]:only-child, td select:only-child{width:100%} /*keit 180521: commenting, 180525: :only-child*/
 caption{position:absolute!important;clip:rect(1px,1px, 1px, 1px)}
 

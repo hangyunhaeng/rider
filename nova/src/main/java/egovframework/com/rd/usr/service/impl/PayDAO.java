@@ -175,8 +175,9 @@ public class PayDAO extends EgovComAbstractDAO {
 	public List<CooperatorPayVO> selectCooperatorPayList(CooperatorPayVO vo) throws Exception {
 		return selectList("payDAO.selectCooperatorPayList", vo);
 	}
+
 	/**
-	 * 협력사 수익 계산근거 조회(협력사)
+	 * 운영사 수익 계산근거 조회(협력사)
 	 * @param vo
 	 * @return
 	 * @throws Exception
@@ -185,7 +186,7 @@ public class PayDAO extends EgovComAbstractDAO {
 		return selectList("payDAO.selectProfitFeeCoop", vo);
 	}
 	/**
-	 * 협력사 수익 계산근거 조회(라이더)
+	 * 운영사 수익 계산근거 조회(라이더)
 	 * @param vo
 	 * @return
 	 * @throws Exception
@@ -194,13 +195,40 @@ public class PayDAO extends EgovComAbstractDAO {
 		return selectList("payDAO.selectProfitFeeRider", vo);
 	}
 	/**
-	 * 협력사 수익 계산근거
+	 * 운영사 수익 계산근거
 	 * @param vo
 	 * @return
 	 * @throws Exception
 	 */
 	public ProfitVO selectProfitBase(ProfitVO vo) throws Exception {
 		return selectOne("payDAO.selectProfitBase", vo);
+	}
+	/**
+	 * 협력사 수익 계산근거 조회(협력사)
+	 * @param vo
+	 * @return
+	 * @throws Exception
+	 */
+	public List<CooperatorPayVO> selectCoopProfitFeeCoop(ProfitVO vo) throws Exception {
+		return selectList("payDAO.selectCoopProfitFeeCoop", vo);
+	}
+	/**
+	 * 협력사 수익 계산근거 조회(라이더)
+	 * @param vo
+	 * @return
+	 * @throws Exception
+	 */
+	public List<CooperatorPayVO> selectCoopProfitFeeRider(ProfitVO vo) throws Exception {
+		return selectList("payDAO.selectCoopProfitFeeRider", vo);
+	}
+	/**
+	 * 협력사 수익 계산근거
+	 * @param vo
+	 * @return
+	 * @throws Exception
+	 */
+	public ProfitVO selectCoopProfitBase(ProfitVO vo) throws Exception {
+		return selectOne("payDAO.selectCoopProfitBase", vo);
 	}
 
 }
