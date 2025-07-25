@@ -3,6 +3,7 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 
 
+
 <main class="main" style="height: 60px;">
 
 		<!-- Hero Section -->
