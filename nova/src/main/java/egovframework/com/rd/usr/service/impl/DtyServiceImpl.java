@@ -1163,6 +1163,26 @@ public class DtyServiceImpl extends EgovAbstractServiceImpl implements DtyServic
 	public List<WeekRiderInfoVO> selectWeekRiderInfoByAtchFileId(WeekInfoVO vo) throws Exception {
 		return dtyDAO.selectWeekRiderInfoByAtchFileId(vo);
 	}
+
+	/**
+	 * 주정산 데이터 조회
+	 * @param vo
+	 * @return
+	 * @throws Exception
+	 */
+	public List<WeekInfoVO> selectWeekInfoByParam(WeekInfoVO vo) throws Exception {
+		return dtyDAO.selectWeekInfoByParam(vo);
+	}
+
+	/**
+	 * 주정산 라이더 데이터 조회
+	 * @param vo
+	 * @return
+	 * @throws Exception
+	 */
+	public List<WeekRiderInfoVO> selectWeekRiderInfoByParam(WeekInfoVO vo) throws Exception {
+		return dtyDAO.selectWeekRiderInfoByParam(vo);
+	}
 	/**
 	 *  파일 업로드 현황 조회 / 주정산 파일
 	 * @param vo

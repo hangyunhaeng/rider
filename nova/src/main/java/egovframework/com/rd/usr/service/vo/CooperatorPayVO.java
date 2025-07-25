@@ -26,6 +26,8 @@ public class CooperatorPayVO extends Sch implements Serializable {
 	private int sendFee;
 	//출금액
 	private int sendPrice;
+	//잔액
+	private int balance;
 	//송금일자
 	private String tranDay;
 	//거래고유번호

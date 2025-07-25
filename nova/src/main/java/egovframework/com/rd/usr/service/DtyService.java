@@ -113,6 +113,21 @@ public interface DtyService {
 	 */
 	public List<WeekRiderInfoVO> selectWeekRiderInfoByAtchFileId(WeekInfoVO vo) throws Exception ;
 	/**
+	 * 주정산 데이터 조회
+	 * @param vo
+	 * @return
+	 * @throws Exception
+	 */
+	public List<WeekInfoVO> selectWeekInfoByParam(WeekInfoVO vo) throws Exception ;
+
+	/**
+	 * 주정산 라이더 데이터 조회
+	 * @param vo
+	 * @return
+	 * @throws Exception
+	 */
+	public List<WeekRiderInfoVO> selectWeekRiderInfoByParam(WeekInfoVO vo) throws Exception ;
+	/**
 	 *  파일 업로드 현황 조회 / 주정산 파일
 	 * @param vo
 	 * @return

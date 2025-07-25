@@ -35,6 +35,8 @@ public class WeekPayVO extends Sch implements Serializable {
 	private int fee;
 	//출금액
 	private BigDecimal sendPrice;
+	//잔액
+	private int balance;
 	//정산시작일
 	private String accountsStDt;
 	//정산종료일

@@ -96,6 +96,14 @@ public class DtyDAO extends EgovComAbstractDAO {
 	public List<WeekRiderInfoVO> selectWeekRiderInfoByAtchFileId(WeekInfoVO vo) throws Exception {
 		return selectList("dtyDAO.selectWeekRiderInfoByAtchFileId", vo);
 	}
+
+	public List<WeekInfoVO> selectWeekInfoByParam(WeekInfoVO vo)  throws Exception {
+		return selectList("dtyDAO.selectWeekInfoByParam", vo);
+	}
+
+	public List<WeekRiderInfoVO> selectWeekRiderInfoByParam(WeekInfoVO vo) throws Exception {
+		return selectList("dtyDAO.selectWeekRiderInfoByParam", vo);
+	}
 	/**
 	 *  파일 업로드 현황 조회 / 주정산 파일
 	 * @param vo

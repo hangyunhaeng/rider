@@ -30,9 +30,12 @@ public class Sch implements Serializable {
 
 	private String searchFromDate;
 	private String searchToDate;
+	private String searchFromDate1;
+	private String searchToDate1;
 
 	private String searchCooperatorId;
 	private String searchGubun;
+	private String searchGubun1;
 	/* 조회조건 */
 	private String searchId;
 	private String searchNm;

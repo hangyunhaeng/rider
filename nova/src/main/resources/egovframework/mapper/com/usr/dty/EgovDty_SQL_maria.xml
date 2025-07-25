@@ -157,6 +157,53 @@
 			order by b.WEEK_ID asc, LPAD(b.NO, 4,0) ASC
 	</select>
 
+
+	<select id="selectWeekInfoByParam" parameterType="egovframework.com.rd.usr.service.vo.WeekInfoVO" resultType="egovframework.com.rd.usr.service.vo.WeekInfoVO">
+		SELECT
+			WEEK_ID,COOPERATOR_ID,ACCOUNTS_ST_DT,ACCOUNTS_ED_DT ,DELIVERY_COST ,ADD_ACCOUNTS ,OPERATING_COST,MANAGEMENT_COST
+			,OPERATING_FEE,ETC_COST,TIME_INSURANCE,OWNER_EMPLOYMENT_INSURANCE,RIDER_EMPLOYMENT_INSURANCE,OWNER_INDUSTRIAL_INSURANCE
+			,RIDER_INDUSTRIAL_INSURANCE,WITHHOLDING_TAX_INSURANCE_SUM,EMPLOYMENT_INSURANCE_ACCOUNTS,INDUSTRIAL_INSURANCE_ACCOUNTS
+			,G,ACCOUNTS_SCHEDULE_COST,TAX_BILL_SUPPLY,TAX_BILL_ADD ,TAX_BILL_SUM ,NOTE,ATCH_FILE_ID,CREAT_DT,CREAT_ID
+		FROM RD_WEEK_INFO
+		WHERE 1=1
+			<if test="searchFromDate1 != null and searchFromDate1 != '' and searchFromDate1 != null and searchFromDate1 != ''">
+			AND (ACCOUNTS_ST_DT BETWEEN #{searchFromDate1} AND #{searchFromDate1} or ACCOUNTS_ED_DT BETWEEN #{searchFromDate1} AND #{searchFromDate1})
+			</if>
+			<if test="searchGubun != null and searchGubun != ''">
+			</if>
+			<if test="schAuthorCode == 'ROLE_USER'">
+			/* 협력사 조건 *//* COOPERATOR_ID로 조건을 만든건 ★정산 파일을 올릴때 권한이 있는 협력사ID 데이터만 올릴수 있음!!★ - 나머지는 오류 처리할꺼임  */
+			AND COOPERATOR_ID IN (
+				SELECT COOPERATOR_ID FROM RD_COOPERATOR a
+				WHERE a.REGISTRATION_SN = #{schIhidNum} AND use_at ='Y'
+			)
+			</if>
+	</select>
+
+	<select id="selectWeekRiderInfoByParam" parameterType="egovframework.com.rd.usr.service.vo.WeekInfoVO" resultType="egovframework.com.rd.usr.service.vo.WeekRiderInfoVO">
+		SELECT
+			b.WEEK_ID,b.NO,b.MBER_ID,b.MBER_NM,b.CNT,b.DELIVERY_COST,b.ADD_COST,b.SUM_COST,b.TIME_INSURANCE,b.NECESSARY_EXPENSES,b.PAY,b.OWNER_EMPLOYMENT_INSURANCE
+			,b.RIDER_EMPLOYMENT_INSURANCE,b.OWNER_INDUSTRIAL_INSURANCE,b.RIDER_INDUSTRIAL_INSURANCE,b.WITHHOLDING_TAX_INSURANCE_SUM
+			,b.OWNER_EMPLOYMENT_INSURANCE_ACCOUNTS,b.RIDER_EMPLOYMENT_INSURANCE_ACCOUNTS,b.SUM_EMPLOYMENT_INSURANCE_ACCOUNTS
+			,b.OWNER_INDUSTRIAL_INSURANCE_ACCOUNTS,b.RIDER_INDUSTRIAL_INSURANCE_ACCOUNTS,b.SUM_INDUSTRIAL_INSURANCE_ACCOUNTS
+			,b.OPERATING_COST,b.ACCOUNTS_COST,b.INCOME_TAX,b.RESIDENCE_TAX,b.WITHHOLDING_TAX,b.GIVE_PAY,b.CREAT_DT,b.CREAT_ID
+		FROM RD_WEEK_INFO a, RD_WEEK_RIDER_INFO b
+		WHERE a.week_id = b.week_id
+			<if test="searchFromDate1 != null and searchFromDate1 != '' and searchFromDate1 != null and searchFromDate1 != ''">
+			AND (a.ACCOUNTS_ST_DT BETWEEN #{searchFromDate1} AND #{searchFromDate1} or a.ACCOUNTS_ED_DT BETWEEN #{searchFromDate1} AND #{searchFromDate1})
+			</if>
+			<if test="searchGubun != null and searchGubun != ''">
+			</if>
+			<if test="schAuthorCode == 'ROLE_USER'">
+			/* 협력사 조건 *//* COOPERATOR_ID로 조건을 만든건 ★정산 파일을 올릴때 권한이 있는 협력사ID 데이터만 올릴수 있음!!★ - 나머지는 오류 처리할꺼임  */
+			AND COOPERATOR_ID IN (
+				SELECT COOPERATOR_ID FROM RD_COOPERATOR a
+				WHERE a.REGISTRATION_SN = #{schIhidNum} AND use_at ='Y'
+			)
+			</if>
+			order by b.WEEK_ID asc, LPAD(b.NO, 4,0) ASC
+	</select>
+
 	<select id="selectUploadStateInWeek" parameterType="egovframework.com.rd.usr.service.vo.WeekInfoVO" resultType="egovframework.com.rd.usr.service.vo.UploadStateVO">
 		SELECT c.ATCH_FILE_ID, d.ORIGNL_FILE_NM, a.COOPERATOR_ID, b.COOPERATOR_NM, a.WEEK_ID, a.ACCOUNTS_ST_DT, a.ACCOUNTS_ED_DT, DATE_FORMAT(c.CREAT_DT,'%Y%m%d') CREAT_DT
 		FROM RD_WEEK_INFO a

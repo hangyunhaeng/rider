@@ -38,6 +38,8 @@ public class DayPayVO extends Sch implements Serializable {
 	private int sendFee;
 	//출금가능금액
 	private int ablePrice;
+	//잔액
+	private int balance;
 	//출금액
 	private int sendPrice;
 	//정산완료구분
