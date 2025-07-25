@@ -261,4 +261,20 @@ public interface DtyService {
 	 * @throws Exception
 	 */
 	public int updateWeekPayByTransfer(DoszTransferVO vo) throws Exception ;
+
+	/**
+	 * 일정산 내역 확정
+	 * @param deliveryInfoVO
+	 * @return
+	 * @throws Exception
+	 */
+	public void fixDay(DeliveryInfoVO deliveryInfoVO) throws Exception ;
+
+	/**
+	 * 주정산 내역 확정
+	 * @param weekInfoVO
+	 * @return
+	 * @throws Exception
+	 */
+	public void fixWeek(WeekInfoVO weekInfoVO) throws Exception ;
 }

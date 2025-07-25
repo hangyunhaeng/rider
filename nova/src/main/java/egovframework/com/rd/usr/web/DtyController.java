@@ -966,7 +966,6 @@ public class DtyController {
         //총판 or 협력사
         weekInfoVO.setSchAuthorCode(user.getAuthorCode());
         weekInfoVO.setSchIhidNum(user.getIhidNum());
-        weekInfoVO.setSearchGubun("DAY");
 
         List<WeekInfoVO> list = dtyService.selectWeekInfoByParam(weekInfoVO);
         List<WeekRiderInfoVO> listRider = dtyService.selectWeekRiderInfoByParam(weekInfoVO);
@@ -978,4 +977,90 @@ public class DtyController {
         map.put("resultCode", "success");
         return ResponseEntity.ok(map);
 	}
+
+
+	/**
+	 * 일정산 내역 확정
+	 * @param request
+	 * @param sessionVO
+	 * @param model
+	 * @param status
+	 * @return
+	 * @throws Exception
+	 */
+	@RequestMapping("/usr/dty0005_0003.do")
+	public ResponseEntity<?> dty0005_0003(@ModelAttribute("DeliveryInfoVO") DeliveryInfoVO deliveryInfoVO, HttpServletRequest request, SessionVO sessionVO, ModelMap model, SessionStatus status) throws Exception{
+
+    	//로그인 체크
+        LoginVO user = (LoginVO)EgovUserDetailsHelper.getAuthenticatedUser();
+        Boolean isAuthenticated = EgovUserDetailsHelper.isAuthenticated();
+
+        if(!isAuthenticated) {
+        	return ResponseEntity.status(401).body("Unauthorized");
+        }
+
+        if(!Util.isUsr()) {
+        	return ResponseEntity.status(401).body("Unauthorized");
+        }
+
+        //총판 or 협력사
+        deliveryInfoVO.setSchAuthorCode(user.getAuthorCode());
+        deliveryInfoVO.setSchIhidNum(user.getIhidNum());
+        deliveryInfoVO.setSearchGubun("DAY");
+
+        dtyService.fixDay(deliveryInfoVO);
+
+        List<DeliveryInfoVO> list = dtyService.selectDeliveryInfoByAtchFileId(deliveryInfoVO);
+        //return value
+        Map<String, Object> map =  new HashMap<String, Object>();
+
+        map.put("list", list);
+        map.put("resultCode", "success");
+        return ResponseEntity.ok(map);
+	}
+
+
+
+	/**
+	 * 주정산 내역 확정
+	 * @param request
+	 * @param sessionVO
+	 * @param model
+	 * @param status
+	 * @return
+	 * @throws Exception
+	 */
+	@RequestMapping("/usr/dty0005_0004.do")
+	public ResponseEntity<?> dty0005_0004(@ModelAttribute("WeekInfoVO") WeekInfoVO weekInfoVO, HttpServletRequest request, SessionVO sessionVO, ModelMap model, SessionStatus status) throws Exception{
+
+    	//로그인 체크
+        LoginVO user = (LoginVO)EgovUserDetailsHelper.getAuthenticatedUser();
+        Boolean isAuthenticated = EgovUserDetailsHelper.isAuthenticated();
+
+        if(!isAuthenticated) {
+        	return ResponseEntity.status(401).body("Unauthorized");
+        }
+
+        if(!Util.isUsr()) {
+        	return ResponseEntity.status(401).body("Unauthorized");
+        }
+
+        //총판 or 협력사
+        weekInfoVO.setSchAuthorCode(user.getAuthorCode());
+        weekInfoVO.setSchIhidNum(user.getIhidNum());
+
+
+        dtyService.fixWeek(weekInfoVO);
+
+        List<WeekInfoVO> list = dtyService.selectWeekInfoByParam(weekInfoVO);
+        List<WeekRiderInfoVO> listRider = dtyService.selectWeekRiderInfoByParam(weekInfoVO);
+        //return value
+        Map<String, Object> map =  new HashMap<String, Object>();
+
+        map.put("list", list);
+        map.put("listRider", listRider);
+        map.put("resultCode", "success");
+        return ResponseEntity.ok(map);
+	}
+
 }

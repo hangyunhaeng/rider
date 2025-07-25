@@ -62,6 +62,12 @@
 					WHERE REGISTRATION_SN = #{searchRegistrationSn}
 				)
 				</if>
+				<if test="searchFixGubun == 'YES'">
+				AND a.FIX_DAY is not null
+				</if>
+				<if test="searchFixGubun == 'NO'">
+				AND a.FIX_DAY is null
+				</if>
 
 			</if>
 			<if test="schAuthorCode == 'ROLE_USER'">
@@ -72,6 +78,56 @@
 			)
 			</if>
 	</select>
+	<update id="updateFixDay" parameterType="egovframework.com.rd.usr.service.vo.DayPayVO">
+		UPDATE RD_DELIVERY_INFO
+		SET FIX_DAY = DATE_FORMAT(SYSDATE(), '%Y%m%d')
+		WHERE (COOPERATOR_ID,RUN_DE, DELIVERY_SN) IN (
+			SELECT
+				a.COOPERATOR_ID,a.RUN_DE, a.DELIVERY_SN
+			FROM RD_DELIVERY_INFO a
+			LEFT JOIN COMTNGNRLMBER b ON a.mber_id = b.mber_id
+			WHERE 1=1
+				<if test="searchGubun == 'FILE'">
+					AND ATCH_FILE_ID = #{searchId}
+				</if>
+				<if test="searchMberId != null and searchMberId != ''">
+					AND a.MBER_ID = #{searchMberId}
+				</if>
+				<if test="searchRunDeDate != null and searchRunDeDate != ''">
+					AND a.RUN_DE like '%' #{searchRunDeDate} '%'
+				</if>
+
+				<if test="searchGubun == 'DAY'">
+					<if test='searchCooperatorId != null and searchCooperatorId != "all"'>
+					AND COOPERATOR_ID = #{searchCooperatorId}
+					</if>
+					<if test="searchNm != null and searchNm != ''">
+					AND MBER_NM like '%' #{searchNm} '%'
+					</if>
+					AND RUN_DE BETWEEN #{searchFromDate} AND #{searchToDate}
+					<if test="searchRegistrationSn != null and searchRegistrationSn != ''">
+					AND COOPERATOR_ID IN (
+						SELECT COOPERATOR_ID from RD_COOPERATOR
+						WHERE REGISTRATION_SN = #{searchRegistrationSn}
+					)
+					</if>
+					<if test="searchFixGubun == 'YES'">
+					AND a.FIX_DAY is not null
+					</if>
+					<if test="searchFixGubun == 'NO'">
+					AND a.FIX_DAY is null
+					</if>
+
+				</if>
+				<if test="schAuthorCode == 'ROLE_USER'">
+				/* 협력사 조건 *//* COOPERATOR_ID로 조건을 만든건 ★정산 파일을 올릴때 권한이 있는 협력사ID 데이터만 올릴수 있음!!★ - 나머지는 오류 처리할꺼임  */
+				AND COOPERATOR_ID IN (
+					SELECT COOPERATOR_ID FROM RD_COOPERATOR a
+					WHERE a.REGISTRATION_SN = #{schIhidNum} AND use_at ='Y'
+				)
+				</if>
+		)
+	</update>
 
 	<insert id="insertDeliveryError" parameterType="egovframework.com.rd.usr.service.vo.DeliveryErrorVO">
 		INSERT INTO RD_DELIVERY_ERROR
@@ -167,7 +223,7 @@
 		FROM RD_WEEK_INFO
 		WHERE 1=1
 			<if test="searchFromDate1 != null and searchFromDate1 != '' and searchFromDate1 != null and searchFromDate1 != ''">
-			AND (ACCOUNTS_ST_DT BETWEEN #{searchFromDate1} AND #{searchFromDate1} or ACCOUNTS_ED_DT BETWEEN #{searchFromDate1} AND #{searchFromDate1})
+			AND (ACCOUNTS_ST_DT BETWEEN #{searchFromDate1} AND #{searchToDate1} or ACCOUNTS_ED_DT BETWEEN #{searchFromDate1} AND #{searchToDate1})
 			</if>
 			<if test="searchGubun != null and searchGubun != ''">
 			</if>
@@ -182,7 +238,7 @@
 
 	<select id="selectWeekRiderInfoByParam" parameterType="egovframework.com.rd.usr.service.vo.WeekInfoVO" resultType="egovframework.com.rd.usr.service.vo.WeekRiderInfoVO">
 		SELECT
-			b.WEEK_ID,b.NO,b.MBER_ID,b.MBER_NM,b.CNT,b.DELIVERY_COST,b.ADD_COST,b.SUM_COST,b.TIME_INSURANCE,b.NECESSARY_EXPENSES,b.PAY,b.OWNER_EMPLOYMENT_INSURANCE
+			b.WEEK_ID,b.NO,a.cooperator_id,b.MBER_ID,b.MBER_NM,b.CNT,b.DELIVERY_COST,b.ADD_COST,b.SUM_COST,b.TIME_INSURANCE,b.NECESSARY_EXPENSES,b.PAY,b.OWNER_EMPLOYMENT_INSURANCE
 			,b.RIDER_EMPLOYMENT_INSURANCE,b.OWNER_INDUSTRIAL_INSURANCE,b.RIDER_INDUSTRIAL_INSURANCE,b.WITHHOLDING_TAX_INSURANCE_SUM
 			,b.OWNER_EMPLOYMENT_INSURANCE_ACCOUNTS,b.RIDER_EMPLOYMENT_INSURANCE_ACCOUNTS,b.SUM_EMPLOYMENT_INSURANCE_ACCOUNTS
 			,b.OWNER_INDUSTRIAL_INSURANCE_ACCOUNTS,b.RIDER_INDUSTRIAL_INSURANCE_ACCOUNTS,b.SUM_INDUSTRIAL_INSURANCE_ACCOUNTS
@@ -190,7 +246,7 @@
 		FROM RD_WEEK_INFO a, RD_WEEK_RIDER_INFO b
 		WHERE a.week_id = b.week_id
 			<if test="searchFromDate1 != null and searchFromDate1 != '' and searchFromDate1 != null and searchFromDate1 != ''">
-			AND (a.ACCOUNTS_ST_DT BETWEEN #{searchFromDate1} AND #{searchFromDate1} or a.ACCOUNTS_ED_DT BETWEEN #{searchFromDate1} AND #{searchFromDate1})
+			AND (a.ACCOUNTS_ST_DT BETWEEN #{searchFromDate1} AND #{searchToDate1} or a.ACCOUNTS_ED_DT BETWEEN #{searchFromDate1} AND #{searchToDate1})
 			</if>
 			<if test="searchGubun != null and searchGubun != ''">
 			</if>
@@ -350,6 +406,58 @@
 			) sub_tab
 		) tab
 	</select>
+
+	<select id="selectFixDay" parameterType="egovframework.com.rd.usr.service.vo.DayPayVO" resultType="egovframework.com.rd.usr.service.vo.DayPayVO">
+		SELECT tab.*
+		, DELIVERY_PRICE/*배달비*/
+				- DAY_FEE	/*선정산수수료+콜수수료*/
+				- INSURANCE /*4대보험*/
+					AS ABLE_PRICE
+		FROM(
+			SELECT COOPERATOR_ID, MBER_ID, DAY, '1' AS IO_GUBUN, DELIVERY_PRICE
+			, DELIVERY_PRICE - INSURANCE - FEE_CALL_COST AS 산정대상
+			, CEILING((DELIVERY_PRICE - INSURANCE - FEE_CALL_COST) * FEE_ADMINSTRATOR) + FEE_CALL_COST AS DAY_FEE
+			, INSURANCE
+			, 'N' AS WEEK_YN, 'Y' AS USE_AT, ATCH_FILE_ID AS DAY_ATCH_FILE_ID, FEE_CALL_COST, DELIVERY_CNT, FEE_ID, RIDER_FEE_ID
+			/*협력사 수익: 콜수수료*/
+			, FLOOR(FEE_CALL_COST*FEE_COOPERATOR_CALL) AS FEE_COOPERATOR_CALL_COST
+			FROM
+			(
+				SELECT fee_tab.*
+					/*선지급수수료(%) + 건당 콜수수료(원)  =  수익*/
+					/*, CEILING(DELIVERY_PRICE*FEE_ADMINSTRATOR) + DELIVERY_CNT*FEE_CALL AS DAY_FEE*/
+
+					/* 고용보험(%)+ 산재보험(%)+ 원천세(%) + 시간제보험(원 최대7,000)  =  보험료 */
+					, CEILING(DELIVERY_PRICE*(FEE_EMPLOYMENT_INSURANCE+FEE_INDUSTRIAL_INSURANCE+FEE_WITHHOLDING_TAX)) + if(DELIVERY_CNT*FEE_TIME_INSURANCE > #{timeInsuranceMaxFee}, #{timeInsuranceMaxFee}, DELIVERY_CNT*FEE_TIME_INSURANCE) AS INSURANCE
+					/* 콜수수료 */
+					, DELIVERY_CNT*FEE_CALL AS FEE_CALL_COST
+				FROM (
+					SELECT nvl(b.FEE_ADMINSTRATOR*0.01, 0) AS FEE_ADMINSTRATOR /* 선지급수수료(%) */
+					, nvl(nvl(c.FEE_EMPLOYMENT_INSURANCE, b.FEE_EMPLOYMENT_INSURANCE)*0.01, 0) AS FEE_EMPLOYMENT_INSURANCE/* 고용보험(%) */
+					, nvl(nvl(c.FEE_INDUSTRIAL_INSURANCE, b.FEE_INDUSTRIAL_INSURANCE)*0.01, 0) AS FEE_INDUSTRIAL_INSURANCE/* 산재보험(%) */
+					, nvl(nvl(c.FEE_WITHHOLDING_TAX, b.FEE_WITHHOLDING_TAX)*0.01, 0) AS FEE_WITHHOLDING_TAX/* 원천세(%) */
+					, nvl(nvl(c.FEE_TIME_INSURANCE, b.FEE_TIME_INSURANCE), 0) AS FEE_TIME_INSURANCE/* 시간제보험(원 최대7,000) */
+					, nvl(nvl(c.FEE_CALL, b.FEE_CALL), 0) AS FEE_CALL/* 건당 콜수수료(원) */
+					, a.COOPERATOR_ID, a.MBER_ID,a.RUN_DE AS DAY, SUM(a.DELIVERY_PRICE) AS DELIVERY_PRICE, SUM(if(a.DELIVERY_STATE = TRIM('전달완료'), 1, 0)) DELIVERY_CNT
+					, b.FEE_ID, c.RIDER_FEE_ID, b.FEE_COOPERATOR_CALL*0.01 AS FEE_COOPERATOR_CALL
+					, a.ATCH_FILE_ID
+					FROM RD_DELIVERY_INFO a
+					LEFT JOIN RD_COOPERATOR_FEE b ON a.COOPERATOR_ID = b.COOPERATOR_ID AND b.use_at ='Y'
+					LEFT JOIN RD_RIDER_FEE c ON a.COOPERATOR_ID = c.COOPERATOR_ID  AND a.MBER_ID = c.MBER_ID AND  c.use_at ='Y'
+					LEFT JOIN COMTNGNRLMBER d ON a.mber_id = d.mber_id
+					WHERE 1 = 1
+						AND a.RUN_DE BETWEEN #{searchFromDate} AND #{searchToDate}
+						<if test="searchNm != null and searchNm != ''">
+						AND d.MBER_NM like '%' #{searchNm} '%'
+						</if>
+						AND a.FIX_DAY is null	/* 확정은 미확정 데이터를 대상으로만 한다 */
+					GROUP BY a.COOPERATOR_ID, a.MBER_ID, a.RUN_DE
+				) fee_tab
+
+			) sub_tab
+		) tab
+	</select>
+
 	<insert id="insertDayPay" parameterType="egovframework.com.rd.usr.service.vo.DayPayVO">
 		INSERT INTO RD_DAY_PAY
 		(DYP_ID, COOPERATOR_ID,MBER_ID, DAY, IO_GUBUN, DELIVERY_PRICE, DELIVERY_CNT, DAY_FEE, INSURANCE, SEND_FEE, ABLE_PRICE, SEND_PRICE, WEEK_YN
@@ -593,7 +701,13 @@
 			JOIN RD_ETC b on a.COOPERATOR_ID = b.COOPERATOR_ID AND a.MBER_ID = b.MBER_ID AND b.finish_at ='N' AND AUTH_RESPONS_DT IS NOT NULL AND RESPONS_AT ='Y'
 			LEFT JOIN RD_DAY_PAY c ON b.COOPERATOR_ID = c.COOPERATOR_ID AND b.MBER_ID = c.MBER_ID  AND b.ETC_ID = c.ETC_ID AND c.IO_GUBUN ='2' AND c.day = a.RUN_DE
 			LEFT JOIN RD_WEEK_PAY d ON b.COOPERATOR_ID = d.COOPERATOR_ID AND b.MBER_ID = d.MBER_ID  AND b.ETC_ID = d.ETC_ID AND d.IO_GUBUN = '2' AND d.TRAN_DAY = a.RUN_DE
-			WHERE a.ATCH_FILE_ID = #{dayAtchFileId}
+			LEFT JOIN COMTNGNRLMBER e ON a.mber_id = e.mber_id
+			WHERE 1 = 1
+				AND a.RUN_DE BETWEEN #{searchFromDate} AND #{searchToDate}
+				<if test="searchNm != null and searchNm != ''">
+				AND e.MBER_NM like '%' #{searchNm} '%'
+				</if>
+				AND a.FIX_DAY is null	/* 확정은 미확정 데이터를 대상으로만 한다 */
 			GROUP BY b.etc_id, a.mber_id, a.RUN_DE
 	</select>
 	<update id="finishEtc" parameterType="egovframework.com.rd.usr.service.vo.EtcVO">

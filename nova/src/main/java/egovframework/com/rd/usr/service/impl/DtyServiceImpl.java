@@ -88,6 +88,7 @@ import egovframework.com.uss.umt.service.UserDefaultVO;
 import egovframework.com.uss.umt.service.impl.MberManageDAO;
 import egovframework.com.utl.fcc.service.EgovStringUtil;
 import kr.co.dozn.secure.base.CryptoUtil;
+import lombok.Synchronized;
 
 /**
  * @Class Name : DtyServiceImpl.java
@@ -245,7 +246,7 @@ public class DtyServiceImpl extends EgovAbstractServiceImpl implements DtyServic
 			}
 		}
 
-
+/*
 
     	//1. 라이더 입금 : 일정산 입금내역 수수료 계산 후 라이더의 입금이력 등록
 		//2. 수익 등록
@@ -439,7 +440,7 @@ public class DtyServiceImpl extends EgovAbstractServiceImpl implements DtyServic
     		}// end if("Y".equals(one.getAbleYn())) {
 
     	}
-
+*/
 
 	}
 
@@ -2252,5 +2253,228 @@ public class DtyServiceImpl extends EgovAbstractServiceImpl implements DtyServic
 	 */
 	public int updateWeekPayByTransfer(DoszTransferVO vo) throws Exception {
 		return dtyDAO.updateWeekPayByTransfer(vo);
+	}
+	/**
+	 * 일정산 내역 확정
+	 * @param deliveryInfoVO
+	 * @return
+	 * @throws Exception
+	 */
+	@Synchronized
+	public void fixDay(DeliveryInfoVO deliveryInfoVO) throws Exception {
+
+        LoginVO user = (LoginVO)EgovUserDetailsHelper.getAuthenticatedUser();
+
+
+    	//1. 라이더 입금 : 일정산 입금내역 수수료 계산 후 라이더의 입금이력 등록
+		//2. 수익 등록
+		DayPayVO inVo = new DayPayVO();
+		inVo.setSearchFromDate(deliveryInfoVO.getSearchFromDate());
+		inVo.setSearchToDate(deliveryInfoVO.getSearchToDate());
+		inVo.setSearchNm(deliveryInfoVO.getSearchNm());
+		inVo.setSearchGubun(deliveryInfoVO.getSearchGubun());
+		inVo.setTimeInsuranceMaxFee(Integer.parseInt(EgovProperties.getProperty("Globals.timeInsuranceMaxFee")) );
+
+
+    	List<DayPayVO> dayList = dtyDAO.selectFixDay(inVo);
+    	for(int i = 0 ; i<dayList.size() ; i++) {
+    		DayPayVO one = dayList.get(i);
+
+    		//라이더 입금
+    		one.setDypId(egovDypIdGnrService.getNextStringId());
+    		one.setCreatId(user.getId());
+    		dtyDAO.insertDayPay(one);
+
+    		//수익 등록(콜수수료)
+    		ProfitVO fitVo = new ProfitVO();
+    		if(one.getFeeCallCost()-one.getFeeCooperatorCallCost() > 0) {
+	    		fitVo.setProfitId(egovFitIdGnrService.getNextStringId());
+	    		fitVo.setCooperatorId(one.getCooperatorId());//협력사
+	    		fitVo.setMberId(one.getMberId());			//라이더ID
+	    		fitVo.setGubun("C");						//콜수수료
+	    		fitVo.setCost(one.getFeeCallCost()-one.getFeeCooperatorCallCost()); 		//금액
+	    		fitVo.setDeliveryCost(one.getDeliveryPrice());	//배달비
+	    		fitVo.setDeliveryCnt(one.getDeliveryCnt());	//배달건수
+	    		fitVo.setDeliveryDay(one.getDay());			//배달일
+	    		fitVo.setDypId(one.getDypId());				//DYP_ID
+	    		fitVo.setFeeId(one.getFeeId());				//FEE_ID
+	    		fitVo.setRiderFeeId(one.getRiderFeeId());	//RIDER_FEE_ID
+	    		fitVo.setCreatId(user.getId());
+	    		dtyDAO.insertProfit(fitVo);
+    		}
+
+    		//협력사 수익등록(콜수수료)
+    		if(one.getFeeCooperatorCallCost() > 0) {
+	    		ProfitVO citVo = new ProfitVO();
+	    		citVo.setCoofitId(egovCitIdGnrService.getNextStringId());
+	    		citVo.setProfitId(fitVo.getProfitId());
+	    		citVo.setCooperatorId(one.getCooperatorId());//협력사
+	    		citVo.setMberId(one.getMberId());			//라이더ID
+	    		citVo.setGubun("C");						//콜수수료
+	    		citVo.setCost(one.getFeeCooperatorCallCost());//금액
+	    		citVo.setDeliveryCost(one.getDeliveryPrice());	//배달비
+	    		citVo.setDeliveryCnt(one.getDeliveryCnt());	//배달건수
+	    		citVo.setDeliveryDay(one.getDay());			//배달일
+	    		citVo.setDypId(one.getDypId());				//DYP_ID
+	    		citVo.setFeeId(one.getFeeId());				//FEE_ID
+	    		citVo.setRiderFeeId(one.getRiderFeeId());	//RIDER_FEE_ID
+	    		citVo.setCreatId(user.getId());
+	    		dtyDAO.insertCooperatorProfit(citVo);
+    		}
+
+    	}
+
+
+
+    	//대출 출금 : 대출 입금 대상 조회 후 출금이력 생성
+    	List<EtcVO> etcList = dtyDAO.selectEtcList(inVo);
+		String tranDay = Util.getDay();
+
+		//		대출 출금 갚은 건수를 확인하기 위한 맵(etc_id를 키로 갯수를 관리한다)
+		HashMap<String, Integer> etcSumCnt = new HashMap<String, Integer>();
+
+    	for(int i = 0 ; i<etcList.size() ; i++) {
+    		EtcVO one = etcList.get(i);
+    		if("Y".equals(one.getAbleYn())) {
+
+    			//대출 출금을 이미 갚은 건수를 설정한다
+    			if(etcSumCnt.get(one.getEtcId()) == null) {
+    				etcSumCnt.put(one.getEtcId(), one.getSumEtcCnt());
+    			}
+
+    			if(etcSumCnt.get(one.getEtcId()) < one.getPaybackDay()) {
+    				//대출출금건수를 올린다
+    				etcSumCnt.put(one.getEtcId(), etcSumCnt.get(one.getEtcId())+1);
+		    		one.setLastUpdusrId(user.getId());
+
+		    		//1.출금 가능금액 내의 금액인지 확인
+		    		MyInfoVO myInfoVO = new MyInfoVO();
+		    		myInfoVO.setMberId(one.getMberId());
+		    		myInfoVO.setSearchCooperatorId(one.getCooperatorId());
+		    		MyInfoVO ablePrice = rotService.selectAblePrice(myInfoVO);
+		    		if(one.getPaybackCost() <= ablePrice.getWeekAblePrice()) {
+
+		    			WeekPayVO insertVo = new WeekPayVO();
+		    			insertVo.setWkpId(egovWkpIdGnrService.getNextStringId());
+		    			insertVo.setMberId(one.getMberId());
+		    			insertVo.setCooperatorId(one.getCooperatorId());
+		    			insertVo.setDwGubun("WEK");
+		    			insertVo.setIoGubun("2");
+		    			insertVo.setFee(0);
+		    			insertVo.setSendPrice(new BigDecimal(one.getPaybackCost()));
+		    			insertVo.setEtcId(one.getEtcId());
+		    			insertVo.setTranDay(one.getDay());
+		//    			insertVo.setTelegramNo(telegramNo);
+		    			insertVo.setUseAt("Y");
+		    			insertVo.setCreatId(user.getId());
+
+		    			dtyDAO.insertWeekPay(insertVo);
+		    			dtyDAO.finishEtc(one);
+
+
+		        		//수익 등록(기타수수료) 운영사는 기타수수료가 발생하지 않음
+	//	        		ProfitVO fitVo = new ProfitVO();
+	//	        		fitVo.setProfitId(egovFitIdGnrService.getNextStringId());
+	//	        		fitVo.setCooperatorId(one.getCooperatorId());//협력사
+	//	        		fitVo.setMberId(one.getMberId());			//라이더ID
+	//	        		fitVo.setGubun("E");						//기타수수료
+	//	        		fitVo.setCost(0); 		//금액
+	//	        		fitVo.setWkpId(insertVo.getWkpId());		//WKP_ID
+	//	        		fitVo.setCreatId(user.getId());
+	//	        		dtyDAO.insertProfit(fitVo);
+
+		        		//협력사 수익등록(기타수수료)
+		        		ProfitVO citVo = new ProfitVO();
+		        		citVo.setCoofitId(egovCitIdGnrService.getNextStringId());
+		        		citVo.setProfitId(egovFitIdGnrService.getNextStringId());
+		        		citVo.setCooperatorId(one.getCooperatorId());//협력사
+		        		citVo.setMberId(one.getMberId());			//라이더ID
+		        		citVo.setGubun("E");						//기타수수료
+		        		citVo.setCost(one.getPaybackCost());		//금액
+		        		citVo.setWkpId(insertVo.getWkpId());				//DYP_ID
+		        		citVo.setCreatId(user.getId());
+		        		dtyDAO.insertCooperatorProfit(citVo);
+
+
+		    		} else if(one.getPaybackCost() <= ablePrice.getDayAblePrice() ) {	//출금 가능금액 체크
+
+
+		    			//선지급 수수료 계산
+		    			DayPayVO fee = new DayPayVO();
+		    			fee.setMberId(one.getMberId());
+		    			fee.setCooperatorId(one.getCooperatorId());
+		    			fee.setInputPrice(one.getPaybackCost());
+		    			DayPayVO resultFee = rotDAO.selectDayFee(fee);
+
+		    			int dayFee = resultFee.getDayFee();
+		    			int insurance = 0;
+
+		    			DayPayVO insertVo = new DayPayVO();
+
+		    			insertVo.setDypId(egovDypIdGnrService.getNextStringId());
+		    			insertVo.setMberId(one.getMberId());
+		    			insertVo.setCooperatorId(one.getCooperatorId());
+		    			insertVo.setDay(one.getDay());
+		    			insertVo.setIoGubun("2");			//출금
+		    			insertVo.setDayFee(0);				//선출금수수료
+		    			insertVo.setInsurance(insurance);	//보험료
+		    			insertVo.setSendFee(0);		//이체수수료
+		    			insertVo.setSendPrice(one.getPaybackCost());
+		    			insertVo.setWeekYn("N");			//정산완료
+		    			insertVo.setEtcId(one.getEtcId());
+		    			insertVo.setTranDay(one.getDay());
+		//    			insertVo.setTelegramNo(telegramNo);
+		    			insertVo.setUseAt("Y");
+		    			insertVo.setCreatId(user.getId());
+		    			dtyDAO.insertDayPay(insertVo);
+		    			dtyDAO.finishEtc(one);
+
+
+
+		        		//수익 등록(기타수수료) 운영사는 기타수수료가 발생하지 않음
+	//	        		ProfitVO fitVo = new ProfitVO();
+	//	        		fitVo.setProfitId(egovFitIdGnrService.getNextStringId());
+	//	        		fitVo.setCooperatorId(one.getCooperatorId());//협력사
+	//	        		fitVo.setMberId(one.getMberId());			//라이더ID
+	//	        		fitVo.setGubun("E");						//기타수수료
+	//	        		fitVo.setCost(0); 		//금액
+	//	        		fitVo.setDypId(insertVo.getDypId());				//DYP_ID
+	//	        		fitVo.setFeeId(resultFee.getFeeId());				//FEE_ID
+	//	        		fitVo.setRiderFeeId(resultFee.getRiderFeeId());	//RIDER_FEE_ID
+	//	        		fitVo.setCreatId(user.getId());
+	//	        		dtyDAO.insertProfit(fitVo);
+
+		        		//협력사 수익등록(기타수수료)
+		        		ProfitVO citVo = new ProfitVO();
+		        		citVo.setCoofitId(egovCitIdGnrService.getNextStringId());
+		        		citVo.setProfitId(egovFitIdGnrService.getNextStringId());
+		        		citVo.setCooperatorId(one.getCooperatorId());//협력사
+		        		citVo.setMberId(one.getMberId());			//라이더ID
+		        		citVo.setGubun("E");						//기타수수료
+		        		citVo.setCost(one.getPaybackCost());//금액
+		        		citVo.setDypId(insertVo.getDypId());				//DYP_ID
+		        		citVo.setFeeId(resultFee.getFeeId());				//FEE_ID
+		        		citVo.setRiderFeeId(resultFee.getRiderFeeId());	//RIDER_FEE_ID
+		        		citVo.setCreatId(user.getId());
+		        		dtyDAO.insertCooperatorProfit(citVo);
+
+		    		}
+    			}// end if(etcSumCnt.get(one.getEtcId()) < one.getPaybackDay())
+    		}// end if("Y".equals(one.getAbleYn())) {
+
+    	}
+
+        //확정일자 세팅
+        dtyDAO.updateFixDay(inVo);
+	}
+
+	/**
+	 * 주정산 내역 확정
+	 * @param weekInfoVO
+	 * @return
+	 * @throws Exception
+	 */
+	public void fixWeek(WeekInfoVO weekInfoVO) throws Exception {
+
 	}
 }

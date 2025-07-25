@@ -35,6 +35,7 @@ public class Sch implements Serializable {
 
 	private String searchCooperatorId;
 	private String searchGubun;
+	private String searchFixGubun;
 	private String searchGubun1;
 	/* 조회조건 */
 	private String searchId;

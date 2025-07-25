@@ -57,6 +57,16 @@ public class DtyDAO extends EgovComAbstractDAO {
 	public List<DeliveryInfoVO> selectDeliveryInfoByAtchFileId(DeliveryInfoVO vo) throws Exception {
 		return selectList("dtyDAO.selectDeliveryInfoByAtchFileId", vo);
 	}
+
+	/**
+	 * 확정일자 세팅
+	 * @param vo
+	 * @return
+	 * @throws Exception
+	 */
+	public int updateFixDay(DayPayVO vo) throws Exception {
+		return update("dtyDAO.updateFixDay", vo);
+	}
 	/**
 	 * 오류건 insert
 	 */
@@ -157,6 +167,15 @@ public class DtyDAO extends EgovComAbstractDAO {
 	 */
 	public List<DayPayVO> selectDayPay(DayPayVO vo)throws Exception {
 		return selectList("dtyDAO.selectDayPay", vo);
+	}
+	/**
+	 * 일정산 입금내역 수수료 계산 후 조회
+	 * @param vo
+	 * @return
+	 * @throws Exception
+	 */
+	public List<DayPayVO> selectFixDay(DayPayVO vo)throws Exception {
+		return selectList("dtyDAO.selectFixDay", vo);
 	}
 	/**
 	 * 일정산 입금내역 등록

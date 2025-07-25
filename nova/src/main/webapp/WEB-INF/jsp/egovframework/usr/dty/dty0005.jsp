@@ -153,6 +153,7 @@
 
 	var columnDefs3= [
 		{ headerName: "NO", field: "no", minWidth: 70 },
+		{ headerName: "협력사아이디", field: "cooperatorId", minWidth: 120},
 		{ headerName: "User ID", field: "mberId", minWidth: 120, cellClass: 'ag-cell-left'},
 		{ headerName: "라이더명", field: "mberNm", minWidth: 120},
 		{ headerName: "처리건수", field: "cnt", minWidth: 120, cellClass: 'ag-cell-right', valueGetter:(params) => { return currencyFormatter(params.data.cnt)}},
@@ -358,13 +359,13 @@
 	}
 
 	//일정산 내역 조회
-	function doSearch(){
+	function doSearchDay(){
 		const params = new URLSearchParams();
 
 		params.append('searchFromDate', getOnlyNumber($('#searchFromDate').val()));//배달일
 		params.append('searchToDate', getOnlyNumber($('#searchToDate').val()));	//배달일
 		params.append('searchNm', $('#searchNm').val());			//라이더
-		params.append('searchGubun', $('#searchGubun').val());		//확정여부
+		params.append('searchFixGubun', $('#searchFixGubun').val());		//확정여부
 		// 로딩 시작
         $('.loading-wrap--js').show();
         axios.post('${pageContext.request.contextPath}/usr/dty0005_0001.do',params).then(function(response) {
@@ -393,17 +394,114 @@
             $('.loading-wrap--js').hide();
         });
 	}
+	function doFixDay(){
 
-	//주정산 내역 조회
-	function doSearch(){
+		if($('#searchFixGubun').val() != 'NO'){
+			alert('대상확정은 미확정 대상으로만 진행 할 수 있습니다\n확정을 취소합니다');
+			return;
+		}
+
+		if(!confirm('대상확정은 조회 대상이 아닌 검색 조건 대상으로 진행됩니다!\n확정 하시겠습니까?')){
+			return;
+		}
 		const params = new URLSearchParams();
 
-		params.append('searchFromDate1', getOnlyNumber($('#searchFromDate').val()));//배달일
-		params.append('searchToDate1', getOnlyNumber($('#searchToDate').val()));	//배달일
-		params.append('searchGubun', $('#searchGubun').val());		//확정여부
+		params.append('searchFromDate', getOnlyNumber($('#searchFromDate').val()));//배달일
+		params.append('searchToDate', getOnlyNumber($('#searchToDate').val()));	//배달일
+		params.append('searchNm', $('#searchNm').val());			//라이더
+		params.append('searchFixGubun', $('#searchFixGubun').val());		//확정여부
+		// 로딩 시작
+        $('.loading-wrap--js').show();
+        axios.post('${pageContext.request.contextPath}/usr/dty0005_0003.do',params).then(function(response) {
+        	// 로딩 종료
+            $('.loading-wrap--js').hide();
+
+            if(chkLogOut(response.data)){
+            	return;
+            }
+
+        	if(response.data.resultCode == "success"){
+	        	if (response.data.list.length == 0) {
+	        		grid.setGridOption('rowData',[]);  	// 데이터가 없는 경우 빈 배열 설정
+	        		grid.showNoRowsOverlay();  			// 데이터가 없는 경우
+	            } else {
+	            	data = response.data.list;	//정상데이터
+					grid.setGridOption("rowData", data);
+	            }
+        	}
+
+        })
+        .catch(function(error) {
+            console.error('There was an error fetching the data:', error);
+        }).finally(function() {
+        	// 로딩 종료
+            $('.loading-wrap--js').hide();
+        });
+	}
+
+	//주정산 내역 조회
+	function doSearchWeek(){
+		const params = new URLSearchParams();
+
+		params.append('searchFromDate1', getOnlyNumber($('#searchFromDate1').val()));//배달일
+		params.append('searchToDate1', getOnlyNumber($('#searchToDate1').val()));	//배달일
+		params.append('searchFixGubun', $('#searchFixGubun1').val());		//확정여부
 		// 로딩 시작
         $('.loading-wrap--js').show();
         axios.post('${pageContext.request.contextPath}/usr/dty0005_0002.do',params).then(function(response) {
+        	// 로딩 종료
+            $('.loading-wrap--js').hide();
+
+            if(chkLogOut(response.data)){
+            	return;
+            }
+
+        	if(response.data.resultCode == "success"){
+	        	if (response.data.list.length == 0) {
+	        		grid2.setGridOption('rowData',[]);  	// 데이터가 없는 경우 빈 배열 설정
+	        		grid2.showNoRowsOverlay();  			// 데이터가 없는 경우
+	            } else {
+	            	data = response.data.list;	//정상데이터
+					grid2.setGridOption("rowData", data);
+	            }
+
+	        	if (response.data.listRider.length == 0) {
+	        		grid3.setGridOption('rowData',[]);  	// 데이터가 없는 경우 빈 배열 설정
+	        		grid3.showNoRowsOverlay();  			// 데이터가 없는 경우
+	            } else {
+	            	data = response.data.listRider;	//정상데이터
+					grid3.setGridOption("rowData", data);
+	            }
+        	}
+
+        })
+        .catch(function(error) {
+            console.error('There was an error fetching the data:', error);
+        }).finally(function() {
+        	// 로딩 종료
+            $('.loading-wrap--js').hide();
+        });
+	}
+
+	function doFixWeek(){
+
+		if($('#searchFixGubun1').val() != 'NO'){
+			alert('대상확정은 미확정 대상으로만 진행 할 수 있습니다\n확정을 취소합니다');
+			return;
+		}
+
+		if(!confirm('대상확정은 조회 대상이 아닌 검색 조건 대상으로 진행됩니다!\n확정 하시겠습니까?')){
+			return;
+		}
+
+		const params = new URLSearchParams();
+
+		params.append('searchFromDate1', getOnlyNumber($('#searchFromDate1').val()));//배달일
+		params.append('searchToDate1', getOnlyNumber($('#searchToDate1').val()));	//배달일
+		params.append('searchFixGubun', $('#searchFixGubun1').val());		//확정여부
+		// 로딩 시작
+        $('.loading-wrap--js').show();
+        axios.post('${pageContext.request.contextPath}/usr/dty0005_0004.do',params).then(function(response) {
         	// 로딩 종료
             $('.loading-wrap--js').hide();
 
@@ -553,17 +651,17 @@
 						</td>
 						<th>확정여부</th>
 						<td>
-							<select name='searchGubun' style='width: 100%' id='searchGubun'>
-								<option value="N">미확정</option>
-								<option value="Y">확정</option>
+							<select style='width: 100%' id='searchFixGubun'>
+								<option value="NO">미확정</option>
+								<option value="YES">확정</option>
 							</select>
 						</td>
 					</tr>
 				</table>
 
 				<div class="btnwrap">
-					<button id="loadDataBtn" class="btn ty1" onclick="doSearch();">조회</button>
-					<button id="일정산확정버튼" class="btn btn-primary" >대상확정</button>
+					<button class="btn ty1" onclick="doSearchDay();">조회</button>
+					<button class="btn ty1" onclick="doFixDay();">대상확정</button>
 				</div>
 
 			<!-- grid  -->
@@ -597,19 +695,23 @@
 						</td>
 					</tr>
 					<tr>
+						<th>라이더</th>
+						<td>
+							<input id="searchNm" type="text" value="">
+						</td>
 						<th>확정여부</th>
-						<td colspan='3'>
-							<select name='searchGubun1' style='width: 100%' id='searchGubun1'>
-								<option value="N">미확정</option>
-								<option value="Y">확정</option>
+						<td>
+							<select style='width: 100%' id='searchFixGubun1'>
+								<option value="NO">미확정</option>
+								<option value="YES">확정</option>
 							</select>
 						</td>
 					</tr>
 				</table>
 
 				<div class="btnwrap">
-					<button class="btn ty1">조회</button>
-					<button id="주정산확정버튼" class="btn btn-primary" >대상확정</button>
+					<button class="btn ty1" onclick="doSearchWeek();">조회</button>
+					<button class="btn ty1"onclick="doFixWeek();">대상확정</button>
 
 				</div>
 
@@ -617,7 +719,7 @@
 				<br>
 				<div id="loadingOverlay" style="display: none;">Loading...</div>
 				<div  class="ib_product">
-					<div id="myGrid2" class="ag-theme-alpine" style="height: 150px; width: 100%;"></div>
+					<div id="myGrid2" class="ag-theme-alpine" style="height: 200px; width: 100%;"></div>
 				</div>
 
 
@@ -625,7 +727,7 @@
 
 				<br>
 				<div  class="ib_product">
-					<div id="myGrid3" class="ag-theme-alpine" style="height: 380px; width: 100%;"></div>
+					<div id="myGrid3" class="ag-theme-alpine" style="height: 330px; width: 100%;"></div>
 				</div>
 			</div>
 
