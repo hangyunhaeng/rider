@@ -58,6 +58,10 @@ public class DtyDAO extends EgovComAbstractDAO {
 		return selectList("dtyDAO.selectDeliveryInfoByAtchFileId", vo);
 	}
 
+	public List<DeliveryInfoVO> selectDeliveryInfoByParam(DeliveryInfoVO vo) throws Exception {
+		return selectList("dtyDAO.selectDeliveryInfoByParam", vo);
+	}
+
 	/**
 	 * 확정일자 세팅
 	 * @param vo
@@ -66,6 +70,15 @@ public class DtyDAO extends EgovComAbstractDAO {
 	 */
 	public int updateFixDay(DayPayVO vo) throws Exception {
 		return update("dtyDAO.updateFixDay", vo);
+	}
+	/**
+	 * 확정일자 세팅
+	 * @param vo
+	 * @return
+	 * @throws Exception
+	 */
+	public int updateFixWeek(WeekInfoVO vo) throws Exception {
+		return update("dtyDAO.updateFixWeek", vo);
 	}
 	/**
 	 * 오류건 insert
@@ -151,6 +164,16 @@ public class DtyDAO extends EgovComAbstractDAO {
 		return selectList("dtyDAO.selectWeekPay", vo);
 	}
 	/**
+	 * 주정산 가능금액 계산
+	 * @param vo
+	 * @return
+	 * @throws Exception
+	 */
+	public List<WeekPayVO> selectPixWeek(WeekInfoVO vo) throws Exception {
+		return selectList("dtyDAO.selectPixWeek", vo);
+	}
+
+	/**
 	 * 주정산 입출금 insert
 	 * @param vo
 	 * @return
@@ -215,6 +238,16 @@ public class DtyDAO extends EgovComAbstractDAO {
 		return update("dtyDAO.updateDayPayWeekConfirm", vo);
 	}
 	/**
+	 * 일정산 입금이력을 정산완료로 정정
+	 * 협력사아이디, 기간
+	 * @param vo
+	 * @return
+	 * @throws Exception
+	 */
+	public int updateFixDayPayWeekConfirm(WeekInfoVO vo)throws Exception {
+		return update("dtyDAO.updateFixDayPayWeekConfirm", vo);
+	}
+	/**
 	 * 일정산 출금이력을 정산완료로 정정
 	 * 협력사아이디
 	 * @param vo
@@ -225,6 +258,16 @@ public class DtyDAO extends EgovComAbstractDAO {
 		return update("dtyDAO.updateDayPayWeekConfirm2", vo);
 	}
 	/**
+	 * 일정산 출금이력을 정산완료로 정정
+	 * 협력사아이디
+	 * @param vo
+	 * @return
+	 * @throws Exception
+	 */
+	public int updateFixDayPayWeekConfirm2(WeekInfoVO vo)throws Exception {
+		return update("dtyDAO.updateFixDayPayWeekConfirm2", vo);
+	}
+	/**
 	 * 미정산 선출금 출금이력조회
 	 * @param vo
 	 * @return
@@ -232,6 +275,15 @@ public class DtyDAO extends EgovComAbstractDAO {
 	 */
 	public List<WeekPayVO> selectDayPayIoGubn2List(WeekInfoVO vo) throws Exception {
 		return selectList("dtyDAO.selectDayPayIoGubn2List", vo);
+	}
+	/**
+	 * 미정산 선출금 출금이력조회
+	 * @param vo
+	 * @return
+	 * @throws Exception
+	 */
+	public List<WeekPayVO> selectFixDayPayIoGubn2List(WeekInfoVO vo) throws Exception {
+		return selectList("dtyDAO.selectFixDayPayIoGubn2List", vo);
 	}
 	/**
 	 * 이체 테이블 insert

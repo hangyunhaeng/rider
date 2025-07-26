@@ -78,6 +78,54 @@
 			)
 			</if>
 	</select>
+
+
+	<select id="selectDeliveryInfoByParam" parameterType="egovframework.com.rd.usr.service.vo.DeliveryInfoVO" resultType="egovframework.com.rd.usr.service.vo.DeliveryInfoVO">
+		SELECT
+			COOPERATOR_ID, COOPERATOR_NM,REGISTRATION_SN,REGISTRATION_NM,RUN_DE,DELIVERY_SN,DELIVERY_STATE,
+			SERVICE_TYPE,DELIVERY_TYPE,RIDER_ID,a.MBER_ID,RIDER_NM,DELIVERY_METHOD,SHOP_SN,SHOP_NM,GOODS_PRICE,
+			PICKUP_ADDR,DESTINATION_ADDR,ORDER_DT,OPERATE_RIDER_DT,SHOP_COMEIN_DT,PICKUP_FINIST_DT,DELIVERY_FINIST_DT,
+			DISTANCE,ADD_DELIVERY_REASON,ADD_DELIVERY_DESC,PICKUP_LAW_DONG,BASIC_PRICE,WEATHER_PRIMAGE,ADD_PRIMAGE,
+			PEAK_PRIMAGE_ETC,DELIVERY_PRICE,RIDER_CAUSE_YN,ADD_PRIMAGE_DESC,NOTE,ATCH_FILE_ID,CREAT_DT,CREAT_ID
+		FROM RD_DELIVERY_INFO a
+		LEFT JOIN COMTNGNRLMBER b ON a.mber_id = b.mber_id
+		WHERE 1=1
+			AND RUN_DE BETWEEN #{searchFromDate} AND #{searchToDate}
+
+			<if test="searchMberId != null and searchMberId != ''">
+				AND a.MBER_ID = #{searchMberId}
+			</if>
+			<if test="searchRunDeDate != null and searchRunDeDate != ''">
+				AND a.RUN_DE like '%' #{searchRunDeDate} '%'
+			</if>
+
+			<if test='searchCooperatorId != null and searchCooperatorId != "all"'>
+				AND COOPERATOR_ID = #{searchCooperatorId}
+			</if>
+			<if test="searchNm != null and searchNm != ''">
+				AND MBER_NM like '%' #{searchNm} '%'
+			</if>
+			<if test="searchRegistrationSn != null and searchRegistrationSn != ''">
+				AND COOPERATOR_ID IN (
+					SELECT COOPERATOR_ID from RD_COOPERATOR
+					WHERE REGISTRATION_SN = #{searchRegistrationSn}
+				)
+			</if>
+			<if test="searchFixGubun == 'YES'">
+				AND a.FIX_DAY is not null
+			</if>
+			<if test="searchFixGubun == 'NO'">
+				AND a.FIX_DAY is null
+			</if>
+
+			<if test="schAuthorCode == 'ROLE_USER'">
+			/* 협력사 조건 *//* COOPERATOR_ID로 조건을 만든건 ★정산 파일을 올릴때 권한이 있는 협력사ID 데이터만 올릴수 있음!!★ - 나머지는 오류 처리할꺼임  */
+			AND COOPERATOR_ID IN (
+				SELECT COOPERATOR_ID FROM RD_COOPERATOR a
+				WHERE a.REGISTRATION_SN = #{schIhidNum} AND use_at ='Y'
+			)
+			</if>
+	</select>
 	<update id="updateFixDay" parameterType="egovframework.com.rd.usr.service.vo.DayPayVO">
 		UPDATE RD_DELIVERY_INFO
 		SET FIX_DAY = DATE_FORMAT(SYSDATE(), '%Y%m%d')
@@ -87,38 +135,12 @@
 			FROM RD_DELIVERY_INFO a
 			LEFT JOIN COMTNGNRLMBER b ON a.mber_id = b.mber_id
 			WHERE 1=1
-				<if test="searchGubun == 'FILE'">
-					AND ATCH_FILE_ID = #{searchId}
-				</if>
-				<if test="searchMberId != null and searchMberId != ''">
-					AND a.MBER_ID = #{searchMberId}
-				</if>
-				<if test="searchRunDeDate != null and searchRunDeDate != ''">
-					AND a.RUN_DE like '%' #{searchRunDeDate} '%'
-				</if>
 
-				<if test="searchGubun == 'DAY'">
-					<if test='searchCooperatorId != null and searchCooperatorId != "all"'>
-					AND COOPERATOR_ID = #{searchCooperatorId}
-					</if>
-					<if test="searchNm != null and searchNm != ''">
-					AND MBER_NM like '%' #{searchNm} '%'
-					</if>
-					AND RUN_DE BETWEEN #{searchFromDate} AND #{searchToDate}
-					<if test="searchRegistrationSn != null and searchRegistrationSn != ''">
-					AND COOPERATOR_ID IN (
-						SELECT COOPERATOR_ID from RD_COOPERATOR
-						WHERE REGISTRATION_SN = #{searchRegistrationSn}
-					)
-					</if>
-					<if test="searchFixGubun == 'YES'">
-					AND a.FIX_DAY is not null
-					</if>
-					<if test="searchFixGubun == 'NO'">
-					AND a.FIX_DAY is null
-					</if>
-
+				AND RUN_DE BETWEEN #{searchFromDate} AND #{searchToDate}
+				<if test="searchNm != null and searchNm != ''">
+				AND MBER_NM like '%' #{searchNm} '%'
 				</if>
+				AND a.FIX_DAY is null
 				<if test="schAuthorCode == 'ROLE_USER'">
 				/* 협력사 조건 *//* COOPERATOR_ID로 조건을 만든건 ★정산 파일을 올릴때 권한이 있는 협력사ID 데이터만 올릴수 있음!!★ - 나머지는 오류 처리할꺼임  */
 				AND COOPERATOR_ID IN (
@@ -127,6 +149,24 @@
 				)
 				</if>
 		)
+	</update>
+	<update id="updateFixWeek" parameterType="egovframework.com.rd.usr.service.vo.WeekInfoVO">
+		UPDATE RD_WEEK_RIDER_INFO a,(
+
+				SELECT wi.week_id, a.mber_id
+					FROM RD_WEEK_INFO wi
+					LEFT JOIN RD_WEEK_RIDER_INFO wr ON wi.WEEK_ID = wr.week_id
+					JOIN RD_DAY_PAY a ON wi.COOPERATOR_ID = a.COOPERATOR_ID AND wr.MBER_ID = a.mber_id AND a.use_at = 'Y' AND IO_GUBUN= '1'
+					LEFT JOIN COMTNGNRLMBER d ON wr.mber_id = d.mber_id
+						WHERE 1=1
+							AND wr.FIX_DAY is NULL
+							AND (wi.ACCOUNTS_ST_DT BETWEEN #{searchFromDate} AND #{searchToDate} or wi.ACCOUNTS_ED_DT BETWEEN #{searchFromDate} AND #{searchToDate})
+							<![CDATA[
+							AND if(wi.accounts_st_dt <= a.DAY AND wi.accounts_ed_dt >= a.DAY, 1, 0) =1]]>
+		) b
+		SET FIX_DAY = DATE_FORMAT(SYSDATE(), '%Y%m%d')
+		where a.week_id = b.week_id
+			and a.mber_id = b.mber_id
 	</update>
 
 	<insert id="insertDeliveryError" parameterType="egovframework.com.rd.usr.service.vo.DeliveryErrorVO">
@@ -222,11 +262,8 @@
 			,G,ACCOUNTS_SCHEDULE_COST,TAX_BILL_SUPPLY,TAX_BILL_ADD ,TAX_BILL_SUM ,NOTE,ATCH_FILE_ID,CREAT_DT,CREAT_ID
 		FROM RD_WEEK_INFO
 		WHERE 1=1
-			<if test="searchFromDate1 != null and searchFromDate1 != '' and searchFromDate1 != null and searchFromDate1 != ''">
 			AND (ACCOUNTS_ST_DT BETWEEN #{searchFromDate1} AND #{searchToDate1} or ACCOUNTS_ED_DT BETWEEN #{searchFromDate1} AND #{searchToDate1})
-			</if>
-			<if test="searchGubun != null and searchGubun != ''">
-			</if>
+
 			<if test="schAuthorCode == 'ROLE_USER'">
 			/* 협력사 조건 *//* COOPERATOR_ID로 조건을 만든건 ★정산 파일을 올릴때 권한이 있는 협력사ID 데이터만 올릴수 있음!!★ - 나머지는 오류 처리할꺼임  */
 			AND COOPERATOR_ID IN (
@@ -245,10 +282,12 @@
 			,b.OPERATING_COST,b.ACCOUNTS_COST,b.INCOME_TAX,b.RESIDENCE_TAX,b.WITHHOLDING_TAX,b.GIVE_PAY,b.CREAT_DT,b.CREAT_ID
 		FROM RD_WEEK_INFO a, RD_WEEK_RIDER_INFO b
 		WHERE a.week_id = b.week_id
-			<if test="searchFromDate1 != null and searchFromDate1 != '' and searchFromDate1 != null and searchFromDate1 != ''">
 			AND (a.ACCOUNTS_ST_DT BETWEEN #{searchFromDate1} AND #{searchToDate1} or a.ACCOUNTS_ED_DT BETWEEN #{searchFromDate1} AND #{searchToDate1})
+			<if test="searchFixGubun == 'YES'">
+			AND b.FIX_DAY is not null
 			</if>
-			<if test="searchGubun != null and searchGubun != ''">
+			<if test="searchFixGubun == 'NO'">
+			AND b.FIX_DAY is null
 			</if>
 			<if test="schAuthorCode == 'ROLE_USER'">
 			/* 협력사 조건 *//* COOPERATOR_ID로 조건을 만든건 ★정산 파일을 올릴때 권한이 있는 협력사ID 데이터만 올릴수 있음!!★ - 나머지는 오류 처리할꺼임  */
@@ -352,6 +391,43 @@
 				GROUP BY a.COOPERATOR_ID, a.mber_id
 			) c ON a.COOPERATOR_ID = c.COOPERATOR_ID AND b.MBER_ID = c.MBER_ID
 		WHERE a.ATCH_FILE_ID = #{atchFileId}
+	</select>
+
+	<select id="selectPixWeek" parameterType="egovframework.com.rd.usr.service.vo.WeekInfoVO" resultType="egovframework.com.rd.usr.service.vo.WeekPayVO">
+		SELECT a.WEEK_ID, a.COOPERATOR_ID, b.MBER_ID, 'WEK' AS DW_GUBUN, '1' AS IO_GUBUN, b.GIVE_PAY
+		,b.GIVE_PAY - d.CALL_FEE_COST AS ABLE_PRICE, d.CALL_FEE_COST
+		, 0 AS FEE, a.ACCOUNTS_ST_DT, a.ACCOUNTS_ED_DT, a.ATCH_FILE_ID, 'Y' AS USE_AT
+		FROM RD_WEEK_INFO a
+			LEFT JOIN RD_WEEK_RIDER_INFO b on a.WEEK_ID = b.week_id
+			LEFT JOIN COMTNGNRLMBER c ON b.mber_id = c.mber_id
+			LEFT JOIN (
+				SELECT a.COOPERATOR_ID, a.mber_id
+				<![CDATA[
+				, SUM(nvl(if(wi.accounts_st_dt <= a.DAY AND wi.accounts_ed_dt >= a.DAY, b.COST, 0), 0))
+					+ SUM(nvl(if(wi.accounts_st_dt <= a.DAY AND wi.accounts_ed_dt >= a.DAY, c.COST, 0), 0)) CALL_FEE_COST
+				]]>
+				, a.DAY, wi.accounts_st_dt, wi.accounts_ed_dt
+					, d.MBER_NM
+					FROM RD_WEEK_INFO wi
+					LEFT JOIN RD_WEEK_RIDER_INFO wr ON wi.WEEK_ID = wr.week_id
+					LEFT JOIN RD_DAY_PAY a ON wi.COOPERATOR_ID = a.COOPERATOR_ID AND wr.MBER_ID = a.mber_id AND a.use_at = 'Y' AND IO_GUBUN= '1' AND a.WEEK_YN = 'N'
+					LEFT JOIN RD_PROFIT b ON a.COOPERATOR_ID = b.COOPERATOR_ID AND a.mber_id = b.MBER_ID AND b.gubun ='C' AND a.DYP_ID = b.DYP_ID
+					LEFT JOIN RD_COOPERATOR_PROFIT c ON a.COOPERATOR_ID = c.COOPERATOR_ID AND a.mber_id = c.MBER_ID AND c.gubun ='C' AND a.DYP_ID = c.DYP_ID
+					LEFT JOIN COMTNGNRLMBER d ON wr.mber_id = d.mber_id
+						WHERE 1=1
+							AND wr.FIX_DAY is null
+							AND (wi.ACCOUNTS_ST_DT BETWEEN #{searchFromDate} AND #{searchToDate} or wi.ACCOUNTS_ED_DT BETWEEN #{searchFromDate} AND #{searchToDate})
+							<if test="searchNm != null and searchNm != ''">
+							AND d.MBER_NM LIKE '%' #{searchNm} '%'
+							</if>
+				GROUP BY a.COOPERATOR_ID, a.mber_id
+			) d ON a.COOPERATOR_ID = d.COOPERATOR_ID AND b.MBER_ID = d.MBER_ID
+		WHERE 1=1
+			AND b.FIX_DAY is null
+			AND (a.ACCOUNTS_ST_DT BETWEEN #{searchFromDate} AND #{searchToDate} or a.ACCOUNTS_ED_DT BETWEEN #{searchFromDate} AND #{searchToDate})
+			<if test="searchNm != null and searchNm != ''">
+			AND c.MBER_NM LIKE '%' #{searchNm} '%'
+			</if>
 	</select>
 
 	<insert id="insertWeekPay" parameterType="egovframework.com.rd.usr.service.vo.WeekPayVO">
@@ -528,6 +604,37 @@
 		AND COOPERATOR_ID = #{cooperatorId}
 		AND DAY BETWEEN #{accountsStDt} AND #{accountsEdDt}
 	</update>
+	<update id="updateFixDayPayWeekConfirm" parameterType="egovframework.com.rd.usr.service.vo.WeekInfoVO">
+		UPDATE RD_DAY_PAY a, (
+				SELECT a.DYP_ID, a.COOPERATOR_ID, a.mber_id, wi.week_Id
+				, a.DAY, wi.accounts_st_dt, wi.accounts_ed_dt
+					, wi.ATCH_FILE_ID
+					, d.MBER_NM
+					FROM RD_WEEK_INFO wi
+					LEFT JOIN RD_WEEK_RIDER_INFO wr ON wi.WEEK_ID = wr.week_id
+					LEFT JOIN RD_DAY_PAY a ON wi.COOPERATOR_ID = a.COOPERATOR_ID AND wr.MBER_ID = a.mber_id AND a.use_at = 'Y' AND IO_GUBUN= '1'
+					LEFT JOIN COMTNGNRLMBER d ON wr.mber_id = d.mber_id
+						WHERE 1=1
+							AND wr.FIX_DAY is NULL
+							AND a.WEEK_YN = 'N'
+							AND (wi.ACCOUNTS_ST_DT BETWEEN #{searchFromDate} AND #{searchToDate} or wi.ACCOUNTS_ED_DT BETWEEN #{searchFromDate} AND #{searchToDate})
+							<if test="searchNm != null and searchNm != ''">
+							AND d.MBER_NM LIKE '%' #{searchNm} '%'
+							</if>
+							<![CDATA[
+							AND if(wi.accounts_st_dt <= a.DAY AND wi.accounts_ed_dt >= a.DAY, 1, 0) =1]]>
+
+		) b
+		SET a.WEEK_YN ='Y'
+		, a.WEK_ATCH_FILE_ID = b.ATCH_FILE_ID
+		, a.WEEK_ID = b.week_Id
+		, a.LAST_UPDT_PNTTM = SYSDATE()
+		, a.LAST_UPDUSR_ID = #{lastUpdusrId}
+		WHERE a.WEEK_YN ='N'
+		AND a.USE_AT ='Y'
+		AND a.IO_GUBUN = '1'
+		AND a.DYP_ID = b.DYP_ID
+	</update>
 	<update id="updateDayPayWeekConfirm2" parameterType="egovframework.com.rd.usr.service.vo.WeekInfoVO">
 		UPDATE RD_DAY_PAY
 		SET WEEK_YN ='Y'
@@ -540,6 +647,31 @@
 		AND IO_GUBUN = '2'
 		AND COOPERATOR_ID = #{cooperatorId}
 	</update>
+	<update id="updateFixDayPayWeekConfirm2" parameterType="egovframework.com.rd.usr.service.vo.WeekInfoVO">
+		UPDATE RD_DAY_PAY a,  (
+				SELECT a.COOPERATOR_ID, a.mber_id, wi.ATCH_FILE_ID, wi.WEEK_ID
+					FROM RD_WEEK_INFO wi
+					LEFT JOIN RD_WEEK_RIDER_INFO wr ON wi.WEEK_ID = wr.week_id
+					JOIN RD_DAY_PAY a ON wi.COOPERATOR_ID = a.COOPERATOR_ID AND wr.MBER_ID = a.mber_id AND a.use_at = 'Y' AND IO_GUBUN= '1'
+					LEFT JOIN COMTNGNRLMBER d ON wr.mber_id = d.mber_id
+						WHERE 1=1
+							AND wr.FIX_DAY is NULL
+							AND (wi.ACCOUNTS_ST_DT BETWEEN #{searchFromDate} AND #{searchToDate} or wi.ACCOUNTS_ED_DT BETWEEN #{searchFromDate} AND #{searchToDate})
+							<![CDATA[
+							AND if(wi.accounts_st_dt <= a.DAY AND wi.accounts_ed_dt >= a.DAY, 1, 0) =1]]>
+
+		) b
+		SET a.WEEK_YN ='Y'
+		, a.WEK_ATCH_FILE_ID = b.ATCH_FILE_ID
+		, a.WEEK_ID = b.WEEK_ID
+		, a.LAST_UPDT_PNTTM = SYSDATE()
+		, a.LAST_UPDUSR_ID = #{lastUpdusrId}
+		WHERE a.WEEK_YN ='N'
+		AND a.USE_AT ='Y'
+		AND a.IO_GUBUN = '2'
+		AND a.COOPERATOR_ID = b.COOPERATOR_ID
+		AND a.mber_id = b.mber_id
+	</update>
 	<select id="selectDayPayIoGubn2List" parameterType="egovframework.com.rd.usr.service.vo.WeekInfoVO" resultType="egovframework.com.rd.usr.service.vo.WeekPayVO">
 		SELECT COOPERATOR_ID, MBER_ID, 'DAY' DW_GUBUN, '2', IO_GUBUN, NVL(DAY_FEE, 0)+NVL(INSURANCE,0)+NVL(SEND_FEE,0) AS FEE
 		, SEND_PRICE, DYP_ID, TRAN_DAY, TELEGRAM_NO,'Y' AS USE_AT, ETC_ID
@@ -548,6 +680,27 @@
 		AND USE_AT = 'Y'
 		AND IO_GUBUN = '2'
 		AND COOPERATOR_ID = #{cooperatorId}
+	</select>
+		<select id="selectFixDayPayIoGubn2List" parameterType="egovframework.com.rd.usr.service.vo.WeekInfoVO" resultType="egovframework.com.rd.usr.service.vo.WeekPayVO">
+		SELECT COOPERATOR_ID, MBER_ID, 'DAY' DW_GUBUN, '2', IO_GUBUN, NVL(DAY_FEE, 0)+NVL(INSURANCE,0)+NVL(SEND_FEE,0) AS FEE
+		, SEND_PRICE, DYP_ID, TRAN_DAY, TELEGRAM_NO,'Y' AS USE_AT, ETC_ID
+		from RD_DAY_PAY
+		WHERE WEEK_YN = 'N'
+		AND USE_AT = 'Y'
+		AND IO_GUBUN = '2'
+		AND (COOPERATOR_ID, mber_id) in (
+				SELECT a.COOPERATOR_ID, a.mber_id
+					FROM RD_WEEK_INFO wi
+					LEFT JOIN RD_WEEK_RIDER_INFO wr ON wi.WEEK_ID = wr.week_id
+					JOIN RD_DAY_PAY a ON wi.COOPERATOR_ID = a.COOPERATOR_ID AND wr.MBER_ID = a.mber_id AND a.use_at = 'Y' AND IO_GUBUN= '1'
+					LEFT JOIN COMTNGNRLMBER d ON wr.mber_id = d.mber_id
+						WHERE 1=1
+							AND wr.FIX_DAY is NULL
+							AND (wi.ACCOUNTS_ST_DT BETWEEN #{searchFromDate} AND #{searchToDate} or wi.ACCOUNTS_ED_DT BETWEEN #{searchFromDate} AND #{searchToDate})
+							<![CDATA[
+							AND if(wi.accounts_st_dt <= a.DAY AND wi.accounts_ed_dt >= a.DAY, 1, 0) =1]]>
+
+		)
 	</select>
 
 	<insert id="insertTransfer" parameterType="egovframework.com.rd.usr.service.vo.DoszTransferVO">

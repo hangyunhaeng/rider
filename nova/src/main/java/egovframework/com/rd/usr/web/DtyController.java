@@ -864,9 +864,8 @@ public class DtyController {
         //총판 or 협력사
         deliveryInfoVO.setSchAuthorCode(user.getAuthorCode());
         deliveryInfoVO.setSchIhidNum(user.getIhidNum());
-        deliveryInfoVO.setSearchGubun("DAY");
 
-        List<DeliveryInfoVO> list = dtyService.selectDeliveryInfoByAtchFileId(deliveryInfoVO);
+        List<DeliveryInfoVO> list = dtyService.selectDeliveryInfoByParam(deliveryInfoVO);
         //return value
         Map<String, Object> map =  new HashMap<String, Object>();
 
@@ -927,9 +926,8 @@ public class DtyController {
         //총판 or 협력사
         deliveryInfoVO.setSchAuthorCode(user.getAuthorCode());
         deliveryInfoVO.setSchIhidNum(user.getIhidNum());
-        deliveryInfoVO.setSearchGubun("DAY");
 
-        List<DeliveryInfoVO> list = dtyService.selectDeliveryInfoByAtchFileId(deliveryInfoVO);
+        List<DeliveryInfoVO> list = dtyService.selectDeliveryInfoByParam(deliveryInfoVO);
         //return value
         Map<String, Object> map =  new HashMap<String, Object>();
 
@@ -1006,11 +1004,10 @@ public class DtyController {
         //총판 or 협력사
         deliveryInfoVO.setSchAuthorCode(user.getAuthorCode());
         deliveryInfoVO.setSchIhidNum(user.getIhidNum());
-        deliveryInfoVO.setSearchGubun("DAY");
 
         dtyService.fixDay(deliveryInfoVO);
 
-        List<DeliveryInfoVO> list = dtyService.selectDeliveryInfoByAtchFileId(deliveryInfoVO);
+        List<DeliveryInfoVO> list = dtyService.selectDeliveryInfoByParam(deliveryInfoVO);
         //return value
         Map<String, Object> map =  new HashMap<String, Object>();
 
@@ -1049,17 +1046,23 @@ public class DtyController {
         weekInfoVO.setSchAuthorCode(user.getAuthorCode());
         weekInfoVO.setSchIhidNum(user.getIhidNum());
 
-
-        dtyService.fixWeek(weekInfoVO);
-
-        List<WeekInfoVO> list = dtyService.selectWeekInfoByParam(weekInfoVO);
-        List<WeekRiderInfoVO> listRider = dtyService.selectWeekRiderInfoByParam(weekInfoVO);
         //return value
         Map<String, Object> map =  new HashMap<String, Object>();
 
-        map.put("list", list);
-        map.put("listRider", listRider);
-        map.put("resultCode", "success");
+        try {
+	        dtyService.fixWeek(weekInfoVO);
+
+	        List<WeekInfoVO> list = dtyService.selectWeekInfoByParam(weekInfoVO);
+	        List<WeekRiderInfoVO> listRider = dtyService.selectWeekRiderInfoByParam(weekInfoVO);
+
+	        map.put("list", list);
+	        map.put("listRider", listRider);
+	        map.put("resultCode", "success");
+        } catch(Exception e) {
+			LOGGER.error(e.toString());
+	        map.put("resultCode", "fail");
+			map.put("resultMsg", e.getMessage());
+        }
         return ResponseEntity.ok(map);
 	}
 

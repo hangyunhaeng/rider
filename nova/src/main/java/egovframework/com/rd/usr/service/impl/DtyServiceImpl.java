@@ -1099,7 +1099,7 @@ public class DtyServiceImpl extends EgovAbstractServiceImpl implements DtyServic
 //			insertPayData.add(weekPayVO);
 		}
 
-		List<WeekPayVO> weekPayList = dtyDAO.selectWeekPay(weekGapjiOne);
+/*		List<WeekPayVO> weekPayList = dtyDAO.selectWeekPay(weekGapjiOne);
 		//주정산 입금 이력 데이터를 DB에 isnert
 		for(int i = 0 ; i < weekPayList.size() ; i++) {
 			WeekPayVO one = weekPayList.get(i);
@@ -1121,7 +1121,7 @@ public class DtyServiceImpl extends EgovAbstractServiceImpl implements DtyServic
 		}
 		//일정산 출금이력을 정산완료로 세팅
 		weekGapjiOne.setLastUpdusrId(user.getId());
-		dtyDAO.updateDayPayWeekConfirm2(weekGapjiOne);
+		dtyDAO.updateDayPayWeekConfirm2(weekGapjiOne);*/
 	}
 
 	/**
@@ -1132,6 +1132,16 @@ public class DtyServiceImpl extends EgovAbstractServiceImpl implements DtyServic
 	 */
 	public List<DeliveryInfoVO> selectDeliveryInfoByAtchFileId(DeliveryInfoVO vo) throws Exception {
 		return dtyDAO.selectDeliveryInfoByAtchFileId(vo);
+	}
+
+	/**
+	 * 배달정보 리스트 가져오기
+	 * @param vo
+	 * @return
+	 * @throws Exception
+	 */
+	public List<DeliveryInfoVO> selectDeliveryInfoByParam(DeliveryInfoVO vo) throws Exception {
+		return dtyDAO.selectDeliveryInfoByParam(vo);
 	}
 
 	/**
@@ -2475,6 +2485,33 @@ public class DtyServiceImpl extends EgovAbstractServiceImpl implements DtyServic
 	 * @throws Exception
 	 */
 	public void fixWeek(WeekInfoVO weekInfoVO) throws Exception {
+        LoginVO user = (LoginVO)EgovUserDetailsHelper.getAuthenticatedUser();
 
+		List<WeekPayVO> weekPayList = dtyDAO.selectPixWeek(weekInfoVO);
+		//주정산 입금 이력 데이터를 DB에 isnert
+		for(int i = 0 ; i < weekPayList.size() ; i++) {
+			WeekPayVO one = weekPayList.get(i);
+			one.setWkpId(egovWkpIdGnrService.getNextStringId());
+			one.setCreatId(user.getId());
+			dtyDAO.insertWeekPay(one);
+		}
+		//일정산 입금이력을 정산 완료로 세팅 -- 협력사아이디, 기간으로 (TODO - 정합성체크 - 금액은 체크 않하나?)
+		weekInfoVO.setLastUpdusrId(user.getId());
+		dtyDAO.updateFixDayPayWeekConfirm(weekInfoVO);
+
+		//미정산 선출금 출금이력조회하여 주정산 출금내역으로 insert
+		List<WeekPayVO> dayPayListIoGubun2 = dtyDAO.selectFixDayPayIoGubn2List(weekInfoVO);
+		for(int i = 0 ; i < dayPayListIoGubun2.size() ; i++) {
+			WeekPayVO one = dayPayListIoGubun2.get(i);
+			one.setWkpId(egovWkpIdGnrService.getNextStringId());
+			one.setCreatId(user.getId());
+			dtyDAO.insertWeekPay(one);
+		}
+		//일정산 출금이력을 정산완료로 세팅
+		weekInfoVO.setLastUpdusrId(user.getId());
+		dtyDAO.updateFixDayPayWeekConfirm2(weekInfoVO);
+
+        //확정일자 세팅
+        dtyDAO.updateFixWeek(weekInfoVO);
 	}
 }

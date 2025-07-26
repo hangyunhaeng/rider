@@ -89,7 +89,13 @@ public interface DtyService {
 	 * @throws Exception
 	 */
 	public List<DeliveryInfoVO> selectDeliveryInfoByAtchFileId(DeliveryInfoVO vo) throws Exception ;
-
+	/**
+	 * 배달정보 리스트 가져오기
+	 * @param vo
+	 * @return
+	 * @throws Exception
+	 */
+	public List<DeliveryInfoVO> selectDeliveryInfoByParam(DeliveryInfoVO vo) throws Exception ;
 
 	/**
 	 * 파일별 업로드 오류 리스트 가져오기

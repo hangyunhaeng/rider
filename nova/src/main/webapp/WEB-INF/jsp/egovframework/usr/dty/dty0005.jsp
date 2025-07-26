@@ -496,8 +496,8 @@
 
 		const params = new URLSearchParams();
 
-		params.append('searchFromDate1', getOnlyNumber($('#searchFromDate1').val()));//배달일
-		params.append('searchToDate1', getOnlyNumber($('#searchToDate1').val()));	//배달일
+		params.append('searchFromDate', getOnlyNumber($('#searchFromDate1').val()));//배달일
+		params.append('searchToDate', getOnlyNumber($('#searchToDate1').val()));	//배달일
 		params.append('searchFixGubun', $('#searchFixGubun1').val());		//확정여부
 		// 로딩 시작
         $('.loading-wrap--js').show();
@@ -509,13 +509,28 @@
             	return;
             }
 
+            if(response.data.resultCode != "success"){
+				if(response.data.resultMsg != '' && response.data.resultMsg != null)
+					alert(response.data.resultMsg);
+				else alert("대상확정에 실패하였습니다.");
+				return ;
+			}
+
         	if(response.data.resultCode == "success"){
 	        	if (response.data.list.length == 0) {
-	        		grid.setGridOption('rowData',[]);  	// 데이터가 없는 경우 빈 배열 설정
-	        		grid.showNoRowsOverlay();  			// 데이터가 없는 경우
+	        		grid2.setGridOption('rowData',[]);  	// 데이터가 없는 경우 빈 배열 설정
+	        		grid2.showNoRowsOverlay();  			// 데이터가 없는 경우
 	            } else {
 	            	data = response.data.list;	//정상데이터
-					grid.setGridOption("rowData", data);
+					grid2.setGridOption("rowData", data);
+	            }
+
+	        	if (response.data.listRider.length == 0) {
+	        		grid3.setGridOption('rowData',[]);  	// 데이터가 없는 경우 빈 배열 설정
+	        		grid3.showNoRowsOverlay();  			// 데이터가 없는 경우
+	            } else {
+	            	data = response.data.listRider;	//정상데이터
+					grid3.setGridOption("rowData", data);
 	            }
         	}
 
