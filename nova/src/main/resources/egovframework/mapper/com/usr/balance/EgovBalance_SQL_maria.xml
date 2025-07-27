@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="balanceDAO">
+	<select id="selectBalanceForUpdate" parameterType="egovframework.com.rd.usr.service.vo.BalanceVO" resultType="egovframework.com.rd.usr.service.vo.BalanceVO">
+		SELECT * FROM RD_BALNCE
+		WHERE MBER_ID = #{mberId}
+		FOR UPDATE
+	</select>
+	<update id="updateBalance" parameterType="egovframework.com.rd.usr.service.vo.BalanceVO">
+		UPDATE RD_BALNCE
+		SET BALANCE = BALANCE + #{cost}
+		WHERE MBER_ID = #{mberId}
+	</update>
+	<select id="selectBalanceByIdx" parameterType="egovframework.com.rd.usr.service.vo.BalanceVO" resultType="egovframework.com.rd.usr.service.vo.BalanceVO">
+		SELECT rn, tab.* FROM(
+				SELECT ROWNUM()-1 RN, tab.* FROM (
+					SELECT a.* FROM RD_BALNCE a
+					ORDER BY MBER_ID desc
+				) tab
+		)tab
+		WHERE rn = #{schIdx} MOD 8
+	</select>
+
+
+	<select id="selectBalanceByMberId" parameterType="egovframework.com.rd.usr.service.vo.BalanceVO" resultType="egovframework.com.rd.usr.service.vo.BalanceVO">
+		select * from RD_BALNCE where mber_id = #{mberId}
+	</select>
+</mapper>
