@@ -2511,7 +2511,9 @@ public class DtyServiceImpl extends EgovAbstractServiceImpl implements DtyServic
 		weekInfoVO.setLastUpdusrId(user.getId());
 		dtyDAO.updateFixDayPayWeekConfirm2(weekInfoVO);
 
-        //확정일자 세팅
+        // 확정일자 세팅 : RD_WEEK_RIDER_INFO
         dtyDAO.updateFixWeek(weekInfoVO);
+        // 확정일자 세팅 : RD_WEEK_INFO 의 확정일자 세팅(하위 RD_WEEK_RIDER_INFO가 모두 Fix_day가 설정 시)
+        dtyDAO.updateFixWeekInfo(weekInfoVO);
 	}
 }

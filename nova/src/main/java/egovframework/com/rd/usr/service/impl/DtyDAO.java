@@ -80,6 +80,16 @@ public class DtyDAO extends EgovComAbstractDAO {
 	public int updateFixWeek(WeekInfoVO vo) throws Exception {
 		return update("dtyDAO.updateFixWeek", vo);
 	}
+
+	/**
+	 * 확정일자 세팅
+	 * @param vo
+	 * @return
+	 * @throws Exception
+	 */
+	public int updateFixWeekInfo(WeekInfoVO vo) throws Exception {
+		return update("dtyDAO.updateFixWeekInfo", vo);
+	}
 	/**
 	 * 오류건 insert
 	 */

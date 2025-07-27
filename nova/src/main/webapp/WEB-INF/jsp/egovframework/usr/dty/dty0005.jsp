@@ -443,8 +443,9 @@
 	function doSearchWeek(){
 		const params = new URLSearchParams();
 
-		params.append('searchFromDate1', getOnlyNumber($('#searchFromDate1').val()));//배달일
-		params.append('searchToDate1', getOnlyNumber($('#searchToDate1').val()));	//배달일
+		params.append('searchFromDate', getOnlyNumber($('#searchFromDate1').val()));//배달일
+		params.append('searchToDate', getOnlyNumber($('#searchToDate1').val()));	//배달일
+		params.append('searchNm', $('#searchNm1').val());			//라이더
 		params.append('searchFixGubun', $('#searchFixGubun1').val());		//확정여부
 		// 로딩 시작
         $('.loading-wrap--js').show();
@@ -498,6 +499,7 @@
 
 		params.append('searchFromDate', getOnlyNumber($('#searchFromDate1').val()));//배달일
 		params.append('searchToDate', getOnlyNumber($('#searchToDate1').val()));	//배달일
+		params.append('searchNm', $('#searchNm1').val());			//라이더
 		params.append('searchFixGubun', $('#searchFixGubun1').val());		//확정여부
 		// 로딩 시작
         $('.loading-wrap--js').show();
@@ -712,7 +714,7 @@
 					<tr>
 						<th>라이더</th>
 						<td>
-							<input id="searchNm" type="text" value="">
+							<input id="searchNm1" type="text" value="">
 						</td>
 						<th>확정여부</th>
 						<td>

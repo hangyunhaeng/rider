@@ -163,10 +163,28 @@
 							AND (wi.ACCOUNTS_ST_DT BETWEEN #{searchFromDate} AND #{searchToDate} or wi.ACCOUNTS_ED_DT BETWEEN #{searchFromDate} AND #{searchToDate})
 							<![CDATA[
 							AND if(wi.accounts_st_dt <= a.DAY AND wi.accounts_ed_dt >= a.DAY, 1, 0) =1]]>
+							<if test="searchNm != null and searchNm != ''">
+							AND d.MBER_NM like '%' #{searchNm} '%'
+							</if>
 		) b
 		SET FIX_DAY = DATE_FORMAT(SYSDATE(), '%Y%m%d')
 		where a.week_id = b.week_id
 			and a.mber_id = b.mber_id
+	</update>
+
+	<update id="updateFixWeekInfo" parameterType="egovframework.com.rd.usr.service.vo.WeekInfoVO">
+		UPDATE RD_WEEK_INFO a, (
+			SELECT wi.WEEK_ID, SUM(if(wr.FIX_DAY IS NULL , 1, 0)) AS NOT_CNT
+			FROM RD_WEEK_INFO wi
+			LEFT JOIN RD_WEEK_RIDER_INFO wr ON wi.WEEK_ID = wr.week_id
+			WHERE 1=1
+				AND wi.FIX_DAY is NULL
+				AND (wi.ACCOUNTS_ST_DT BETWEEN #{searchFromDate} AND #{searchToDate} or wi.ACCOUNTS_ED_DT BETWEEN #{searchFromDate} AND #{searchToDate})
+			GROUP BY wi.WEEK_ID
+		)b
+		SET a.FIX_DAY = DATE_FORMAT(SYSDATE(), '%Y%m%d')
+		WHERE a.WEEK_ID = b.WEEK_ID
+		AND b.NOT_CNT = 0
 	</update>
 
 	<insert id="insertDeliveryError" parameterType="egovframework.com.rd.usr.service.vo.DeliveryErrorVO">
@@ -262,8 +280,13 @@
 			,G,ACCOUNTS_SCHEDULE_COST,TAX_BILL_SUPPLY,TAX_BILL_ADD ,TAX_BILL_SUM ,NOTE,ATCH_FILE_ID,CREAT_DT,CREAT_ID
 		FROM RD_WEEK_INFO
 		WHERE 1=1
-			AND (ACCOUNTS_ST_DT BETWEEN #{searchFromDate1} AND #{searchToDate1} or ACCOUNTS_ED_DT BETWEEN #{searchFromDate1} AND #{searchToDate1})
-
+			AND (ACCOUNTS_ST_DT BETWEEN #{searchFromDate} AND #{searchToDate} or ACCOUNTS_ED_DT BETWEEN #{searchFromDate} AND #{searchToDate})
+			<if test="searchFixGubun == 'YES'">
+			AND FIX_DAY is not null
+			</if>
+			<if test="searchFixGubun == 'NO'">
+			AND FIX_DAY is null
+			</if>
 			<if test="schAuthorCode == 'ROLE_USER'">
 			/* 협력사 조건 *//* COOPERATOR_ID로 조건을 만든건 ★정산 파일을 올릴때 권한이 있는 협력사ID 데이터만 올릴수 있음!!★ - 나머지는 오류 처리할꺼임  */
 			AND COOPERATOR_ID IN (
@@ -280,14 +303,19 @@
 			,b.OWNER_EMPLOYMENT_INSURANCE_ACCOUNTS,b.RIDER_EMPLOYMENT_INSURANCE_ACCOUNTS,b.SUM_EMPLOYMENT_INSURANCE_ACCOUNTS
 			,b.OWNER_INDUSTRIAL_INSURANCE_ACCOUNTS,b.RIDER_INDUSTRIAL_INSURANCE_ACCOUNTS,b.SUM_INDUSTRIAL_INSURANCE_ACCOUNTS
 			,b.OPERATING_COST,b.ACCOUNTS_COST,b.INCOME_TAX,b.RESIDENCE_TAX,b.WITHHOLDING_TAX,b.GIVE_PAY,b.CREAT_DT,b.CREAT_ID
-		FROM RD_WEEK_INFO a, RD_WEEK_RIDER_INFO b
-		WHERE a.week_id = b.week_id
-			AND (a.ACCOUNTS_ST_DT BETWEEN #{searchFromDate1} AND #{searchToDate1} or a.ACCOUNTS_ED_DT BETWEEN #{searchFromDate1} AND #{searchToDate1})
+		FROM RD_WEEK_INFO a
+		LEFT JOIN RD_WEEK_RIDER_info b on a.week_id = b.week_id
+		LEFT JOIN COMTNGNRLMBER c ON b.MBER_ID = c.MBER_ID
+		WHERE 1 = 1
+			AND (a.ACCOUNTS_ST_DT BETWEEN #{searchFromDate} AND #{searchToDate} or a.ACCOUNTS_ED_DT BETWEEN #{searchFromDate} AND #{searchToDate})
 			<if test="searchFixGubun == 'YES'">
 			AND b.FIX_DAY is not null
 			</if>
 			<if test="searchFixGubun == 'NO'">
 			AND b.FIX_DAY is null
+			</if>
+			<if test="searchNm != null and searchNm != ''">
+			AND c.MBER_NM LIKE '%' #{searchNm} '%'
 			</if>
 			<if test="schAuthorCode == 'ROLE_USER'">
 			/* 협력사 조건 *//* COOPERATOR_ID로 조건을 만든건 ★정산 파일을 올릴때 권한이 있는 협력사ID 데이터만 올릴수 있음!!★ - 나머지는 오류 처리할꺼임  */
