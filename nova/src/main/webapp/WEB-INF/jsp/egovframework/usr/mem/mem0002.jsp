@@ -917,6 +917,7 @@
 							<li><a href="${pageContext.request.contextPath}/usr/dty0001.do">일별 자료 업로드</a></li>
 							<li><a href="${pageContext.request.contextPath}/usr/dty0002.do">주별 자료 업로드</a></li>
 							<li><a href="${pageContext.request.contextPath}/usr/dty0003.do">자료 업로드 이력</a></li>
+							<li><a href="${pageContext.request.contextPath}/usr/dty0005.do">자료 확정</a></li>
 						</ul>
 					</li>
 					<li><a href="${pageContext.request.contextPath}/usr/mem0004.do">MyPage</a></li>
