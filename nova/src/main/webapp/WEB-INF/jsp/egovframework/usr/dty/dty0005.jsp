@@ -379,9 +379,32 @@
         	if(response.data.resultCode == "success"){
 	        	if (response.data.list.length == 0) {
 	        		grid.setGridOption('rowData',[]);  	// 데이터가 없는 경우 빈 배열 설정
+					var sum = [{cooperatorId:"합계"
+						, goodsPrice: 0
+						, distance: 0
+						, basicPrice: 0
+						, weatherPrimage: 0
+						, addPrimage: 0
+						, peakPrimageEtc: 0
+						, deliveryPrice: 0
+						}
+					];
+					grid.setGridOption('pinnedBottomRowData', sum);
 	        		grid.showNoRowsOverlay();  			// 데이터가 없는 경우
 	            } else {
 	            	data = response.data.list;	//정상데이터
+
+					var sum = [{cooperatorId:"합계"
+						, goodsPrice: response.data.list.reduce((acc, num) => Number(acc, 10) + Number(num.goodsPrice, 10), 0)
+						, distance: response.data.list.reduce((acc, num) => Number(acc, 10) + Number(num.distance, 10), 0)
+						, basicPrice: response.data.list.reduce((acc, num) => Number(acc, 10) + Number(num.basicPrice, 10), 0)
+						, weatherPrimage: response.data.list.reduce((acc, num) => Number(acc, 10) + Number(num.weatherPrimage, 10), 0)
+						, addPrimage: response.data.list.reduce((acc, num) => Number(acc, 10) + Number(num.addPrimage, 10), 0)
+						, peakPrimageEtc: response.data.list.reduce((acc, num) => Number(acc, 10) + Number(num.peakPrimageEtc, 10), 0)
+						, deliveryPrice: response.data.list.reduce((acc, num) => Number(acc, 10) + Number(num.deliveryPrice, 10), 0)
+						}
+					];
+					grid.setGridOption('pinnedBottomRowData', sum);	//합계데이터는 정상데이터만 포함한다
 					grid.setGridOption("rowData", data);
 	            }
         	}
@@ -423,9 +446,32 @@
         	if(response.data.resultCode == "success"){
 	        	if (response.data.list.length == 0) {
 	        		grid.setGridOption('rowData',[]);  	// 데이터가 없는 경우 빈 배열 설정
+					var sum = [{cooperatorId:"합계"
+						, goodsPrice: 0
+						, distance: 0
+						, basicPrice: 0
+						, weatherPrimage: 0
+						, addPrimage: 0
+						, peakPrimageEtc: 0
+						, deliveryPrice: 0
+						}
+					];
+					grid.setGridOption('pinnedBottomRowData', sum);
 	        		grid.showNoRowsOverlay();  			// 데이터가 없는 경우
 	            } else {
 	            	data = response.data.list;	//정상데이터
+
+					var sum = [{cooperatorId:"합계"
+						, goodsPrice: response.data.list.reduce((acc, num) => Number(acc, 10) + Number(num.goodsPrice, 10), 0)
+						, distance: response.data.list.reduce((acc, num) => Number(acc, 10) + Number(num.distance, 10), 0)
+						, basicPrice: response.data.list.reduce((acc, num) => Number(acc, 10) + Number(num.basicPrice, 10), 0)
+						, weatherPrimage: response.data.list.reduce((acc, num) => Number(acc, 10) + Number(num.weatherPrimage, 10), 0)
+						, addPrimage: response.data.list.reduce((acc, num) => Number(acc, 10) + Number(num.addPrimage, 10), 0)
+						, peakPrimageEtc: response.data.list.reduce((acc, num) => Number(acc, 10) + Number(num.peakPrimageEtc, 10), 0)
+						, deliveryPrice: response.data.list.reduce((acc, num) => Number(acc, 10) + Number(num.deliveryPrice, 10), 0)
+						}
+					];
+					grid.setGridOption('pinnedBottomRowData', sum);	//합계데이터는 정상데이터만 포함한다
 					grid.setGridOption("rowData", data);
 	            }
         	}
@@ -460,17 +506,122 @@
         	if(response.data.resultCode == "success"){
 	        	if (response.data.list.length == 0) {
 	        		grid2.setGridOption('rowData',[]);  	// 데이터가 없는 경우 빈 배열 설정
+					var sum = [{cooperatorId:"합계"
+						, deliveryCost : 0
+						, addAccounts : 0
+						, operatingCost : 0
+						, managementCost : 0
+						, operatingFee : 0
+						, etcCost : 0
+						, timeInsurance : 0
+						, ownerEmploymentInsurance : 0
+						, riderEmploymentInsurance : 0
+						, ownerIndustrialInsurance : 0
+						, riderIndustrialInsurance : 0
+						, withholdingTaxInsuranceSum : 0
+						, employmentInsuranceAccounts : 0
+						, industrialInsuranceAccounts : 0
+						, g : 0
+						, accountsScheduleCost : 0
+						, taxBillSupply : 0
+						, taxBillAdd : 0
+						, taxBillSum : 0
+						}
+					];
+					grid2.setGridOption('pinnedBottomRowData', sum);
 	        		grid2.showNoRowsOverlay();  			// 데이터가 없는 경우
 	            } else {
 	            	data = response.data.list;	//정상데이터
+
+					var sum = [{cooperatorId:"합계"
+						, deliveryCost: response.data.list.reduce((acc, num) => Number(acc, 10) + Number(num.deliveryCost, 10), 0)
+						, addAccounts: response.data.list.reduce((acc, num) => Number(acc, 10) + Number(num.addAccounts, 10), 0)
+						, operatingCost: response.data.list.reduce((acc, num) => Number(acc, 10) + Number(num.operatingCost, 10), 0)
+						, managementCost: response.data.list.reduce((acc, num) => Number(acc, 10) + Number(num.managementCost, 10), 0)
+						, operatingFee: response.data.list.reduce((acc, num) => Number(acc, 10) + Number(num.operatingFee, 10), 0)
+						, etcCost: response.data.list.reduce((acc, num) => Number(acc, 10) + Number(num.etcCost, 10), 0)
+						, timeInsurance: response.data.list.reduce((acc, num) => Number(acc, 10) + Number(num.timeInsurance, 10), 0)
+						, ownerEmploymentInsurance: response.data.list.reduce((acc, num) => Number(acc, 10) + Number(num.ownerEmploymentInsurance, 10), 0)
+						, riderEmploymentInsurance: response.data.list.reduce((acc, num) => Number(acc, 10) + Number(num.riderEmploymentInsurance, 10), 0)
+						, ownerIndustrialInsurance: response.data.list.reduce((acc, num) => Number(acc, 10) + Number(num.ownerIndustrialInsurance, 10), 0)
+						, riderIndustrialInsurance: response.data.list.reduce((acc, num) => Number(acc, 10) + Number(num.riderIndustrialInsurance, 10), 0)
+						, withholdingTaxInsuranceSum: response.data.list.reduce((acc, num) => Number(acc, 10) + Number(num.withholdingTaxInsuranceSum, 10), 0)
+						, employmentInsuranceAccounts: response.data.list.reduce((acc, num) => Number(acc, 10) + Number(num.employmentInsuranceAccounts, 10), 0)
+						, industrialInsuranceAccounts: response.data.list.reduce((acc, num) => Number(acc, 10) + Number(num.industrialInsuranceAccounts, 10), 0)
+						, g: response.data.list.reduce((acc, num) => Number(acc, 10) + Number(num.g, 10), 0)
+						, accountsScheduleCost: response.data.list.reduce((acc, num) => Number(acc, 10) + Number(num.accountsScheduleCost, 10), 0)
+						, taxBillSupply: response.data.list.reduce((acc, num) => Number(acc, 10) + Number(num.taxBillSupply, 10), 0)
+						, taxBillAdd: response.data.list.reduce((acc, num) => Number(acc, 10) + Number(num.taxBillAdd, 10), 0)
+						, taxBillSum: response.data.list.reduce((acc, num) => Number(acc, 10) + Number(num.taxBillSum, 10), 0)
+						}
+					];
+					grid2.setGridOption('pinnedBottomRowData', sum);	//합계데이터는 정상데이터만 포함한다
 					grid2.setGridOption("rowData", data);
 	            }
 
 	        	if (response.data.listRider.length == 0) {
 	        		grid3.setGridOption('rowData',[]);  	// 데이터가 없는 경우 빈 배열 설정
+					var sum = [{cooperatorId:"합계"
+						, cnt : 0
+						, deliveryCost : 0
+						, addCos : 0
+						, sumCost : 0
+						, timeInsurance : 0
+						, necessaryExpenses : 0
+						, pay : 0
+						, ownerEmploymentInsurance : 0
+						, riderEmploymentInsurance : 0
+						, ownerIndustrialInsurance : 0
+						, riderIndustrialInsurance : 0
+						, withholdingTaxInsuranceSum : 0
+						, ownerEmploymentInsuranceAccounts : 0
+						, riderEmploymentInsuranceAccounts : 0
+						, sumEmploymentInsuranceAccounts : 0
+						, ownerIndustrialInsuranceAccounts : 0
+						, riderIndustrialInsuranceAccounts : 0
+						, sumIndustrialInsuranceAccounts : 0
+						, operatingCost : 0
+						, accountsCost : 0
+						, incomeTax : 0
+						, residenceTax : 0
+						, withholdingTax : 0
+						, givePay : 0
+						}
+					];
+					grid3.setGridOption('pinnedBottomRowData', sum);
 	        		grid3.showNoRowsOverlay();  			// 데이터가 없는 경우
 	            } else {
+	            	debugger;
 	            	data = response.data.listRider;	//정상데이터
+
+					var sum = [{cooperatorId:"합계"
+						, cnt: response.data.listRider.reduce((acc, num) => Number(acc, 10) + Number(num.cnt, 10), 0)
+						, deliveryCost: response.data.listRider.reduce((acc, num) => Number(acc, 10) + Number(num.deliveryCost, 10), 0)
+						, addCost: response.data.listRider.reduce((acc, num) => Number(acc, 10) + Number(num.addCost, 10), 0)
+						, sumCost: response.data.listRider.reduce((acc, num) => Number(acc, 10) + Number(num.sumCost, 10), 0)
+						, timeInsurance: response.data.listRider.reduce((acc, num) => Number(acc, 10) + Number(num.timeInsurance, 10), 0)
+						, necessaryExpenses: response.data.listRider.reduce((acc, num) => Number(acc, 10) + Number(num.necessaryExpenses, 10), 0)
+						, pay: response.data.listRider.reduce((acc, num) => Number(acc, 10) + Number(num.pay, 10), 0)
+						, ownerEmploymentInsurance: response.data.listRider.reduce((acc, num) => Number(acc, 10) + Number(num.ownerEmploymentInsurance, 10), 0)
+						, riderEmploymentInsurance: response.data.listRider.reduce((acc, num) => Number(acc, 10) + Number(num.riderEmploymentInsurance, 10), 0)
+						, ownerIndustrialInsurance: response.data.listRider.reduce((acc, num) => Number(acc, 10) + Number(num.ownerIndustrialInsurance, 10), 0)
+						, riderIndustrialInsurance: response.data.listRider.reduce((acc, num) => Number(acc, 10) + Number(num.riderIndustrialInsurance, 10), 0)
+						, withholdingTaxInsuranceSum: response.data.listRider.reduce((acc, num) => Number(acc, 10) + Number(num.withholdingTaxInsuranceSum, 10), 0)
+						, ownerEmploymentInsuranceAccounts: response.data.listRider.reduce((acc, num) => Number(acc, 10) + Number(num.ownerEmploymentInsuranceAccounts, 10), 0)
+						, riderEmploymentInsuranceAccounts: response.data.listRider.reduce((acc, num) => Number(acc, 10) + Number(num.riderEmploymentInsuranceAccounts, 10), 0)
+						, sumEmploymentInsuranceAccounts: response.data.listRider.reduce((acc, num) => Number(acc, 10) + Number(num.sumEmploymentInsuranceAccounts, 10), 0)
+						, ownerIndustrialInsuranceAccounts: response.data.listRider.reduce((acc, num) => Number(acc, 10) + Number(num.ownerIndustrialInsuranceAccounts, 10), 0)
+						, riderIndustrialInsuranceAccounts: response.data.listRider.reduce((acc, num) => Number(acc, 10) + Number(num.riderIndustrialInsuranceAccounts, 10), 0)
+						, sumIndustrialInsuranceAccounts: response.data.listRider.reduce((acc, num) => Number(acc, 10) + Number(num.sumIndustrialInsuranceAccounts, 10), 0)
+						, operatingCost: response.data.listRider.reduce((acc, num) => Number(acc, 10) + Number(num.operatingCost, 10), 0)
+						, accountsCost: response.data.listRider.reduce((acc, num) => Number(acc, 10) + Number(num.accountsCost, 10), 0)
+						, incomeTax: response.data.listRider.reduce((acc, num) => Number(acc, 10) + Number(num.incomeTax, 10), 0)
+						, residenceTax: response.data.listRider.reduce((acc, num) => Number(acc, 10) + Number(num.residenceTax, 10), 0)
+						, withholdingTax: response.data.listRider.reduce((acc, num) => Number(acc, 10) + Number(num.withholdingTax, 10), 0)
+						, givePay: response.data.listRider.reduce((acc, num) => Number(acc, 10) + Number(num.givePay, 10), 0)
+						}
+					];
+					grid3.setGridOption('pinnedBottomRowData', sum);	//합계데이터는 정상데이터만 포함한다
 					grid3.setGridOption("rowData", data);
 	            }
         	}
@@ -634,7 +785,7 @@
 	</form>
 
 	<div class="keit-header-body innerwrap clearfix">
-		<p class="tit">확정</p>
+<!-- 		<p class="tit">확정</p> -->
 
 			<input name="pageUnit" type="hidden" value="1000"/>
 			<input name="pageSize" type="hidden" value="1000"/>
@@ -644,6 +795,7 @@
 
 			<!-- 좌 -->
 			<div style="float: left; width: 49%; margin-right: 1%">
+				<p class="tit">일별 자료 확정</p>
 				<table>
 					<colgroup>
 						<col style="width: 13%">
@@ -692,7 +844,7 @@
 
 			<!-- 우 -->
 			<div style="float: left; width: 50%;">
-
+				<p class="tit">주별 자료 확정</p>
 
 				<table>
 					<colgroup>

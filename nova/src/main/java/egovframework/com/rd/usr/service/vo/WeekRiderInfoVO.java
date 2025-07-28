@@ -39,6 +39,8 @@ public class WeekRiderInfoVO extends Sch implements Serializable {
 	private String weekId;
 	/** no */
 	private String no;
+	/** COOPERATOR_ID */
+	private String cooperatorId;
 	/** User ID */
 	private String mberId;
 	/** 라이더명 */

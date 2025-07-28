@@ -300,6 +300,7 @@ function gridValidPhoneNumber(params){
  */
 function gridPercent(params) {
 
+
 	var inputDate = params.newValue.toString();
 
 
@@ -318,7 +319,8 @@ function gridPercent(params) {
 		alert("소수점 이하 3자리까지만 허용됩니다");
         return params.oldValue;
 	}
-	if(arrInputData[0] != undefined && arrInputData[0].length > 2){
+	debugger;
+	if(arrInputData[0] != undefined && arrInputData[0].length > 2 && Number(arrInputData[0], 10) > 100){
 		alert("100%이상은 적용할 수 없습니다");
         return params.oldValue;
 	}
