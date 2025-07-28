@@ -423,7 +423,7 @@
 
 	<select id="selectPixWeek" parameterType="egovframework.com.rd.usr.service.vo.WeekInfoVO" resultType="egovframework.com.rd.usr.service.vo.WeekPayVO">
 		SELECT a.WEEK_ID, a.COOPERATOR_ID, b.MBER_ID, 'WEK' AS DW_GUBUN, '1' AS IO_GUBUN, b.GIVE_PAY
-		,b.GIVE_PAY - d.CALL_FEE_COST AS ABLE_PRICE, d.CALL_FEE_COST
+		,b.GIVE_PAY - d.CALL_FEE_COST - d.PROGRAM_FEE_COST AS ABLE_PRICE, d.CALL_FEE_COST, d.PROGRAM_FEE_COST
 		, 0 AS FEE, a.ACCOUNTS_ST_DT, a.ACCOUNTS_ED_DT, a.ATCH_FILE_ID, 'Y' AS USE_AT
 		FROM RD_WEEK_INFO a
 			LEFT JOIN RD_WEEK_RIDER_INFO b on a.WEEK_ID = b.week_id
@@ -433,6 +433,7 @@
 				<![CDATA[
 				, SUM(nvl(if(wi.accounts_st_dt <= a.DAY AND wi.accounts_ed_dt >= a.DAY, b.COST, 0), 0))
 					+ SUM(nvl(if(wi.accounts_st_dt <= a.DAY AND wi.accounts_ed_dt >= a.DAY, c.COST, 0), 0)) CALL_FEE_COST
+				, SUM(nvl(if(wi.accounts_st_dt <= a.DAY AND wi.accounts_ed_dt >= a.DAY, e.COST, 0), 0)) PROGRAM_FEE_COST
 				]]>
 				, a.DAY, wi.accounts_st_dt, wi.accounts_ed_dt
 					, d.MBER_NM
@@ -441,6 +442,7 @@
 					LEFT JOIN RD_DAY_PAY a ON wi.COOPERATOR_ID = a.COOPERATOR_ID AND wr.MBER_ID = a.mber_id AND a.use_at = 'Y' AND IO_GUBUN= '1' AND a.WEEK_YN = 'N'
 					LEFT JOIN RD_PROFIT b ON a.COOPERATOR_ID = b.COOPERATOR_ID AND a.mber_id = b.MBER_ID AND b.gubun ='C' AND a.DYP_ID = b.DYP_ID
 					LEFT JOIN RD_COOPERATOR_PROFIT c ON a.COOPERATOR_ID = c.COOPERATOR_ID AND a.mber_id = c.MBER_ID AND c.gubun ='C' AND a.DYP_ID = c.DYP_ID
+					LEFT JOIN RD_PROFIT e ON a.COOPERATOR_ID = e.COOPERATOR_ID AND a.mber_id = e.MBER_ID AND e.gubun ='P' AND a.DYP_ID = e.DYP_ID
 					LEFT JOIN COMTNGNRLMBER d ON wr.mber_id = d.mber_id
 						WHERE 1=1
 							AND wr.FIX_DAY is null
@@ -514,15 +516,15 @@
 	<select id="selectFixDay" parameterType="egovframework.com.rd.usr.service.vo.DayPayVO" resultType="egovframework.com.rd.usr.service.vo.DayPayVO">
 		SELECT tab.*
 		, DELIVERY_PRICE/*배달비*/
-				- DAY_FEE	/*선정산수수료+콜수수료*/
+				- DAY_FEE	/*선정산수수료+콜수수료+프로그램료*/
 				- INSURANCE /*4대보험*/
 					AS ABLE_PRICE
 		FROM(
 			SELECT COOPERATOR_ID, MBER_ID, DAY, '1' AS IO_GUBUN, DELIVERY_PRICE
-			, DELIVERY_PRICE - INSURANCE - FEE_CALL_COST AS 산정대상
-			, CEILING((DELIVERY_PRICE - INSURANCE - FEE_CALL_COST) * FEE_ADMINSTRATOR) + FEE_CALL_COST AS DAY_FEE
+			, DELIVERY_PRICE - INSURANCE - FEE_CALL_COST - FEE_PROGRAM_COST AS 산정대상
+			, CEILING((DELIVERY_PRICE - INSURANCE - FEE_CALL_COST - FEE_PROGRAM_COST) * FEE_ADMINSTRATOR) + FEE_CALL_COST + FEE_PROGRAM_COST AS DAY_FEE
 			, INSURANCE
-			, 'N' AS WEEK_YN, 'Y' AS USE_AT, ATCH_FILE_ID AS DAY_ATCH_FILE_ID, FEE_CALL_COST, DELIVERY_CNT, FEE_ID, RIDER_FEE_ID
+			, 'N' AS WEEK_YN, 'Y' AS USE_AT, ATCH_FILE_ID AS DAY_ATCH_FILE_ID, FEE_CALL_COST, FEE_PROGRAM_COST,DELIVERY_CNT, FEE_ID, RIDER_FEE_ID
 			/*협력사 수익: 콜수수료*/
 			, FLOOR(FEE_CALL_COST*FEE_COOPERATOR_CALL) AS FEE_COOPERATOR_CALL_COST
 			FROM
@@ -535,6 +537,8 @@
 					, CEILING(DELIVERY_PRICE*(FEE_EMPLOYMENT_INSURANCE+FEE_INDUSTRIAL_INSURANCE+FEE_WITHHOLDING_TAX)) + if(DELIVERY_CNT*FEE_TIME_INSURANCE > #{timeInsuranceMaxFee}, #{timeInsuranceMaxFee}, DELIVERY_CNT*FEE_TIME_INSURANCE) AS INSURANCE
 					/* 콜수수료 */
 					, DELIVERY_CNT*FEE_CALL AS FEE_CALL_COST
+					/* 프로그램료 */
+					, DELIVERY_CNT*FEE_PROGRAM AS FEE_PROGRAM_COST
 				FROM (
 					SELECT nvl(b.FEE_ADMINSTRATOR*0.01, 0) AS FEE_ADMINSTRATOR /* 선지급수수료(%) */
 					, nvl(nvl(c.FEE_EMPLOYMENT_INSURANCE, b.FEE_EMPLOYMENT_INSURANCE)*0.01, 0) AS FEE_EMPLOYMENT_INSURANCE/* 고용보험(%) */
@@ -542,6 +546,7 @@
 					, nvl(nvl(c.FEE_WITHHOLDING_TAX, b.FEE_WITHHOLDING_TAX)*0.01, 0) AS FEE_WITHHOLDING_TAX/* 원천세(%) */
 					, nvl(nvl(c.FEE_TIME_INSURANCE, b.FEE_TIME_INSURANCE), 0) AS FEE_TIME_INSURANCE/* 시간제보험(원 최대7,000) */
 					, nvl(nvl(c.FEE_CALL, b.FEE_CALL), 0) AS FEE_CALL/* 건당 콜수수료(원) */
+					, nvl(b.FEE_PROGRAM, 0) AS FEE_PROGRAM /* 프로그램료(원) */
 					, a.COOPERATOR_ID, a.MBER_ID,a.RUN_DE AS DAY, SUM(a.DELIVERY_PRICE) AS DELIVERY_PRICE, SUM(if(a.DELIVERY_STATE = TRIM('전달완료'), 1, 0)) DELIVERY_CNT
 					, b.FEE_ID, c.RIDER_FEE_ID, b.FEE_COOPERATOR_CALL*0.01 AS FEE_COOPERATOR_CALL
 					, a.ATCH_FILE_ID

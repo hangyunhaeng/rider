@@ -87,46 +87,69 @@
 		{ headerName: "소속<br/>라이더", field: "rdcnt", minWidth: 80, cellClass: 'ag-cell-right'},
 		{ headerName: "출금가능금액", field: "xxx", minWidth: 90, cellClass: 'ag-cell-right'},
 		{ headerName: "feeId", field: "feeId", minWidth: 90, hide:true},
-		{ headerName: "선지급수수료(%)", field: "feeAdminstrator", minWidth: 90, editable: (params) => {return ('${loginVO.authorCode}' =='ROLE_ADMIN')? true: false}
-			, cellClass: (params) => {return agGrideditClass(params, "ag-cell-right");}
-			, valueGetter:(params) => { return currencyFormatter(params.data.feeAdminstrator);}
-            , valueParser: (params) => { return gridPercent(params);}
+		{
+		    headerName: '선지급수수료',
+		    children: [
+				{ headerName: "전체(%)", field: "feeAdminstrator", minWidth: 90, editable: (params) => {return ('${loginVO.authorCode}' =='ROLE_ADMIN')? true: false}
+					, cellClass: (params) => {return agGrideditClass(params, "ag-cell-right");}
+					, valueGetter:(params) => { return currencyFormatter(params.data.feeAdminstrator);}
+		            , valueParser: (params) => { return gridPercent(params);}
+				},
+
+				{ headerName: "협력사(%)", field: "feeCooperator", minWidth: 90, editable: (params) => {return ('${loginVO.authorCode}' =='ROLE_ADMIN')? true: false}
+					, cellClass: (params) => {return agGrideditClass(params, "ag-cell-right");}
+					, valueGetter:(params) => { return currencyFormatter(params.data.feeCooperator);}
+		            , valueParser: (params) => { return gridPercent(params);}
+				}
+		    ]
 		},
-		{ headerName: "협력사<br/>선지급수수료(%)", field: "feeCooperator", minWidth: 90, editable: (params) => {return ('${loginVO.authorCode}' =='ROLE_ADMIN')? true: false}
-			, cellClass: (params) => {return agGrideditClass(params, "ag-cell-right");}
-			, valueGetter:(params) => { return currencyFormatter(params.data.feeCooperator);}
-            , valueParser: (params) => { return gridPercent(params);}
+		{
+		    headerName: '보험,세금',
+		    children: [
+				{ headerName: "고용(%)", field: "feeEmploymentInsurance", minWidth: 90, editable: true
+					, cellClass: (params) => {return agGrideditClass(params, "ag-cell-right");}
+					, valueGetter:(params) => { return currencyFormatter(params.data.feeEmploymentInsurance);}
+		            , valueParser: (params) => { return gridPercent(params);}
+				},
+				{ headerName: "산재(%)", field: "feeIndustrialInsurance", minWidth: 90, editable: true
+					, cellClass: (params) => {return agGrideditClass(params, "ag-cell-right");}
+					, valueGetter:(params) => { return currencyFormatter(params.data.feeIndustrialInsurance);}
+		            , valueParser: (params) => { return gridPercent(params);}
+				},
+				{ headerName: "원천세(%)", field: "feeWithholdingTax", minWidth: 90, editable: true
+					, cellClass: (params) => {return agGrideditClass(params, "ag-cell-right");}
+					, valueGetter:(params) => { return currencyFormatter(params.data.feeWithholdingTax);}
+		            , valueParser: (params) => { return gridPercent(params);}
+				},
+				{ headerName: "시간제(원)", field: "feeTimeInsurance", minWidth: 90, editable: true
+					, cellClass: (params) => {return agGrideditClass(params, "ag-cell-right");}
+					, valueGetter:(params) => { return currencyFormatter(params.data.feeTimeInsurance);}
+		            , valueParser: (params) => { return gridWan(params);}
+				}
+			]
 		},
-		{ headerName: "고용보험(%)", field: "feeEmploymentInsurance", minWidth: 90, editable: true
-			, cellClass: (params) => {return agGrideditClass(params, "ag-cell-right");}
-			, valueGetter:(params) => { return currencyFormatter(params.data.feeEmploymentInsurance);}
-            , valueParser: (params) => { return gridPercent(params);}
+		{
+		    headerName: '콜수수료',
+		    children: [
+				{ headerName: "전체(원)", field: "feeCall", minWidth: 90, editable: true
+					, cellClass: (params) => {return agGrideditClass(params, "ag-cell-right");}
+					, valueGetter:(params) => { return currencyFormatter(params.data.feeCall);}
+		            , valueParser: (params) => { return gridWan(params);}
+				},
+				{ headerName: "협력사(%)", field: "feeCooperatorCall", minWidth: 90, editable: (params) => {return ('${loginVO.authorCode}' =='ROLE_ADMIN')? true: false}
+					, cellClass: (params) => {return agGrideditClass(params, "ag-cell-right");}
+					, valueGetter:(params) => { return currencyFormatter(params.data.feeCooperatorCall);}
+		            , valueParser: (params) => { return gridPercent(params);}
+				}
+			]
 		},
-		{ headerName: "산재보험(%)", field: "feeIndustrialInsurance", minWidth: 90, editable: true
+
+		{ headerName: "프로그램료(원)", field: "feeProgram", minWidth: 90, editable: (params) => {return ('${loginVO.authorCode}' =='ROLE_ADMIN')? true: false}
 			, cellClass: (params) => {return agGrideditClass(params, "ag-cell-right");}
-			, valueGetter:(params) => { return currencyFormatter(params.data.feeIndustrialInsurance);}
-            , valueParser: (params) => { return gridPercent(params);}
-		},
-		{ headerName: "원천세(%)", field: "feeWithholdingTax", minWidth: 90, editable: true
-			, cellClass: (params) => {return agGrideditClass(params, "ag-cell-right");}
-			, valueGetter:(params) => { return currencyFormatter(params.data.feeWithholdingTax);}
-            , valueParser: (params) => { return gridPercent(params);}
-		},
-		{ headerName: "시간제보험(원)", field: "feeTimeInsurance", minWidth: 90, editable: true
-			, cellClass: (params) => {return agGrideditClass(params, "ag-cell-right");}
-			, valueGetter:(params) => { return currencyFormatter(params.data.feeTimeInsurance);}
+			, valueGetter:(params) => { return currencyFormatter(params.data.feeProgram);}
             , valueParser: (params) => { return gridWan(params);}
 		},
-		{ headerName: "콜수수료(원)", field: "feeCall", minWidth: 90, editable: true
-			, cellClass: (params) => {return agGrideditClass(params, "ag-cell-right");}
-			, valueGetter:(params) => { return currencyFormatter(params.data.feeCall);}
-            , valueParser: (params) => { return gridWan(params);}
-		},
-		{ headerName: "협력사<br/>콜수수료(%)", field: "feeCooperatorCall", minWidth: 90, editable: (params) => {return ('${loginVO.authorCode}' =='ROLE_ADMIN')? true: false}
-			, cellClass: (params) => {return agGrideditClass(params, "ag-cell-right");}
-			, valueGetter:(params) => { return currencyFormatter(params.data.feeCooperatorCall);}
-            , valueParser: (params) => { return gridPercent(params);}
-		},
+
 		{ headerName: "사용여부", field: "useAt", minWidth: 90, editable: (params) => {return ('${loginVO.authorCode}' == 'ROLE_ADMIN')? true: false}
 		, valueGetter:(params) => { return (params.node.data.useAt=='Y')?"사용": "미사용"}
 		, cellEditor: 'agSelectCellEditor'

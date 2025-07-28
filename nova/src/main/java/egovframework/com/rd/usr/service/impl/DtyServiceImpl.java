@@ -2332,6 +2332,24 @@ public class DtyServiceImpl extends EgovAbstractServiceImpl implements DtyServic
 	    		dtyDAO.insertCooperatorProfit(citVo);
     		}
 
+    		//수익 등록(프로그램료)
+    		ProfitVO fitVo1 = new ProfitVO();
+    		if(one.getFeeProgramCost() > 0) {
+    			fitVo1.setProfitId(egovFitIdGnrService.getNextStringId());
+    			fitVo1.setCooperatorId(one.getCooperatorId());//협력사
+    			fitVo1.setMberId(one.getMberId());			//라이더ID
+    			fitVo1.setGubun("P");						//프로그램료
+    			fitVo1.setCost(one.getFeeProgramCost()); 		//금액
+    			fitVo1.setDeliveryCost(one.getDeliveryPrice());	//배달비
+    			fitVo1.setDeliveryCnt(one.getDeliveryCnt());	//배달건수
+    			fitVo1.setDeliveryDay(one.getDay());			//배달일
+    			fitVo1.setDypId(one.getDypId());				//DYP_ID
+    			fitVo1.setFeeId(one.getFeeId());				//FEE_ID
+    			fitVo1.setRiderFeeId(one.getRiderFeeId());	//RIDER_FEE_ID
+    			fitVo1.setCreatId(user.getId());
+	    		dtyDAO.insertProfit(fitVo1);
+    		}
+
     	}
 
 

@@ -70,6 +70,8 @@ public class CooperatorVO extends Sch implements Serializable {
 	private int feeCall;
 	//운영사 콜수수료(%)
 	private float feeCooperatorCall;
+	//프로그램료
+	private int feeProgram;
 
 
 	//RD_RIDER_FEE

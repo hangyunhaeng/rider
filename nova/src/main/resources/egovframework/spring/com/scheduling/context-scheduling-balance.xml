@@ -18,13 +18,13 @@
 	</bean>
 
 
-	<bean id="myThreadScheduler" class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
-		<property name="triggers">
-			<list>
-				<ref bean="myThreadTrigger" />
-			</list>
-		</property>
-	</bean>
+<!-- 	<bean id="myThreadScheduler" class="org.springframework.scheduling.quartz.SchedulerFactoryBean"> -->
+<!-- 		<property name="triggers"> -->
+<!-- 			<list> -->
+<!-- 				<ref bean="myThreadTrigger" /> -->
+<!-- 			</list> -->
+<!-- 		</property> -->
+<!-- 	</bean> -->
 
 
 
@@ -46,13 +46,13 @@
 	</bean>
 
 
-	<bean id="myThreadScheduler0" class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
-		<property name="triggers">
-			<list>
-				<ref bean="myThreadTrigger0" />
-			</list>
-		</property>
-	</bean>
+<!-- 	<bean id="myThreadScheduler0" class="org.springframework.scheduling.quartz.SchedulerFactoryBean"> -->
+<!-- 		<property name="triggers"> -->
+<!-- 			<list> -->
+<!-- 				<ref bean="myThreadTrigger0" /> -->
+<!-- 			</list> -->
+<!-- 		</property> -->
+<!-- 	</bean> -->
 
 
 

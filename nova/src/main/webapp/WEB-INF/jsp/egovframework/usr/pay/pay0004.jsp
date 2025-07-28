@@ -565,6 +565,8 @@
 					for (let colDef of imsiColumnDefs) {
 						if (colDef.field == "feeCall" || colDef.field == "feeCooperatorCall") {
 							colDef.cellClass = "edited-bg";
+						} else {
+							colDef.cellClass = "";
 						}
 					}
 	                grid2.setGridOption("columnDefs", imsiColumnDefs);
@@ -574,7 +576,8 @@
 					for (let colDef of imsiColumnDefs1) {
 						if (colDef.field == "feeCall") {
 							colDef.cellClass = "edited-bg";
-							break;
+						} else {
+							colDef.cellClass = "";
 						}
 					}
 	                grid3.setGridOption("columnDefs", imsiColumnDefs1);
@@ -589,6 +592,8 @@
 					for (let colDef of imsiColumnDefs) {
 						if (colDef.field == "feeAdminstrator" || colDef.field == "feeCooperator") {
 							colDef.cellClass = "edited-bg";
+						} else {
+							colDef.cellClass = "";
 						}
 					}
 	                grid2.setGridOption("columnDefs", imsiColumnDefs);

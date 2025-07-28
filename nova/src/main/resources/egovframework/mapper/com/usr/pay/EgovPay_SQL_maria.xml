@@ -187,7 +187,7 @@
 		SELECT a.PROFIT_ID, a.COOPERATOR_ID, a.MBER_ID, a.GUBUN, a.COST, a.DELIVERY_COST, a.DELIVERY_CNT, a.DELIVERY_DAY, a.DYP_ID, a.WKP_ID, a.FEE_ID, a.RIDER_FEE_ID
 		, DATE_FORMAT(a.CREAT_DT, '%Y%m%d') AS CREAT_DT, a.CREAT_ID
 		, b.MBER_NM, c.COOPERATOR_NM
-		, case when a.gubun = 'C' then '콜수수료' when a.gubun ='E' then '기타수수료' when a.gubun ='D' then '선지급수수료' ELSE '' END GUBUN_NM
+		, case when a.gubun = 'C' then '콜수수료' when a.gubun ='E' then '기타수수료' when a.gubun ='D' then '선지급수수료' when a.gubun ='P' then '프로그램료' ELSE '' END GUBUN_NM
 		FROM RD_PROFIT a
 		LEFT JOIN COMTNGNRLMBER b ON a.mber_id = b.mber_id
 		LEFT JOIN RD_COOPERATOR c ON a.cooperator_id = c.COOPERATOR_ID
@@ -339,7 +339,7 @@
 
 	<select id="selectProfitFeeCoop" parameterType="egovframework.com.rd.usr.service.vo.ProfitVO"  resultType="egovframework.com.rd.usr.service.vo.CooperatorVO">
 		SELECT a.COOPERATOR_ID, COOPERATOR_NM, REGISTRATION_SN, COMPANY_NM, REGISTRATION_NM, CEO_NM, a.USE_AT, DATE_FORMAT(b.CREAT_DT, '%Y%m%d') AS CREAT_DT, a.CREAT_ID, 'R' GUBUN
-		, cp.FEE_ID, FEE_ADMINSTRATOR, FEE_COOPERATOR, FEE_EMPLOYMENT_INSURANCE, FEE_INDUSTRIAL_INSURANCE, FEE_WITHHOLDING_TAX, FEE_TIME_INSURANCE, FEE_CALL, FEE_COOPERATOR_CALL
+		, cp.FEE_ID, FEE_ADMINSTRATOR, FEE_COOPERATOR, FEE_EMPLOYMENT_INSURANCE, FEE_INDUSTRIAL_INSURANCE, FEE_WITHHOLDING_TAX, FEE_TIME_INSURANCE, FEE_CALL, FEE_COOPERATOR_CALL, FEE_PROGRAM
 		FROM RD_PROFIT cp
 		left join RD_COOPERATOR a ON cp.COOPERATOR_ID = a.COOPERATOR_ID
 		LEFT JOIN RD_COOPERATOR_FEE b ON cp.fee_id = b.fee_id
@@ -365,8 +365,8 @@
 	</select>
 	<select id="selectProfitBase" parameterType="egovframework.com.rd.usr.service.vo.ProfitVO" resultType="egovframework.com.rd.usr.service.vo.ProfitVO">
 		SELECT a.GUBUN
-		, case when a.gubun = 'C' then '콜수수료' when a.gubun ='E' then '기타수수료' when a.gubun ='D' then '선지급수수료' ELSE '' END GUBUN_NM
-		, case when a.GUBUN = 'C' then a.DELIVERY_COST when a.GUBUN = 'D' then b.SEND_PRICE ELSE 0 END cost
+		, case when a.gubun = 'C' then '콜수수료' when a.gubun ='E' then '기타수수료' when a.gubun ='D' then '선지급수수료' when a.gubun ='P' then '프로그램료' ELSE '' END GUBUN_NM
+		, case when a.GUBUN = 'C' or a.GUBUN = 'P' then a.DELIVERY_COST when a.GUBUN = 'D' then b.SEND_PRICE ELSE 0 END cost
 		, a.DELIVERY_CNT, a.DELIVERY_DAY
 		FROM RD_PROFIT a
 		LEFT JOIN RD_DAY_PAY b ON a.DYP_ID = b.DYP_ID
@@ -377,7 +377,7 @@
 
 	<select id="selectCoopProfitFeeCoop" parameterType="egovframework.com.rd.usr.service.vo.ProfitVO"  resultType="egovframework.com.rd.usr.service.vo.CooperatorVO">
 		SELECT a.COOPERATOR_ID, COOPERATOR_NM, REGISTRATION_SN, COMPANY_NM, REGISTRATION_NM, CEO_NM, a.USE_AT, DATE_FORMAT(b.CREAT_DT, '%Y%m%d') AS CREAT_DT, a.CREAT_ID, 'R' GUBUN
-		, cp.FEE_ID, FEE_ADMINSTRATOR, FEE_COOPERATOR, FEE_EMPLOYMENT_INSURANCE, FEE_INDUSTRIAL_INSURANCE, FEE_WITHHOLDING_TAX, FEE_TIME_INSURANCE, FEE_CALL, FEE_COOPERATOR_CALL
+		, cp.FEE_ID, FEE_ADMINSTRATOR, FEE_COOPERATOR, FEE_EMPLOYMENT_INSURANCE, FEE_INDUSTRIAL_INSURANCE, FEE_WITHHOLDING_TAX, FEE_TIME_INSURANCE, FEE_CALL, FEE_COOPERATOR_CALL, FEE_PROGRAM
 		FROM RD_COOPERATOR_PROFIT cp
 		left join RD_COOPERATOR a ON cp.COOPERATOR_ID = a.COOPERATOR_ID
 		LEFT JOIN RD_COOPERATOR_FEE b ON cp.fee_id = b.fee_id
