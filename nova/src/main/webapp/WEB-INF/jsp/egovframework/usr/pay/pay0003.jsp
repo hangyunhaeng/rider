@@ -704,7 +704,7 @@
 							<select id="searchGubun" name='searchGubun' style='width: 100%'>
 								<option value="all">전체</option>
 								<option value="C">콜수수료</option>
-								<option value="D">선출금수수료</option>
+								<option value="D">선지급수수료</option>
 								<option value="P">프로그램료</option>
 							</select>
 						</td>
