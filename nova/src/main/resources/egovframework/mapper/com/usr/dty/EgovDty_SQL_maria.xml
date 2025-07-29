@@ -949,6 +949,24 @@
 	</update>
 
 	<select id="selectForUPdateBalanceByParam" parameterType="egovframework.com.rd.usr.service.vo.BalanceVO" resultType="egovframework.com.rd.usr.service.vo.BalanceVO">
+
+			SELECT *
+			FROM RD_BALNCE
+			WHERE (COOPERATOR_ID, MBER_ID) IN
+					SELECT a.COOPERATOR_ID, a.mber_id
+					FROM RD_DELIVERY_INFO a
+					LEFT JOIN RD_COOPERATOR_FEE b ON a.COOPERATOR_ID = b.COOPERATOR_ID AND b.use_at ='Y'
+					LEFT JOIN RD_RIDER_FEE c ON a.COOPERATOR_ID = c.COOPERATOR_ID  AND a.MBER_ID = c.MBER_ID AND  c.use_at ='Y'
+					LEFT JOIN COMTNGNRLMBER d ON a.mber_id = d.mber_id
+					WHERE 1 = 1
+						AND a.RUN_DE BETWEEN #{searchFromDate} AND #{searchToDate}
+
+						AND d.MBER_NM like '%' #{searchNm} '%'
+
+						AND a.FIX_DAY is null	/* 확정은 미확정 데이터를 대상으로만 한다 */
+					GROUP BY a.COOPERATOR_ID, a.MBER_ID
+			)
+			FOR UPDATE
 	</select>
 
 </mapper>
