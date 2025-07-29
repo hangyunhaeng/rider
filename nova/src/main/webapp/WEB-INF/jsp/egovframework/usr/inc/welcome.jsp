@@ -1,7 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
-
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
 
 
 <main class="main" style="height: 60px;">
@@ -14,7 +14,7 @@
 				data-aos="fade-in">
 			<div class="container-fluid container-xl position-relative d-flex align-items-center">
 				<div class="d-flex align-items-center me-auto"></div>
-		 		<sm class="btn-getstarted">${loginVO.name}<c:if test="${loginVO.authorCode eq 'ROLE_ADMIN'}">(운영사)</c:if>님 환영합니다</sm>
+		 		<sm class="btn-getstarted">${loginVO.name}<c:if test="${loginVO.authorCode eq 'ROLE_ADMIN'}">(운영사1)</c:if>님 환영합니다</sm>
 		 	</div>
 		</section>
 	</main>
