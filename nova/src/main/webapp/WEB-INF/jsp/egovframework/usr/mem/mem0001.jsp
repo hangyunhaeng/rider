@@ -560,7 +560,7 @@
 
 <!-- 			<div style="float: left; width: 49%; margin-right: 1%"> -->
 				<div style="height: 0px;">
-					<span class="pagetotal" style='margin-right: 20px;'>협력사 : 미사용으로 변경시 하위 모든 라이더 출금이 막힘(%는 소수점 이하 3자리)</span>
+					<span class="pagetotal" style='margin-right: 20px;'>협력사 : 미사용으로 변경시 하위 모든 라이더 출금이 막힘(%는 소수점 이하 3자리). 시간제(원), 콜수수료, 프로그램료는 콜당 부과되는 금앱입니다.</span>
 					<div class="btnwrap">
 						<button id="협력사추가버튼" class="btn btn-primary" style='display:none;'>추가</button>
 						<button id="협력사삭제버튼" class="btn btn-primary" style="display:none;">삭제</button>
