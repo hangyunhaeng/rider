@@ -247,19 +247,19 @@ function chkWan(str) {
 
     return true;
 }
-
 /**
  * 그리드 - 사업자번호
  */
 function gridRegistrationSn(params){
-    if (new RegExp(/[^0-9+-]/).test(params.newValue)) {
+/*    if (new RegExp(/[^0-9+-]/).test(params.newValue)) {
         alert('숫자만 입력하세요');
         return params.oldValue;
-    }
+    }*/
 
-    var regex = /[^0-9]/g;
-    if(params.newValue.replace(regex, "").length != 10){
-		alert('사업자번호는 총 10자리 입니다.');
+//    var regex = /[^0-9]/g;
+//    if(params.newValue.replace(regex, "").length != 10){
+	if(params.newValue.length != 10){
+		alert('식별번호는 총 10자리 입니다.');
 		//return params.newValue.replace(regex, "").substring(0, 10);
 		return params.oldValue;
 	}

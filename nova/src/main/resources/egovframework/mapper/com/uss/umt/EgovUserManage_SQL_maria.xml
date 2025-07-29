@@ -226,7 +226,7 @@ FROM(
                 PASSWORD_HINT       = #{passwordHint}    ,
                 PASSWORD_CNSR       = #{passwordCnsr}    ,
                 EMPL_NO             = #{emplNo}          ,
-                IHIDNUM             = REGEXP_REPLACE(#{ihidnum}, '[^0-9]+', '')         ,
+                IHIDNUM             = #{ihidnum}  ,
                 SEXDSTN_CODE        = #{sexdstnCode}     ,
                 BRTHDY                = #{brth}            ,
                 AREA_NO             = #{areaNo}          ,

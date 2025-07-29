@@ -305,49 +305,49 @@ public class MemServiceImpl extends EgovAbstractServiceImpl implements MemServic
             searchVO.setSearchKeyword(vo.getMberId());
             MberManageVO userOne = mberManageDAO.selectUserListRider(searchVO);
         	if( userOne != null ) {
-/*        		//핸드폰번호 최초등록 시
-        		if(Util.isEmpty(userOne.getMbtlnum())) {
+        		//핸드폰번호 최초등록 시
+//        		if(Util.isEmpty(userOne.getMbtlnum())) {
+//
+//        			//1. 임시패스워드와 MBER_CONFIRM_AT를 N로 설정
+//        			MberManageVO mberManageVO = new MberManageVO();
+//        		    mberManageVO.setUniqId(userOne.getUniqId());
+//        	        mberManageVO.setPassword(EgovFileScrty.encryptPassword("Daon2025!", EgovStringUtil.isNullToString(userOne.getMberId())));
+//        	        mberManageVO.setMberConfirmAt("N");
+//        	        mberManageService.updatePasswordSelf(mberManageVO);
+//
+//        	        //2. 알림톡 토큰 가져오기
+//        	        String responseData = dtyService.getMsgTocken();
+//        	        LOGGER.debug("responseData1 : "+responseData);
+//
+//
+//        	        if(!Util.isEmpty(responseData)) {
+//        		        JSONParser jsonParse = new JSONParser();
+//        		        JSONObject jsonObj = (JSONObject) jsonParse.parse(responseData);
+//        		        if("200".equals(jsonObj.get("code")) ) {
+//	        		        JSONObject data = (JSONObject) jsonObj.get("data");
+//	        		        DoznTokenVO doznTokenVO = new DoznTokenVO();
+//	        		        doznTokenVO.setSendAccessToken(data.get("sendAccessToken").toString());
+//	        		        doznTokenVO.setSendRefreshToken(data.get("sendRefreshToken").toString());
+//
+//	            	        //3. 성공시 메세지 발송
+//	        		        String sendData = dtyService.doznHttpRequestMsg("임시", data.get("sendAccessToken").toString(), data.get("sendRefreshToken").toString());
+//
+//	            	        if(!Util.isEmpty(sendData)) {
+//	            		        JSONParser jsonParse1 = new JSONParser();
+//	            		        JSONObject jsonObj1 = (JSONObject) jsonParse1.parse(sendData);
+//	            		        if("200".equals(jsonObj1.get("code")) ) {
+//
+//	            		        	JSONObject dataMsg = (JSONObject) jsonObj1.get("data");
+//	            		        	String reportData = dtyService.doznHttpRequestReport("임시", data.get("sendAccessToken").toString(), data.get("sendRefreshToken").toString(), dataMsg.get("referenceKey").toString());
+//	            		        }
+//	            	        }
+//
+//        		        }
+//
+//        	        }
+//
+//        		}
 
-        			//1. 임시패스워드와 MBER_CONFIRM_AT를 N로 설정
-        			MberManageVO mberManageVO = new MberManageVO();
-        		    mberManageVO.setUniqId(userOne.getUniqId());
-        	        mberManageVO.setPassword(EgovFileScrty.encryptPassword("Daon2025!", EgovStringUtil.isNullToString(userOne.getMberId())));
-        	        mberManageVO.setMberConfirmAt("N");
-        	        mberManageService.updatePasswordSelf(mberManageVO);
-
-        	        //2. 알림톡 토큰 가져오기
-        	        String responseData = dtyService.getMsgTocken();
-        	        LOGGER.debug("responseData1 : "+responseData);
-
-
-        	        if(!Util.isEmpty(responseData)) {
-        		        JSONParser jsonParse = new JSONParser();
-        		        JSONObject jsonObj = (JSONObject) jsonParse.parse(responseData);
-        		        if("200".equals(jsonObj.get("code")) ) {
-	        		        JSONObject data = (JSONObject) jsonObj.get("data");
-	        		        DoznTokenVO doznTokenVO = new DoznTokenVO();
-	        		        doznTokenVO.setSendAccessToken(data.get("sendAccessToken").toString());
-	        		        doznTokenVO.setSendRefreshToken(data.get("sendRefreshToken").toString());
-
-	            	        //3. 성공시 메세지 발송
-	        		        String sendData = dtyService.doznHttpRequestMsg("임시", data.get("sendAccessToken").toString(), data.get("sendRefreshToken").toString());
-
-	            	        if(!Util.isEmpty(sendData)) {
-	            		        JSONParser jsonParse1 = new JSONParser();
-	            		        JSONObject jsonObj1 = (JSONObject) jsonParse1.parse(sendData);
-	            		        if("200".equals(jsonObj1.get("code")) ) {
-
-	            		        	JSONObject dataMsg = (JSONObject) jsonObj1.get("data");
-	            		        	String reportData = dtyService.doznHttpRequestReport("임시", data.get("sendAccessToken").toString(), data.get("sendRefreshToken").toString(), dataMsg.get("referenceKey").toString());
-	            		        }
-	            	        }
-
-        		        }
-
-        	        }
-
-        		}
-*/
         		userOne.setMberNm(vo.getMberNm());
         		userOne.setMoblphonNo(vo.getMbtlnum());
         		mberManageDAO.updateMber(userOne);

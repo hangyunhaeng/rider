@@ -38,7 +38,6 @@ public class BalanceServiceImpl extends EgovAbstractServiceImpl implements Balan
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(BalanceServiceImpl.class);
 
-	@Transactional
 	public int transactionBalance(BalanceVO vo) throws Exception {
 		balanceDAO.selectBalanceForUpdate(vo);
 		return balanceDAO.updateBalance(vo);

@@ -170,8 +170,8 @@
 
 	//내역 조회
 	function doSearch(){
-		if($('#searchRegistrationSn').val().trim() != '' && getOnlyNumber($('#searchRegistrationSn').val().trim()).length != 10){
-			alert("사업자번호는 10자리입니다");
+		if($('#searchRegistrationSn').val().trim() != '' && $('#searchRegistrationSn').val().trim().length != 10){
+			alert("식별번호는 10자리입니다");
 			$('#searchRegistrationSn').focus()
 			return ;
 		}
@@ -181,7 +181,7 @@
 		params.append('searchFromDate', getOnlyNumber($('#searchFromDate').val()));
 		params.append('searchToDate', getOnlyNumber($('#searchToDate').val()));
 		params.append('searchNm', $('#searchNm').val().trim());
-		params.append('searchRegistrationSn', getOnlyNumber($('#searchRegistrationSn').val().trim()));
+		params.append('searchRegistrationSn', $('#searchRegistrationSn').val().trim());
 		params.append('searchGubun', $('#searchGubun').val());
 
 		// 로딩 시작
@@ -410,9 +410,10 @@
 								<input id="searchToDate" class="form-control search fs-9 float-start w40p" type="date" placeholder="Search" aria-label="Search" _mstplaceholder="181961" _mstaria-label="74607">
 							</div>
 						</td>
-						<th>사업자번호</th>
+						<th>식별번호</th>
 						<td>
-							<input id="searchRegistrationSn" type="text" oninput="this.value = this.value.replace(/[^0-9-]/g, '').replace(/(\..*)\./g, '$1');">
+<!-- 							<input id="searchRegistrationSn" type="text" oninput="this.value = this.value.replace(/[^0-9-]/g, '').replace(/(\..*)\./g, '$1');"> -->
+							<input id="searchRegistrationSn" type="text">
 						</td>
 					</tr>
 					<tr>

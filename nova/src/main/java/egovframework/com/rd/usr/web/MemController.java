@@ -666,6 +666,8 @@ public class MemController {
 
 	        CooperatorVO vo = new CooperatorVO();
 	        vo.setSearchGubun("R");
+	        vo.setSchAuthorCode(user.getAuthorCode());
+	        vo.setSchIhidNum(user.getIhidNum());
 	        map.put("orglist", memService.selectCooperatorListRDCnt(vo));
 	        map.put("resultCode", "success");
         } catch(IllegalArgumentException e) {

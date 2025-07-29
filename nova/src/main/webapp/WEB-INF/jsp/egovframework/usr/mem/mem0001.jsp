@@ -70,7 +70,7 @@
 			, cellClass: (params) => {return agGrideditClass(params)}},
 		{ headerName: "협력사이름", field: "cooperatorNm", minWidth: 120, editable: (params) => {return ('${loginVO.authorCode}' =='ROLE_ADMIN')? true: false}
 			, cellClass: (params) => {return agGrideditClass(params)}},
-		{ headerName: "사업자등록번호", field: "registrationSn", minWidth: 110, editable: (params) => {return ('${loginVO.authorCode}' == 'ROLE_ADMIN')? true: false}
+		{ headerName: "식별번호", field: "registrationSn", minWidth: 110, editable: (params) => {return ('${loginVO.authorCode}' == 'ROLE_ADMIN')? true: false}
             , valueParser: (params) => {
                 return gridRegistrationSn(params);
             }

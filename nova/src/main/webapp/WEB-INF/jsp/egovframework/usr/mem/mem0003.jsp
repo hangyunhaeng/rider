@@ -70,7 +70,7 @@
 		{ headerName: "NO", field: "no", minWidth: 70, valueGetter:(params) => { return params.node.rowIndex + 1} },
 		{ headerName: "crud", field: "crud", minWidth: 90, hide:true},
 		{ headerName: "ID", field: "mberId", minWidth: 90, editable: (params) => {return (params.node.data.crud == 'c')? true: false}, cellClass: (params) => {return agGrideditClass(params)}},
-		{ headerName: "사업자등록번호", field: "ihidnum", minWidth: 110, editable: (params) => {return ('${loginVO.authorCode}' == 'ROLE_ADMIN')? true: false}, cellClass: (params) => {return agGrideditClass(params)}
+		{ headerName: "식별번호", field: "ihidnum", minWidth: 110, editable: (params) => {return ('${loginVO.authorCode}' == 'ROLE_ADMIN')? true: false}, cellClass: (params) => {return agGrideditClass(params)}
             , valueParser: (params) => {
                 return gridRegistrationSn(params);
             }
@@ -91,7 +91,7 @@
 		{ headerName: "crud", field: "crud", minWidth: 90, hide:true},
 		{ headerName: "협력사아이디", field: "cooperatorId", minWidth: 120},
 		{ headerName: "협력사이름", field: "cooperatorNm", minWidth: 90},
-		{ headerName: "사업자등록번호", field: "registrationSn", minWidth: 90},
+		{ headerName: "식별번호", field: "registrationSn", minWidth: 90},
 		{ headerName: "상호", field: "companyNm", minWidth: 90},
 		{ headerName: "사업자이름", field: "registrationNm", minWidth: 90, cellClass: 'ag-cell-left'},
 		{ headerName: "대표자명", field: "ceoNm", minWidth: 90},

@@ -101,13 +101,13 @@
 		INSERT INTO RD_COOPERATOR
 		    (COOPERATOR_ID,COOPERATOR_NM, REGISTRATION_SN, COMPANY_NM, REGISTRATION_NM, CEO_NM, USE_AT, CREAT_DT, CREAT_ID)
 		VALUES
-		   (#{cooperatorId},#{cooperatorNm}, REGEXP_REPLACE(#{registrationSn}, '[^0-9]+', ''), #{companyNm}, #{registrationNm}, #{ceoNm}, #{useAt},SYSDATE(),#{creatId})
+		   (#{cooperatorId},#{cooperatorNm}, #{registrationSn}, #{companyNm}, #{registrationNm}, #{ceoNm}, #{useAt},SYSDATE(),#{creatId})
 	</insert>
 	<update id="updateCooperator" parameterType="egovframework.com.rd.usr.service.vo.CooperatorVO">
 		UPDATE RD_COOPERATOR
 		SET
 		COOPERATOR_NM = #{cooperatorNm}
-		, REGISTRATION_SN=REGEXP_REPLACE(#{registrationSn}, '[^0-9]+', '')
+		, REGISTRATION_SN=#{registrationSn}
 		, COMPANY_NM=#{companyNm}
 		<if test="schAuthorCode == 'ROLE_ADMIN'">
 		/* 총판만 사업자번호 변경이 가능 */
@@ -127,7 +127,7 @@
 		INSERT INTO RD_COOPERATOR
 		    (COOPERATOR_ID,COOPERATOR_NM, REGISTRATION_SN, COMPANY_NM, REGISTRATION_NM, CEO_NM, USE_AT, CREAT_DT, CREAT_ID)
 		VALUES
-		   (#{cooperatorId},#{cooperatorNm}, REGEXP_REPLACE(#{registrationSn}, '[^0-9]+', ''), #{companyNm}, #{registrationNm}, #{ceoNm}, #{useAt},SYSDATE(),#{creatId})
+		   (#{cooperatorId},#{cooperatorNm}, #{registrationSn}, #{companyNm}, #{registrationNm}, #{ceoNm}, #{useAt},SYSDATE(),#{creatId})
 		ON DUPLICATE KEY UPDATE
 		    COOPERATOR_ID = VALUES(COOPERATOR_ID),
 		    COOPERATOR_NM = VALUES(COOPERATOR_NM),
