@@ -21,6 +21,7 @@ import lombok.Setter;
 @EqualsAndHashCode(callSuper = true)
 public class BalanceVO extends Sch implements Serializable {
 
+	private String cooperatorId;
 	private String mberId;
 	private int balance;
 	private int cost;
