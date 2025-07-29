@@ -72,7 +72,7 @@
 					, valueGetter:(params) => { return currencyFormatter(params.data.feeWithholdingTax);}
 		            , valueParser: (params) => { return gridPercent(params);}
 				},
-				{ headerName: "시간제(원)", field: "feeTimeInsurance", minWidth: 90, editable: true
+				{ headerName: "시간제보험(원)", field: "feeTimeInsurance", minWidth: 90, editable: true
 					, cellClass: (params) => {return agGrideditClass(params, "ag-cell-right");}
 					, valueGetter:(params) => { return currencyFormatter(params.data.feeTimeInsurance);}
 		            , valueParser: (params) => { return gridWan(params);}
