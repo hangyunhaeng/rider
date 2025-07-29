@@ -662,13 +662,15 @@ public class MemController {
 
         try {
 	        CooperatorVO searchVo = memService.saveCooperatoRider(list, user);
+	        searchVo.setSchAuthorCode(user.getAuthorCode());
+	        searchVo.setSchIhidNum(user.getIhidNum());
 	        map.put("list", memService.selectCooperatorRiderListByCooperator(searchVo));
 
 	        CooperatorVO vo = new CooperatorVO();
-	        vo.setSearchGubun("R");
+//	        vo.setSearchGubun("R");
 	        vo.setSchAuthorCode(user.getAuthorCode());
 	        vo.setSchIhidNum(user.getIhidNum());
-	        map.put("orglist", memService.selectCooperatorListRDCnt(vo));
+	        map.put("orglist", memService.selectCooperatorDetailList(vo));
 	        map.put("resultCode", "success");
         } catch(IllegalArgumentException e) {
         	map.put("resultCode", "fail");

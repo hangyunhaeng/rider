@@ -948,4 +948,7 @@
 		)
 	</update>
 
+	<select id="selectForUPdateBalanceByParam" parameterType="egovframework.com.rd.usr.service.vo.BalanceVO" resultType="egovframework.com.rd.usr.service.vo.BalanceVO">
+	</select>
+
 </mapper>
