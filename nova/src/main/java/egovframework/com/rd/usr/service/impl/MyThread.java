@@ -43,11 +43,11 @@ public class MyThread extends EgovAbstractServiceImpl{
 
 			BalanceVO inputVo = balanceService.selectBalanceByIdx(vo);	//랜덤으로 사용자 추출
 			inputVo.setCost(randomInt);
-			LOGGER.debug("inputVo  MberId : "+inputVo.getMberId()+" cost : "+inputVo.getCost()+" Banlance : "+inputVo.getBalance());
+			LOGGER.debug("inputVo  MberId : "+inputVo.getMberId()+" cost : "+inputVo.getCost()+" Banlance : "+inputVo.getBalance0());
 			balanceService.transactionBalance(inputVo);	//  금액 설정
 			BalanceVO returnVo = balanceService.selectBalanceByMberId(inputVo);
 
-			LOGGER.debug("returnVo  MberId : "+returnVo.getMberId()+" cost : "+inputVo.getCost()+" Banlance : "+returnVo.getBalance());
+			LOGGER.debug("returnVo  MberId : "+returnVo.getMberId()+" cost : "+inputVo.getCost()+" Banlance : "+returnVo.getBalance0());
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
