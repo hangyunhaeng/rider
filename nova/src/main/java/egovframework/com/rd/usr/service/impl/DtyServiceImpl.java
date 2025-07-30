@@ -62,6 +62,7 @@ import egovframework.com.rd.Util;
 import egovframework.com.rd.usr.service.DtyService;
 import egovframework.com.rd.usr.service.ExcelSheetHandler;
 import egovframework.com.rd.usr.service.RotService;
+import egovframework.com.rd.usr.service.vo.BalanceVO;
 import egovframework.com.rd.usr.service.vo.CooperatorVO;
 import egovframework.com.rd.usr.service.vo.DayPayVO;
 import egovframework.com.rd.usr.service.vo.DeliveryErrorVO;
@@ -1273,6 +1274,13 @@ public class DtyServiceImpl extends EgovAbstractServiceImpl implements DtyServic
 	 */
 	public DoszTransferVO actDayPay(DayPayVO vo) throws Exception {
 		LoginVO user = (LoginVO)EgovUserDetailsHelper.getAuthenticatedUser();
+
+        //0. 사용자용 select for update 로 rock
+		BalanceVO forUpdateVo = new BalanceVO();
+		forUpdateVo.setCooperatorId(vo.getCooperatorId());
+		forUpdateVo.setMberId(user.getId());
+		dtyDAO.selectForUPdateBalanceByMberId(forUpdateVo);
+
 		int sendFee = Integer.parseInt(EgovProperties.getProperty("Globals.sendFee"));
 
 		int inputPrice = vo.getInputPrice();		//사용자가 입력한 출금 요청 금액
@@ -1317,6 +1325,9 @@ public class DtyServiceImpl extends EgovAbstractServiceImpl implements DtyServic
 		vo.setCreatId(user.getId());
 		dtyDAO.insertDayPay(vo);
 
+
+		//라이더 잔액 조정
+		setBalance(vo.getCooperatorId(), user.getId(), user.getId(), new BigDecimal((inputPrice+sendFee)*-1), new BigDecimal(0));
 
 		//수익 등록(선지급)
 		ProfitVO fitVo = new ProfitVO();
@@ -1370,6 +1381,12 @@ public class DtyServiceImpl extends EgovAbstractServiceImpl implements DtyServic
 	public DoszTransferVO actWekPay(WeekPayVO vo) throws Exception {
 
 		LoginVO user = (LoginVO)EgovUserDetailsHelper.getAuthenticatedUser();
+        //0. 사용자용 select for update 로 rock
+		BalanceVO forUpdateVo = new BalanceVO();
+		forUpdateVo.setCooperatorId(vo.getCooperatorId());
+		forUpdateVo.setMberId(user.getId());
+		dtyDAO.selectForUPdateBalanceByMberId(forUpdateVo);
+
 		int sendFee = Integer.parseInt(EgovProperties.getProperty("Globals.sendFee"));
 
 		int inputPrice = vo.getInputPrice();		//사용자가 입력한 출금 요청 금액
@@ -1403,6 +1420,8 @@ public class DtyServiceImpl extends EgovAbstractServiceImpl implements DtyServic
 
 		dtyDAO.insertWeekPay(vo);
 
+		//라이더 잔액 조정
+		setBalance(vo.getCooperatorId(), user.getId(), user.getId(), new BigDecimal(0), new BigDecimal((inputPrice+sendFee)*-1));
 
 		MyInfoVO bankInfo = rotService.selectMyInfo(myInfoVO);
 		DoszTransferVO doszTransferVO = new DoszTransferVO();
@@ -2256,6 +2275,16 @@ public class DtyServiceImpl extends EgovAbstractServiceImpl implements DtyServic
 	 * @throws Exception
 	 */
 	public void updateDayPayByTransfer(DoszTransferVO vo) throws Exception {
+
+        LoginVO user = (LoginVO)EgovUserDetailsHelper.getAuthenticatedUser();
+        vo.setLastUpdusrId(user.getId());
+
+		//0. 사용자 select for update 로 rock
+		dtyDAO.selectForUPdateBalanceByDayTran(vo);
+		// 잔액 조정
+		dtyDAO.updateBalanceDayPayByTransfer(vo);
+
+		// 출금이력 삭제
 		dtyDAO.updateDayPayByTransfer(vo);
 		dtyDAO.deleteProfit(vo);
 		dtyDAO.deleteCooperatorProfit(vo);
@@ -2268,6 +2297,15 @@ public class DtyServiceImpl extends EgovAbstractServiceImpl implements DtyServic
 	 * @throws Exception
 	 */
 	public int updateWeekPayByTransfer(DoszTransferVO vo) throws Exception {
+
+        LoginVO user = (LoginVO)EgovUserDetailsHelper.getAuthenticatedUser();
+        vo.setLastUpdusrId(user.getId());
+
+		//0. 사용자 select for update 로 rock
+		dtyDAO.selectForUPdateBalanceByWeekTran(vo);
+		// 잔액 조정
+		dtyDAO.updateBalanceWeekPayByTransfer(vo);
+		// 출금이력 삭제
 		return dtyDAO.updateWeekPayByTransfer(vo);
 	}
 	/**
@@ -2281,6 +2319,14 @@ public class DtyServiceImpl extends EgovAbstractServiceImpl implements DtyServic
 
         LoginVO user = (LoginVO)EgovUserDetailsHelper.getAuthenticatedUser();
 
+        //0. 확정대상 사용자를 모두 select for update 로 rock
+        BalanceVO balanceVO = new BalanceVO();
+
+        balanceVO.setSearchFromDate(deliveryInfoVO.getSearchFromDate());
+        balanceVO.setSearchToDate(deliveryInfoVO.getSearchToDate());
+        balanceVO.setSearchNm(deliveryInfoVO.getSearchNm());
+        List<BalanceVO> balanceList = dtyDAO.selectForUPdateBalanceByParam(balanceVO);
+
 
     	//1. 라이더 입금 : 일정산 입금내역 수수료 계산 후 라이더의 입금이력 등록
 		//2. 수익 등록
@@ -2292,6 +2338,7 @@ public class DtyServiceImpl extends EgovAbstractServiceImpl implements DtyServic
 		inVo.setTimeInsuranceMaxFee(Integer.parseInt(EgovProperties.getProperty("Globals.timeInsuranceMaxFee")) );
 
 
+
     	List<DayPayVO> dayList = dtyDAO.selectFixDay(inVo);
     	for(int i = 0 ; i<dayList.size() ; i++) {
     		DayPayVO one = dayList.get(i);
@@ -2300,6 +2347,10 @@ public class DtyServiceImpl extends EgovAbstractServiceImpl implements DtyServic
     		one.setDypId(egovDypIdGnrService.getNextStringId());
     		one.setCreatId(user.getId());
     		dtyDAO.insertDayPay(one);
+
+    		//라이더 잔액 조정
+    		setBalance(one.getCooperatorId(), one.getMberId(), user.getId(), new BigDecimal(one.getAblePrice()), new BigDecimal(0));
+
 
     		//수익 등록(콜수수료)
     		ProfitVO fitVo = new ProfitVO();
@@ -2406,6 +2457,10 @@ public class DtyServiceImpl extends EgovAbstractServiceImpl implements DtyServic
 		    			dtyDAO.finishEtc(one);
 
 
+		        		//라이더 잔액 조정
+		        		setBalance(one.getCooperatorId(), one.getMberId(), user.getId(), new BigDecimal(0), new BigDecimal(one.getPaybackCost()*-1));
+
+
 		        		//수익 등록(기타수수료) 운영사는 기타수수료가 발생하지 않음
 	//	        		ProfitVO fitVo = new ProfitVO();
 	//	        		fitVo.setProfitId(egovFitIdGnrService.getNextStringId());
@@ -2452,7 +2507,7 @@ public class DtyServiceImpl extends EgovAbstractServiceImpl implements DtyServic
 		    			insertVo.setIoGubun("2");			//출금
 		    			insertVo.setDayFee(0);				//선출금수수료
 		    			insertVo.setInsurance(insurance);	//보험료
-		    			insertVo.setSendFee(0);		//이체수수료
+		    			insertVo.setSendFee(0);				//이체수수료
 		    			insertVo.setSendPrice(one.getPaybackCost());
 		    			insertVo.setWeekYn("N");			//정산완료
 		    			insertVo.setEtcId(one.getEtcId());
@@ -2463,6 +2518,9 @@ public class DtyServiceImpl extends EgovAbstractServiceImpl implements DtyServic
 		    			dtyDAO.insertDayPay(insertVo);
 		    			dtyDAO.finishEtc(one);
 
+
+		        		//라이더 잔액 조정
+		        		setBalance(one.getCooperatorId(), one.getMberId(), user.getId(), new BigDecimal(one.getPaybackCost()*-1), new BigDecimal(0));
 
 
 		        		//수익 등록(기타수수료) 운영사는 기타수수료가 발생하지 않음
@@ -2511,6 +2569,14 @@ public class DtyServiceImpl extends EgovAbstractServiceImpl implements DtyServic
 	public void fixWeek(WeekInfoVO weekInfoVO) throws Exception {
         LoginVO user = (LoginVO)EgovUserDetailsHelper.getAuthenticatedUser();
 
+        //0. 확정대상 사용자를 모두 select for update 로 rock
+        BalanceVO balanceVO = new BalanceVO();
+
+        balanceVO.setSearchFromDate(weekInfoVO.getSearchFromDate());
+        balanceVO.setSearchToDate(weekInfoVO.getSearchToDate());
+        balanceVO.setSearchNm(weekInfoVO.getSearchNm());
+        List<BalanceVO> balanceList = dtyDAO.selectForUPdateBalanceWeekByParam(balanceVO);
+
 		List<WeekPayVO> weekPayList = dtyDAO.selectPixWeek(weekInfoVO);
 		//주정산 입금 이력 데이터를 DB에 isnert
 		for(int i = 0 ; i < weekPayList.size() ; i++) {
@@ -2518,12 +2584,22 @@ public class DtyServiceImpl extends EgovAbstractServiceImpl implements DtyServic
 			one.setWkpId(egovWkpIdGnrService.getNextStringId());
 			one.setCreatId(user.getId());
 			dtyDAO.insertWeekPay(one);
+
+    		//라이더 잔액 조정(주금액 +)
+    		setBalance(one.getCooperatorId(), one.getMberId(), user.getId(), new BigDecimal(0), one.getAblePrice());
 		}
-		//일정산 입금이력을 정산 완료로 세팅 -- 협력사아이디, 기간으로 (TODO - 정합성체크 - 금액은 체크 않하나?)
+
 		weekInfoVO.setLastUpdusrId(user.getId());
+
+		//라이더 잔액 조정(일금액을 확정대상만큼 차감)
+		dtyDAO.updateFixDayBalance(weekInfoVO);
+
+		//일정산 입금이력을 정산 완료로 세팅 -- 협력사아이디, 기간으로 (TODO - 정합성체크 - 금액은 체크 않하나?)
 		dtyDAO.updateFixDayPayWeekConfirm(weekInfoVO);
 
-		//미정산 선출금 출금이력조회하여 주정산 출금내역으로 insert
+
+
+		//미정산 선출금(기타리스 포함) 출금이력조회하여 주정산 출금내역으로 insert
 		List<WeekPayVO> dayPayListIoGubun2 = dtyDAO.selectFixDayPayIoGubn2List(weekInfoVO);
 		for(int i = 0 ; i < dayPayListIoGubun2.size() ; i++) {
 			WeekPayVO one = dayPayListIoGubun2.get(i);
@@ -2531,6 +2607,13 @@ public class DtyServiceImpl extends EgovAbstractServiceImpl implements DtyServic
 			one.setCreatId(user.getId());
 			dtyDAO.insertWeekPay(one);
 		}
+
+
+
+
+		//라이더 잔액 조정(선출금, 기타리스 만큼 주금액에서 차감, 일금액에 +)
+		dtyDAO.updateFixDayBalance2(weekInfoVO);
+
 		//일정산 출금이력을 정산완료로 세팅
 		weekInfoVO.setLastUpdusrId(user.getId());
 		dtyDAO.updateFixDayPayWeekConfirm2(weekInfoVO);
@@ -2539,5 +2622,31 @@ public class DtyServiceImpl extends EgovAbstractServiceImpl implements DtyServic
         dtyDAO.updateFixWeek(weekInfoVO);
         // 확정일자 세팅 : RD_WEEK_INFO 의 확정일자 세팅(하위 RD_WEEK_RIDER_INFO가 모두 Fix_day가 설정 시)
         dtyDAO.updateFixWeekInfo(weekInfoVO);
+	}
+
+	private void setBalance(String CoopId, String mberId, String mdfId, BigDecimal balance0, BigDecimal balance1) throws Exception {
+		//라이더 잔액 조정
+		BalanceVO mberBalance = new BalanceVO();
+		mberBalance.setMberId(mberId);
+		mberBalance.setCooperatorId(CoopId);
+		if(dtyDAO.selectBalanceById(mberBalance) == null) {
+			//insert 잔액
+    		//1.출금 가능금액 내의 금액인지 확인
+    		MyInfoVO ableVo = new MyInfoVO();
+    		ableVo.setMberId(mberId);
+    		ableVo.setSearchCooperatorId(CoopId);
+    		MyInfoVO ablePriceForBal = rotService.selectAblePrice(ableVo);
+    		mberBalance.setCooperatorId(CoopId);
+    		mberBalance.setBalance0(new BigDecimal(ablePriceForBal.getDayAblePrice()) );
+    		mberBalance.setBalance1(new BigDecimal(ablePriceForBal.getWeekAblePrice()) );
+    		dtyDAO.insertBalance(mberBalance);
+		} else {
+			//+잔액
+			mberBalance.setCooperatorId(CoopId);
+			mberBalance.setLastUpdusrId(mdfId);
+			mberBalance.setBalance0(balance0);
+			mberBalance.setBalance1(balance1);
+			dtyDAO.updateBalance(mberBalance);
+		}
 	}
 }

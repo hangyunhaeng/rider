@@ -1,9 +1,7 @@
 package egovframework.com.rd.usr.service.vo;
 
 import java.io.Serializable;
-import java.util.List;
-
-import com.ibm.icu.math.BigDecimal;
+import java.math.BigDecimal;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -23,7 +21,8 @@ public class BalanceVO extends Sch implements Serializable {
 
 	private String cooperatorId;
 	private String mberId;
-	private int balance;
+	private BigDecimal balance0;
+	private BigDecimal balance1;
 	private int cost;
 	private String lastUpdtPnttm;
 	private String lastUpdusrId ;

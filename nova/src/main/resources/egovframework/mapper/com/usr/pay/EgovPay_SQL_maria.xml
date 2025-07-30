@@ -118,6 +118,41 @@
 		WHERE STATUS = '400'
 		AND error_code IN ('VTIM', '0011')
 	</select>
+	<select id="selectForUpdateBalanceTranster" resultType="egovframework.com.rd.usr.service.vo.BalanceVO">
+		SELECT * FROM RD_BALNCE
+		WHERE (COOPERATOR_ID, MBER_ID) IN (
+					SELECT COOPERATOR_ID, MBER_ID FROM RD_DAY_PAY
+					WHERE (TELEGRAM_NO, TRAN_DAY) IN (
+
+							SELECT TELEGRAM_NO, TRAN_DAY FROM RD_TRANSFER
+							WHERE STATUS = '999'
+
+							UNION ALL
+
+							SELECT TELEGRAM_NO, TRAN_DAY FROM RD_TRANSFER
+							WHERE STATUS = '400'
+							AND error_code IN ('VTIM', '0011')
+					)
+					AND use_at ='Y'
+
+					UNION
+
+					SELECT COOPERATOR_ID, MBER_ID FROM RD_WEEK_PAY
+					WHERE (TELEGRAM_NO, TRAN_DAY) IN (
+
+							SELECT TELEGRAM_NO, TRAN_DAY FROM RD_TRANSFER
+							WHERE STATUS = '999'
+
+							UNION ALL
+
+							SELECT TELEGRAM_NO, TRAN_DAY FROM RD_TRANSFER
+							WHERE STATUS = '400'
+							AND error_code IN ('VTIM', '0011')
+					)
+					AND use_at ='Y'
+				)
+		FOR UPDATE
+	</select>
 	<update id="updateTransterProsseceResult" parameterType="egovframework.com.rd.usr.service.vo.DoszResultVO">
 		UPDATE RD_TRANSFER
 		SET STATUS = #{status}

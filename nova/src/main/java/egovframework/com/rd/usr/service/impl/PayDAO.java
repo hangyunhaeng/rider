@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Repository;
 
 import egovframework.com.cmm.service.impl.EgovComAbstractDAO;
+import egovframework.com.rd.usr.service.vo.BalanceVO;
 import egovframework.com.rd.usr.service.vo.CooperatorPayVO;
 import egovframework.com.rd.usr.service.vo.DoszDSResultVO;
 import egovframework.com.rd.usr.service.vo.DoszResultVO;
@@ -57,6 +58,15 @@ public class PayDAO extends EgovComAbstractDAO {
 	 */
 	public List<DoszResultVO> selectTransterProsseceResult() throws Exception {
 		return selectList("payDAO.selectTransterProsseceResult");
+	}
+
+	/**
+	 * 이체처리결과 조회 대상 잔액을 기록하기 위한 select for update
+	 * @return
+	 * @throws Exception
+	 */
+	public List<BalanceVO> selectForUpdateBalanceTranster() throws Exception {
+		return selectList("payDAO.selectForUpdateBalanceTranster");
 	}
 
 	/**

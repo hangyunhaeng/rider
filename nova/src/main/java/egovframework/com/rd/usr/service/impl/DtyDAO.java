@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Repository;
 
 import egovframework.com.cmm.service.impl.EgovComAbstractDAO;
+import egovframework.com.rd.usr.service.vo.BalanceVO;
 import egovframework.com.rd.usr.service.vo.DayPayVO;
 import egovframework.com.rd.usr.service.vo.DeliveryErrorVO;
 import egovframework.com.rd.usr.service.vo.DeliveryInfoVO;
@@ -184,6 +185,16 @@ public class DtyDAO extends EgovComAbstractDAO {
 	}
 
 	/**
+	 * 주정산 확정시 입출금 잔액을 기록하기 위한 select for update
+	 * @param vo
+	 * @return
+	 * @throws Exception
+	 */
+	public List<BalanceVO> selectForUPdateBalanceWeekByParam(BalanceVO vo) throws Exception {
+		return selectList("dtyDAO.selectForUPdateBalanceWeekByParam", vo);
+	}
+
+	/**
 	 * 주정산 입출금 insert
 	 * @param vo
 	 * @return
@@ -258,6 +269,16 @@ public class DtyDAO extends EgovComAbstractDAO {
 		return update("dtyDAO.updateFixDayPayWeekConfirm", vo);
 	}
 	/**
+	 * 일정산 입금이력을 정산완료로 정정시 라이더 잔액 조정
+	 * 협력사아이디, 기간
+	 * @param vo
+	 * @return
+	 * @throws Exception
+	 */
+	public int updateFixDayBalance(WeekInfoVO vo)throws Exception {
+		return update("dtyDAO.updateFixDayBalance", vo);
+	}
+	/**
 	 * 일정산 출금이력을 정산완료로 정정
 	 * 협력사아이디
 	 * @param vo
@@ -276,6 +297,17 @@ public class DtyDAO extends EgovComAbstractDAO {
 	 */
 	public int updateFixDayPayWeekConfirm2(WeekInfoVO vo)throws Exception {
 		return update("dtyDAO.updateFixDayPayWeekConfirm2", vo);
+	}
+
+	/**
+	 * 일정산 출금이력을 정산완료로 정정시 라이더 잔액 조정
+	 * 협력사아이디
+	 * @param vo
+	 * @return
+	 * @throws Exception
+	 */
+	public int updateFixDayBalance2(WeekInfoVO vo)throws Exception {
+		return update("dtyDAO.updateFixDayBalance2", vo);
 	}
 	/**
 	 * 미정산 선출금 출금이력조회
@@ -380,6 +412,44 @@ public class DtyDAO extends EgovComAbstractDAO {
 	}
 
 	/**
+	 * 확정금액 이체실패시 입출금 잔액을 기록하기 위한 select for update
+	 * @param vo
+	 * @return
+	 * @throws Exception
+	 */
+	public BalanceVO selectForUPdateBalanceByWeekTran(DoszTransferVO vo) throws Exception {
+		return selectOne("dtyDAO.selectForUPdateBalanceByWeekTran", vo);
+	}
+
+	/**
+	 * 선정산 이체실패시 입출금 잔액을 기록하기 위한 select for update
+	 * @param vo
+	 * @return
+	 * @throws Exception
+	 */
+	public BalanceVO selectForUPdateBalanceByDayTran(DoszTransferVO vo) throws Exception {
+		return selectOne("dtyDAO.selectForUPdateBalanceByDayTran", vo);
+	}
+	/**
+	 * 확정금액 이체 실패시 잔액 조정
+	 * @param vo
+	 * @return
+	 * @throws Exception
+	 */
+	public int updateBalanceWeekPayByTransfer(DoszTransferVO vo) throws Exception {
+		return update("dtyDAO.updateBalanceWeekPayByTransfer", vo);
+	}
+
+	/**
+	 * 선정산 이체실패시 잔액 조정
+	 * @param vo
+	 * @return
+	 * @throws Exception
+	 */
+	public int updateBalanceDayPayByTransfer(DoszTransferVO vo) throws Exception {
+		return update("dtyDAO.updateBalanceDayPayByTransfer", vo);
+	}
+	/**
 	 * 대출 입금 대상 조회
 	 * @param vo
 	 * @return
@@ -435,6 +505,50 @@ public class DtyDAO extends EgovComAbstractDAO {
 	public int deleteCooperatorProfit(DoszTransferVO vo) throws Exception {
 		return update("dtyDAO.deleteCooperatorProfit", vo);
 	}
-
+	/**
+	 * 확정시 입출금 잔액을 기록하기 위한 select for update
+	 * @param vo
+	 * @return
+	 * @throws Exception
+	 */
+	public List<BalanceVO> selectForUPdateBalanceByParam(BalanceVO vo) throws Exception {
+		return selectList("dtyDAO.selectForUPdateBalanceByParam", vo);
+	}
+	/**
+	 * 확정시 입출금 잔액을 기록하기 위한 select for update
+	 * @param vo
+	 * @return
+	 * @throws Exception
+	 */
+	public List<BalanceVO> selectForUPdateBalanceByMberId(BalanceVO vo) throws Exception {
+		return selectList("dtyDAO.selectForUPdateBalanceByMberId", vo);
+	}
+	/**
+	 * 특정 대상 잔액 조회
+	 * @param vo
+	 * @return
+	 * @throws Exception
+	 */
+	public BalanceVO selectBalanceById(BalanceVO vo) throws Exception {
+		return selectOne("dtyDAO.selectBalanceById", vo);
+	}
+	/**
+	 * 잔액 생성
+	 * @param vo
+	 * @return
+	 * @throws Exception
+	 */
+	public int insertBalance(BalanceVO vo) throws Exception {
+		return insert("dtyDAO.insertBalance", vo);
+	}
+	/**
+	 * 잔액 보정
+	 * @param vo
+	 * @return
+	 * @throws Exception
+	 */
+	public int updateBalance(BalanceVO vo) throws Exception {
+		return update("dtyDAO.updateBalance", vo);
+	}
 }
 

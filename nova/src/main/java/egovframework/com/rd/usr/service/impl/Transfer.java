@@ -4,6 +4,7 @@ package egovframework.com.rd.usr.service.impl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -58,11 +59,18 @@ public class Transfer extends EgovAbstractServiceImpl {
 	 * Spring(Quartz)에서 제공하는 MethodInvokingJobDetailFactoryBean 사용으로 호출된다.
 	 * 관련 설정은 context-schedule.xml 참조
 	 */
+	@Transactional
 	public void execute() {
 
 		try {
 			LOGGER.debug("Transfer ..........start");
+
+			//0. 사용자 select for update 로 rock
+			payDAO.selectForUpdateBalanceTranster();
+
 			List<DoszResultVO> list = payDAO.selectTransterProsseceResult();
+
+
 
 			for(int i = 0; i< list.size() ; i++) {
 				DoszResultVO one = list.get(i);
@@ -125,10 +133,17 @@ public class Transfer extends EgovAbstractServiceImpl {
 		            	} else if("200".equals(tranResult.getStatus()) ){	//성공
 
 		            	} else {
+		            		tranResult.setLastUpdusrId("batch");
+		            		// 잔액 조정
+		            		dtyDAO.updateBalanceDayPayByTransfer(tranResult);
+		            		// 거래내역 삭제
 		            		dtyDAO.updateDayPayByTransfer(tranResult);	//실패 확정시 거래내역 삭제
 		            		dtyDAO.deleteProfit(tranResult);
 		            		dtyDAO.deleteCooperatorProfit(tranResult);
 
+		            		// 잔액 조정
+		            		dtyDAO.updateBalanceWeekPayByTransfer(tranResult);
+		            		// 거래내역 삭제
 		            		dtyDAO.updateWeekPayByTransfer(tranResult);	//실패 확정시 거래내역 삭제
 		            	}
 		            }
