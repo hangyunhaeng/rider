@@ -146,15 +146,21 @@ public class Transfer extends EgovAbstractServiceImpl {
 		            	} else {
 		            		// 라이더 잔액 조정
 		            		dtyDAO.updateBalanceDayPayByTransfer(tranResult);
-		            		// 거래내역 삭제
+		            		// 거래내역 삭제(DAY)
 		            		dtyDAO.updateDayPayByTransfer(tranResult);	//실패 확정시 거래내역 삭제
 		            		dtyDAO.deleteProfit(tranResult);
 		            		dtyDAO.deleteCooperatorProfit(tranResult);
 
 		            		// 라이더 잔액 조정
 		            		dtyDAO.updateBalanceWeekPayByTransfer(tranResult);
-		            		// 거래내역 삭제
+		            		// 거래내역 삭제(WEEK)
 		            		dtyDAO.updateWeekPayByTransfer(tranResult);	//실패 확정시 거래내역 삭제
+
+
+		            		// 협력사 잔액 조정
+		            		// 거래내역 삭제(협력사)
+		            		payDAO.updateBalanceCooperatorPayByTransfer(tranResult);
+		            		payDAO.updateCooperatorPayByTransfer(tranResult);
 		            	}
 		            }
 

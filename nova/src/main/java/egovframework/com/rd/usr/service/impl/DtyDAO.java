@@ -467,6 +467,7 @@ public class DtyDAO extends EgovComAbstractDAO {
 	public int updateBalanceDayPayByTransfer(DoszTransferVO vo) throws Exception {
 		return update("dtyDAO.updateBalanceDayPayByTransfer", vo);
 	}
+
 	/**
 	 * 대출 입금 대상 조회
 	 * @param vo

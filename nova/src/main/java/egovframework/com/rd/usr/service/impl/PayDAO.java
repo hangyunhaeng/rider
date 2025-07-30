@@ -175,8 +175,25 @@ public class PayDAO extends EgovComAbstractDAO {
 	public int updateCooperatorPayByTransfer(DoszTransferVO vo) throws Exception {
 		return update("payDAO.updateCooperatorPayByTransfer", vo);
 	}
+	/**
+	 * 협력사 거래 성공 실패시 잔액을 기록하기 위한 select for update
+	 * @param vo
+	 * @return
+	 * @throws Exception
+	 */
+	public BalanceVO selectForUPdateBalanceByTran(DoszTransferVO vo) throws Exception {
+		return selectOne("payDAO.selectForUPdateBalanceByTran", vo);
+	}
 
-
+	/**
+	 * 협력사 잔액 보정
+	 * @param vo
+	 * @return
+	 * @throws Exception
+	 */
+	public int updateBalanceCooperatorPayByTransfer(DoszTransferVO vo) throws Exception {
+		return update("payDAO.updateBalanceCooperatorPayByTransfer", vo);
+	}
 	/**
 	 * 협력사 출금 리스트
 	 * @param vo
