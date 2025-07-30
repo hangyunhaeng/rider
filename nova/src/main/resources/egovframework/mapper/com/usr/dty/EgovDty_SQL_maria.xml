@@ -459,6 +459,26 @@
 			AND c.MBER_NM LIKE '%' #{searchNm} '%'
 			</if>
 	</select>
+	<select id="selectForUPdateBalanceWeekByParam" parameterType="egovframework.com.rd.usr.service.vo.BalanceVO" resultType="egovframework.com.rd.usr.service.vo.BalanceVO">
+		SELECT *
+		FROM RD_BALNCE
+		WHERE (COOPERATOR_ID, MBER_ID) IN (
+			SELECT a.COOPERATOR_ID, b.MBER_ID
+
+			FROM RD_WEEK_INFO a
+				LEFT JOIN RD_WEEK_RIDER_INFO b on a.WEEK_ID = b.week_id
+				LEFT JOIN COMTNGNRLMBER c ON b.mber_id = c.mber_id
+
+			WHERE 1=1
+				AND b.FIX_DAY is null
+				AND (a.ACCOUNTS_ST_DT BETWEEN #{searchFromDate} AND #{searchToDate} or a.ACCOUNTS_ED_DT BETWEEN #{searchFromDate} AND #{searchToDate})
+				<if test="searchNm != null and searchNm != ''">
+				AND d.MBER_NM LIKE '%' #{searchNm} '%'
+				</if>
+				GROUP BY a.COOPERATOR_ID, b.MBER_ID
+		)
+		FOR UPDATE
+	</select>
 
 	<insert id="insertWeekPay" parameterType="egovframework.com.rd.usr.service.vo.WeekPayVO">
 		INSERT INTO RD_WEEK_PAY
@@ -668,6 +688,36 @@
 		AND a.IO_GUBUN = '1'
 		AND a.DYP_ID = b.DYP_ID
 	</update>
+
+	<update id="updateFixDayBalance"  parameterType="egovframework.com.rd.usr.service.vo.WeekInfoVO">
+		UPDATE RD_BALNCE a, (
+				SELECT a.COOPERATOR_ID, a.MBER_ID, SUM(able_price) AS able_price
+					FROM RD_WEEK_INFO wi
+					LEFT JOIN RD_WEEK_RIDER_INFO wr ON wi.WEEK_ID = wr.week_id
+					LEFT JOIN RD_DAY_PAY a ON wi.COOPERATOR_ID = a.COOPERATOR_ID AND wr.MBER_ID = a.mber_id AND a.use_at = 'Y' AND IO_GUBUN= '1'
+					LEFT JOIN COMTNGNRLMBER d ON wr.mber_id = d.mber_id
+						WHERE 1=1
+							AND wr.FIX_DAY is NULL
+							AND a.WEEK_YN = 'N'
+							AND (wi.ACCOUNTS_ST_DT BETWEEN #{searchFromDate} AND #{searchToDate} or wi.ACCOUNTS_ED_DT BETWEEN #{searchFromDate} AND #{searchToDate})
+
+							<if test="searchNm != null and searchNm != ''">
+							AND d.MBER_NM LIKE '%' #{searchNm} '%'
+							</if>
+
+							<![CDATA[
+							AND if(wi.accounts_st_dt <= a.DAY AND wi.accounts_ed_dt >= a.DAY, 1, 0) =1]]>
+							AND a.WEEK_YN ='N'
+							AND a.USE_AT ='Y'
+							AND a.IO_GUBUN = '1'
+							GROUP BY a.COOPERATOR_ID, a.MBER_ID
+		)b
+		SET a.BALANCE0 = a.BALANCE0 - b.able_price
+		, LAST_UPDT_PNTTM = SYSDATE()
+		, LAST_UPDUSR_ID = #{lastUpdusrId}
+		WHERE a.COOPERATOR_ID = b.COOPERATOR_ID
+		AND a.MBER_ID = b.MBER_ID
+	</update>
 	<update id="updateDayPayWeekConfirm2" parameterType="egovframework.com.rd.usr.service.vo.WeekInfoVO">
 		UPDATE RD_DAY_PAY
 		SET WEEK_YN ='Y'
@@ -685,13 +735,11 @@
 				SELECT a.COOPERATOR_ID, a.mber_id, wi.ATCH_FILE_ID, wi.WEEK_ID
 					FROM RD_WEEK_INFO wi
 					LEFT JOIN RD_WEEK_RIDER_INFO wr ON wi.WEEK_ID = wr.week_id
-					JOIN RD_DAY_PAY a ON wi.COOPERATOR_ID = a.COOPERATOR_ID AND wr.MBER_ID = a.mber_id AND a.use_at = 'Y' AND IO_GUBUN= '1'
+					JOIN RD_DAY_PAY a ON wi.COOPERATOR_ID = a.COOPERATOR_ID AND wr.MBER_ID = a.mber_id AND a.use_at = 'Y' AND IO_GUBUN= '2'
 					LEFT JOIN COMTNGNRLMBER d ON wr.mber_id = d.mber_id
 						WHERE 1=1
 							AND wr.FIX_DAY is NULL
 							AND (wi.ACCOUNTS_ST_DT BETWEEN #{searchFromDate} AND #{searchToDate} or wi.ACCOUNTS_ED_DT BETWEEN #{searchFromDate} AND #{searchToDate})
-							<![CDATA[
-							AND if(wi.accounts_st_dt <= a.DAY AND wi.accounts_ed_dt >= a.DAY, 1, 0) =1]]>
 
 		) b
 		SET a.WEEK_YN ='Y'
@@ -704,6 +752,29 @@
 		AND a.IO_GUBUN = '2'
 		AND a.COOPERATOR_ID = b.COOPERATOR_ID
 		AND a.mber_id = b.mber_id
+	</update>
+	<update id="updateFixDayBalance2" parameterType="egovframework.com.rd.usr.service.vo.WeekInfoVO">
+		UPDATE RD_BALNCE a, (
+				SELECT a.COOPERATOR_ID, a.MBER_ID, SUM(day_fee+send_fee+send_price) able_price, SUM(send_fee+send_price) able_price_day
+					FROM RD_WEEK_INFO wi
+					LEFT JOIN RD_WEEK_RIDER_INFO wr ON wi.WEEK_ID = wr.week_id
+					JOIN RD_DAY_PAY a ON wi.COOPERATOR_ID = a.COOPERATOR_ID AND wr.MBER_ID = a.mber_id AND a.use_at = 'Y' AND  IO_GUBUN= '2'
+					LEFT JOIN COMTNGNRLMBER d ON wr.mber_id = d.mber_id
+						WHERE 1=1
+							AND wr.FIX_DAY is NULL
+							AND (wi.ACCOUNTS_ST_DT BETWEEN #{searchFromDate} AND #{searchToDate} or wi.ACCOUNTS_ED_DT BETWEEN #{searchFromDate} AND #{searchToDate})
+							and a.WEEK_YN ='N'
+							AND a.USE_AT ='Y'
+							AND a.IO_GUBUN = '2'
+							GROUP BY a.COOPERATOR_ID, a.MBER_ID
+		)b
+		SET a.BALANCE0 = a.BALANCE0 + b.able_price_day
+		, a.BALANCE1 = a.BALANCE1 - b.able_price
+		, LAST_UPDT_PNTTM = SYSDATE()
+		, LAST_UPDUSR_ID = #{lastUpdusrId}
+		WHERE a.COOPERATOR_ID = b.COOPERATOR_ID
+		AND a.MBER_ID = b.MBER_ID
+
 	</update>
 	<select id="selectDayPayIoGubn2List" parameterType="egovframework.com.rd.usr.service.vo.WeekInfoVO" resultType="egovframework.com.rd.usr.service.vo.WeekPayVO">
 		SELECT COOPERATOR_ID, MBER_ID, 'DAY' DW_GUBUN, '2', IO_GUBUN, NVL(DAY_FEE, 0)+NVL(INSURANCE,0)+NVL(SEND_FEE,0) AS FEE
@@ -871,6 +942,44 @@
 		set USE_AT = 'N'
 		WHERE TRAN_DAY = #{tranDay} AND  TELEGRAM_NO = #{telegram_no} AND USE_AT ='Y'
 	</update>
+	<select id="selectForUPdateBalanceByWeekTran" parameterType="egovframework.com.rd.usr.service.vo.DoszTransferVO" resultType="egovframework.com.rd.usr.service.vo.BalanceVO">
+		SELECT * FROM RD_BALNCE
+		WHERE (COOPERATOR_ID, MBER_ID) IN (
+		SELECT COOPERATOR_ID, MBER_ID FROM RD_WEEK_PAY
+				WHERE TRAN_DAY = #{tranDay} AND  TELEGRAM_NO = #{telegram_no} AND USE_AT ='Y'
+				)
+		FOR UPDATE
+	</select>
+	<select id="selectForUPdateBalanceByDayTran" parameterType="egovframework.com.rd.usr.service.vo.DoszTransferVO" resultType="egovframework.com.rd.usr.service.vo.BalanceVO">
+		SELECT * FROM RD_BALNCE
+		WHERE (COOPERATOR_ID, MBER_ID) IN (
+		SELECT COOPERATOR_ID, MBER_ID FROM RD_DAY_PAY
+				WHERE TRAN_DAY = #{tranDay} AND  TELEGRAM_NO = #{telegram_no} AND USE_AT ='Y'
+				)
+		FOR UPDATE
+	</select>
+	<update id="updateBalanceWeekPayByTransfer" parameterType="egovframework.com.rd.usr.service.vo.DoszTransferVO">
+		UPDATE RD_BALNCE a, (
+			SELECT * FROM RD_WEEK_PAY
+				WHERE TRAN_DAY = #{tranDay} AND  TELEGRAM_NO = #{telegram_no} AND USE_AT ='Y'
+			) b
+		SET a.BALANCE1 = a.BALANCE1 + b.FEE + b.SEND_PRICE
+			, LAST_UPDT_PNTTM = SYSDATE()
+			, LAST_UPDUSR_ID = #{lastUpdusrId}
+		WHERE a.COOPERATOR_ID = b.COOPERATOR_ID
+		AND a.MBER_ID = b.MBER_ID
+	</update>
+	<update id="updateBalanceDayPayByTransfer" parameterType="egovframework.com.rd.usr.service.vo.DoszTransferVO">
+		UPDATE RD_BALNCE a, (
+			SELECT * FROM RD_DAY_PAY
+				WHERE TRAN_DAY = #{tranDay} AND  TELEGRAM_NO = #{telegram_no} AND USE_AT ='Y'
+			) b
+		SET a.BALANCE0 = a.BALANCE0 + b.SEND_FEE + b.SEND_PRICE
+			, LAST_UPDT_PNTTM = SYSDATE()
+			, LAST_UPDUSR_ID = #{lastUpdusrId}
+		WHERE a.COOPERATOR_ID = b.COOPERATOR_ID
+		AND a.MBER_ID = b.MBER_ID
+	</update>
 	<select id="selectEtcList" parameterType="egovframework.com.rd.usr.service.vo.DayPayVO" resultType="egovframework.com.rd.usr.service.vo.EtcVO">
 			SELECT b.ETC_ID, b.COOPERATOR_ID, b.MBER_ID, b.GUBUN, a.RUN_DE AS DAY, b.PAYBACK_DAY, b.PAYBACK_COST, b.PAYBACK_COST_ALL, DATE_FORMAT(b.AUTH_REQUEST_DT, '%Y%m%d') AUTH_REQUEST_DT
 			, DATE_FORMAT(b.AUTH_RESPONS_DT, '%Y%m%d') AUTH_RESPONS_DT, b.RESPONS_AT, b.USE_AT, DATE_FORMAT(b.CREAT_DT, '%Y%m%d') CREAT_DT, b.CREAT_ID, b.LAST_UPDT_PNTTM, b.LAST_UPDUSR_ID
@@ -949,24 +1058,53 @@
 	</update>
 
 	<select id="selectForUPdateBalanceByParam" parameterType="egovframework.com.rd.usr.service.vo.BalanceVO" resultType="egovframework.com.rd.usr.service.vo.BalanceVO">
+		SELECT *
+		FROM RD_BALNCE
+		WHERE (COOPERATOR_ID, MBER_ID) IN (
+				SELECT a.COOPERATOR_ID, a.mber_id
+				FROM RD_DELIVERY_INFO a
+				LEFT JOIN RD_COOPERATOR_FEE b ON a.COOPERATOR_ID = b.COOPERATOR_ID AND b.use_at ='Y'
+				LEFT JOIN RD_RIDER_FEE c ON a.COOPERATOR_ID = c.COOPERATOR_ID  AND a.MBER_ID = c.MBER_ID AND  c.use_at ='Y'
+				LEFT JOIN COMTNGNRLMBER d ON a.mber_id = d.mber_id
+				WHERE 1 = 1
+					AND a.RUN_DE BETWEEN #{searchFromDate} AND #{searchToDate}
 
-			SELECT *
-			FROM RD_BALNCE
-			WHERE (COOPERATOR_ID, MBER_ID) IN
-					SELECT a.COOPERATOR_ID, a.mber_id
-					FROM RD_DELIVERY_INFO a
-					LEFT JOIN RD_COOPERATOR_FEE b ON a.COOPERATOR_ID = b.COOPERATOR_ID AND b.use_at ='Y'
-					LEFT JOIN RD_RIDER_FEE c ON a.COOPERATOR_ID = c.COOPERATOR_ID  AND a.MBER_ID = c.MBER_ID AND  c.use_at ='Y'
-					LEFT JOIN COMTNGNRLMBER d ON a.mber_id = d.mber_id
-					WHERE 1 = 1
-						AND a.RUN_DE BETWEEN #{searchFromDate} AND #{searchToDate}
+					AND d.MBER_NM like '%' #{searchNm} '%'
 
-						AND d.MBER_NM like '%' #{searchNm} '%'
-
-						AND a.FIX_DAY is null	/* 확정은 미확정 데이터를 대상으로만 한다 */
-					GROUP BY a.COOPERATOR_ID, a.MBER_ID
-			)
-			FOR UPDATE
+					AND a.FIX_DAY is null	/* 확정은 미확정 데이터를 대상으로만 한다 */
+				GROUP BY a.COOPERATOR_ID, a.MBER_ID
+		)
+		FOR UPDATE
 	</select>
 
+	<select id="selectForUPdateBalanceByMberId" parameterType="egovframework.com.rd.usr.service.vo.BalanceVO" resultType="egovframework.com.rd.usr.service.vo.BalanceVO">
+		SELECT *
+		FROM RD_BALNCE
+		WHERE 1=1
+			AND COOPERATOR_ID = #{cooperatorId}
+			AND MBER_ID = #{mberId}
+		FOR UPDATE
+	</select>
+	<select id="selectBalanceById" parameterType="egovframework.com.rd.usr.service.vo.BalanceVO" resultType="egovframework.com.rd.usr.service.vo.BalanceVO">
+		select * from RD_BALNCE
+		WHERE COOPERATOR_ID = #{cooperatorId} and MBER_ID = #{mberId}
+	</select>
+	<insert id="insertBalance"  parameterType="egovframework.com.rd.usr.service.vo.BalanceVO">
+		INSERT INTO RD_BALNCE
+		(COOPERATOR_ID, MBER_ID, BALANCE0, BALANCE1)
+		VALUES(#{cooperatorId}, #{mberId}, #{balance0}, #{balance1})
+	</insert>
+
+	<update id="updateBalance"  parameterType="egovframework.com.rd.usr.service.vo.BalanceVO">
+		UPDATE RD_BALNCE
+		SET LAST_UPDT_PNTTM = SYSDATE()
+			, LAST_UPDUSR_ID = #{lastUpdusrId}
+		<if test="balance0 != 0">
+			, BALANCE0 = BALANCE0+ #{balance0}
+		</if>
+		<if test="balance1 != 0">
+			, BALANCE1 = BALANCE1+ #{balance1}
+		</if>
+		WHERE COOPERATOR_ID = #{cooperatorId} and MBER_ID = #{mberId}
+	</update>
 </mapper>

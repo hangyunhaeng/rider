@@ -112,7 +112,7 @@
 		<![CDATA[
 			/* 출금가능여부는 라이더가 직접 출금할때만 사용한다 */
 			, (SELECT if(
-		 						a.USE_AT='Y' AND b.USE_AT='Y' and nvl(c.RESPONS_AT, 'Y') ='Y'AND (DATE_FORMAT(SYSDATE(), '%Y%m%d') <= b.end_dt OR b.END_DT IS null)
+		 						a.USE_AT='Y' AND b.USE_AT='Y' and if(c.AUTH_REQUEST_DT is NULL, 'Y', nvl(c.RESPONS_AT, 'Y')) ='Y' AND (DATE_FORMAT(SYSDATE(), '%Y%m%d') <= b.end_dt OR b.END_DT IS null)
 						, 'Y', 'N')
 								 FROM RD_COOPERATOR a
 									LEFT JOIN RD_COOPERATOR_RIDER_CONNECT b ON a.COOPERATOR_ID = b.COOPERATOR_ID

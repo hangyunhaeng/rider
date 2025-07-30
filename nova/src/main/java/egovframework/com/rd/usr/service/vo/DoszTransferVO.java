@@ -60,4 +60,5 @@ public class DoszTransferVO implements Serializable {
 
 	private String errorCode;
 	private String errorMessage;
+	private String lastUpdusrId;
 }
