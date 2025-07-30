@@ -666,7 +666,7 @@
 						</td>
 					</tr>
 					<tr>
-						<th>등록일</th>
+						<th>배달일</th>
 						<td>
 							<div>
 								<input id="searchFromDate" class="form-control search fs-9 float-start w40p"" type="date" placeholder="Search" aria-label="Search" _mstplaceholder="181961" _mstaria-label="74607">

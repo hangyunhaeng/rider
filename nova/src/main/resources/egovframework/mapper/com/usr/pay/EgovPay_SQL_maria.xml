@@ -203,7 +203,7 @@
 			<if test="searchNm != null and searchNm != ''">
 			AND b.mber_nm like '%' #{searchNm} '%'
 			</if>
-			AND DATE_FORMAT(a.CREAT_DT,'%Y%m%d') BETWEEN #{searchFromDate} AND #{searchToDate}
+			AND a.DELIVERY_DAY BETWEEN #{searchFromDate} AND #{searchToDate}
 			<if test="searchRegistrationSn != null and searchRegistrationSn != ''">
 			AND a.COOPERATOR_ID IN (
 				SELECT COOPERATOR_ID from RD_COOPERATOR
@@ -233,7 +233,7 @@
 			<if test="searchNm != null and searchNm != ''">
 			AND b.mber_nm like '%' #{searchNm} '%'
 			</if>
-			AND DATE_FORMAT(a.CREAT_DT,'%Y%m%d') BETWEEN #{searchFromDate} AND #{searchToDate}
+			AND a.DELIVERY_DAY BETWEEN #{searchFromDate} AND #{searchToDate}
 			<if test="searchRegistrationSn != null and searchRegistrationSn != ''">
 			AND a.COOPERATOR_ID IN (
 				SELECT COOPERATOR_ID from RD_COOPERATOR
