@@ -66,4 +66,7 @@ public class Sch implements Serializable {
 
 	private String shcn;		//나이스용도
 
+
+	private String cooperatorMberId;		//협력사 mberId
+
 }

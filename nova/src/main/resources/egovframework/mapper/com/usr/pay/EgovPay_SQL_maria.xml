@@ -118,9 +118,10 @@
 		WHERE STATUS = '400'
 		AND error_code IN ('VTIM', '0011')
 	</select>
-	<select id="selectForUpdateBalanceTranster" resultType="egovframework.com.rd.usr.service.vo.BalanceVO">
+	<select id="selectForUpdateBalanceTranster" parameterType="egovframework.com.rd.usr.service.vo.Sch" resultType="egovframework.com.rd.usr.service.vo.BalanceVO">
 		SELECT * FROM RD_BALNCE
 		WHERE (COOPERATOR_ID, MBER_ID) IN (
+					/*일정산*/
 					SELECT COOPERATOR_ID, MBER_ID FROM RD_DAY_PAY
 					WHERE (TELEGRAM_NO, TRAN_DAY) IN (
 
@@ -137,6 +138,7 @@
 
 					UNION
 
+					/*주정산*/
 					SELECT COOPERATOR_ID, MBER_ID FROM RD_WEEK_PAY
 					WHERE (TELEGRAM_NO, TRAN_DAY) IN (
 
@@ -150,6 +152,23 @@
 							AND error_code IN ('VTIM', '0011')
 					)
 					AND use_at ='Y'
+
+					UNION
+
+					/*협력사*/
+					SELECT COOPERATOR_ID, #{cooperatorMberId} FROM RD_DAY_PAY
+					WHERE (TELEGRAM_NO, TRAN_DAY) IN (
+
+							SELECT TELEGRAM_NO, TRAN_DAY FROM RD_TRANSFER
+							WHERE STATUS = '999'
+
+							UNION ALL
+
+							SELECT TELEGRAM_NO, TRAN_DAY FROM RD_TRANSFER
+							WHERE STATUS = '400'
+							AND error_code IN ('VTIM', '0011')
+					)
+					GROUP BY COOPERATOR_ID
 				)
 		FOR UPDATE
 	</select>
@@ -288,10 +307,12 @@
 			LEFT JOIN RD_TRANSFER c ON b.TRAN_DAY = c.TRAN_DAY AND b.TELEGRAM_NO = c.TELEGRAM_NO
 			WHERE 1=1
 				AND aa.USE_AT = 'Y'
+			<if test="schIhidNum != null and schIhidNum != ''">
 				AND aa.COOPERATOR_ID IN (
 					SELECT COOPERATOR_ID FROM RD_COOPERATOR sub_a
 					WHERE sub_a.REGISTRATION_SN = #{schIhidNum} AND use_at ='Y'
 				)
+			</if>
 			<if test="searchCooperatorId != null and searchCooperatorId != ''">
 				AND aa.COOPERATOR_ID = #{searchCooperatorId}
 			</if>
@@ -306,10 +327,12 @@
 			left join RD_COOPERATOR_PAY a ON aa.cooperator_id = a.cooperator_id AND a.USE_AT ='Y'
 			WHERE 1=1
 				AND aa.USE_AT = 'Y'
+			<if test="schIhidNum != null and schIhidNum != ''">
 				AND aa.COOPERATOR_ID IN (
 					SELECT COOPERATOR_ID FROM RD_COOPERATOR sub_a
 					WHERE sub_a.REGISTRATION_SN = #{schIhidNum} AND use_at ='Y'
 				)
+			</if>
 			<if test="searchCooperatorId != null and searchCooperatorId != ''">
 				AND aa.COOPERATOR_ID = #{searchCooperatorId}
 			</if>

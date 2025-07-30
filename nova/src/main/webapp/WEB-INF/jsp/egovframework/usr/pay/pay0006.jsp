@@ -82,7 +82,7 @@
 		searchFromDate.setDate(oneMonthAgo.getFullYear()+"-"+(oneMonthAgo.getMonth()+1)+"-"+oneMonthAgo.getDate());
 		searchToDate.setDate(today.getFullYear()+"-"+(today.getMonth()+1)+"-"+today.getDate());
 
-		$('#coopAblePrice').html(currencyFormatter(minWon0(${ablePrice.coopAblePrice})));
+// 		$('#coopAblePrice').html(currencyFormatter(minWon0(${ablePrice.coopAblePrice})));
 
 		loadCooperatorList();
 		//그리드 설정

@@ -17,6 +17,7 @@ import egovframework.com.rd.usr.service.vo.DoznHistoryVO;
 import egovframework.com.rd.usr.service.vo.HistoryVO;
 import egovframework.com.rd.usr.service.vo.MyInfoVO;
 import egovframework.com.rd.usr.service.vo.ProfitVO;
+import egovframework.com.rd.usr.service.vo.Sch;
 import egovframework.com.uat.uia.web.EgoRDLoginController;
 
 
@@ -65,8 +66,8 @@ public class PayDAO extends EgovComAbstractDAO {
 	 * @return
 	 * @throws Exception
 	 */
-	public List<BalanceVO> selectForUpdateBalanceTranster() throws Exception {
-		return selectList("payDAO.selectForUpdateBalanceTranster");
+	public List<BalanceVO> selectForUpdateBalanceTranster(Sch vo) throws Exception {
+		return selectList("payDAO.selectForUpdateBalanceTranster", vo);
 	}
 
 	/**

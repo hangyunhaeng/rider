@@ -1930,6 +1930,8 @@ public class DtyServiceImpl extends EgovAbstractServiceImpl implements DtyServic
 	 */
 	public DoszTransferVO transfer(DoszTransferVO vo) throws Exception {
 
+        LoginVO user = (LoginVO)EgovUserDetailsHelper.getAuthenticatedUser();
+
 		vo.setApi_key(EgovProperties.getProperty("Globals.apiKey"));
 		vo.setOrg_code(EgovProperties.getProperty("Globals.orgCode"));
 		ObjectMapper mapper = new ObjectMapper();
@@ -1951,6 +1953,13 @@ public class DtyServiceImpl extends EgovAbstractServiceImpl implements DtyServic
 		        vo.setSendDt(jsonObj.get("send_dt").toString());
 		        vo.setSendTm(jsonObj.get("send_tm").toString());
 		        vo.setNatvTrNo(jsonObj.get("natv_tr_no").toString());
+
+		        //선입금 완료시 협력사 잔액 조정
+		        vo.setCooperatorMberId(EgovProperties.getProperty("Globals.cooperatorId"));
+		        vo.setLastUpdusrId(user.getId());
+		        dtyDAO.selectForUpdateBalanceDayTran(vo);
+		        dtyDAO.updateBalanceDayTran(vo);
+
 	        } else {
 		        vo.setErrorCode(jsonObj.get("error_code").toString());
 		        vo.setErrorMessage(jsonObj.get("error_message").toString());
@@ -2325,6 +2334,7 @@ public class DtyServiceImpl extends EgovAbstractServiceImpl implements DtyServic
         balanceVO.setSearchFromDate(deliveryInfoVO.getSearchFromDate());
         balanceVO.setSearchToDate(deliveryInfoVO.getSearchToDate());
         balanceVO.setSearchNm(deliveryInfoVO.getSearchNm());
+        balanceVO.setCooperatorMberId(EgovProperties.getProperty("Globals.cooperatorId"));
         List<BalanceVO> balanceList = dtyDAO.selectForUPdateBalanceByParam(balanceVO);
 
 
@@ -2387,6 +2397,10 @@ public class DtyServiceImpl extends EgovAbstractServiceImpl implements DtyServic
 	    		citVo.setRiderFeeId(one.getRiderFeeId());	//RIDER_FEE_ID
 	    		citVo.setCreatId(user.getId());
 	    		dtyDAO.insertCooperatorProfit(citVo);
+
+
+	    		//협력사 잔액 조정
+	    		setBalance(one.getCooperatorId(), EgovProperties.getProperty("Globals.cooperatorId"), user.getId(), new BigDecimal(one.getFeeCooperatorCallCost()), new BigDecimal(0));
     		}
 
     		//수익 등록(프로그램료)
@@ -2484,6 +2498,9 @@ public class DtyServiceImpl extends EgovAbstractServiceImpl implements DtyServic
 		        		citVo.setCreatId(user.getId());
 		        		dtyDAO.insertCooperatorProfit(citVo);
 
+		        		//협력사 잔액 조정
+			    		setBalance(one.getCooperatorId(), EgovProperties.getProperty("Globals.cooperatorId"), user.getId(), new BigDecimal(one.getPaybackCost()), new BigDecimal(0));
+
 
 		    		} else if(one.getPaybackCost() <= ablePrice.getDayAblePrice() ) {	//출금 가능금액 체크
 
@@ -2549,6 +2566,10 @@ public class DtyServiceImpl extends EgovAbstractServiceImpl implements DtyServic
 		        		citVo.setRiderFeeId(resultFee.getRiderFeeId());	//RIDER_FEE_ID
 		        		citVo.setCreatId(user.getId());
 		        		dtyDAO.insertCooperatorProfit(citVo);
+
+
+		        		//협력사 잔액 조정
+			    		setBalance(one.getCooperatorId(), EgovProperties.getProperty("Globals.cooperatorId"), user.getId(), new BigDecimal(one.getPaybackCost()), new BigDecimal(0));
 
 		    		}
     			}// end if(etcSumCnt.get(one.getEtcId()) < one.getPaybackDay())
@@ -2631,14 +2652,26 @@ public class DtyServiceImpl extends EgovAbstractServiceImpl implements DtyServic
 		mberBalance.setCooperatorId(CoopId);
 		if(dtyDAO.selectBalanceById(mberBalance) == null) {
 			//insert 잔액
-    		//1.출금 가능금액 내의 금액인지 확인
-    		MyInfoVO ableVo = new MyInfoVO();
-    		ableVo.setMberId(mberId);
-    		ableVo.setSearchCooperatorId(CoopId);
-    		MyInfoVO ablePriceForBal = rotService.selectAblePrice(ableVo);
-    		mberBalance.setCooperatorId(CoopId);
-    		mberBalance.setBalance0(new BigDecimal(ablePriceForBal.getDayAblePrice()) );
-    		mberBalance.setBalance1(new BigDecimal(ablePriceForBal.getWeekAblePrice()) );
+
+
+			if(EgovProperties.getProperty("Globals.cooperatorId").equals(mberId) ) {
+				//협력사
+	    		MyInfoVO ableVo = new MyInfoVO();
+	    		ableVo.setSearchCooperatorId(CoopId);
+	    		List<MyInfoVO> ablePriceForBal = payDAO.cooperatorAblePrice(ableVo);//리스트가 나오면 안됨.
+	    		mberBalance.setBalance0(new BigDecimal(ablePriceForBal.get(0).getCoopAblePrice()) );
+	    		mberBalance.setBalance1(new BigDecimal(0) );
+
+			} else {
+				//라이더
+	    		//1.출금 가능금액 내의 금액인지 확인
+	    		MyInfoVO ableVo = new MyInfoVO();
+	    		ableVo.setMberId(mberId);
+	    		ableVo.setSearchCooperatorId(CoopId);
+	    		MyInfoVO ablePriceForBal = rotService.selectAblePrice(ableVo);
+	    		mberBalance.setBalance0(new BigDecimal(ablePriceForBal.getDayAblePrice()) );
+	    		mberBalance.setBalance1(new BigDecimal(ablePriceForBal.getWeekAblePrice()) );
+			}
     		dtyDAO.insertBalance(mberBalance);
 		} else {
 			//+잔액

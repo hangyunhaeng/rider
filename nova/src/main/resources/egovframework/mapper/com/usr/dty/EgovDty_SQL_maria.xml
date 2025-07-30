@@ -839,6 +839,33 @@
 			</if>
 		WHERE TRAN_DAY = #{tranDay} AND TELEGRAM_NO = #{telegram_no}
 	</update>
+	<select id="selectForUpdateBalanceDayTran" parameterType="egovframework.com.rd.usr.service.vo.DoszTransferVO" resultType="egovframework.com.rd.usr.service.vo.BalanceVO">
+		SELECT *
+		FROM RD_BALNCE
+		WHERE (cooperator_id, mber_id) IN (
+			SELECT cooperator_id, #{cooperatorMberId} FROM RD_DAY_PAY
+			WHERE (tran_day, telegram_no) IN  (
+				SELECT tran_day, telegram_no FROM RD_TRANSFER
+				WHERE TRAN_DAY = #{tranDay} AND TELEGRAM_NO = #{telegram_no}
+			)
+			AND use_At ='Y'
+		)
+		FOR UPDATE
+	</select>
+	<update id="updateBalanceDayTran" parameterType="egovframework.com.rd.usr.service.vo.DoszTransferVO">
+		UPDATE RD_BALNCE a, (
+				SELECT cooperator_id, #{cooperatorMberId}, day_fee FROM RD_DAY_PAY
+				WHERE (tran_day, telegram_no) IN  (
+					SELECT tran_day, telegram_no FROM RD_TRANSFER
+					WHERE TRAN_DAY = #{tranDay} AND TELEGRAM_NO = #{telegram_no}
+				)
+				AND use_At ='Y'
+			)b
+		set a.BALANCE0 = a.BALANCE0 + b.day_fee
+			, LAST_UPDT_PNTTM = SYSDATE()
+			, LAST_UPDUSR_ID = #{lastUpdusrId}
+
+	</update>
 	<insert id="insertSchAccout" parameterType="egovframework.com.rd.usr.service.vo.DoszSchAccoutVO">
 		INSERT INTO RD_SCH_ACCOUNT
 		(TRAN_DAY, TELEGRAM_NO, BANK_CODE, ACCOUNT, AMOUNT, RES_ALL_YN, CREAT_DT, CREAT_ID)
@@ -1073,6 +1100,21 @@
 
 					AND a.FIX_DAY is null	/* 확정은 미확정 데이터를 대상으로만 한다 */
 				GROUP BY a.COOPERATOR_ID, a.MBER_ID
+
+				UNION
+
+				SELECT a.COOPERATOR_ID, #{cooperatorMberId} AS MBER_ID
+				FROM RD_DELIVERY_INFO a
+				LEFT JOIN RD_COOPERATOR_FEE b ON a.COOPERATOR_ID = b.COOPERATOR_ID AND b.use_at ='Y'
+				LEFT JOIN RD_RIDER_FEE c ON a.COOPERATOR_ID = c.COOPERATOR_ID  AND a.MBER_ID = c.MBER_ID AND  c.use_at ='Y'
+				LEFT JOIN COMTNGNRLMBER d ON a.mber_id = d.mber_id
+				WHERE 1 = 1
+					AND a.RUN_DE BETWEEN #{searchFromDate} AND #{searchToDate}
+
+					AND d.MBER_NM like '%' #{searchNm} '%'
+
+					AND a.FIX_DAY is null	/* 확정은 미확정 데이터를 대상으로만 한다 */
+				GROUP BY a.COOPERATOR_ID
 		)
 		FOR UPDATE
 	</select>

@@ -13,6 +13,7 @@ import egovframework.com.rd.Util;
 import egovframework.com.rd.usr.service.vo.DoszResultVO;
 import egovframework.com.rd.usr.service.vo.DoszTransferVO;
 import egovframework.com.rd.usr.service.vo.DoznHistoryVO;
+import egovframework.com.rd.usr.service.vo.Sch;
 import kr.co.dozn.secure.base.CryptoUtil;
 
 import java.io.BufferedReader;
@@ -66,7 +67,9 @@ public class Transfer extends EgovAbstractServiceImpl {
 			LOGGER.debug("Transfer ..........start");
 
 			//0. 사용자 select for update 로 rock
-			payDAO.selectForUpdateBalanceTranster();
+			Sch sch = new Sch();
+			sch.setCooperatorMberId(EgovProperties.getProperty("Globals.cooperatorId"));
+			payDAO.selectForUpdateBalanceTranster(sch);
 
 			List<DoszResultVO> list = payDAO.selectTransterProsseceResult();
 
@@ -109,7 +112,6 @@ public class Transfer extends EgovAbstractServiceImpl {
 			        	doszResultVO.setErrorMessage(jsonObj.get("error_message").toString());
 			        }
 
-			        payDAO.updateTransterProsseceResult(doszResultVO);
 
 
 
@@ -119,6 +121,8 @@ public class Transfer extends EgovAbstractServiceImpl {
 			        tranResult.setStatusCd(doszResultVO.getStatusCd());
 			        tranResult.setTranDay(one.getTr_dt());
 			        tranResult.setTelegram_no(one.getOrg_telegram_no());
+            		tranResult.setLastUpdusrId("batch");
+
 		            if(Util.isEmpty(tranResult.getStatus())){	//응답없음
 //		            	dtyDAO.updateDayPayByTransfer(tranResult);
 //	            		dtyDAO.updateWeekPayByTransfer(tranResult);
@@ -132,21 +136,30 @@ public class Transfer extends EgovAbstractServiceImpl {
 		            		// 배치에서 재처리
 		            	} else if("200".equals(tranResult.getStatus()) ){	//성공
 
+
+		    		        //선입금 완료시 협력사 잔액 조정
+		            		tranResult.setCooperatorMberId(EgovProperties.getProperty("Globals.cooperatorId"));
+		    		        dtyDAO.updateBalanceDayTran(tranResult);
+
+
+
 		            	} else {
-		            		tranResult.setLastUpdusrId("batch");
-		            		// 잔액 조정
+		            		// 라이더 잔액 조정
 		            		dtyDAO.updateBalanceDayPayByTransfer(tranResult);
 		            		// 거래내역 삭제
 		            		dtyDAO.updateDayPayByTransfer(tranResult);	//실패 확정시 거래내역 삭제
 		            		dtyDAO.deleteProfit(tranResult);
 		            		dtyDAO.deleteCooperatorProfit(tranResult);
 
-		            		// 잔액 조정
+		            		// 라이더 잔액 조정
 		            		dtyDAO.updateBalanceWeekPayByTransfer(tranResult);
 		            		// 거래내역 삭제
 		            		dtyDAO.updateWeekPayByTransfer(tranResult);	//실패 확정시 거래내역 삭제
 		            	}
 		            }
+
+		            //트랜잭션이 않먹히는거 같아 맨 마지막에 업데이트
+			        payDAO.updateTransterProsseceResult(doszResultVO);
 
 		        }
 
