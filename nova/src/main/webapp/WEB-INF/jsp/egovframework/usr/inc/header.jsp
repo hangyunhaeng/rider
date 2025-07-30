@@ -68,5 +68,24 @@
 <script src="<c:url value='/js/xlsx.full.min.js' />"></script>
 <script src="<c:url value='/js/xlsx-populate.min.js' />"></script>
 <script src="<c:url value='/js/axios.min.js' />"></script>
-	<link href="<c:url value='/vendor/admin/bootstrap/3.4.1/bootstrap.min.css' />" rel="stylesheet">
+<%-- 	<link href="<c:url value='/vendor/admin/bootstrap/3.4.1/bootstrap.min.css' />" rel="stylesheet"> --%>
 <!-- 	<script src="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script> -->
+
+
+
+	<!-- phoenix -->
+	<script src="<c:url value='/vendor/admin/bootstrap/js/bootstrap.min.js' />"></script>
+    <script src="<c:url value='/js/phoenix/simplebar.min.js' />"></script>
+    <script src="<c:url value='/js/phoenix/config.js' />"></script>
+    <link href="<c:url value='/css/phoenix/choices.min.css' />" rel="stylesheet">
+    <link href="<c:url value='/css/phoenix/dhtmlxgantt.css' />" rel="stylesheet">
+    <link href="<c:url value='/css/phoenix/flatpickr.min.css' />" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com/">
+    <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin="">
+    <link href="<c:url value='/css/phoenix/css2.css' />" rel="stylesheet">
+    <link href="<c:url value='/css/phoenix/simplebar.min.css' />" rel="stylesheet">
+    <link rel="stylesheet" href="<c:url value='/css/phoenix/line.css' />">
+    <link href="<c:url value='/css/phoenix/theme-rtl.min.css' />" type="text/css" rel="stylesheet" id="style-rtl" disabled="true">
+    <link href="<c:url value='/css/phoenix/theme.min.css' />" type="text/css" rel="stylesheet" id="style-default">
+    <link href="<c:url value='/css/phoenix/user-rtl.min.css' />" type="text/css" rel="stylesheet" id="user-style-rtl" disabled="true">
+    <link href="<c:url value='/css/phoenix/user.min.css' />" type="text/css" rel="stylesheet" id="user-style-default">

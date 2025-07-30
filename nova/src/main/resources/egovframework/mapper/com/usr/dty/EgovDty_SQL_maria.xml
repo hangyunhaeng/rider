@@ -1007,6 +1007,7 @@
 		WHERE a.COOPERATOR_ID = b.COOPERATOR_ID
 		AND a.MBER_ID = b.MBER_ID
 	</update>
+
 	<select id="selectEtcList" parameterType="egovframework.com.rd.usr.service.vo.DayPayVO" resultType="egovframework.com.rd.usr.service.vo.EtcVO">
 			SELECT b.ETC_ID, b.COOPERATOR_ID, b.MBER_ID, b.GUBUN, a.RUN_DE AS DAY, b.PAYBACK_DAY, b.PAYBACK_COST, b.PAYBACK_COST_ALL, DATE_FORMAT(b.AUTH_REQUEST_DT, '%Y%m%d') AUTH_REQUEST_DT
 			, DATE_FORMAT(b.AUTH_RESPONS_DT, '%Y%m%d') AUTH_RESPONS_DT, b.RESPONS_AT, b.USE_AT, DATE_FORMAT(b.CREAT_DT, '%Y%m%d') CREAT_DT, b.CREAT_ID, b.LAST_UPDT_PNTTM, b.LAST_UPDUSR_ID

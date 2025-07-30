@@ -155,8 +155,26 @@
 
 					UNION
 
-					/*협력사*/
-					SELECT COOPERATOR_ID, #{cooperatorMberId} FROM RD_DAY_PAY
+					/*협력사 선입금 수수료 */
+					SELECT COOPERATOR_ID, #{cooperatorMberId} AS MBER_ID FROM RD_DAY_PAY
+					WHERE (TELEGRAM_NO, TRAN_DAY) IN (
+
+							SELECT TELEGRAM_NO, TRAN_DAY FROM RD_TRANSFER
+							WHERE STATUS = '999'
+
+							UNION ALL
+
+							SELECT TELEGRAM_NO, TRAN_DAY FROM RD_TRANSFER
+							WHERE STATUS = '400'
+							AND error_code IN ('VTIM', '0011')
+					)
+					GROUP BY COOPERATOR_ID
+
+
+					UNION
+
+					/*협력사 출금 */
+					SELECT COOPERATOR_ID, #{cooperatorMberId} AS MBER_ID FROM RD_COOPERATOR_PAY
 					WHERE (TELEGRAM_NO, TRAN_DAY) IN (
 
 							SELECT TELEGRAM_NO, TRAN_DAY FROM RD_TRANSFER
@@ -351,6 +369,24 @@
 		UPDATE RD_COOPERATOR_PAY
 		set USE_AT = 'N'
 		WHERE TRAN_DAY = #{tranDay} AND  TELEGRAM_NO = #{telegram_no} AND USE_AT ='Y'
+	</update>
+	<select id="selectForUPdateBalanceByTran" parameterType="egovframework.com.rd.usr.service.vo.DoszTransferVO" resultType="egovframework.com.rd.usr.service.vo.BalanceVO">
+		SELECT * FROM RD_BALNCE
+		WHERE (COOPERATOR_ID, MBER_ID) IN (
+		SELECT COOPERATOR_ID, #{cooperatorMberId} AS MBER_ID FROM RD_COOPERATOR_PAY
+				WHERE TRAN_DAY = #{tranDay} AND  TELEGRAM_NO = #{telegram_no} AND USE_AT ='Y'
+				)
+		FOR UPDATE
+	</select>
+	<update id="updateBalanceCooperatorPayByTransfer" parameterType="egovframework.com.rd.usr.service.vo.DoszTransferVO">
+		UPDATE RD_BALNCE a, (
+				SELECT COOPERATOR_ID, #{cooperatorMberId} AS MBER_ID, SEND_FEE+SEND_PRICE AS SUM_COST
+				from RD_COOPERATOR_PAY
+				WHERE TRAN_DAY = #{tranDay} AND  TELEGRAM_NO = #{telegram_no} AND USE_AT ='Y'
+		)b
+		SET BALANCE0 = BALANCE0 + SUM_COST
+		WHERE a.COOPERATOR_ID = b.COOPERATOR_ID
+		AND a.MBER_ID = b.MBER_ID
 	</update>
 	<select id="selectCooperatorPayList" parameterType="egovframework.com.rd.usr.service.vo.CooperatorPayVO" resultType="egovframework.com.rd.usr.service.vo.CooperatorPayVO">
 		SELECT aa.cooperator_nm

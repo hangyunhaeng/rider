@@ -1,6 +1,7 @@
 package egovframework.com.rd.usr.service.impl;
 
 
+import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -19,6 +20,7 @@ import egovframework.com.cmm.util.EgovUserDetailsHelper;
 import egovframework.com.rd.Util;
 import egovframework.com.rd.usr.service.PayService;
 import egovframework.com.rd.usr.service.RotService;
+import egovframework.com.rd.usr.service.vo.BalanceVO;
 import egovframework.com.rd.usr.service.vo.CooperatorPayVO;
 import egovframework.com.rd.usr.service.vo.DayPayVO;
 import egovframework.com.rd.usr.service.vo.DoszDSResultVO;
@@ -126,6 +128,13 @@ public class PayServiceImpl extends EgovAbstractServiceImpl implements PayServic
 	 */
 	public DoszTransferVO cooperatorPay(CooperatorPayVO vo) throws Exception {
 		LoginVO user = (LoginVO)EgovUserDetailsHelper.getAuthenticatedUser();
+
+        //0. 사용자용 select for update 로 rock
+		BalanceVO forUpdateVo = new BalanceVO();
+		forUpdateVo.setCooperatorId(vo.getCooperatorId());
+		forUpdateVo.setMberId(EgovProperties.getProperty("Globals.cooperatorId"));
+		dtyDAO.selectForUPdateBalanceByMberId(forUpdateVo);
+
 		int sendFee = Integer.parseInt(EgovProperties.getProperty("Globals.sendFee"));
 
 		int inputPrice = vo.getInputPrice();		//사용자가 입력한 출금 요청 금액
@@ -155,6 +164,8 @@ public class PayServiceImpl extends EgovAbstractServiceImpl implements PayServic
 		payDAO.isnertCooperatorPay(vo);
 
 
+		//협력사 잔액 조정
+		setBalance(vo.getCooperatorId(), EgovProperties.getProperty("Globals.cooperatorId"), user.getId(), new BigDecimal((inputPrice+sendFee)*-1), new BigDecimal(0));
 
 		MyInfoVO bankInfo = rotService.selectMyInfo(myInfoVO);
 		DoszTransferVO doszTransferVO = new DoszTransferVO();
@@ -178,6 +189,14 @@ public class PayServiceImpl extends EgovAbstractServiceImpl implements PayServic
 	 * @throws Exception
 	 */
 	public void updateCooperatorPayByTransfer(DoszTransferVO vo) throws Exception {
+
+		//0. 사용자 select for update 로 rock
+		vo.setCooperatorMberId(EgovProperties.getProperty("Globals.cooperatorId"));
+		payDAO.selectForUPdateBalanceByTran(vo);
+
+		// 잔액 조정
+		payDAO.updateBalanceCooperatorPayByTransfer(vo);
+
 		payDAO.updateCooperatorPayByTransfer(vo);
 	}
 
@@ -256,5 +275,44 @@ public class PayServiceImpl extends EgovAbstractServiceImpl implements PayServic
 	 */
 	public ProfitVO selectCoopProfitBase(ProfitVO vo) throws Exception {
 		return payDAO.selectCoopProfitBase(vo);
+	}
+
+
+	private void setBalance(String CoopId, String mberId, String mdfId, BigDecimal balance0, BigDecimal balance1) throws Exception {
+		//라이더 잔액 조정
+		BalanceVO mberBalance = new BalanceVO();
+		mberBalance.setMberId(mberId);
+		mberBalance.setCooperatorId(CoopId);
+		if(dtyDAO.selectBalanceById(mberBalance) == null) {
+			//insert 잔액
+
+
+			if(EgovProperties.getProperty("Globals.cooperatorId").equals(mberId) ) {
+				//협력사
+	    		MyInfoVO ableVo = new MyInfoVO();
+	    		ableVo.setSearchCooperatorId(CoopId);
+	    		List<MyInfoVO> ablePriceForBal = payDAO.cooperatorAblePrice(ableVo);//리스트가 나오면 안됨.
+	    		mberBalance.setBalance0(new BigDecimal(ablePriceForBal.get(0).getCoopAblePrice()) );
+	    		mberBalance.setBalance1(new BigDecimal(0) );
+
+			} else {
+				//라이더
+	    		//1.출금 가능금액 내의 금액인지 확인
+	    		MyInfoVO ableVo = new MyInfoVO();
+	    		ableVo.setMberId(mberId);
+	    		ableVo.setSearchCooperatorId(CoopId);
+	    		MyInfoVO ablePriceForBal = rotService.selectAblePrice(ableVo);
+	    		mberBalance.setBalance0(new BigDecimal(ablePriceForBal.getDayAblePrice()) );
+	    		mberBalance.setBalance1(new BigDecimal(ablePriceForBal.getWeekAblePrice()) );
+			}
+    		dtyDAO.insertBalance(mberBalance);
+		} else {
+			//+잔액
+			mberBalance.setCooperatorId(CoopId);
+			mberBalance.setLastUpdusrId(mdfId);
+			mberBalance.setBalance0(balance0);
+			mberBalance.setBalance1(balance1);
+			dtyDAO.updateBalance(mberBalance);
+		}
 	}
 }
