@@ -184,7 +184,7 @@
 
 
 				<div class="ib_product">
-					<div class="post-form" id="summernote">
+					<div class="post-form img-thumbnail" id="summernote">
 
 					</div>
 				</div>

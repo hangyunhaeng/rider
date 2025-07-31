@@ -1331,32 +1331,36 @@ public class DtyServiceImpl extends EgovAbstractServiceImpl implements DtyServic
 
 		//수익 등록(선지급)
 		ProfitVO fitVo = new ProfitVO();
-		fitVo.setProfitId(egovFitIdGnrService.getNextStringId());
-		fitVo.setCooperatorId(vo.getCooperatorId());//협력사
-		fitVo.setMberId(user.getId());				//라이더ID
-		fitVo.setGubun("D");						//선지급수수료
-		fitVo.setCost(dayFee-resultFee.getFeeCooperatorCost()); //금액
-		fitVo.setDeliveryDay(tranDay); 						//이체일
-		fitVo.setDypId(vo.getDypId());				//DYP_ID
-		fitVo.setFeeId(resultFee.getFeeId());		//FEE_ID
-		fitVo.setRiderFeeId(resultFee.getRiderFeeId());	//RIDER_FEE_ID
-		fitVo.setCreatId(user.getId());
-		dtyDAO.insertProfit(fitVo);
+		if(dayFee-resultFee.getFeeCooperatorCost() > 0) {
+			fitVo.setProfitId(egovFitIdGnrService.getNextStringId());
+			fitVo.setCooperatorId(vo.getCooperatorId());//협력사
+			fitVo.setMberId(user.getId());				//라이더ID
+			fitVo.setGubun("D");						//선지급수수료
+			fitVo.setCost(dayFee-resultFee.getFeeCooperatorCost()); //금액
+			fitVo.setDeliveryDay(tranDay); 						//이체일
+			fitVo.setDypId(vo.getDypId());				//DYP_ID
+			fitVo.setFeeId(resultFee.getFeeId());		//FEE_ID
+			fitVo.setRiderFeeId(resultFee.getRiderFeeId());	//RIDER_FEE_ID
+			fitVo.setCreatId(user.getId());
+			dtyDAO.insertProfit(fitVo);
+		}
 
 		//협력사 수익등록(선지급)
-		ProfitVO citVo = new ProfitVO();
-		citVo.setCoofitId(egovCitIdGnrService.getNextStringId());
-		citVo.setProfitId(fitVo.getProfitId());
-		citVo.setCooperatorId(vo.getCooperatorId());		//협력사
-		citVo.setMberId(user.getId());						//라이더ID
-		citVo.setGubun("D");								//선지급수수료
-		citVo.setCost(resultFee.getFeeCooperatorCost());	//금액
-		citVo.setDeliveryDay(tranDay); 						//이체일
-		citVo.setDypId(vo.getDypId());						//DYP_ID
-		citVo.setFeeId(resultFee.getFeeId());				//FEE_ID
-		citVo.setRiderFeeId(resultFee.getRiderFeeId());		//RIDER_FEE_ID
-		citVo.setCreatId(user.getId());
-		dtyDAO.insertCooperatorProfit(citVo);
+		if(resultFee.getFeeCooperatorCost() > 0) {
+			ProfitVO citVo = new ProfitVO();
+			citVo.setCoofitId(egovCitIdGnrService.getNextStringId());
+			citVo.setProfitId(fitVo.getProfitId());
+			citVo.setCooperatorId(vo.getCooperatorId());		//협력사
+			citVo.setMberId(user.getId());						//라이더ID
+			citVo.setGubun("D");								//선지급수수료
+			citVo.setCost(resultFee.getFeeCooperatorCost());	//금액
+			citVo.setDeliveryDay(tranDay); 						//이체일
+			citVo.setDypId(vo.getDypId());						//DYP_ID
+			citVo.setFeeId(resultFee.getFeeId());				//FEE_ID
+			citVo.setRiderFeeId(resultFee.getRiderFeeId());		//RIDER_FEE_ID
+			citVo.setCreatId(user.getId());
+			dtyDAO.insertCooperatorProfit(citVo);
+		}
 
 
 		MyInfoVO bankInfo = rotService.selectMyInfo(myInfoVO);

@@ -79,7 +79,7 @@
     <script src="<c:url value='/js/phoenix/config.js' />"></script>
     <link href="<c:url value='/css/phoenix/choices.min.css' />" rel="stylesheet">
     <link href="<c:url value='/css/phoenix/dhtmlxgantt.css' />" rel="stylesheet">
-    <link href="<c:url value='/css/phoenix/flatpickr.min.css' />" rel="stylesheet">
+<%--     <link href="<c:url value='/css/phoenix/flatpickr.min.css' />" rel="stylesheet"> --%>
     <link rel="preconnect" href="https://fonts.googleapis.com/">
     <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin="">
     <link href="<c:url value='/css/phoenix/css2.css' />" rel="stylesheet">
