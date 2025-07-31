@@ -8,7 +8,7 @@
     var str = location.pathname; //URI 경로 끝까지
     var filename = str.split('/')[2];
 
-    if(filename.indexOf('com0002.do') == 0 || filename.indexOf('not0001.do') == 0) {
+    if(filename.indexOf('not0001.do') == 0) {
     	$('.com0002').addClass('active');
     	$('.com0002_1').addClass('active');
     } else if(filename.indexOf('inq0001.do') == 0) {
