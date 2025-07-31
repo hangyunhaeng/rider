@@ -125,6 +125,11 @@
 			, cellEditorParams: params => { return {values: ['D', 'R', 'E']}; }
 			, cellClass: (params) => {return agGrideditClass(params)}
 		},
+		{ headerName: "상환시작일", field: "startDt", minWidth: 100, maxWidth: 100, editable: (params) => {return (params.node.data.responsAt == 'Y')? false: true}
+	        , valueParser: (params) => { return gridValidDate(params);}
+	        , cellClass: (params) => {return agGrideditClass(params)}
+	        , valueGetter:(params) => { return getStringDate(params.data.startDt)}
+		},
 		{ headerName: "상환기간(일)", field: "paybackDay", minWidth: 10, maxWidth: 100, editable: (params) => {return (params.node.data.responsAt == 'Y')? false: true}
 			, cellClass: (params) => {return agGrideditClass(params, "ag-cell-right");}
 			, valueGetter:(params) => { return currencyFormatter(params.data.paybackDay);}
@@ -312,10 +317,12 @@
 
 
 	function createNewRowData2() {
+		var today = new Date();
 	    var newData = {
     		cooperatorId: $('#modalCooperatorId').val(),
     		mberId: $('#modalMberId').val(),
     		gubun: 'D',
+    		startDt : today.getFullYear()+(""+(today.getMonth()+1)).padStart(2, '0')+""+today.getDate(),
     		useAt: 'Y',
     		uniq: grid2.getDisplayedRowCount()+1,
     		crud: "c",

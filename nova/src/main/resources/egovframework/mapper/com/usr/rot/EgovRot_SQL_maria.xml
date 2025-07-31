@@ -111,14 +111,16 @@
 		SELECT SUM(DAY_ABLE_PRICE) AS DAY_ABLE_PRICE, SUM(WEEK_ABLE_PRICE) AS WEEK_ABLE_PRICE
 		<![CDATA[
 			/* 출금가능여부는 라이더가 직접 출금할때만 사용한다 */
-			, (SELECT if(
-		 						a.USE_AT='Y' AND b.USE_AT='Y' and if(c.AUTH_REQUEST_DT is NULL, 'Y', nvl(c.RESPONS_AT, 'Y')) ='Y' AND (DATE_FORMAT(SYSDATE(), '%Y%m%d') <= b.end_dt OR b.END_DT IS null)
-						, 'Y', 'N')
-								 FROM RD_COOPERATOR a
-									LEFT JOIN RD_COOPERATOR_RIDER_CONNECT b ON a.COOPERATOR_ID = b.COOPERATOR_ID
-									LEFT JOIN RD_ETC c ON b.COOPERATOR_ID = c.COOPERATOR_ID AND b.MBER_ID = c.MBER_ID AND c.USE_AT = 'Y' AND c.RESPONS_AT != 'Y' AND c.FINISH_AT != 'Y'
-									WHERE a.COOPERATOR_ID = #{searchCooperatorId} AND b.MBER_ID = #{mberId}
-										GROUP BY c.COOPERATOR_ID, c.MBER_ID
+			, (	SELECT case when a.USE_AT != 'Y' then 'N'
+							when b.USE_AT != 'Y' then 'N'
+							when c.AUTH_REQUEST_DT IS not NULL AND c.RESPONS_AT != 'Y' then 'N'
+							when b.END_DT IS NOT NULL AND (DATE_FORMAT(SYSDATE(), '%Y%m%d')) >= b.END_DT then 'N'
+							ELSE  'Y' END
+						 FROM RD_COOPERATOR a
+							LEFT JOIN RD_COOPERATOR_RIDER_CONNECT b ON a.COOPERATOR_ID = b.COOPERATOR_ID
+							LEFT JOIN RD_ETC c ON b.COOPERATOR_ID = c.COOPERATOR_ID AND b.MBER_ID = c.MBER_ID AND c.USE_AT = 'Y' AND c.RESPONS_AT != 'Y' AND c.FINISH_AT != 'Y'
+							WHERE a.COOPERATOR_ID = #{searchCooperatorId} AND b.MBER_ID = #{mberId}
+								GROUP BY c.COOPERATOR_ID, c.MBER_ID
 			) USE_AT ]]>
 
 		FROM(

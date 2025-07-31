@@ -1031,6 +1031,7 @@
 				AND e.MBER_NM like '%' #{searchNm} '%'
 				</if>
 				AND a.FIX_DAY is null	/* 확정은 미확정 데이터를 대상으로만 한다 */
+				AND a.RUN_DE >= b.START_DT /*실행일 이후부터 대상*/
 			GROUP BY b.etc_id, a.mber_id, a.RUN_DE
 	</select>
 	<update id="finishEtc" parameterType="egovframework.com.rd.usr.service.vo.EtcVO">

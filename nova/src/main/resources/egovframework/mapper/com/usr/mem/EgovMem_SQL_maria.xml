@@ -459,7 +459,7 @@
 			FROM (
 		</if>
 
-			SELECT @ROWNUM:=@ROWNUM+1 AS UNIQ, a.ETC_ID, a.COOPERATOR_ID, a.MBER_ID, a.GUBUN, a.PAYBACK_DAY, a.PAYBACK_COST, a.PAYBACK_COST_ALL, DATE_FORMAT(a.AUTH_REQUEST_DT, '%Y%m%d') AUTH_REQUEST_DT
+			SELECT @ROWNUM:=@ROWNUM+1 AS UNIQ, a.ETC_ID, a.COOPERATOR_ID, a.MBER_ID, a.GUBUN, a.START_DT ,a.PAYBACK_DAY, a.PAYBACK_COST, a.PAYBACK_COST_ALL, DATE_FORMAT(a.AUTH_REQUEST_DT, '%Y%m%d') AUTH_REQUEST_DT
 			, DATE_FORMAT(a.AUTH_RESPONS_DT, '%Y%m%d') AUTH_RESPONS_DT, a.RESPONS_AT, a.FINISH_AT, a.USE_AT, DATE_FORMAT(a.CREAT_DT, '%Y%m%d') CREAT_DT, a.CREAT_ID, a.LAST_UPDT_PNTTM, a.LAST_UPDUSR_ID
 			, 'false' chk, nvl(SUM(b.SEND_PRICE), 0) + nvl(SUM(c.SEND_PRICE), 0) AS FINISH_COST
 		   , d.MBER_NM, e.COOPERATOR_NM
@@ -538,13 +538,13 @@
 	<insert id="insertEtc" parameterType="egovframework.com.rd.usr.service.vo.EtcVO">
 
 		INSERT INTO RD_ETC
-		(ETC_ID, COOPERATOR_ID, MBER_ID, GUBUN, PAYBACK_DAY, PAYBACK_COST, PAYBACK_COST_ALL
+		(ETC_ID, COOPERATOR_ID, MBER_ID, GUBUN, START_DT, PAYBACK_DAY, PAYBACK_COST, PAYBACK_COST_ALL
 		, USE_AT, CREAT_DT, CREAT_ID
 		<if test="chk == 'true'">
 		, AUTH_REQUEST_DT
 		</if>
 		)
-		SELECT #{etcId}, #{cooperatorId}, #{mberId}, #{gubun}, #{paybackDay}, #{paybackCost}, #{paybackCostAll}
+		SELECT #{etcId}, #{cooperatorId}, #{mberId}, #{gubun}, #{startDt}, #{paybackDay}, #{paybackCost}, #{paybackCostAll}
 		, 'Y', SYSDATE(), #{creatId}
 		<if test="chk == 'true'">
 		, SYSDATE()
@@ -558,13 +558,14 @@
 	</insert>
 	<update id="updateEtc" parameterType="egovframework.com.rd.usr.service.vo.EtcVO">
 		UPDATE RD_ETC
-		SET GUBUN = #{gubun}, PAYBACK_DAY = #{paybackDay}, PAYBACK_COST = #{paybackCost}, PAYBACK_COST_ALL = #{paybackCostAll}
+		SET GUBUN = #{gubun}, START_DT = #{startDt}, PAYBACK_DAY = #{paybackDay}, PAYBACK_COST = #{paybackCost}, PAYBACK_COST_ALL = #{paybackCostAll}
 			, LAST_UPDT_PNTTM = #{lastUpdtPnttm}, LAST_UPDUSR_ID = SYSDATE()
 		WHERE ETC_ID = #{etcId}
 	</update>
 	<update id="requestEtc" parameterType="egovframework.com.rd.usr.service.vo.EtcVO">
 		UPDATE RD_ETC
 		SET AUTH_REQUEST_DT = SYSDATE()
+			, GUBUN = #{gubun}, START_DT = #{startDt}, PAYBACK_DAY = #{paybackDay}, PAYBACK_COST = #{paybackCost}, PAYBACK_COST_ALL = #{paybackCostAll}
 			, LAST_UPDT_PNTTM = #{lastUpdtPnttm}, LAST_UPDUSR_ID = SYSDATE()
 		WHERE ETC_ID = #{etcId}
 			AND RESPONS_AT !='Y'

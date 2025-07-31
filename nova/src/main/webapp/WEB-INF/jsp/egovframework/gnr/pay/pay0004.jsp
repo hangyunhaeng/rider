@@ -118,6 +118,7 @@
 				내역.find('label:eq(0)').show();
 			}
 			내역.find('label[class~=form-check-label]:eq(1)').html(dataInfo.paybackDay+'일동안 '+currencyFormatter(dataInfo.paybackCost)+'원 출금');
+			내역.find('label[class~=실행일]').html('실행일 [ '+getStringDate(dataInfo.startDt)+' ]');
 			내역.find('label[class~=text-body-tertiary]').html(getStringDate(dataInfo.authRequestDt));
 			내역.find('span[class~=총금액]').html('입금 '+currencyFormatter(dataInfo.finishCost)+'원 / 총 '+currencyFormatter(dataInfo.paybackCostAll)+'원');
 
@@ -260,10 +261,10 @@
 
 								<div class="row justify-content-between mb-1 mb-md-0 d-flex align-items-center lh-1">
 									<div class="col-auto" data-bs-toggle="collapse" data-bs-target="" aria-expanded="false" onclick="리스트(this);">
-										<label class="form-check-label mb-2 mb-md-0 fs-9 me-2 line-clamp-1 text-body cursor-pointer" >30일간 10,000원 출금</label>
+										<label class="form-check-label mb-1 mb-md-0 fs-9 me-2 line-clamp-1 text-body cursor-pointer pt-1" >30일간 10,000원 출금</label>
 									</div>
 									<div class="col-auto d-flex">
-										<span class="fs-9 mb-2" style=""></span>
+										<label class="form-check-label mb-1 mb-md-0 fs-9 line-clamp-1 text-body cursor-pointer pt-1 실행일" style="">실행일 [ 2020-01-01 ]</label>
 									</div>
 								</div>
 

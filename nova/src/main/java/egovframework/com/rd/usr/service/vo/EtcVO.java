@@ -27,6 +27,8 @@ public class EtcVO extends Sch implements Serializable {
 	private String mberId;
 	//수수료 종류(대여:D, 리스,:R 기타:E)
 	private String gubun;
+	//상환시작일
+	private String startDt;
 	//상환기간(일)
 	private int paybackDay;
 	//일별상환금액

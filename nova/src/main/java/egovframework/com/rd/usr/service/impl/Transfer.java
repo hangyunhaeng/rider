@@ -112,6 +112,7 @@ public class Transfer extends EgovAbstractServiceImpl {
 			        	doszResultVO.setErrorMessage(jsonObj.get("error_message").toString());
 			        }
 
+			        payDAO.updateTransterProsseceResult(doszResultVO);
 
 
 
@@ -163,9 +164,6 @@ public class Transfer extends EgovAbstractServiceImpl {
 		            		payDAO.updateCooperatorPayByTransfer(tranResult);
 		            	}
 		            }
-
-		            //트랜잭션이 않먹히는거 같아 맨 마지막에 업데이트
-			        payDAO.updateTransterProsseceResult(doszResultVO);
 
 		        }
 
