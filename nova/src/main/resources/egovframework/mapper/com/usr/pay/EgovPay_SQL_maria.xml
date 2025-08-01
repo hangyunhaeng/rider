@@ -508,9 +508,9 @@
 	<insert id="insertKko" parameterType="egovframework.com.rd.usr.service.vo.KkoVO">
 		INSERT INTO RD_KKO
 		(KKO_ID, UP_KKO_ID, MBER_ID, GUBUN, MBTLNUM, URL, SEND_ACCESS_TOKEN, SEND_REFRESH_TOKEN, SEND_LONGTXT, RECV_LONGTXT
-			, CODE, USER_KEY, STATUS, KAORSLTCODE, BIGO, CREAT_DT, CREAT_ID)
+			, CODE, USER_KEY, STATUS, KAORSLTCODE, BIGO, SEND_DT, CREAT_DT, CREAT_ID)
 		values(#{kkoId}, #{upKkoId}, #{mberId}, #{gubun}, #{mbtlnum}, #{url}, #{sendAccessToken}, #{sendRefreshToken}, #{sendLongtxt}, #{recvLongtxt}
-			, #{code}, #{userKey}, #{status}, #{kaorsltcode}, #{bigo}, SYSDATE(), #{creatId})
+			, #{code}, #{userKey}, #{status}, #{kaorsltcode}, #{bigo}, #{sendDt},SYSDATE(), #{creatId})
 	</insert>
 	<update id="updateKko" parameterType="egovframework.com.rd.usr.service.vo.KkoVO">
 		UPDATE RD_KKO

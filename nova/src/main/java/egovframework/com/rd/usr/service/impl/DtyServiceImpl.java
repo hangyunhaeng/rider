@@ -2112,6 +2112,7 @@ public class DtyServiceImpl extends EgovAbstractServiceImpl implements DtyServic
             kkoVO.setGubun("1");	//토큰
             kkoVO.setUrl("/api/v1/send/auth/token");
             kkoVO.setCreatId(user.getId());
+            kkoVO.setSendDt(Util.getDay());
             payDAO.insertKko(kkoVO);
 
             returnVo.setKkoId(kkoVO.getKkoId());
@@ -2203,6 +2204,7 @@ public class DtyServiceImpl extends EgovAbstractServiceImpl implements DtyServic
         	kkoVo.setSendRefreshToken(sendRefreshToken);
         	kkoVo.setCreatId(user.getId());
         	kkoVo.setBigo("패스워드 알림 발송대기");
+        	kkoVo.setSendDt(Util.getDay());
             JSONArray jsonSendList = new JSONArray(jsonParameters.get("phoneList").toString());
             for (int i = 0; i < jsonSendList.length(); ++i) {
             	JSONParser parser = new JSONParser();
