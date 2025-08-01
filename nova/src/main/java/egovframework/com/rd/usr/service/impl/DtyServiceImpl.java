@@ -234,7 +234,7 @@ public class DtyServiceImpl extends EgovAbstractServiceImpl implements DtyServic
 	            	deliveryInfoVO.setSchIhidNum(user.getIhidNum());
 
 	            	if(dtyDAO.insertDeliveryInfo(deliveryInfoVO) <= 0) {
-	            		throw new IllegalArgumentException("조건이 맞지 않아 등록 불가") ;
+	            		throw new IllegalArgumentException("협력사아이디가 없거나 수수료가 설정되어있지 않습니다.") ;
 	            	}
 
 	            	insertMber(deliveryInfoVO.getMberId(), deliveryInfoVO.getRiderNm(), deliveryInfoVO.getCooperatorId(), user);
@@ -248,6 +248,11 @@ public class DtyServiceImpl extends EgovAbstractServiceImpl implements DtyServic
 					eVo.setCreatId(user.getId());
 					eVo.setUseAt("Y");
 					dtyDAO.insertDeliveryError(eVo);
+
+					FileVO fVo = new FileVO();
+					fVo.setAtchFileId(atchFileId);
+					fVo.setErorrMsg(e.getMessage());
+					dtyDAO.updateFileUploadErrMsg(fVo);
 				}
 
 			}

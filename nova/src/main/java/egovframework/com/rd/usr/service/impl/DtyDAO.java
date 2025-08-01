@@ -6,6 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Repository;
 
+import egovframework.com.cmm.service.FileVO;
 import egovframework.com.cmm.service.impl.EgovComAbstractDAO;
 import egovframework.com.rd.usr.service.vo.BalanceVO;
 import egovframework.com.rd.usr.service.vo.DayPayVO;
@@ -568,6 +569,15 @@ public class DtyDAO extends EgovComAbstractDAO {
 	 */
 	public int updateBalance(BalanceVO vo) throws Exception {
 		return update("dtyDAO.updateBalance", vo);
+	}
+	/**
+	 * 엑셀 파일 업로드 에러메세지
+	 * @param vo
+	 * @return
+	 * @throws Exception
+	 */
+	public int updateFileUploadErrMsg(FileVO vo) throws Exception {
+		return update("dtyDAO.updateFileUploadErrMsg", vo);
 	}
 }
 

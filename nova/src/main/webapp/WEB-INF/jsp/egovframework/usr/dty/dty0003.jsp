@@ -22,7 +22,8 @@
 		{ headerName: "협력사이름", field: "cooperatorNm", minWidth: 90},
 		{ headerName: "정산시작일", field: "accountsStDt", minWidth: 90},
 		{ headerName: "정산종료일", field: "accountsEdDt", minWidth: 90},
-		{ headerName: "파일명", field: "orignlFileNm", minWidth: 400, cellClass: 'ag-cell-left tdul'},
+		{ headerName: "파일명", field: "orignlFileNm", minWidth: 300, cellClass: 'ag-cell-left tdul'},
+		{ headerName: "오류메세지", field: "erorrMsg", minWidth: 120, cellClass: 'ag-cell-left'},
 		{ headerName: "등록일", field: "creatDt", minWidth: 90, valueGetter:(params) => { return getStringDate(params.node.data.creatDt)} },
 		{ headerName: "atchFileId", field: "atchFileId", minWidth: 90, hide:true},
 		{ headerName: "weekId", field: "weekId", minWidth: 90, hide:true}
@@ -33,7 +34,8 @@
 		{ headerName: "협력사아이디", field: "cooperatorId", minWidth: 120},
 		{ headerName: "협력사이름", field: "cooperatorNm", minWidth: 90},
 		{ headerName: "배달건수", field: "cnt", minWidth: 90},
-		{ headerName: "파일명", field: "orignlFileNm", minWidth: 400, cellClass: 'ag-cell-left tdul'},
+		{ headerName: "파일명", field: "orignlFileNm", minWidth: 300, cellClass: 'ag-cell-left tdul'},
+		{ headerName: "오류메세지", field: "erorrMsg", minWidth: 120, cellClass: 'ag-cell-left'},
 		{ headerName: "등록일", field: "creatDt", minWidth: 90, valueGetter:(params) => { return getStringDate(params.node.data.creatDt)} },
 		{ headerName: "atchFileId", field: "atchFileId", minWidth: 90, hide:true}
 	];
@@ -258,7 +260,7 @@
 						<col style="width: *">
 					</colgroup>
 					<tr>
-						<th>정산일</th>
+						<th>업로드월</th>
 						<td>
 							<input id="searchDate" class="form-control search fs-9" type="date" placeholder="Search" aria-label="Search" _mstplaceholder="181961" _mstaria-label="74607">
 						</td>

@@ -66,6 +66,8 @@ public class FileVO extends ComDefaultVO {
      */
     public String fileGubun = "";
 
+    public String erorrMsg;
+
     /**
      * atchFileId attribute를 리턴한다.
      *
@@ -250,6 +252,14 @@ public class FileVO extends ComDefaultVO {
 
 	public void setFileGubun(String fileGubun) {
 		this.fileGubun = fileGubun;
+	}
+
+	public String getErorrMsg() {
+		return erorrMsg;
+	}
+
+	public void setErorrMsg(String erorrMsg) {
+		this.erorrMsg = erorrMsg;
 	}
 
 }

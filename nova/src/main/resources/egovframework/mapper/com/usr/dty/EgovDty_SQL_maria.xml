@@ -329,11 +329,11 @@
 
 	<select id="selectUploadStateInWeek" parameterType="egovframework.com.rd.usr.service.vo.WeekInfoVO" resultType="egovframework.com.rd.usr.service.vo.UploadStateVO">
 		SELECT c.ATCH_FILE_ID, d.ORIGNL_FILE_NM, a.COOPERATOR_ID, b.COOPERATOR_NM, a.WEEK_ID, a.ACCOUNTS_ST_DT, a.ACCOUNTS_ED_DT, DATE_FORMAT(c.CREAT_DT,'%Y%m%d') CREAT_DT
-		FROM RD_WEEK_INFO a
-			left JOIN RD_COOPERATOR b ON a.COOPERATOR_ID = b.COOPERATOR_ID
-			LEFT JOIN COMTNFILE c ON a.atch_file_id  =c.ATCH_FILE_ID
+		FROM COMTNFILE c
 			LEFT JOIN COMTNFILEDETAIL d ON c.ATCH_FILE_ID = d.ATCH_FILE_ID
-		WHERE SUBSTRING(a.ACCOUNTS_ST_DT, 1, 6) = #{searchDate}
+			left join RD_WEEK_INFO a ON c.ATCH_FILE_ID = a.ATCH_FILE_ID
+			left JOIN RD_COOPERATOR b ON a.COOPERATOR_ID = b.COOPERATOR_ID
+		WHERE DATE_FORMAT(c.CREAT_DT, '%Y%m') =  #{searchDate}
 
 			<if test="schAuthorCode == 'ROLE_USER'">
 			/* 협력사 조건 *//* COOPERATOR_ID로 조건을 만든건 ★정산 파일을 올릴때 권한이 있는 협력사ID 데이터만 올릴수 있음!!★ - 나머지는 오류 처리할꺼임  */
@@ -347,15 +347,17 @@
 			<if test='searchCooperatorId != null and searchCooperatorId != "all"'>
 				AND	a.COOPERATOR_ID = #{searchCooperatorId}
 			</if>
+				AND file_gubun = 'WEEK'
+			ORDER BY c.CREAT_DT desc
 
 	</select>
 	<select id="selectUploadStateInDay" parameterType="egovframework.com.rd.usr.service.vo.WeekInfoVO" resultType="egovframework.com.rd.usr.service.vo.UploadStateVO">
-		SELECT c.ATCH_FILE_ID, d.ORIGNL_FILE_NM, a.COOPERATOR_ID, b.COOPERATOR_NM, COUNT(a.DELIVERY_SN) CNT, DATE_FORMAT(a.CREAT_DT,'%Y%m%d') CREAT_DT
-		FROM RD_DELIVERY_INFO a
-			LEFT JOIN RD_COOPERATOR b ON a.COOPERATOR_ID = b.COOPERATOR_ID
-			LEFT JOIN COMTNFILE c ON a.atch_file_id  =c.ATCH_FILE_ID
+		SELECT c.ATCH_FILE_ID, d.ORIGNL_FILE_NM, a.COOPERATOR_ID, b.COOPERATOR_NM, COUNT(a.DELIVERY_SN) CNT, DATE_FORMAT(a.CREAT_DT,'%Y%m%d') CREAT_DT, d.ERORR_MSG
+		FROM COMTNFILE c
 			LEFT JOIN COMTNFILEDETAIL d ON c.ATCH_FILE_ID = d.ATCH_FILE_ID
-		WHERE SUBSTRING(a.RUN_DE, 1, 6) = #{searchDate}
+			LEFT JOIN RD_DELIVERY_INFO a ON c.ATCH_FILE_ID = a.ATCH_FILE_ID
+			LEFT JOIN RD_COOPERATOR b ON a.COOPERATOR_ID = b.COOPERATOR_ID
+		WHERE DATE_FORMAT(c.CREAT_DT, '%Y%m')  = #{searchDate}
 
 			<if test="schAuthorCode == 'ROLE_USER'">
 			/* 협력사 조건 *//* COOPERATOR_ID로 조건을 만든건 ★정산 파일을 올릴때 권한이 있는 협력사ID 데이터만 올릴수 있음!!★ - 나머지는 오류 처리할꺼임  */
@@ -369,7 +371,9 @@
 			<if test='searchCooperatorId != null and searchCooperatorId != "all"'>
 				AND	a.COOPERATOR_ID = #{searchCooperatorId}
 			</if>
-		GROUP BY a.atch_file_id, b.COOPERATOR_ID
+				AND file_gubun ='DAY'
+		GROUP BY a.atch_file_id, b.COOPERATOR_ID, c.ATCH_FILE_ID
+		ORDER BY c.CREAT_DT desc
 	</select>
 
 	<select id="selectCooperatorList" resultType="egovframework.com.rd.usr.service.vo.SearchKeyVO">
@@ -1150,5 +1154,10 @@
 			, BALANCE1 = BALANCE1+ #{balance1}
 		</if>
 		WHERE COOPERATOR_ID = #{cooperatorId} and MBER_ID = #{mberId}
+	</update>
+	<update id="updateFileUploadErrMsg" parameterType="egovframework.com.cmm.service.FileVO">
+		UPDATE COMTNFILEDETAIL
+		SET ERORR_MSG = SUBSTR(#{erorrMsg}, 1, 900)
+		WHERE ATCH_FILE_ID = #{atchFileId}
 	</update>
 </mapper>
