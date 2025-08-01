@@ -44,7 +44,7 @@
 		{ headerName: "협력사이름", field: "cooperatorNm", minWidth: 90},
 		{ headerName: "식별번호", field: "registrationSn", minWidth: 90},
 		{ headerName: "상호", field: "companyNm", minWidth: 90},
-		{ headerName: "사업자이름", field: "registrationNm", minWidth: 90, cellClass: 'ag-cell-left'},
+		{ headerName: "사업자이름", field: "registrationNm", minWidth: 90, cellClass: 'ag-cell-left', hide:true},
 		{ headerName: "대표자명", field: "ceoNm", minWidth: 90},
 		{ headerName: "사용여부", field: "useAt", minWidth: 90, valueGetter:(params) => { return (params.node.data.useAt=='Y')?"사용": "미사용"}},
 		{ headerName: "구분", field: "gubun", minWidth: 90, hide:true}
