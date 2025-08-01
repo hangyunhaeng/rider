@@ -505,4 +505,65 @@
 		WHERE 1 = 1
 			AND a.coofit_id = #{coofitId}
 	</select>
+	<insert id="insertKko" parameterType="egovframework.com.rd.usr.service.vo.KkoVO">
+		INSERT INTO RD_KKO
+		(KKO_ID, UP_KKO_ID, MBER_ID, GUBUN, MBTLNUM, URL, SEND_ACCESS_TOKEN, SEND_REFRESH_TOKEN, SEND_LONGTXT, RECV_LONGTXT
+			, CODE, USER_KEY, STATUS, KAORSLTCODE, BIGO, CREAT_DT, CREAT_ID)
+		values(#{kkoId}, #{upKkoId}, #{mberId}, #{gubun}, #{mbtlnum}, #{url}, #{sendAccessToken}, #{sendRefreshToken}, #{sendLongtxt}, #{recvLongtxt}
+			, #{code}, #{userKey}, #{status}, #{kaorsltcode}, #{bigo}, SYSDATE(), #{creatId})
+	</insert>
+	<update id="updateKko" parameterType="egovframework.com.rd.usr.service.vo.KkoVO">
+		UPDATE RD_KKO
+		SET CODE = #{code}
+			<if test='sendAccessToken != null and sendAccessToken != ""'>
+			, SEND_ACCESS_TOKEN = #{sendAccessToken}
+			</if>
+			<if test='sendRefreshToken != null and sendRefreshToken != ""'>
+			, SEND_REFRESH_TOKEN = #{sendRefreshToken}
+			</if>
+			<if test='recvLongtxt != null and recvLongtxt != ""'>
+			, RECV_LONGTXT = #{recvLongtxt}
+			</if>
+			<if test='referenceKey != null and referenceKey != ""'>
+			, REFERENCE_KEY = #{referenceKey}
+			</if>
+			<if test='userKey != null and userKey != ""'>
+			, USER_KEY = #{userKey}
+			</if>
+			<if test='status != null and status != ""'>
+			, STATUS = #{status}
+			</if>
+			<if test='kaorsltcode != null and kaorsltcode != ""'>
+			, KAORSLTCODE = #{kaorsltcode}
+			</if>
+			<if test='bigo != null and bigo != ""'>
+			, BIGO = #{bigo}
+			</if>
+		where KKO_ID = #{kkoId}
+	</update>
+	<update id="updateKkoUsr" parameterType="egovframework.com.rd.usr.service.vo.KkoVO">
+		UPDATE RD_KKO
+		SET BIGO = #{bigo}
+		, REFERENCE_KEY = #{referenceKey}
+		, USER_KEY = #{userKey}
+		WHERE UP_KKO_ID = #{upKkoId}
+		AND MBTLNUM = #{mbtlnum}
+	</update>
+	<select id="selectKkoProsseceResult" resultType="egovframework.com.rd.usr.service.vo.KkoVO">
+		SELECT * FROM RD_KKO
+		WHERE GUBUN ='2'
+			AND USER_KEY IS NOT NULL
+			AND SEND_ACCESS_TOKEN IS NOT NULL
+			AND SEND_REFRESH_TOKEN IS NOT NULL
+			AND (STATUS is null or STATUS != '3')
+	</select>
+	<update id="updateKkoReport" parameterType="egovframework.com.rd.usr.service.vo.KkoVO">
+		UPDATE RD_KKO
+		SET BIGO = #{bigo}
+		, STATUS = #{status}
+		, KAORSLTCODE = #{kaorsltcode}
+		, RECV_LONGTXT = #{recvLongtxt}
+		WHERE REFERENCE_KEY = #{referenceKey}
+		AND USER_KEY = #{userKey}
+	</update>
 </mapper>

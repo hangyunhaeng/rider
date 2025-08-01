@@ -15,6 +15,7 @@ import egovframework.com.rd.usr.service.vo.DoszResultVO;
 import egovframework.com.rd.usr.service.vo.DoszTransferVO;
 import egovframework.com.rd.usr.service.vo.DoznHistoryVO;
 import egovframework.com.rd.usr.service.vo.HistoryVO;
+import egovframework.com.rd.usr.service.vo.KkoVO;
 import egovframework.com.rd.usr.service.vo.MyInfoVO;
 import egovframework.com.rd.usr.service.vo.ProfitVO;
 import egovframework.com.rd.usr.service.vo.Sch;
@@ -258,7 +259,53 @@ public class PayDAO extends EgovComAbstractDAO {
 	public ProfitVO selectCoopProfitBase(ProfitVO vo) throws Exception {
 		return selectOne("payDAO.selectCoopProfitBase", vo);
 	}
+	/**
+	 * 카톡 발송 이력 insert
+	 * @param vo
+	 * @return
+	 * @throws Exception
+	 */
+	public int insertKko(KkoVO vo) throws Exception {
+		return insert("payDAO.insertKko", vo);
+	}
 
+	/**
+	 * 카톡 수신 이력 udpate
+	 * @param vo
+	 * @return
+	 * @throws Exception
+	 */
+	public int updateKko(KkoVO vo) throws Exception {
+		return update("payDAO.updateKko", vo);
+	}
+
+
+	/**
+	 * 카톡 수신 사용자별 이력 udpate
+	 * @param vo
+	 * @return
+	 * @throws Exception
+	 */
+	public int updateKkoUsr(KkoVO vo) throws Exception {
+		return update("payDAO.updateKkoUsr", vo);
+	}
+	/**
+	 * 카톡 발송 확인 대상
+	 * @return
+	 * @throws Exception
+	 */
+	public List<KkoVO> selectKkoProsseceResult() throws Exception {
+		return selectList("payDAO.selectKkoProsseceResult");
+	}
+	/**
+	 * 카톡 발송 확인 후 업데이트
+	 * @param vo
+	 * @return
+	 * @throws Exception
+	 */
+	public int updateKkoReport(KkoVO vo) throws Exception {
+		return update("payDAO.updateKkoReport", vo);
+	}
 }
 
 

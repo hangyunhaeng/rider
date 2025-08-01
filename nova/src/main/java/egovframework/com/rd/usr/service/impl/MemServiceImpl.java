@@ -1,12 +1,14 @@
 package egovframework.com.rd.usr.service.impl;
 
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.annotation.Resource;
 
 import org.egovframe.rte.fdl.cmmn.EgovAbstractServiceImpl;
 import org.egovframe.rte.fdl.idgnr.EgovIdGnrService;
+import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.slf4j.Logger;
@@ -24,6 +26,7 @@ import egovframework.com.rd.usr.service.vo.DayPayVO;
 import egovframework.com.rd.usr.service.vo.DeliveryInfoVO;
 import egovframework.com.rd.usr.service.vo.DoznTokenVO;
 import egovframework.com.rd.usr.service.vo.EtcVO;
+import egovframework.com.rd.usr.service.vo.KkoVO;
 import egovframework.com.sec.rgm.service.AuthorGroup;
 import egovframework.com.sec.rgm.service.EgovAuthorGroupService;
 import egovframework.com.uss.umt.service.EgovMberManageService;
@@ -56,6 +59,8 @@ public class MemServiceImpl extends EgovAbstractServiceImpl implements MemServic
 
 	@Resource(name = "MemDAO")
 	private MemDAO memDAO;
+	@Resource(name = "PayDAO")
+	private PayDAO payDAO;
 
 	@Resource(name="userManageDAO")
 	private UserManageDAO userManageDAO;
@@ -85,6 +90,9 @@ public class MemServiceImpl extends EgovAbstractServiceImpl implements MemServic
     /** ID Generation */
 	@Resource(name="egovEtcIdGnrService")
 	private EgovIdGnrService egovEtcIdGnrService;
+    /** ID Generation */
+	@Resource(name="egovKkoIdGnrService")
+	private EgovIdGnrService egovKkoIdGnrService;
 
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(MemServiceImpl.class);
@@ -290,8 +298,11 @@ public class MemServiceImpl extends EgovAbstractServiceImpl implements MemServic
 	 * @param list
 	 * @throws Exception
 	 */
+	@SuppressWarnings("unchecked")
 	public CooperatorVO saveCooperatoRider(List<CooperatorVO> list, LoginVO user) throws Exception {
 		CooperatorVO returnVo = new CooperatorVO();
+		List<KkoVO> kkoList = new ArrayList<KkoVO>();
+
         for(int i = 0 ; i< list.size() ;i++) {
 
         	CooperatorVO vo = list.get(i);
@@ -306,47 +317,59 @@ public class MemServiceImpl extends EgovAbstractServiceImpl implements MemServic
             MberManageVO userOne = mberManageDAO.selectUserListRider(searchVO);
         	if( userOne != null ) {
         		//핸드폰번호 최초등록 시
-//        		if(Util.isEmpty(userOne.getMbtlnum())) {
-//
-//        			//1. 임시패스워드와 MBER_CONFIRM_AT를 N로 설정
-//        			MberManageVO mberManageVO = new MberManageVO();
-//        		    mberManageVO.setUniqId(userOne.getUniqId());
-//        	        mberManageVO.setPassword(EgovFileScrty.encryptPassword("Daon2025!", EgovStringUtil.isNullToString(userOne.getMberId())));
-//        	        mberManageVO.setMberConfirmAt("N");
-//        	        mberManageService.updatePasswordSelf(mberManageVO);
-//
-//        	        //2. 알림톡 토큰 가져오기
-//        	        String responseData = dtyService.getMsgTocken();
-//        	        LOGGER.debug("responseData1 : "+responseData);
-//
-//
-//        	        if(!Util.isEmpty(responseData)) {
-//        		        JSONParser jsonParse = new JSONParser();
-//        		        JSONObject jsonObj = (JSONObject) jsonParse.parse(responseData);
-//        		        if("200".equals(jsonObj.get("code")) ) {
-//	        		        JSONObject data = (JSONObject) jsonObj.get("data");
-//	        		        DoznTokenVO doznTokenVO = new DoznTokenVO();
-//	        		        doznTokenVO.setSendAccessToken(data.get("sendAccessToken").toString());
-//	        		        doznTokenVO.setSendRefreshToken(data.get("sendRefreshToken").toString());
-//
-//	            	        //3. 성공시 메세지 발송
-//	        		        String sendData = dtyService.doznHttpRequestMsg("임시", data.get("sendAccessToken").toString(), data.get("sendRefreshToken").toString());
-//
-//	            	        if(!Util.isEmpty(sendData)) {
-//	            		        JSONParser jsonParse1 = new JSONParser();
-//	            		        JSONObject jsonObj1 = (JSONObject) jsonParse1.parse(sendData);
-//	            		        if("200".equals(jsonObj1.get("code")) ) {
-//
-//	            		        	JSONObject dataMsg = (JSONObject) jsonObj1.get("data");
-//	            		        	String reportData = dtyService.doznHttpRequestReport("임시", data.get("sendAccessToken").toString(), data.get("sendRefreshToken").toString(), dataMsg.get("referenceKey").toString());
-//	            		        }
-//	            	        }
-//
-//        		        }
-//
-//        	        }
-//
-//        		}
+        		if(Util.isEmpty(userOne.getMbtlnum()) && !Util.isEmpty(vo.getMbtlnum())) {
+        			//0. 카카오 발송 정보 저장
+        			String pass = vo.getMbtlnum().substring(vo.getMbtlnum().length()-4, vo.getMbtlnum().length());
+        			KkoVO kkoOne = new KkoVO();
+        			kkoOne.setMberId(vo.getMberId());
+        			kkoOne.setMbtlnum(Util.getOnlyNumber(vo.getMbtlnum()));
+        			kkoOne.setParam0(vo.getMberNm());
+        			kkoOne.setParam1("Daon"+pass+"!");
+        			kkoList.add(kkoOne);
+
+
+        			//1. 임시패스워드와 MBER_CONFIRM_AT를 N로 설정
+        			MberManageVO mberManageVO = new MberManageVO();
+
+        		    mberManageVO.setUniqId(userOne.getUniqId());
+        	        mberManageVO.setPassword(EgovFileScrty.encryptPassword("Daon"+pass+"!", EgovStringUtil.isNullToString(userOne.getMberId())));
+        	        mberManageVO.setMberConfirmAt("N");
+        	        mberManageService.updatePasswordSelf(mberManageVO);
+
+        	        /*//2. 알림톡 토큰 가져오기
+        	        String responseData = dtyService.getMsgTocken();
+        	        LOGGER.debug("responseData1 : "+responseData);
+
+
+        	        if(!Util.isEmpty(responseData)) {
+        		        JSONParser jsonParse = new JSONParser();
+        		        JSONObject jsonObj = (JSONObject) jsonParse.parse(responseData);
+        		        if("200".equals(jsonObj.get("code")) ) {
+	        		        JSONObject data = (JSONObject) jsonObj.get("data");
+	        		        DoznTokenVO doznTokenVO = new DoznTokenVO();
+	        		        doznTokenVO.setSendAccessToken(data.get("sendAccessToken").toString());
+	        		        doznTokenVO.setSendRefreshToken(data.get("sendRefreshToken").toString());
+
+	            	        //3. 성공시 메세지 발송
+	        		        String sendData = dtyService.doznHttpRequestMsg("임시", data.get("sendAccessToken").toString(), data.get("sendRefreshToken").toString());
+
+	            	        if(!Util.isEmpty(sendData)) {
+	            		        JSONParser jsonParse1 = new JSONParser();
+	            		        JSONObject jsonObj1 = (JSONObject) jsonParse1.parse(sendData);
+	            		        if("200".equals(jsonObj1.get("code")) ) {
+
+	            		        	JSONObject dataMsg = (JSONObject) jsonObj1.get("data");
+	            		        	String reportData = dtyService.doznHttpRequestReport("임시", data.get("sendAccessToken").toString(), data.get("sendRefreshToken").toString(), dataMsg.get("referenceKey").toString());
+
+	            		        	String a = "1";
+	            		        }
+	            	        }
+
+        		        }
+
+        	        }*/
+
+        		}
 
         		userOne.setMberNm(vo.getMberNm());
         		userOne.setMoblphonNo(vo.getMbtlnum());
@@ -443,6 +466,72 @@ public class MemServiceImpl extends EgovAbstractServiceImpl implements MemServic
 
         	returnVo = vo;
         }
+
+        //알림톡 발송
+        if(kkoList.size() > 0) {
+	        //2. 알림톡 토큰 가져오기
+        	DoznTokenVO responseData = dtyService.getMsgTocken();
+
+        	//3. 메세지 발송
+	        if(!Util.isEmpty(responseData.getSendAccessToken()) && !Util.isEmpty(responseData.getSendRefreshToken())) {
+
+		        JSONArray jsonArray = new JSONArray();
+		        for(int i = 0; i < kkoList.size() ; i++) {
+		        	KkoVO kkoVo = kkoList.get(i);
+    		        JSONObject jsonObject = new JSONObject();
+
+    		        JSONObject variablesObject = new JSONObject();
+    		        variablesObject.put("성명", kkoVo.getParam0());
+    		        variablesObject.put("임시패스워드", kkoVo.getParam1());
+    		        jsonObject.put("variables", variablesObject);
+    		        jsonObject.put("phone", kkoVo.getMbtlnum());
+
+    		        jsonArray.add(jsonObject);
+		        }
+
+		        JSONObject jsonbutton1 = new JSONObject();
+		        jsonbutton1.put("name", "접속");
+		        jsonbutton1.put("type", "WL");
+		        jsonbutton1.put("urlMobile", "https://riderbank.co.kr");
+		        jsonbutton1.put("urlPc", "https://riderbank.co.kr");
+
+		        JSONObject jsonMain = new JSONObject();
+		        jsonMain.put("phoneList",jsonArray);
+		        jsonMain.put("callback","01091835541");
+
+		        JSONObject jsonKakaoMessage = new JSONObject();
+		        jsonKakaoMessage.put("button1", jsonbutton1);
+		        jsonKakaoMessage.put("body", "[라이더뱅크 가입안내]\\n\\n\n\n"
+		        		+ "#{성명}님 라이더뱅크에 등록되셨습니다.\\n\n"
+		        		+ "RADER BANK에 접속하여 임시패스워드로 로그인 후 임시패스워드를 다시 설정해 주시기 바랍니다.\\n\\n\n\n"
+		        		+ "- 임시패스워드 : #{임시패스워드}");
+		        jsonKakaoMessage.put("templateCode", "34e0133b42a141fbb718");
+		        jsonKakaoMessage.put("senderKey", "64e98b5f16c490c13b4333fb1971fb862050389b");
+		        jsonMain.put("kakaoMessage", jsonKakaoMessage);
+		        jsonMain.put("messageType", "kat");
+
+		        LOGGER.debug("json : "+jsonMain.toString());
+    	        //3. 성공시 메세지 발송
+    		    dtyService.doznHttpRequestMsg(jsonMain, responseData.getKkoId(), responseData.getSendAccessToken(), responseData.getSendRefreshToken());
+
+
+
+	        } else {	//토큰을 못받아서 발송 못했을 경우에도 사용자 정보를 이력에 쌓아줘야 나중에 찾음
+		        for(int i = 0; i < kkoList.size() ; i++) {
+		        	KkoVO kkoVo = kkoList.get(i);
+		            //거래이력 누적
+		        	kkoVo.setKkoId(egovKkoIdGnrService.getNextStringId());
+		        	kkoVo.setUpKkoId(responseData.getKkoId());
+		        	kkoVo.setGubun("2");	//메세지
+		        	kkoVo.setUrl("/api/v1/send");
+		        	kkoVo.setCreatId(user.getId());
+		        	kkoVo.setBigo("패스워드 알림 미발송");
+		            payDAO.insertKko(kkoVo);
+		        }
+	        }
+        }
+
+
 		return returnVo;
 	}
 	/**

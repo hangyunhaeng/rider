@@ -6,6 +6,7 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.poi.ss.usermodel.Workbook;
+import org.json.simple.JSONObject;
 import org.springframework.web.multipart.MultipartFile;
 
 import egovframework.com.cmm.LoginVO;
@@ -15,6 +16,7 @@ import egovframework.com.rd.usr.service.vo.DeliveryInfoVO;
 import egovframework.com.rd.usr.service.vo.DoszSchAccoutCostVO;
 import egovframework.com.rd.usr.service.vo.DoszSchAccoutVO;
 import egovframework.com.rd.usr.service.vo.DoszTransferVO;
+import egovframework.com.rd.usr.service.vo.DoznTokenVO;
 import egovframework.com.rd.usr.service.vo.HistoryVO;
 import egovframework.com.rd.usr.service.vo.MyInfoVO;
 import egovframework.com.rd.usr.service.vo.NiceVO;
@@ -220,7 +222,7 @@ public interface DtyService {
 	 * @param vo
 	 * @throws Exception
 	 */
-	public String getMsgTocken() throws Exception ;
+	public DoznTokenVO getMsgTocken() throws Exception ;
 	/**
 	 * DOZN 알림톡 발송
 	 * @param jsonParameters
@@ -228,7 +230,7 @@ public interface DtyService {
 	 * @param sendRefreshToken
 	 * @return
 	 */
-	public String doznHttpRequestMsg(String jsonParameters, String sendAccessToken, String sendRefreshToken) throws Exception ;
+	public String doznHttpRequestMsg(JSONObject jsonParameters, String kkoId, String sendAccessToken, String sendRefreshToken) throws Exception ;
 	/**
 	 * DOZN 알림톡 레포트
 	 * @param jsonParameters

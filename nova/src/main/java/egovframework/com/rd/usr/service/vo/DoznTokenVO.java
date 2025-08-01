@@ -18,6 +18,7 @@ import lombok.Setter;
 @EqualsAndHashCode(callSuper = true)
 public class DoznTokenVO extends Sch implements Serializable {
 
+	private String kkoId;
 	private String sendAccessToken;
 	private String sendRefreshToken;
 }

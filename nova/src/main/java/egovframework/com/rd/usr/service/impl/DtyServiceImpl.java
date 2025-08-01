@@ -71,8 +71,10 @@ import egovframework.com.rd.usr.service.vo.DoszSchAccoutCostVO;
 import egovframework.com.rd.usr.service.vo.DoszSchAccoutVO;
 import egovframework.com.rd.usr.service.vo.DoszTransferVO;
 import egovframework.com.rd.usr.service.vo.DoznHistoryVO;
+import egovframework.com.rd.usr.service.vo.DoznTokenVO;
 import egovframework.com.rd.usr.service.vo.EtcVO;
 import egovframework.com.rd.usr.service.vo.HistoryVO;
+import egovframework.com.rd.usr.service.vo.KkoVO;
 import egovframework.com.rd.usr.service.vo.MyInfoVO;
 import egovframework.com.rd.usr.service.vo.NiceVO;
 import egovframework.com.rd.usr.service.vo.ProfitVO;
@@ -90,6 +92,7 @@ import egovframework.com.uss.umt.service.impl.MberManageDAO;
 import egovframework.com.utl.fcc.service.EgovStringUtil;
 import kr.co.dozn.secure.base.CryptoUtil;
 import lombok.Synchronized;
+import twitter4j.JSONArray;
 
 /**
  * @Class Name : DtyServiceImpl.java
@@ -153,6 +156,9 @@ public class DtyServiceImpl extends EgovAbstractServiceImpl implements DtyServic
     /** ID Generation */
 	@Resource(name="egovCitIdGnrService")
 	private EgovIdGnrService egovCitIdGnrService;
+    /** ID Generation */
+	@Resource(name="egovKkoIdGnrService")
+	private EgovIdGnrService egovKkoIdGnrService;
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(DtyServiceImpl.class);
 
@@ -2085,9 +2091,10 @@ public class DtyServiceImpl extends EgovAbstractServiceImpl implements DtyServic
 	 * @param vo
 	 * @throws Exception
 	 */
-	public String getMsgTocken() throws Exception {
+	public DoznTokenVO getMsgTocken() throws Exception {
 
-
+		LoginVO user = (LoginVO)EgovUserDetailsHelper.getAuthenticatedUser();
+		DoznTokenVO returnVo = new DoznTokenVO();
         HttpURLConnection connection = null;
 
         try {
@@ -2098,6 +2105,16 @@ public class DtyServiceImpl extends EgovAbstractServiceImpl implements DtyServic
             connection.setRequestProperty("memberId", EgovProperties.getProperty("Globals.msgId"));
             connection.setRequestProperty("sendApiKey", EgovProperties.getProperty("Globals.msgApiKey"));
             connection.setDoInput(true);
+
+            //거래이력 누적
+            KkoVO kkoVO = new KkoVO();
+            kkoVO.setKkoId(egovKkoIdGnrService.getNextStringId());
+            kkoVO.setGubun("1");	//토큰
+            kkoVO.setUrl("/api/v1/send/auth/token");
+            kkoVO.setCreatId(user.getId());
+            payDAO.insertKko(kkoVO);
+
+            returnVo.setKkoId(kkoVO.getKkoId());
 
             connection.connect();
 
@@ -2116,16 +2133,35 @@ public class DtyServiceImpl extends EgovAbstractServiceImpl implements DtyServic
                 inReader.close();
                 reader.close();
                 LOGGER.debug("Response: " + response.toString());
+
             } else {
             	LOGGER.debug("Error: " + responseCode);
             }
             if (connection != null) {
             	connection.disconnect();
             }
-            return response.toString();
+
+	        if(!Util.isEmpty(response.toString())) {
+		        JSONParser jsonParse = new JSONParser();
+		        JSONObject jsonObj = (JSONObject) jsonParse.parse(response.toString());
+		        if("200".equals(jsonObj.get("code")) ) {
+    		        JSONObject data = (JSONObject) jsonObj.get("data");
+    		        returnVo.setSendAccessToken(data.get("sendAccessToken").toString());
+    		        returnVo.setSendRefreshToken(data.get("sendRefreshToken").toString());
+    		        kkoVO.setSendAccessToken(returnVo.getSendAccessToken());
+    		        kkoVO.setSendRefreshToken(returnVo.getSendRefreshToken());
+		        }
+		        kkoVO.setCode((String)jsonObj.get("code"));
+	        }
+
+	        //거래이력 결과 수정
+            kkoVO.setRecvLongtxt(response.toString());
+            payDAO.updateKko(kkoVO);
+
+            return returnVo;
         } catch (Exception e) {
             e.printStackTrace();
-            return null;
+            return returnVo;
         } finally {
             if (connection != null) {
             connection.disconnect();
@@ -2140,34 +2176,11 @@ public class DtyServiceImpl extends EgovAbstractServiceImpl implements DtyServic
 	 * @param sendRefreshToken
 	 * @return
 	 */
-	public String doznHttpRequestMsg(String jsonParameters, String sendAccessToken, String sendRefreshToken) throws Exception {
+	public String doznHttpRequestMsg(JSONObject jsonParameters, String kkoId, String sendAccessToken, String sendRefreshToken) throws Exception {
+		LoginVO user = (LoginVO)EgovUserDetailsHelper.getAuthenticatedUser();
     	HttpURLConnection connection = null;
         try {
-            LOGGER.debug("jsonParameters : "+jsonParameters);
-            jsonParameters = "{ "
-            		+ "  \"messageType\": \"kat\", "
-            		+ "  \"kakaoMessage\": { "
-            		+ "    \"senderKey\": \"64e98b5f16c490c13b4333fb1971fb862050389b\", "
-            		+ "    \"templateCode\": \"84cd4558a0b74ad99c9e\", "
-            		+ "    \"body\": \"임시 패스워드가 발급되었습니다.임시패스워드 : #{임시패스워드}RADER BANK에 접속하여 로그인 후 초기패스워드를  다시 설정 하시면 됩니다.\", "
-            		+ "    		\"button1\": { "
-            		+ "    		\"name\": \"접속\","
-            		+ "    		\"type\": \"WL\", "
-            		+ "    		\"urlMobile\": \"https://riderbank.co.kr\","
-            		+ "    		\"urlPc\": \"https://riderbank.co.kr\" "
-            		+ "    	} "
-            		+ "}, "
-//            		+ "\"referenceKey\": \"20250723000000000000000000000003\", "
-            		+ "  \"callback\": \"010-555-6666\", "
-            		+ "  \"phoneList\": [ "
-            		+ "    { "
-            		+ "      \"phone\": \"01032465205\", "
-            		+ "      \"variables\": { "
-            		+ "        \"임시패스워드\": \"00000\" "
-            		+ "      } "
-            		+ "    } "
-            		+ "  ] "
-            		+ "} ";
+            LOGGER.debug("jsonParameters : "+jsonParameters.toString());
 
             URL url = new URL(EgovProperties.getProperty("Globals.msgUrl")+"/api/v1/send");
             connection = (HttpURLConnection) url.openConnection();
@@ -2181,10 +2194,33 @@ public class DtyServiceImpl extends EgovAbstractServiceImpl implements DtyServic
             connection.setDoOutput(true);
 
 
+            //거래이력 누적
+            KkoVO kkoVo = new KkoVO();
+        	kkoVo.setUpKkoId(kkoId);
+        	kkoVo.setGubun("2");	//메세지
+        	kkoVo.setUrl("/api/v1/send");
+        	kkoVo.setSendAccessToken(sendAccessToken);
+        	kkoVo.setSendRefreshToken(sendRefreshToken);
+        	kkoVo.setCreatId(user.getId());
+        	kkoVo.setBigo("패스워드 알림 발송대기");
+            JSONArray jsonSendList = new JSONArray(jsonParameters.get("phoneList").toString());
+            for (int i = 0; i < jsonSendList.length(); ++i) {
+            	JSONParser parser = new JSONParser();
+            	JSONObject jsonObject = (JSONObject)parser.parse(jsonSendList.get(i).toString());
+
+		        //거래이력 결과 수정
+            	kkoVo.setKkoId(egovKkoIdGnrService.getNextStringId());
+	        	kkoVo.setMbtlnum((String)jsonObject.get("phone"));
+	        	kkoVo.setSendLongtxt(jsonObject.get("variables").toString());
+	            payDAO.insertKko(kkoVo);
+            }
+
+
+
             DataOutputStream wr = new DataOutputStream (connection.getOutputStream());
 
 
-            wr.write(jsonParameters.getBytes("UTF-8"));
+            wr.write(jsonParameters.toString().getBytes("UTF-8"));
             wr.close();
 
             InputStream is = connection.getInputStream();
@@ -2195,6 +2231,35 @@ public class DtyServiceImpl extends EgovAbstractServiceImpl implements DtyServic
             while ((line = rd.readLine()) != null) {
                 response.append(line);
             }
+            LOGGER.debug("Response: " + response.toString());
+
+            if (connection != null) {
+            	connection.disconnect();
+            }
+
+	        if(!Util.isEmpty(response.toString())) {
+		        JSONParser jsonParse = new JSONParser();
+		        JSONObject jsonObj = (JSONObject) jsonParse.parse(response.toString());
+		        if("200".equals(jsonObj.get("code")) ) {
+
+    		        JSONObject data = (JSONObject) jsonObj.get("data");
+    		        JSONArray jsonList = new JSONArray(data.get("successList").toString());
+
+    		        kkoVo.setReferenceKey(data.get("referenceKey").toString());
+    		        for (int i = 0; i < jsonList.length(); ++i) {
+    	            	JSONParser parser = new JSONParser();
+    		        	JSONObject jsonObject = (JSONObject)parser.parse(jsonList.get(i).toString());
+    			        //거래이력 결과 수정
+    		        	kkoVo.setUserKey((String)jsonObject.get((i+1)+""));
+    		        	kkoVo.setUpKkoId(kkoId);
+    		        	kkoVo.setMbtlnum((String)jsonObject.get("phone"));
+    		        	kkoVo.setBigo("패스워드 알림 발송완료");
+    		            payDAO.updateKkoUsr(kkoVo);
+    		        }
+
+		        }
+	        }
+
 
             return response.toString();
         } catch (Exception e) {
