@@ -186,75 +186,104 @@ public class DtyServiceImpl extends EgovAbstractServiceImpl implements DtyServic
 			ExcelSheetHandler sheet = excelDataBySheet.get(i);
 			List<List<String>> rows = sheet.getRows();
 
-			for(int j = 0; j < rows.size() ; j++) {
-				List<String> row = rows.get(j);
-				try {
-	            	DeliveryInfoVO deliveryInfoVO = new DeliveryInfoVO();
-	            	deliveryInfoVO.setCooperatorId(row.get(0));
-	            	deliveryInfoVO.setCooperatorNm(row.get(1));
-	            	deliveryInfoVO.setRegistrationSn(row.get(2));
-	            	deliveryInfoVO.setRegistrationNm(row.get(3));
-	            	deliveryInfoVO.setRunDe(row.get(4));
-	            	deliveryInfoVO.setDeliverySn(row.get(5));
-	            	deliveryInfoVO.setDeliveryState(row.get(6));
-	            	deliveryInfoVO.setServiceType(row.get(7));
-	            	deliveryInfoVO.setDeliveryType(row.get(8));
-	            	deliveryInfoVO.setRiderId(row.get(9));
-	            	deliveryInfoVO.setMberId(row.get(10));
-	            	deliveryInfoVO.setRiderNm(row.get(11));
-	            	deliveryInfoVO.setDeliveryMethod(row.get(12));
-	            	deliveryInfoVO.setShopSn(row.get(13));
-	            	deliveryInfoVO.setShopNm(row.get(14));
-	            	deliveryInfoVO.setGoodsPrice(row.get(15));
-	            	deliveryInfoVO.setPickupAddr(row.get(16));
-	            	deliveryInfoVO.setDestinationAddr(row.get(17));
-	            	deliveryInfoVO.setOrderDt(row.get(18));
-	            	deliveryInfoVO.setOperateRiderDt(row.get(19));
-	            	deliveryInfoVO.setShopComeinDt(row.get(20));
-	            	deliveryInfoVO.setPickupFinistDt(row.get(21));
-	            	deliveryInfoVO.setDeliveryFinistDt(row.get(22));
-	            	deliveryInfoVO.setDistance(row.get(23));
-	            	deliveryInfoVO.setAddDeliveryReason(row.get(24));
-	            	deliveryInfoVO.setAddDeliveryDesc(row.get(25));
-	            	deliveryInfoVO.setPickupLawDong(row.get(26));
-	            	deliveryInfoVO.setBasicPrice(Integer.parseInt(row.get(27)) );
-	            	deliveryInfoVO.setWeatherPrimage(Integer.parseInt(row.get(28)) );
-	            	deliveryInfoVO.setAddPrimage(Integer.parseInt(row.get(29)) );
-	            	deliveryInfoVO.setPeakPrimageEtc(Integer.parseInt(row.get(30)) );
-	            	deliveryInfoVO.setDeliveryPrice(Integer.parseInt(row.get(31)) );
-	            	deliveryInfoVO.setRiderCauseYn(row.get(32));
-	            	deliveryInfoVO.setAddPrimageDesc(row.get(33));
-	            	deliveryInfoVO.setNote("");
-	            	deliveryInfoVO.setAtchFileId(atchFileId);
-	            	deliveryInfoVO.setCreatId(user.getId());
-
-
-	            	//권한
-	            	deliveryInfoVO.setSchAuthorCode(user.getAuthorCode());
-	            	deliveryInfoVO.setSchIhidNum(user.getIhidNum());
-
-	            	if(dtyDAO.insertDeliveryInfo(deliveryInfoVO) <= 0) {
-	            		throw new IllegalArgumentException("협력사아이디가 없거나 수수료가 설정되어있지 않습니다.") ;
-	            	}
-
-	            	insertMber(deliveryInfoVO.getMberId(), deliveryInfoVO.getRiderNm(), deliveryInfoVO.getCooperatorId(), user);
-				}catch(Exception e) {
-					LOGGER.error(e.toString());
-					e.printStackTrace();
-					//insert 오류시 RD_DELIVERY_ERROR 테이블에 넣기
-					DeliveryErrorVO eVo = new DeliveryErrorVO();
-					eVo.setLongtxt(row.toString());
-					eVo.setAtchFileId(atchFileId);
-					eVo.setCreatId(user.getId());
-					eVo.setUseAt("Y");
-					dtyDAO.insertDeliveryError(eVo);
-
-					FileVO fVo = new FileVO();
-					fVo.setAtchFileId(atchFileId);
-					fVo.setErorrMsg(e.getMessage());
-					dtyDAO.updateFileUploadErrMsg(fVo);
+			try {
+				List<String> headerList = sheet.getHeader();
+				if(!"협력사아이디".equals(headerList.get(0).trim())) {
+					throw new IllegalArgumentException("엑셀 서식이 다릅니다 [협력사아이디 : A열]") ;
+				}
+				if(!"운행일".equals(headerList.get(4).trim())) {
+					throw new IllegalArgumentException("엑셀 서식이 다릅니다 [운행일 : E열]") ;
+				}
+				if(!"배달번호".equals(headerList.get(5).trim())) {
+					throw new IllegalArgumentException("엑셀 서식이 다릅니다 [배달번호 : F열]") ;
+				}
+				if(!"USER ID".equals(headerList.get(10).trim().toUpperCase())) {
+					throw new IllegalArgumentException("엑셀 서식이 다릅니다 [User ID : K열]") ;
+				}
+				if(!"라이더명".equals(headerList.get(11).trim())) {
+					throw new IllegalArgumentException("엑셀 서식이 다릅니다 [라이더명 : L열]") ;
+				}
+				if(!"배달처리비".equals(headerList.get(31).trim())) {
+					throw new IllegalArgumentException("엑셀 서식이 다릅니다 [배달처리비 : AF열]") ;
 				}
 
+
+				for(int j = 0; j < rows.size() ; j++) {
+					List<String> row = rows.get(j);
+					try {
+		            	DeliveryInfoVO deliveryInfoVO = new DeliveryInfoVO();
+		            	deliveryInfoVO.setCooperatorId(row.get(0));
+		            	deliveryInfoVO.setCooperatorNm(row.get(1));
+		            	deliveryInfoVO.setRegistrationSn(row.get(2));
+		            	deliveryInfoVO.setRegistrationNm(row.get(3));
+		            	deliveryInfoVO.setRunDe(row.get(4));
+		            	deliveryInfoVO.setDeliverySn(row.get(5));
+		            	deliveryInfoVO.setDeliveryState(row.get(6));
+		            	deliveryInfoVO.setServiceType(row.get(7));
+		            	deliveryInfoVO.setDeliveryType(row.get(8));
+		            	deliveryInfoVO.setRiderId(row.get(9));
+		            	deliveryInfoVO.setMberId(row.get(10));
+		            	deliveryInfoVO.setRiderNm(row.get(11));
+		            	deliveryInfoVO.setDeliveryMethod(row.get(12));
+		            	deliveryInfoVO.setShopSn(row.get(13));
+		            	deliveryInfoVO.setShopNm(row.get(14));
+		            	deliveryInfoVO.setGoodsPrice(row.get(15));
+		            	deliveryInfoVO.setPickupAddr(row.get(16));
+		            	deliveryInfoVO.setDestinationAddr(row.get(17));
+		            	deliveryInfoVO.setOrderDt(row.get(18));
+		            	deliveryInfoVO.setOperateRiderDt(row.get(19));
+		            	deliveryInfoVO.setShopComeinDt(row.get(20));
+		            	deliveryInfoVO.setPickupFinistDt(row.get(21));
+		            	deliveryInfoVO.setDeliveryFinistDt(row.get(22));
+		            	deliveryInfoVO.setDistance(row.get(23));
+		            	deliveryInfoVO.setAddDeliveryReason(row.get(24));
+		            	deliveryInfoVO.setAddDeliveryDesc(row.get(25));
+		            	deliveryInfoVO.setPickupLawDong(row.get(26));
+		            	deliveryInfoVO.setBasicPrice(Integer.parseInt(row.get(27)) );
+		            	deliveryInfoVO.setWeatherPrimage(Integer.parseInt(row.get(28)) );
+		            	deliveryInfoVO.setAddPrimage(Integer.parseInt(row.get(29)) );
+		            	deliveryInfoVO.setPeakPrimageEtc(Integer.parseInt(row.get(30)) );
+		            	deliveryInfoVO.setDeliveryPrice(Integer.parseInt(row.get(31)) );
+		            	deliveryInfoVO.setRiderCauseYn(row.get(32));
+		            	deliveryInfoVO.setAddPrimageDesc(row.get(33));
+		            	deliveryInfoVO.setNote("");
+		            	deliveryInfoVO.setAtchFileId(atchFileId);
+		            	deliveryInfoVO.setCreatId(user.getId());
+
+
+		            	//권한
+		            	deliveryInfoVO.setSchAuthorCode(user.getAuthorCode());
+		            	deliveryInfoVO.setSchIhidNum(user.getIhidNum());
+
+		            	if(dtyDAO.insertDeliveryInfo(deliveryInfoVO) <= 0) {
+		            		throw new IllegalArgumentException("협력사아이디가 없거나 수수료가 설정되어있지 않습니다.") ;
+		            	}
+
+		            	insertMber(deliveryInfoVO.getMberId(), deliveryInfoVO.getRiderNm(), deliveryInfoVO.getCooperatorId(), user);
+					}catch(Exception e) {
+						LOGGER.error(e.toString());
+						e.printStackTrace();
+						//insert 오류시 RD_DELIVERY_ERROR 테이블에 넣기
+						DeliveryErrorVO eVo = new DeliveryErrorVO();
+						eVo.setLongtxt(row.toString());
+						eVo.setAtchFileId(atchFileId);
+						eVo.setCreatId(user.getId());
+						eVo.setUseAt("Y");
+						dtyDAO.insertDeliveryError(eVo);
+
+						FileVO fVo = new FileVO();
+						fVo.setAtchFileId(atchFileId);
+						fVo.setErorrMsg(e.getMessage());
+						dtyDAO.updateFileUploadErrMsg(fVo);
+					}
+
+				}
+			}catch(Exception e) {
+				LOGGER.error(e.toString());
+				FileVO fVo = new FileVO();
+				fVo.setAtchFileId(atchFileId);
+				fVo.setErorrMsg(e.getMessage());
+				dtyDAO.updateFileUploadErrMsg(fVo);
 			}
 		}
 
@@ -1010,6 +1039,24 @@ public class DtyServiceImpl extends EgovAbstractServiceImpl implements DtyServic
 					int rowSize = this.getRowSize(rowObj);
 					if(rowSize > 10) {
 						LOGGER.debug("----------");
+
+						if(riderIdx == 2) {
+							//헤더 체크
+							if(!"USER ID".equals(rowObj.getCell(1).toString().trim().toUpperCase())) {
+								throw new IllegalArgumentException("엑셀 서식이 다릅니다 [User ID : B열]") ;
+							}
+							if(!"라이더명".equals(rowObj.getCell(2).toString().trim().toUpperCase())) {
+								throw new IllegalArgumentException("엑셀 서식이 다릅니다 [라이더명 : C열]") ;
+							}
+							if(!"처리건수".equals(rowObj.getCell(3).toString().trim().toUpperCase())) {
+								throw new IllegalArgumentException("엑셀 서식이 다릅니다 [라이더명 : D열]") ;
+							}
+							if(rowObj.getCell(25).toString().trim().toUpperCase().indexOf("지급금액") < 0
+									&& rowObj.getCell(26).toString().trim().toUpperCase().indexOf("지급금액") < 0) {
+								throw new IllegalArgumentException("엑셀 서식이 다릅니다 [라이더별 지급금액 : Z열 or AA열]") ;
+							}
+						}
+
 						if(riderIdx != 4) {		//헤더 제거용
 							riderIdx++;
 							continue;

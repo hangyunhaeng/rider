@@ -352,7 +352,7 @@
 
 	</select>
 	<select id="selectUploadStateInDay" parameterType="egovframework.com.rd.usr.service.vo.WeekInfoVO" resultType="egovframework.com.rd.usr.service.vo.UploadStateVO">
-		SELECT c.ATCH_FILE_ID, d.ORIGNL_FILE_NM, a.COOPERATOR_ID, b.COOPERATOR_NM, COUNT(a.DELIVERY_SN) CNT, DATE_FORMAT(a.CREAT_DT,'%Y%m%d') CREAT_DT, d.ERORR_MSG
+		SELECT c.ATCH_FILE_ID, d.ORIGNL_FILE_NM, a.COOPERATOR_ID, b.COOPERATOR_NM, COUNT(a.DELIVERY_SN) CNT, DATE_FORMAT(c.CREAT_DT,'%Y%m%d') CREAT_DT, d.ERORR_MSG
 		FROM COMTNFILE c
 			LEFT JOIN COMTNFILEDETAIL d ON c.ATCH_FILE_ID = d.ATCH_FILE_ID
 			LEFT JOIN RD_DELIVERY_INFO a ON c.ATCH_FILE_ID = a.ATCH_FILE_ID
