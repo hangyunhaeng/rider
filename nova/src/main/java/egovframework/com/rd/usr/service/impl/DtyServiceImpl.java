@@ -2819,8 +2819,9 @@ public class DtyServiceImpl extends EgovAbstractServiceImpl implements DtyServic
 	public void deleteWeekAtchFile(WeekInfoVO weekInfoVO) throws Exception {
 
 		WeekInfoVO cnt = dtyDAO.selectFixWeekInfo(weekInfoVO);
-		if(cnt.getTotalCnt() <= 0) {
-			dtyDAO.deleteWeekAtchFile(weekInfoVO);
+		if(cnt.getTotalCnt() > 0) {
+			throw new IllegalArgumentException("확정 데이터가 있어 삭제를 취소합니다") ;
 		}
+		dtyDAO.deleteWeekAtchFile(weekInfoVO);
 	}
 }

@@ -153,16 +153,18 @@
 	<update id="updateFixWeek" parameterType="egovframework.com.rd.usr.service.vo.WeekInfoVO">
 		UPDATE RD_WEEK_RIDER_INFO a,(
 
-				SELECT wi.week_id, a.mber_id
+				SELECT wi.week_id, wr.mber_id
 					FROM RD_WEEK_INFO wi
 					LEFT JOIN RD_WEEK_RIDER_INFO wr ON wi.WEEK_ID = wr.week_id
-					JOIN RD_DAY_PAY a ON wi.COOPERATOR_ID = a.COOPERATOR_ID AND wr.MBER_ID = a.mber_id AND a.use_at = 'Y' AND IO_GUBUN= '1'
+					LEFT JOIN RD_DAY_PAY a ON wi.COOPERATOR_ID = a.COOPERATOR_ID AND wr.MBER_ID = a.mber_id AND a.use_at = 'Y' AND IO_GUBUN= '1'
 					LEFT JOIN COMTNGNRLMBER d ON wr.mber_id = d.mber_id
+					JOIN COMTNFILE e ON wi.ATCH_FILE_ID = e.ATCH_FILE_ID
 						WHERE 1=1
+							AND e.USE_AT ='Y'
 							AND wr.FIX_DAY is NULL
 							AND (wi.ACCOUNTS_ST_DT BETWEEN #{searchFromDate} AND #{searchToDate} or wi.ACCOUNTS_ED_DT BETWEEN #{searchFromDate} AND #{searchToDate})
 							<![CDATA[
-							AND if(wi.accounts_st_dt <= a.DAY AND wi.accounts_ed_dt >= a.DAY, 1, 0) =1]]>
+							/*AND if(wi.accounts_st_dt <= a.DAY AND wi.accounts_ed_dt >= a.DAY, 1, 0) =1*/]]>
 							<if test="searchNm != null and searchNm != ''">
 							AND d.MBER_NM like '%' #{searchNm} '%'
 							</if>
@@ -177,8 +179,10 @@
 			SELECT wi.WEEK_ID, SUM(if(wr.FIX_DAY IS NULL , 1, 0)) AS NOT_CNT
 			FROM RD_WEEK_INFO wi
 			LEFT JOIN RD_WEEK_RIDER_INFO wr ON wi.WEEK_ID = wr.week_id
+			JOIN COMTNFILE a ON wi.ATCH_FILE_ID = a.ATCH_FILE_ID
 			WHERE 1=1
 				AND wi.FIX_DAY is NULL
+				AND a.USE_AT ='Y'
 				AND (wi.ACCOUNTS_ST_DT BETWEEN #{searchFromDate} AND #{searchToDate} or wi.ACCOUNTS_ED_DT BETWEEN #{searchFromDate} AND #{searchToDate})
 			GROUP BY wi.WEEK_ID
 		)b
@@ -431,7 +435,7 @@
 
 	<select id="selectPixWeek" parameterType="egovframework.com.rd.usr.service.vo.WeekInfoVO" resultType="egovframework.com.rd.usr.service.vo.WeekPayVO">
 		SELECT a.WEEK_ID, a.COOPERATOR_ID, b.MBER_ID, 'WEK' AS DW_GUBUN, '1' AS IO_GUBUN, b.GIVE_PAY
-		,b.GIVE_PAY - d.CALL_FEE_COST - d.PROGRAM_FEE_COST AS ABLE_PRICE, d.CALL_FEE_COST, d.PROGRAM_FEE_COST
+		, b.GIVE_PAY - nvl(d.CALL_FEE_COST, 0) - nvl(d.PROGRAM_FEE_COST, 0) AS ABLE_PRICE, d.CALL_FEE_COST, d.PROGRAM_FEE_COST
 		, 0 AS FEE, a.ACCOUNTS_ST_DT, a.ACCOUNTS_ED_DT, a.ATCH_FILE_ID, 'Y' AS USE_AT
 		FROM RD_WEEK_INFO a
 			LEFT JOIN RD_WEEK_RIDER_INFO b on a.WEEK_ID = b.week_id
@@ -487,7 +491,7 @@
 				AND d.USE_AT ='Y'
 				AND (a.ACCOUNTS_ST_DT BETWEEN #{searchFromDate} AND #{searchToDate} or a.ACCOUNTS_ED_DT BETWEEN #{searchFromDate} AND #{searchToDate})
 				<if test="searchNm != null and searchNm != ''">
-				AND d.MBER_NM LIKE '%' #{searchNm} '%'
+				AND b.MBER_NM LIKE '%' #{searchNm} '%'
 				</if>
 				GROUP BY a.COOPERATOR_ID, b.MBER_ID
 		)
@@ -712,8 +716,10 @@
 					LEFT JOIN RD_WEEK_RIDER_INFO wr ON wi.WEEK_ID = wr.week_id
 					LEFT JOIN RD_DAY_PAY a ON wi.COOPERATOR_ID = a.COOPERATOR_ID AND wr.MBER_ID = a.mber_id AND a.use_at = 'Y' AND IO_GUBUN= '1'
 					LEFT JOIN COMTNGNRLMBER d ON wr.mber_id = d.mber_id
+					JOIN COMTNFILE b ON wi.ATCH_FILE_ID = b.ATCH_FILE_ID
 						WHERE 1=1
 							AND wr.FIX_DAY is NULL
+							AND b.USE_AT ='Y'
 							AND a.WEEK_YN = 'N'
 							AND (wi.ACCOUNTS_ST_DT BETWEEN #{searchFromDate} AND #{searchToDate} or wi.ACCOUNTS_ED_DT BETWEEN #{searchFromDate} AND #{searchToDate})
 
@@ -753,8 +759,10 @@
 					LEFT JOIN RD_WEEK_RIDER_INFO wr ON wi.WEEK_ID = wr.week_id
 					JOIN RD_DAY_PAY a ON wi.COOPERATOR_ID = a.COOPERATOR_ID AND wr.MBER_ID = a.mber_id AND a.use_at = 'Y' AND IO_GUBUN= '2'
 					LEFT JOIN COMTNGNRLMBER d ON wr.mber_id = d.mber_id
+					JOIN COMTNFILE b ON wi.ATCH_FILE_ID = b.ATCH_FILE_ID
 						WHERE 1=1
 							AND wr.FIX_DAY is NULL
+							AND b.USE_AT = 'Y'
 							AND (wi.ACCOUNTS_ST_DT BETWEEN #{searchFromDate} AND #{searchToDate} or wi.ACCOUNTS_ED_DT BETWEEN #{searchFromDate} AND #{searchToDate})
 
 		) b
@@ -776,8 +784,10 @@
 					LEFT JOIN RD_WEEK_RIDER_INFO wr ON wi.WEEK_ID = wr.week_id
 					JOIN RD_DAY_PAY a ON wi.COOPERATOR_ID = a.COOPERATOR_ID AND wr.MBER_ID = a.mber_id AND a.use_at = 'Y' AND  IO_GUBUN= '2'
 					LEFT JOIN COMTNGNRLMBER d ON wr.mber_id = d.mber_id
+					LEFT JOIN COMTNFILE b ON wi.atch_file_id = b.atch_file_id
 						WHERE 1=1
 							AND wr.FIX_DAY is NULL
+						AND b.USE_AT ='Y'
 							AND (wi.ACCOUNTS_ST_DT BETWEEN #{searchFromDate} AND #{searchToDate} or wi.ACCOUNTS_ED_DT BETWEEN #{searchFromDate} AND #{searchToDate})
 							and a.WEEK_YN ='N'
 							AND a.USE_AT ='Y'
@@ -814,7 +824,9 @@
 					LEFT JOIN RD_WEEK_RIDER_INFO wr ON wi.WEEK_ID = wr.week_id
 					JOIN RD_DAY_PAY a ON wi.COOPERATOR_ID = a.COOPERATOR_ID AND wr.MBER_ID = a.mber_id AND a.use_at = 'Y' AND IO_GUBUN= '1'
 					LEFT JOIN COMTNGNRLMBER d ON wr.mber_id = d.mber_id
+					JOIN COMTNFILE e ON wi.atch_file_id = e.atch_file_id
 						WHERE 1=1
+							AND e.USE_AT ='Y'
 							AND wr.FIX_DAY is NULL
 							AND (wi.ACCOUNTS_ST_DT BETWEEN #{searchFromDate} AND #{searchToDate} or wi.ACCOUNTS_ED_DT BETWEEN #{searchFromDate} AND #{searchToDate})
 							<![CDATA[
@@ -1178,10 +1190,11 @@
 		WHERE ATCH_FILE_ID = #{searchAtchFileId}
 	</update>
 	<select id="selectFixWeekInfo" parameterType="egovframework.com.rd.usr.service.vo.WeekInfoVO" resultType="egovframework.com.rd.usr.service.vo.WeekInfoVO">
-		SELECT COUNT(WEEK_ID) TOTAL_CNT
-		FROM RD_WEEK_INFO
-		WHERE ATCH_FILE_ID = #{searchAtchFileId}
-		AND FIX_DAY IS NOT NULL
+		SELECT COUNT(b.WEEK_ID) TOTAL_CNT
+		FROM RD_WEEK_INFO a
+			LEFT JOIN RD_WEEK_RIDER_INFO b ON a.WEEK_ID = b.WEEK_ID
+		WHERE a.ATCH_FILE_ID = #{searchAtchFileId}
+		AND b.FIX_DAY IS NOT NULL
 	</select>
 
 </mapper>
