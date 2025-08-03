@@ -2809,4 +2809,18 @@ public class DtyServiceImpl extends EgovAbstractServiceImpl implements DtyServic
 			dtyDAO.updateBalance(mberBalance);
 		}
 	}
+	/**
+	 * 주정산 파일 삭제
+	 * 확정 않한 파일만 삭제 할수 있음
+	 * @param weekInfoVO
+	 * @return
+	 * @throws Exception
+	 */
+	public void deleteWeekAtchFile(WeekInfoVO weekInfoVO) throws Exception {
+
+		WeekInfoVO cnt = dtyDAO.selectFixWeekInfo(weekInfoVO);
+		if(cnt.getTotalCnt() <= 0) {
+			dtyDAO.deleteWeekAtchFile(weekInfoVO);
+		}
+	}
 }

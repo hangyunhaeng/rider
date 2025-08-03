@@ -579,5 +579,23 @@ public class DtyDAO extends EgovComAbstractDAO {
 	public int updateFileUploadErrMsg(FileVO vo) throws Exception {
 		return update("dtyDAO.updateFileUploadErrMsg", vo);
 	}
+	/**
+	 * 주정산 파일 삭제
+	 * @param weekInfoVO
+	 * @return
+	 * @throws Exception
+	 */
+	public int deleteWeekAtchFile(WeekInfoVO weekInfoVO) throws Exception {
+		return update("dtyDAO.deleteWeekAtchFile", weekInfoVO);
+	}
+	/**
+	 * 확정된 주정산 조회(by file)
+	 * @param weekInfoVO
+	 * @return
+	 * @throws Exception
+	 */
+	public WeekInfoVO selectFixWeekInfo(WeekInfoVO weekInfoVO) throws Exception {
+		return selectOne("dtyDAO.selectFixWeekInfo", weekInfoVO);
+	}
 }
 

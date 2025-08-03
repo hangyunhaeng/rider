@@ -812,6 +812,47 @@ public class DtyController {
         return ResponseEntity.ok(map);
 	}
 
+	/**
+	 * 주정산 파일 삭제
+	 * 확정 않한 파일만 삭제 할수 있음
+	 * @param weekInfoVO
+	 * @param request
+	 * @param sessionVO
+	 * @param model
+	 * @param status
+	 * @return
+	 * @throws Exception
+	 */
+	@RequestMapping("/usr/dty0003_0002.do")
+	public ResponseEntity<?> dty0003_0002(@ModelAttribute("WeekInfoVO") WeekInfoVO weekInfoVO, HttpServletRequest request, SessionVO sessionVO, ModelMap model, SessionStatus status) throws Exception{
+		//return value
+		Map<String, Object> map =  new HashMap<String, Object>();
+
+    	//로그인 체크
+        LoginVO user = (LoginVO)EgovUserDetailsHelper.getAuthenticatedUser();
+        Boolean isAuthenticated = EgovUserDetailsHelper.isAuthenticated();
+
+        if(!isAuthenticated) {
+            map.put("resultCode", "logout");
+            return ResponseEntity.ok(map);
+        }
+
+        if(!Util.isUsr()) {
+        	return ResponseEntity.status(401).body("Unauthorized");
+        }
+
+
+        //총판 or 협력사
+        weekInfoVO.setSchAuthorCode(user.getAuthorCode());
+        weekInfoVO.setSchIhidNum(user.getIhidNum());
+
+        dtyService.deleteWeekAtchFile(weekInfoVO);
+
+        map.put("resultWeek", dtyService.selectUploadStateInWeek(weekInfoVO));
+        map.put("resultDay", dtyService.selectUploadStateInDay(weekInfoVO));
+        map.put("resultCode", "success");
+        return ResponseEntity.ok(map);
+	}
 
 	/**
 	 * 배달 정보 조회
