@@ -294,4 +294,12 @@ public interface DtyService {
 	 * @throws Exception
 	 */
 	public void deleteWeekAtchFile(WeekInfoVO weekInfoVO) throws Exception ;
+	/**
+	 * 일정산 파일 삭제
+	 * 확정 않한 파일만 삭제 할수 있음
+	 * @param weekInfoVO
+	 * @return
+	 * @throws Exception
+	 */
+	public void deleteDayAtchFile(WeekInfoVO weekInfoVO) throws Exception ;
 }

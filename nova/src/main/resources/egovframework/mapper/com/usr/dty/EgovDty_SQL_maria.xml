@@ -86,11 +86,13 @@
 			SERVICE_TYPE,DELIVERY_TYPE,RIDER_ID,a.MBER_ID,RIDER_NM,DELIVERY_METHOD,SHOP_SN,SHOP_NM,GOODS_PRICE,
 			PICKUP_ADDR,DESTINATION_ADDR,ORDER_DT,OPERATE_RIDER_DT,SHOP_COMEIN_DT,PICKUP_FINIST_DT,DELIVERY_FINIST_DT,
 			DISTANCE,ADD_DELIVERY_REASON,ADD_DELIVERY_DESC,PICKUP_LAW_DONG,BASIC_PRICE,WEATHER_PRIMAGE,ADD_PRIMAGE,
-			PEAK_PRIMAGE_ETC,DELIVERY_PRICE,RIDER_CAUSE_YN,ADD_PRIMAGE_DESC,NOTE,ATCH_FILE_ID,CREAT_DT,CREAT_ID
+			PEAK_PRIMAGE_ETC,DELIVERY_PRICE,RIDER_CAUSE_YN,ADD_PRIMAGE_DESC,NOTE,a.ATCH_FILE_ID,a.CREAT_DT,a.CREAT_ID
 		FROM RD_DELIVERY_INFO a
 		LEFT JOIN COMTNGNRLMBER b ON a.mber_id = b.mber_id
+		LEFT JOIN COMTNFILE c ON a.ATCH_FILE_ID = c.ATCH_FILE_ID
 		WHERE 1=1
 			AND RUN_DE BETWEEN #{searchFromDate} AND #{searchToDate}
+			AND c.USE_AT ='Y'
 
 			<if test="searchMberId != null and searchMberId != ''">
 				AND a.MBER_ID = #{searchMberId}
@@ -134,8 +136,10 @@
 				a.COOPERATOR_ID,a.RUN_DE, a.DELIVERY_SN
 			FROM RD_DELIVERY_INFO a
 			LEFT JOIN COMTNGNRLMBER b ON a.mber_id = b.mber_id
+			JOIN COMTNFILE c ON a.ATCH_FILE_ID = c.ATCH_FILE_ID
 			WHERE 1=1
 
+				AND c.USE_AT = 'Y'
 				AND RUN_DE BETWEEN #{searchFromDate} AND #{searchToDate}
 				<if test="searchNm != null and searchNm != ''">
 				AND MBER_NM like '%' #{searchNm} '%'
@@ -366,7 +370,7 @@
 			LEFT JOIN RD_DELIVERY_INFO a ON c.ATCH_FILE_ID = a.ATCH_FILE_ID
 			LEFT JOIN RD_COOPERATOR b ON a.COOPERATOR_ID = b.COOPERATOR_ID
 		WHERE DATE_FORMAT(c.CREAT_DT, '%Y%m')  = #{searchDate}
-
+				AND c.USE_AT ='Y'
 			<if test="schAuthorCode == 'ROLE_USER'">
 			/* 협력사 조건 *//* COOPERATOR_ID로 조건을 만든건 ★정산 파일을 올릴때 권한이 있는 협력사ID 데이터만 올릴수 있음!!★ - 나머지는 오류 처리할꺼임  */
 			AND a.COOPERATOR_ID IN (
@@ -592,7 +596,9 @@
 					LEFT JOIN RD_COOPERATOR_FEE b ON a.COOPERATOR_ID = b.COOPERATOR_ID AND b.use_at ='Y'
 					LEFT JOIN RD_RIDER_FEE c ON a.COOPERATOR_ID = c.COOPERATOR_ID  AND a.MBER_ID = c.MBER_ID AND  c.use_at ='Y'
 					LEFT JOIN COMTNGNRLMBER d ON a.mber_id = d.mber_id
+					JOIN COMTNFILE e ON a.ATCH_FILE_ID = e.ATCH_FILE_ID
 					WHERE 1 = 1
+						AND e.USE_AT ='Y'
 						AND a.RUN_DE BETWEEN #{searchFromDate} AND #{searchToDate}
 						<if test="searchNm != null and searchNm != ''">
 						AND d.MBER_NM like '%' #{searchNm} '%'
@@ -1053,7 +1059,9 @@
 			LEFT JOIN RD_DAY_PAY c ON b.COOPERATOR_ID = c.COOPERATOR_ID AND b.MBER_ID = c.MBER_ID  AND b.ETC_ID = c.ETC_ID AND c.IO_GUBUN ='2' AND c.day = a.RUN_DE
 			LEFT JOIN RD_WEEK_PAY d ON b.COOPERATOR_ID = d.COOPERATOR_ID AND b.MBER_ID = d.MBER_ID  AND b.ETC_ID = d.ETC_ID AND d.IO_GUBUN = '2' AND d.TRAN_DAY = a.RUN_DE
 			LEFT JOIN COMTNGNRLMBER e ON a.mber_id = e.mber_id
+			JOIN COMTNFILE f ON a.ATCH_FILE_ID = f.ATCH_FILE_ID
 			WHERE 1 = 1
+				AND f.USE_AT ='Y'
 				AND a.RUN_DE BETWEEN #{searchFromDate} AND #{searchToDate}
 				<if test="searchNm != null and searchNm != ''">
 				AND e.MBER_NM like '%' #{searchNm} '%'
@@ -1123,7 +1131,9 @@
 				LEFT JOIN RD_COOPERATOR_FEE b ON a.COOPERATOR_ID = b.COOPERATOR_ID AND b.use_at ='Y'
 				LEFT JOIN RD_RIDER_FEE c ON a.COOPERATOR_ID = c.COOPERATOR_ID  AND a.MBER_ID = c.MBER_ID AND  c.use_at ='Y'
 				LEFT JOIN COMTNGNRLMBER d ON a.mber_id = d.mber_id
+				JOIN COMTNFILE e ON a.ATCH_FILE_ID = e.ATCH_FILE_ID
 				WHERE 1 = 1
+					AND e.USE_AT ='Y'
 					AND a.RUN_DE BETWEEN #{searchFromDate} AND #{searchToDate}
 
 					AND d.MBER_NM like '%' #{searchNm} '%'
@@ -1138,7 +1148,9 @@
 				LEFT JOIN RD_COOPERATOR_FEE b ON a.COOPERATOR_ID = b.COOPERATOR_ID AND b.use_at ='Y'
 				LEFT JOIN RD_RIDER_FEE c ON a.COOPERATOR_ID = c.COOPERATOR_ID  AND a.MBER_ID = c.MBER_ID AND  c.use_at ='Y'
 				LEFT JOIN COMTNGNRLMBER d ON a.mber_id = d.mber_id
+				JOIN COMTNFILE e ON a.ATCH_FILE_ID = e.ATCH_FILE_ID
 				WHERE 1 = 1
+					AND e.USE_AT ='Y'
 					AND a.RUN_DE BETWEEN #{searchFromDate} AND #{searchToDate}
 
 					AND d.MBER_NM like '%' #{searchNm} '%'
@@ -1184,7 +1196,7 @@
 		SET ERORR_MSG = SUBSTR(#{erorrMsg}, 1, 900)
 		WHERE ATCH_FILE_ID = #{atchFileId}
 	</update>
-	<update id="deleteWeekAtchFile" parameterType="egovframework.com.rd.usr.service.vo.WeekInfoVO">
+	<update id="deleteAtchFile" parameterType="egovframework.com.rd.usr.service.vo.WeekInfoVO">
 		UPDATE COMTNFILE
 		SET USE_AT = 'N'
 		WHERE ATCH_FILE_ID = #{searchAtchFileId}
@@ -1195,6 +1207,13 @@
 			LEFT JOIN RD_WEEK_RIDER_INFO b ON a.WEEK_ID = b.WEEK_ID
 		WHERE a.ATCH_FILE_ID = #{searchAtchFileId}
 		AND b.FIX_DAY IS NOT NULL
+	</select>
+	<select id="selectFixDeleveryInfo" parameterType="egovframework.com.rd.usr.service.vo.WeekInfoVO" resultType="egovframework.com.rd.usr.service.vo.WeekInfoVO">
+		SELECT COUNT(a.COOPERATOR_ID) TOTAL_CNT
+		FROM RD_DELIVERY_INFO a
+
+		WHERE a.ATCH_FILE_ID = #{searchAtchFileId}
+		AND a.FIX_DAY IS NOT NULL
 	</select>
 
 </mapper>
