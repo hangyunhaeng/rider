@@ -379,8 +379,18 @@
 
     </select>
 
+    <select id="selectRiderCoopFeeSame" parameterType="egovframework.com.rd.usr.service.vo.CooperatorVO" resultType="egovframework.com.rd.usr.service.vo.CooperatorVO">
+		SELECT a.FEE_ID FROM RD_COOPERATOR_FEE a
+		WHERE a.COOPERATOR_ID = #{cooperatorId} AND use_at ='Y'
+		AND a.FEE_EMPLOYMENT_INSURANCE = #{feeEmploymentInsurance}
+		AND a.FEE_INDUSTRIAL_INSURANCE = #{feeIndustrialInsurance}
+		AND a.FEE_WITHHOLDING_TAX = #{feeWithholdingTax}
+		AND a.FEE_TIME_INSURANCE = #{feeTimeInsurance}
+		AND a.FEE_CALL = #{feeCall}
+
+    </select>
     <select id="selectRiderFeeSame" parameterType="egovframework.com.rd.usr.service.vo.CooperatorVO" resultType="egovframework.com.rd.usr.service.vo.CooperatorVO">
-		select a.RIDER_FEE_ID from RD_RIDER_FEE a
+		select a.RIDER_FEE_ID, a.COOPERATOR_ID, a.MBER_ID  from RD_RIDER_FEE a
 		WHERE a.COOPERATOR_ID = #{cooperatorId} AND use_at ='Y' AND a.MBER_ID = #{mberId}
 		AND a.FEE_EMPLOYMENT_INSURANCE = #{feeEmploymentInsurance}
 		AND a.FEE_INDUSTRIAL_INSURANCE = #{feeIndustrialInsurance}

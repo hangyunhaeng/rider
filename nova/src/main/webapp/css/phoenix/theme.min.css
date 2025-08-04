@@ -6585,7 +6585,7 @@ textarea.form-control-lg {
   font-size: var(--phoenix-pagination-font-size);
   color: var(--phoenix-pagination-color);
   background-color: var(--phoenix-pagination-bg);
-  border: var(--phoenix-pagination-border-width) solid var(--phoenix-pagination-border-color);
+/*   border: var(--phoenix-pagination-border-width) solid var(--phoenix-pagination-border-color); */
   -webkit-transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, -webkit-box-shadow 0.15s ease-in-out;
   transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, -webkit-box-shadow 0.15s ease-in-out;
   -o-transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;

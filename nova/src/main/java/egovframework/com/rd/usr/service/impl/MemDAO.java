@@ -298,6 +298,16 @@ public class MemDAO extends EgovComAbstractDAO {
 	}
 
 	/**
+	 * 라이더와 협력사 수수료가 같은지 확인
+	 * @param vo
+	 * @return
+	 * @throws Exception
+	 */
+	public CooperatorVO selectRiderCoopFeeSame(CooperatorVO vo) throws Exception {
+		return selectOne("memDAO.selectRiderCoopFeeSame", vo);
+	}
+
+	/**
 	 * 같은 수수료가 있는지 조회(라이더)
 	 * @param vo
 	 * @return

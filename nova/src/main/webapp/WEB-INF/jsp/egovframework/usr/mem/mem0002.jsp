@@ -355,7 +355,7 @@
 	      gridObj.setGridOption("rowData", newStore);
 	}
 
-	// 변경된 협력사 id를 저장한다.
+	// 라이더 정보 저장
 	function saveCooperatorUsr(){
 		grid1.stopEditing();
 

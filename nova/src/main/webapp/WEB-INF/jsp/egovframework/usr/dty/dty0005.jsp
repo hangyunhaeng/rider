@@ -128,6 +128,7 @@
 		var today = new Date();
 		var oneMonthAgo = new Date(new Date().setMonth(new Date().getMonth()-1));
 		var threeDayAgo = new Date(new Date().setDate(new Date().getDate()-3));
+		var towWeekAgo = new Date(new Date().setDate(new Date().getDate()-14));
 
 		var searchFromDate = flatpickr("#searchFromDate", {
 			locale: "ko",
@@ -168,7 +169,7 @@
 		    dateFormat: 'Y-m-d',     // date format 형식
 		    disableMobile: true          // 모바일 지원
 		});
-		searchFromDate1.setDate(oneMonthAgo.getFullYear()+"-"+(oneMonthAgo.getMonth()+1)+"-"+oneMonthAgo.getDate());
+		searchFromDate1.setDate(towWeekAgo.getFullYear()+"-"+(towWeekAgo.getMonth()+1)+"-"+towWeekAgo.getDate());
 		searchToDate1.setDate(today.getFullYear()+"-"+(today.getMonth()+1)+"-"+today.getDate());
 
 
@@ -298,6 +299,11 @@
 		params.append('searchToDate', getOnlyNumber($('#searchToDate').val()));	//배달일
 		params.append('searchNm', $('#searchNm').val());			//라이더
 		params.append('searchFixGubun', $('#searchFixGubun').val());		//확정여부
+
+	    if(!limit2Week($('#searchFromDate').val(), $('#searchToDate').val())){
+	    	return;
+	    }
+
 		// 로딩 시작
         $('.loading-wrap--js').show();
         axios.post('${pageContext.request.contextPath}/usr/dty0005_0001.do',params).then(function(response) {
@@ -350,6 +356,10 @@
         });
 	}
 	function doFixDay(){
+
+	    if(!limit2Week($('#searchFromDate').val(), $('#searchFromDate').val())){
+	    	return;
+	    }
 
 		if($('#searchFixGubun').val() != 'NO'){
 			alert('대상확정은 미확정 대상으로만 진행 할 수 있습니다\n확정을 취소합니다');
@@ -419,6 +429,11 @@
 
 	//주정산 내역 조회
 	function doSearchWeek(){
+
+	    if(!limit2Week($('#searchFromDate1').val(), $('#searchToDate1').val())){
+	    	return;
+	    }
+
 		const params = new URLSearchParams();
 
 		params.append('searchFromDate', getOnlyNumber($('#searchFromDate1').val()));//배달일
@@ -568,6 +583,10 @@
 	}
 
 	function doFixWeek(){
+
+	    if(!limit2Week($('#searchFromDate1').val(), $('#searchToDate1').val())){
+	    	return;
+	    }
 
 		if($('#searchFixGubun1').val() != 'NO'){
 			alert('대상확정은 미확정 대상으로만 진행 할 수 있습니다\n확정을 취소합니다');

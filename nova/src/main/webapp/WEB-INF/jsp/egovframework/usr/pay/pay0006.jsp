@@ -55,7 +55,7 @@
 		//업로드일 세팅
 		var today = new Date();
 		var now = new Date();
-		var oneMonthAgo = new Date(now.setMonth(now.getMonth()-1));
+		var towWeekAgo = new Date(now.setDate(now.getDate()-14));
 		var searchFromDate = flatpickr("#searchFromDate", {
 			locale: "ko",
 			allowInput: false,
@@ -79,7 +79,7 @@
 			doSearch();
 		});
 
-		searchFromDate.setDate(oneMonthAgo.getFullYear()+"-"+(oneMonthAgo.getMonth()+1)+"-"+oneMonthAgo.getDate());
+		searchFromDate.setDate(towWeekAgo.getFullYear()+"-"+(towWeekAgo.getMonth()+1)+"-"+towWeekAgo.getDate());
 		searchToDate.setDate(today.getFullYear()+"-"+(today.getMonth()+1)+"-"+today.getDate());
 
 // 		$('#coopAblePrice').html(currencyFormatter(minWon0(${ablePrice.coopAblePrice})));
@@ -137,6 +137,10 @@
 		params.append('searchCooperatorId', $('#searchCooperatorId').val());
 		params.append('searchFromDate', getOnlyNumber($('#searchFromDate').val()));
 		params.append('searchToDate', getOnlyNumber($('#searchToDate').val()));
+
+	    if(!limit2Week($('#searchFromDate').val(), $('#searchToDate').val())){
+	    	return;
+	    }
 
 		// 로딩 시작
         $('.loading-wrap--js').show();

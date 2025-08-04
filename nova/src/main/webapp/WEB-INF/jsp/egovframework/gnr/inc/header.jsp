@@ -45,7 +45,7 @@
 <script type="text/javascript"	src="<c:url value='/web2/js/jquery-1.11.2.min.js' />"></script>
 <script src="<c:url value='/js/axios.min.js' />"></script>
 <script src="<c:url value='/js/ko.js' />"></script>
-<script src="<c:url value='/js/admin/util.js' />"></script>
+<script src="<c:url value='/js/admin/util.js?v=0.1' />"></script>
 
 	<!-- 상단 메뉴 css -->
 <!-- Favicons -->

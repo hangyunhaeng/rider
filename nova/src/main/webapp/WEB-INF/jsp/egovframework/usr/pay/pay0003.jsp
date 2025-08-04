@@ -210,7 +210,7 @@
 		//업로드일 세팅
 		var today = new Date();
 		var now = new Date();
-		var oneMonthAgo = new Date(now.setMonth(now.getMonth()-1));
+		var towWeekAgo = new Date(now.setDate(now.getDate()-14));
 		var searchFromDate = flatpickr("#searchFromDate", {
 			locale: "ko",
 			allowInput: false,
@@ -234,7 +234,7 @@
 			doSearch();
 		});
 
-		searchFromDate.setDate(oneMonthAgo.getFullYear()+"-"+(oneMonthAgo.getMonth()+1)+"-"+oneMonthAgo.getDate());
+		searchFromDate.setDate(towWeekAgo.getFullYear()+"-"+(towWeekAgo.getMonth()+1)+"-"+towWeekAgo.getDate());
 		searchToDate.setDate(today.getFullYear()+"-"+(today.getMonth()+1)+"-"+today.getDate());
 
 		loadCooperatorList();
@@ -267,12 +267,15 @@
 
 	//내역 조회
 	function doSearch(){
-		debugger;
 		if($('#searchRegistrationSn').val().trim() != '' && $('#searchRegistrationSn').val().trim().length != 10){
 			alert("식별번호는 10자리입니다");
 			$('#searchRegistrationSn').focus()
 			return ;
 		}
+
+	    if(!limit2Week($('#searchFromDate').val(), $('#searchToDate').val())){
+	    	return;
+	    }
 
 		const params = new URLSearchParams();
 		params.append('searchCooperatorId', $('#searchCooperatorId').val());

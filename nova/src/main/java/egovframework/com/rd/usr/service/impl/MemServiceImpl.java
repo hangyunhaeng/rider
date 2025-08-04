@@ -440,28 +440,36 @@ public class MemServiceImpl extends EgovAbstractServiceImpl implements MemServic
 
 
 			// 2. 라이더 수수료 저장
+        	// 2.0 협력사 수수료와 같으면 use_yn을 n로 변경
 			// 2.1 수수료는 변경시 기존 수수료를 use_yn을 N로 변경 후 새로 insert한다
 			// 2.2 기존수수료 조회 후 변경 된 사항이 있을 시에만 insert한다
-			List<CooperatorVO> sameFee = memDAO.selectRiderFeeSame(vo);
-			if(sameFee.size() == 1) {	//기존 수수료와 현재 등록된 수수료가 같으면 pass
-				//pass
-			} else if(sameFee.size() > 1){
-				//데이터가 이상함. 기존 라인들 지우고 새로 등록
-				for(int j = 0 ; j < sameFee.size() ;j++) {
-					CooperatorVO delVo = sameFee.get(j);
-					memDAO.updateRiderFeeUseNo(delVo);
-				}
-	    		String rFeeId = egovRFeeIdGnrService.getNextStringId();
-	    		vo.setRiderFeeId(rFeeId);
-				memDAO.insertRiderFee(vo);
-			} else {
-				//수수료가 달라질 시 기존 정책 use_yn을 n로 변경 후 신규 등록
+        	CooperatorVO sameFe = memDAO.selectRiderCoopFeeSame(vo);
+        	if(sameFe != null && !Util.isEmpty(sameFe.getFeeId())) {
+        		//협력사 수수료와 같으면 라이더 정보 저장하지 않는다.(기존 정보는 삭제한다)
 				memDAO.updateRiderFeeUseNo(vo);
+        	} else {
 
-	    		String rFeeId = egovRFeeIdGnrService.getNextStringId();
-	    		vo.setRiderFeeId(rFeeId);
-				memDAO.insertRiderFee(vo);
-			}
+				List<CooperatorVO> sameFee = memDAO.selectRiderFeeSame(vo);
+				if(sameFee.size() == 1) {	//기존 수수료와 현재 등록된 수수료가 같으면 pass
+					//pass
+				} else if(sameFee.size() > 1){
+					//데이터가 이상함. 기존 라인들 지우고 새로 등록
+					for(int j = 0 ; j < sameFee.size() ;j++) {
+						CooperatorVO delVo = sameFee.get(j);
+						memDAO.updateRiderFeeUseNo(delVo);
+					}
+		    		String rFeeId = egovRFeeIdGnrService.getNextStringId();
+		    		vo.setRiderFeeId(rFeeId);
+					memDAO.insertRiderFee(vo);
+				} else {
+					//수수료가 달라질 시 기존 정책 use_yn을 n로 변경 후 신규 등록
+					memDAO.updateRiderFeeUseNo(vo);
+
+		    		String rFeeId = egovRFeeIdGnrService.getNextStringId();
+		    		vo.setRiderFeeId(rFeeId);
+					memDAO.insertRiderFee(vo);
+				}
+        	}
 
 
         	returnVo = vo;

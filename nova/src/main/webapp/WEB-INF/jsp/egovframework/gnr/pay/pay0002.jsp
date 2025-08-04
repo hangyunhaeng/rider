@@ -16,7 +16,7 @@
 	document.addEventListener('DOMContentLoaded', function() {
 		var today = new Date();
 		var now = new Date();
-		var oneMonthAgo = new Date(now.setMonth(now.getMonth()-1));
+		var towWeekAgo = new Date(now.setDate(now.getDate()-14));
 
 		var fromRunDe = flatpickr("#fromRunDe", {
 			locale: "ko",
@@ -27,7 +27,7 @@
 		    disableMobile: true          // 모바일 지원
 
 		});
-		fromRunDe.setDate(oneMonthAgo.getFullYear()+"-"+(oneMonthAgo.getMonth()+1)+"-"+oneMonthAgo.getDate());
+		fromRunDe.setDate(towWeekAgo.getFullYear()+"-"+(towWeekAgo.getMonth()+1)+"-"+towWeekAgo.getDate());
 
 		var toRunDe = flatpickr("#toRunDe", {
 			locale: "ko",
@@ -44,12 +44,15 @@
 
 
 	function serchList(){
-		// 로딩 시작
-        $('.loading-wrap--js').show();
 	    const params = new URLSearchParams();
 	    var regex = /[^0-9]/g;
 	    params.append('searchFromDate', $($('#fromRunDe')[0]).val().replace(regex, ""));
 	    params.append('searchToDate', $($('#toRunDe')[0]).val().replace(regex, ""));
+
+	    if(!limit2Week($($('#fromRunDe')[0]).val(), $($('#toRunDe')[0]).val())){
+	    	return;
+	    }
+
 
 		// 로딩 시작
         $('.loading-wrap--js').show();

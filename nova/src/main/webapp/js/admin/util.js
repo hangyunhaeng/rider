@@ -601,3 +601,20 @@ let paging = {
     	return false;
 	}
 
+	function limit2Week(start, end){
+		if(nullToString(start) == '' ||  nullToString(end) == ''){
+			alert("검색기간은 필수 조회 조건입니다.");
+			return false;
+		}
+		var startDate = new Date(start);
+		var endDate = new Date(end);
+		var diff = endDate.getTime() - startDate.getTime();
+		var diffDay = diff / (1000*60*60*24);
+		if(diffDay > 14 ){
+			alert("검색기간은 최대 2주입니다.");
+			return false;
+		}
+		return true;
+
+	}
+

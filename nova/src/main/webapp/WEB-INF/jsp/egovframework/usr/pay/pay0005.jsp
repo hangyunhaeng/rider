@@ -25,30 +25,34 @@
 		{ headerName: "라이더ID", field: "mberId", minWidth: 90},
 		{ headerName: "라이더명", field: "mberNm", minWidth: 90},
 		{ headerName: "구분", field: "gubun", minWidth: 140, hide:true},
-		{ headerName: "구분", field: "gubunNm", minWidth: 90
+		{ headerName: "구분", field: "gubunNm", minWidth: 40
 			, valueGetter:(params) => { return (params.node.data.gubun=='D')?"대여": (params.node.data.gubun=='R')?"리스":"기타"}
 		},
-		{ headerName: "상환기간(일)", field: "paybackDay", minWidth: 80
+		{ headerName: "상환시작일", field: "startDt", minWidth: 100
+	        , cellClass: (params) => {return agGrideditClass(params)}
+	        , valueGetter:(params) => { return getStringDate(params.data.startDt)}
+		},
+		{ headerName: "상환<br/>기간(일)", field: "paybackDay", minWidth: 100
 			, cellClass: (params) => {return agGrideditClass(params, "ag-cell-right");}
 			, valueGetter:(params) => { return currencyFormatter(params.data.paybackDay);}
 		},
-		{ headerName: "일별상환금액", field: "paybackCost", minWidth: 80
+		{ headerName: "일별<br/>상환금액", field: "paybackCost", minWidth: 80
 			, cellClass: (params) => {return agGrideditClass(params, "ag-cell-right");}
 			, valueGetter:(params) => { return currencyFormatter(params.data.paybackCost);}
 		},
-		{ headerName: "총상환금액", field: "paybackCostAll", minWidth: 80
+		{ headerName: "총<br/>상환금액", field: "paybackCostAll", minWidth: 80
 			, cellClass: (params) => {return agGrideditClass(params, "ag-cell-right");}
 			, valueGetter:(params) => { return currencyFormatter(params.data.paybackCostAll);}
 		},
-		{ headerName: "상환완료금액", field: "finishCost", minWidth: 80
+		{ headerName: "상환<br/>완료금액", field: "finishCost", minWidth: 70
 			, cellClass: (params) => {return agGrideditClass(params, "ag-cell-right");}
 			, valueGetter:(params) => { return currencyFormatter(params.data.finishCost);}
 		},
-		{ headerName: "상환완료여부", field: "finishAt", minWidth: 80},
-		{ headerName: "승인요청일", field: "authRequestDt", minWidth: 90, valueGetter:(params) => { return getStringDate(params.data.authRequestDt)}},
-		{ headerName: "라이더<br/>승인일", field: "authResponsDt", minWidth: 90, valueGetter:(params) => { return getStringDate(params.data.authResponsDt)}},
+		{ headerName: "상환<br/>완료여부", field: "finishAt", minWidth: 50},
+		{ headerName: "승인요청일", field: "authRequestDt", minWidth: 100, valueGetter:(params) => { return getStringDate(params.data.authRequestDt)}},
+		{ headerName: "라이더<br/>승인일", field: "authResponsDt", minWidth: 100, valueGetter:(params) => { return getStringDate(params.data.authResponsDt)}},
 		{ headerName: "라이더<br/>승인여부", field: "responsAt", minWidth: 80},
-		{ headerName: "등록일", field: "creatDt", minWidth: 90, valueGetter:(params) => { return getStringDate(params.data.creatDt)}}
+		{ headerName: "등록일", field: "creatDt", minWidth: 100, valueGetter:(params) => { return getStringDate(params.data.creatDt)}}
 	];
 
 
@@ -65,7 +69,7 @@
 		//업로드일 세팅
 		var today = new Date();
 		var now = new Date();
-		var oneMonthAgo = new Date(now.setMonth(now.getMonth()-1));
+		var towWeekAgo = new Date(now.setDate(now.getDate()-14));
 		var searchFromDate = flatpickr("#searchFromDate", {
 			locale: "ko",
 			allowInput: false,
@@ -89,7 +93,7 @@
 			doSearch();
 		});
 
-		searchFromDate.setDate(oneMonthAgo.getFullYear()+"-"+(oneMonthAgo.getMonth()+1)+"-"+oneMonthAgo.getDate());
+		searchFromDate.setDate(towWeekAgo.getFullYear()+"-"+(towWeekAgo.getMonth()+1)+"-"+towWeekAgo.getDate());
 		searchToDate.setDate(today.getFullYear()+"-"+(today.getMonth()+1)+"-"+today.getDate());
 
 		loadCooperatorList();
@@ -125,6 +129,10 @@
 			$('#searchRegistrationSn').focus()
 			return ;
 		}
+
+	    if(!limit2Week($('#searchFromDate').val(), $('#searchToDate').val())){
+	    	return;
+	    }
 
 		const params = new URLSearchParams();
 		params.append('searchCooperatorId', $('#searchCooperatorId').val());
