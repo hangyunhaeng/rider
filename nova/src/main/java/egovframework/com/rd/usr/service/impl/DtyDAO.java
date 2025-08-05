@@ -616,5 +616,9 @@ public class DtyDAO extends EgovComAbstractDAO {
 	public int deleteDayAtchFile(WeekInfoVO weekInfoVO) throws Exception {
 		return update("dtyDAO.deleteDayAtchFile", weekInfoVO);
 	}
+
+	public int deleteDeliveryInfo(WeekInfoVO weekInfoVO) throws Exception {
+		return delete("dtyDAO.deleteDeliveryInfo", weekInfoVO);
+	}
 }
 

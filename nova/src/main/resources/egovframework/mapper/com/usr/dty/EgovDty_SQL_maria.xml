@@ -693,8 +693,10 @@
 					LEFT JOIN RD_WEEK_RIDER_INFO wr ON wi.WEEK_ID = wr.week_id
 					LEFT JOIN RD_DAY_PAY a ON wi.COOPERATOR_ID = a.COOPERATOR_ID AND wr.MBER_ID = a.mber_id AND a.use_at = 'Y' AND IO_GUBUN= '1'
 					LEFT JOIN COMTNGNRLMBER d ON wr.mber_id = d.mber_id
+					JOIN COMTNFILE b ON wi.ATCH_FILE_ID = b.ATCH_FILE_ID
 						WHERE 1=1
 							AND wr.FIX_DAY is NULL
+							AND b.USE_AT ='Y'
 							AND a.WEEK_YN = 'N'
 							AND (wi.ACCOUNTS_ST_DT BETWEEN #{searchFromDate} AND #{searchToDate} or wi.ACCOUNTS_ED_DT BETWEEN #{searchFromDate} AND #{searchToDate})
 							<if test="searchNm != null and searchNm != ''">
@@ -1215,5 +1217,10 @@
 		WHERE a.ATCH_FILE_ID = #{searchAtchFileId}
 		AND a.FIX_DAY IS NOT NULL
 	</select>
+
+	<update id="deleteDeliveryInfo" parameterType="egovframework.com.rd.usr.service.vo.WeekInfoVO">
+		DELETE from RD_DELIVERY_INFO
+		WHERE ATCH_FILE_ID = #{searchAtchFileId}
+	</update>
 
 </mapper>
