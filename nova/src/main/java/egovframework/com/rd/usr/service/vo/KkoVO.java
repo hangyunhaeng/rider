@@ -48,4 +48,9 @@ public class KkoVO extends Sch implements Serializable {
 	private String param7;
 	private String param8;
 	private String param9;
+
+	private String rn;
+	private String fix;
+	private String mberNm;
+	private String cdNm;
 }

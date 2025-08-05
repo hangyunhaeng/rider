@@ -306,6 +306,27 @@ public class PayDAO extends EgovComAbstractDAO {
 	public int updateKkoReport(KkoVO vo) throws Exception {
 		return update("payDAO.updateKkoReport", vo);
 	}
+
+	/**
+	 * 알림톡 발송 리스트 가져오기
+	 * @param kkoVO
+	 * @return
+	 * @throws Exception
+	 */
+	public List<KkoVO> selectKkoList(KkoVO vo) throws Exception {
+		return selectList("payDAO.selectKkoList", vo);
+	}
+
+	/**
+	 * 알림톡 발송 리스트 cnt
+	 * @param kkoVO
+	 * @return
+	 * @throws Exception
+	 */
+	public int selectKkoListCnt(KkoVO vo) throws Exception {
+		KkoVO reVo = selectOne("payDAO.selectKkoListCnt", vo);
+		return reVo.getTotalCnt();
+	}
 }
 
 

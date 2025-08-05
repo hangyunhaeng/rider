@@ -2266,6 +2266,7 @@ public class DtyServiceImpl extends EgovAbstractServiceImpl implements DtyServic
             	kkoVo.setKkoId(egovKkoIdGnrService.getNextStringId());
 	        	kkoVo.setMbtlnum((String)jsonObject.get("phone"));
 	        	kkoVo.setSendLongtxt(jsonObject.get("variables").toString());
+	        	kkoVo.setMberId(jsonObject.get("mberId").toString());
 	            payDAO.insertKko(kkoVo);
             }
 

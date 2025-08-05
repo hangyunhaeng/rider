@@ -35,6 +35,9 @@
   	} else if(filename.indexOf('pay0002.do') == 0) {
 	  	$('.dty').addClass('active');
 	  	$('.pay0002').addClass('active');
+  	} else if(filename.indexOf('pay0007.do') == 0) {
+	  	$('.dty').addClass('active');
+	  	$('.pay0007').addClass('active');
   	} else if(filename.indexOf('mem0001.do') == 0) {
 	  	$('.mem').addClass('active');
 	  	$('.mem0001').addClass('active');
@@ -103,6 +106,7 @@ System.out.println("==================================");
 			          	<ul>
 						  <li><a href="${pageContext.request.contextPath}/usr/dty0004.do" class="dty0004">배달정보 조회</a></li>
 						  <li style="display:none;"><a href="${pageContext.request.contextPath}/usr/pay0002.do" class="pay0002">입출금 대사<br></a></li>
+						  <li style="display:none;"><a href="${pageContext.request.contextPath}/usr/pay0007.do" class="pay0007">알림톡 발송 조회<br></a></li>
 			            </ul>
 		            </li>
 

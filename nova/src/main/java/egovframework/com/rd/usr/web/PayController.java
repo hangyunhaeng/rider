@@ -33,6 +33,7 @@ import egovframework.com.rd.usr.service.vo.DoszDSResultVO;
 import egovframework.com.rd.usr.service.vo.DoszTransferVO;
 import egovframework.com.rd.usr.service.vo.EtcVO;
 import egovframework.com.rd.usr.service.vo.HistoryVO;
+import egovframework.com.rd.usr.service.vo.KkoVO;
 import egovframework.com.rd.usr.service.vo.MyInfoVO;
 import egovframework.com.rd.usr.service.vo.ProfitVO;
 
@@ -614,6 +615,72 @@ public class PayController {
 			map.put("resultMsg", e.toString());
         	map.put("resultCode", "fail");
         }
+        return ResponseEntity.ok(map);
+	}
+
+
+	/**
+	 * 알림톡 발송 조회
+	 * @param request
+	 * @param model
+	 * @return
+	 * @throws Exception
+	 */
+    @RequestMapping("/usr/pay0007.do")
+    public String pay0007(@ModelAttribute("KkoVO") KkoVO kkoVO, HttpServletRequest request,ModelMap model) throws Exception {
+
+    	//로그인 체크
+        LoginVO user = (LoginVO)EgovUserDetailsHelper.getAuthenticatedUser();
+        Boolean isAuthenticated = EgovUserDetailsHelper.isAuthenticated();
+
+        if(!isAuthenticated) {
+        	return "egovframework/com/cmm/error/accessDenied";
+        }
+
+        if(!Util.isUsr()) {
+        	return "egovframework/com/cmm/error/accessDenied";
+        }
+        model.addAttribute("kkoVO", kkoVO);
+        return "egovframework/usr/pay/pay0007";
+	}
+
+
+	/**
+	 * 알림톡 발송 리스트 가져오기
+	 * @param request
+	 * @param sessionVO
+	 * @param model
+	 * @param status
+	 * @return
+	 * @throws Exception
+	 */
+	@RequestMapping("/usr/pay0007_0001.do")
+	public ResponseEntity<?> pay0007_0001(@ModelAttribute("KkoVO") KkoVO kkoVO, HttpServletRequest request, SessionVO sessionVO, ModelMap model, SessionStatus status) throws Exception{
+
+    	//로그인 체크
+        LoginVO user = (LoginVO)EgovUserDetailsHelper.getAuthenticatedUser();
+        Boolean isAuthenticated = EgovUserDetailsHelper.isAuthenticated();
+
+        if(!isAuthenticated) {
+        	return ResponseEntity.status(401).body("Unauthorized");
+        }
+
+        if(!Util.isUsr()) {
+        	return ResponseEntity.status(401).body("Unauthorized");
+        }
+
+        //총판 or 협력사
+        kkoVO.setSchUserSe(user.getUserSe());
+        kkoVO.setSchAuthorCode(user.getAuthorCode());
+        kkoVO.setSchIhidNum(user.getIhidNum());
+
+        //return value
+        Map<String, Object> map =  new HashMap<String, Object>();
+
+        List<KkoVO> list = payService.selectKkoList(kkoVO);
+        map.put("cnt", payService.selectKkoListCnt(kkoVO));
+        map.put("list", list);
+        map.put("resultCode", "success");
         return ResponseEntity.ok(map);
 	}
 }

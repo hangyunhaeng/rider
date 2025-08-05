@@ -566,4 +566,62 @@
 		WHERE REFERENCE_KEY = #{referenceKey}
 		AND USER_KEY = #{userKey}
 	</update>
+	<select id="selectKkoList" parameterType="egovframework.com.rd.usr.service.vo.KkoVO" resultType="egovframework.com.rd.usr.service.vo.KkoVO">
+		<if test="schIdx !=0 and schPagePerCnt != 0">
+		SELECT * FROM (
+			SELECT ROWNUM() RN,m.*
+			FROM (
+		</if>
+				WITH RECURSIVE cte AS (
+					SELECT 1 AS LV, a.KKO_ID AS FIX, a.*
+					FROM RD_KKO a
+					WHERE a.UP_KKO_ID IS NULL
+
+						 UNION ALL
+
+					SELECT 1+cte.LV AS LV, a.UP_KKO_ID AS FIX, a.*
+					FROM RD_KKO a
+					INNER JOIN cte ON a.UP_KKO_ID = cte.KKO_ID
+				)
+				SELECT cte.*, a.MBER_NM, b.CD_NM
+				FROM cte
+				LEFT JOIN COMTNGNRLMBER a ON cte.MBER_ID = a.MBER_ID
+				LEFT JOIN RD_CD b ON cte.KAORSLTCODE = b.CD AND b.CD_GROUP = 'KKO_CD'
+
+				WHERE 1=1
+					AND SEND_DT BETWEEN #{searchFromDate} AND #{searchToDate}
+					<if test='searchGubun != null and searchGubun != "all"'>
+					AND GUBUN = #{searchGubun}
+					</if>
+				ORDER BY FIX , lv
+		<if test="schIdx !=0 and schPagePerCnt != 0">
+			) m
+		) m
+		<![CDATA[WHERE RN > #{schIdx}*#{schPagePerCnt} -#{schPagePerCnt} AND RN <= #{schIdx}*#{schPagePerCnt}]]>
+		</if>
+
+	</select>
+
+	<select id="selectKkoListCnt" parameterType="egovframework.com.rd.usr.service.vo.KkoVO" resultType = "egovframework.com.rd.usr.service.vo.KkoVO">
+
+				WITH RECURSIVE cte AS (
+					SELECT 1 AS LV, a.KKO_ID AS FIX, a.*
+					FROM RD_KKO a
+					WHERE a.UP_KKO_ID IS NULL
+
+						 UNION ALL
+
+					SELECT 1+cte.LV AS LV, a.UP_KKO_ID AS FIX, a.*
+					FROM RD_KKO a
+					INNER JOIN cte ON a.UP_KKO_ID = cte.KKO_ID
+				)
+				SELECT COUNT(cte.KKO_ID) TOTAL_CNT
+				FROM cte
+
+				WHERE 1=1
+					AND SEND_DT BETWEEN #{searchFromDate} AND #{searchToDate}
+					<if test='searchGubun != null and searchGubun != "all"'>
+					AND GUBUN = #{searchGubun}
+					</if>
+	</select>
 </mapper>

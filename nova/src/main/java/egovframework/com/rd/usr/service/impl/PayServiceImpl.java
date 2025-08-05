@@ -26,6 +26,7 @@ import egovframework.com.rd.usr.service.vo.DayPayVO;
 import egovframework.com.rd.usr.service.vo.DoszDSResultVO;
 import egovframework.com.rd.usr.service.vo.DoszTransferVO;
 import egovframework.com.rd.usr.service.vo.HistoryVO;
+import egovframework.com.rd.usr.service.vo.KkoVO;
 import egovframework.com.rd.usr.service.vo.MyInfoVO;
 import egovframework.com.rd.usr.service.vo.ProfitVO;
 
@@ -314,5 +315,26 @@ public class PayServiceImpl extends EgovAbstractServiceImpl implements PayServic
 			mberBalance.setBalance1(balance1);
 			dtyDAO.updateBalance(mberBalance);
 		}
+	}
+
+
+	/**
+	 * 알림톡 발송 리스트 가져오기
+	 * @param kkoVO
+	 * @return
+	 * @throws Exception
+	 */
+	public List<KkoVO> selectKkoList(KkoVO vo) throws Exception {
+		return payDAO.selectKkoList(vo);
+	}
+
+	/**
+	 * 알림톡 발송 리스트 cnt
+	 * @param kkoVO
+	 * @return
+	 * @throws Exception
+	 */
+	public int selectKkoListCnt(KkoVO vo) throws Exception {
+		return payDAO.selectKkoListCnt(vo);
 	}
 }

@@ -7,6 +7,7 @@ import egovframework.com.rd.usr.service.vo.CooperatorPayVO;
 import egovframework.com.rd.usr.service.vo.DoszDSResultVO;
 import egovframework.com.rd.usr.service.vo.DoszTransferVO;
 import egovframework.com.rd.usr.service.vo.HistoryVO;
+import egovframework.com.rd.usr.service.vo.KkoVO;
 import egovframework.com.rd.usr.service.vo.MyInfoVO;
 import egovframework.com.rd.usr.service.vo.ProfitVO;
 
@@ -124,4 +125,20 @@ public interface PayService {
 	 * @throws Exception
 	 */
 	public ProfitVO selectCoopProfitBase(ProfitVO vo) throws Exception ;
+
+	/**
+	 * 알림톡 발송 리스트 가져오기
+	 * @param kkoVO
+	 * @return
+	 * @throws Exception
+	 */
+	public List<KkoVO> selectKkoList(KkoVO vo) throws Exception ;
+
+	/**
+	 * 알림톡 발송 리스트 cnt
+	 * @param kkoVO
+	 * @return
+	 * @throws Exception
+	 */
+	public int selectKkoListCnt(KkoVO vo) throws Exception ;
 }

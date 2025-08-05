@@ -493,6 +493,7 @@ public class MemServiceImpl extends EgovAbstractServiceImpl implements MemServic
     		        variablesObject.put("임시패스워드", kkoVo.getParam1());
     		        jsonObject.put("variables", variablesObject);
     		        jsonObject.put("phone", kkoVo.getMbtlnum());
+    		        jsonObject.put("mberId", kkoVo.getMberId());
 
     		        jsonArray.add(jsonObject);
 		        }
