@@ -18,8 +18,10 @@
 	let data;
 	var columnDefs= [
 		{ headerName: "NO", field: "no", minWidth: 70, valueGetter:(params) => { return params.node.rowIndex + 1} },
+		{ headerName: "라이더ID", field: "mberId", minWidth: 140},
+		{ headerName: "라이더명", field: "mberNm", minWidth: 140},
 		{ headerName: "오류", field: "err", minWidth: 120, hide:true},
-		{ headerName: "id", field: "id", minWidth: 120},
+		{ headerName: "id", field: "id", minWidth: 120, hide:true},
 		{ headerName: "협력사아이디", field: "cooperatorId", minWidth: 140},
 		{ headerName: "협력사명", field: "cooperatorNm", minWidth: 140},
 		{ headerName: "입출금", field: "ioGubunNm", minWidth: 80},
@@ -37,8 +39,6 @@
 		{ headerName: "errorMessage", field: "errorMessage", minWidth: 140},
 		{ headerName: "출금일", field: "sendDt", minWidth: 140},
 		{ headerName: "출금시", field: "sendTm", minWidth: 140},
-		{ headerName: "라이더명", field: "mberNm", minWidth: 140},
-		{ headerName: "라이더ID", field: "mberId", minWidth: 140},
 		{ headerName: "telegramNo", field: "telegramNo", minWidth: 140, hide:true},
 		{ headerName: "ioGubun", field: "ioGubun", minWidth: 140, hide:true},
 		{ headerName: "dayAtchFileId", field: "dayAtchFileId", minWidth: 140, hide:true},
