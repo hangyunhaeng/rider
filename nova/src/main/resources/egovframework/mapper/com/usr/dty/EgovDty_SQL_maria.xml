@@ -160,15 +160,12 @@
 				SELECT wi.week_id, wr.mber_id
 					FROM RD_WEEK_INFO wi
 					LEFT JOIN RD_WEEK_RIDER_INFO wr ON wi.WEEK_ID = wr.week_id
-					LEFT JOIN RD_DAY_PAY a ON wi.COOPERATOR_ID = a.COOPERATOR_ID AND wr.MBER_ID = a.mber_id AND a.use_at = 'Y' AND IO_GUBUN= '1'
 					LEFT JOIN COMTNGNRLMBER d ON wr.mber_id = d.mber_id
 					JOIN COMTNFILE e ON wi.ATCH_FILE_ID = e.ATCH_FILE_ID
 						WHERE 1=1
 							AND e.USE_AT ='Y'
 							AND wr.FIX_DAY is NULL
 							AND (wi.ACCOUNTS_ST_DT BETWEEN #{searchFromDate} AND #{searchToDate} or wi.ACCOUNTS_ED_DT BETWEEN #{searchFromDate} AND #{searchToDate})
-							<![CDATA[
-							/*AND if(wi.accounts_st_dt <= a.DAY AND wi.accounts_ed_dt >= a.DAY, 1, 0) =1*/]]>
 							<if test="searchNm != null and searchNm != ''">
 							AND d.MBER_NM like '%' #{searchNm} '%'
 							</if>
@@ -495,7 +492,7 @@
 				AND d.USE_AT ='Y'
 				AND (a.ACCOUNTS_ST_DT BETWEEN #{searchFromDate} AND #{searchToDate} or a.ACCOUNTS_ED_DT BETWEEN #{searchFromDate} AND #{searchToDate})
 				<if test="searchNm != null and searchNm != ''">
-				AND b.MBER_NM LIKE '%' #{searchNm} '%'
+				AND c.MBER_NM LIKE '%' #{searchNm} '%'
 				</if>
 				GROUP BY a.COOPERATOR_ID, b.MBER_ID
 		)
@@ -772,6 +769,9 @@
 							AND wr.FIX_DAY is NULL
 							AND b.USE_AT = 'Y'
 							AND (wi.ACCOUNTS_ST_DT BETWEEN #{searchFromDate} AND #{searchToDate} or wi.ACCOUNTS_ED_DT BETWEEN #{searchFromDate} AND #{searchToDate})
+							<if test="searchNm != null and searchNm != ''">
+							AND d.MBER_NM LIKE '%' #{searchNm} '%'
+							</if>
 
 		) b
 		SET a.WEEK_YN ='Y'
@@ -797,6 +797,9 @@
 							AND wr.FIX_DAY is NULL
 						AND b.USE_AT ='Y'
 							AND (wi.ACCOUNTS_ST_DT BETWEEN #{searchFromDate} AND #{searchToDate} or wi.ACCOUNTS_ED_DT BETWEEN #{searchFromDate} AND #{searchToDate})
+							<if test="searchNm != null and searchNm != ''">
+							AND d.MBER_NM LIKE '%' #{searchNm} '%'
+							</if>
 							and a.WEEK_YN ='N'
 							AND a.USE_AT ='Y'
 							AND a.IO_GUBUN = '2'
@@ -827,18 +830,18 @@
 		AND USE_AT = 'Y'
 		AND IO_GUBUN = '2'
 		AND (COOPERATOR_ID, mber_id) in (
-				SELECT a.COOPERATOR_ID, a.mber_id
+				SELECT wi.COOPERATOR_ID, wr.mber_id
 					FROM RD_WEEK_INFO wi
 					LEFT JOIN RD_WEEK_RIDER_INFO wr ON wi.WEEK_ID = wr.week_id
-					JOIN RD_DAY_PAY a ON wi.COOPERATOR_ID = a.COOPERATOR_ID AND wr.MBER_ID = a.mber_id AND a.use_at = 'Y' AND IO_GUBUN= '1'
 					LEFT JOIN COMTNGNRLMBER d ON wr.mber_id = d.mber_id
 					JOIN COMTNFILE e ON wi.atch_file_id = e.atch_file_id
 						WHERE 1=1
 							AND e.USE_AT ='Y'
 							AND wr.FIX_DAY is NULL
 							AND (wi.ACCOUNTS_ST_DT BETWEEN #{searchFromDate} AND #{searchToDate} or wi.ACCOUNTS_ED_DT BETWEEN #{searchFromDate} AND #{searchToDate})
-							<![CDATA[
-							AND if(wi.accounts_st_dt <= a.DAY AND wi.accounts_ed_dt >= a.DAY, 1, 0) =1]]>
+							<if test="searchNm != null and searchNm != ''">
+							AND d.MBER_NM like '%' #{searchNm} '%'
+							</if>
 
 		)
 	</select>
