@@ -1,15 +1,22 @@
 package egovframework.com.rd;
 
+import java.math.BigDecimal;
+import java.text.DecimalFormat;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.servlet.http.HttpSession;
+
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
 
 import com.ibm.icu.util.Calendar;
 
 import egovframework.com.cmm.LoginVO;
 import egovframework.com.cmm.service.EgovProperties;
 import egovframework.com.cmm.util.EgovUserDetailsHelper;
+import egovframework.com.rd.usr.service.vo.KkoVO;
 
 public class Util {
 
@@ -185,6 +192,77 @@ public class Util {
     		return true;
     	 else
     		return false;
+    }
+
+    public static String currencyFormatter(BigDecimal input) {
+        DecimalFormat df = new DecimalFormat("###,###");
+        return df.format(input);
+
+    }
+    @SuppressWarnings("unchecked")
+	public static JSONObject makeKko(List<KkoVO> kkoList) {
+
+
+    	if(kkoList.size() == 0) {
+    		return null;
+    	}
+
+    	String templateCode = null;
+        JSONArray jsonArray = new JSONArray();
+        for(int i = 0; i < kkoList.size() ; i++) {
+        	KkoVO kkoVo = kkoList.get(i);
+
+        	if(i == 0) {
+        		templateCode = kkoVo.getTemplateCode();
+        	}
+
+	        JSONObject jsonObject = new JSONObject();
+
+	        JSONObject variablesObject = new JSONObject();
+	        if(EgovProperties.getProperty("Globals.passAlert").equals(templateCode)) {
+	        	variablesObject.put("성명", kkoVo.getParam0());
+	        	variablesObject.put("임시패스워드", kkoVo.getParam1());
+	        } else if(EgovProperties.getProperty("Globals.etcAlert").equals(templateCode)) {
+	        	variablesObject.put("구분명", kkoVo.getParam0());
+	        	variablesObject.put("성명", kkoVo.getParam1());
+	        	variablesObject.put("금액", kkoVo.getParam2());
+	        }
+	        jsonObject.put("variables", variablesObject);
+	        jsonObject.put("phone", kkoVo.getMbtlnum());
+	        jsonObject.put("mberId", kkoVo.getMberId());
+
+	        jsonArray.add(jsonObject);
+        }
+
+        JSONObject jsonbutton1 = new JSONObject();
+        jsonbutton1.put("name", "접속");
+        jsonbutton1.put("type", "WL");
+        jsonbutton1.put("urlMobile", "https://riderbank.co.kr");
+        jsonbutton1.put("urlPc", "https://riderbank.co.kr");
+
+        JSONObject jsonMain = new JSONObject();
+        jsonMain.put("phoneList",jsonArray);
+        jsonMain.put("callback","01091835541");
+
+        JSONObject jsonKakaoMessage = new JSONObject();
+        jsonKakaoMessage.put("button1", jsonbutton1);
+        if(EgovProperties.getProperty("Globals.passAlert").equals(templateCode)) {
+	        jsonKakaoMessage.put("body", "[라이더뱅크 가입안내]\\n\\n\n\n"
+	        		+ "#{성명}님 라이더뱅크에 등록되셨습니다.\\n\n"
+	        		+ "RADER BANK에 접속하여 임시패스워드로 로그인 후 임시패스워드를 다시 설정해 주시기 바랍니다.\\n\\n\n\n"
+	        		+ "- 임시패스워드 : #{임시패스워드}");
+        } else if(EgovProperties.getProperty("Globals.etcAlert").equals(templateCode)) {
+	        jsonKakaoMessage.put("body", "[라이더뱅크 #{구분명} 상환 승인 요청]\r\n\n\n"
+	        		+ "#{성명}님 라이더뱅크에서 #{구분명} #{금액}원에 대한 상환 승인 요청이 있습니다.\r\n\n"
+	        		+ "라이더뱅크 > 대여,리스 현황 메뉴에서 확인 하신 후에 승인해 주시기 바랍니다.\r\n\n"
+	        		+ "미승인시 출금 기능이 제한 됩니다.");
+        }
+        jsonKakaoMessage.put("templateCode", templateCode);
+        jsonKakaoMessage.put("senderKey", EgovProperties.getProperty("Globals.senderKey"));
+        jsonMain.put("kakaoMessage", jsonKakaoMessage);
+        jsonMain.put("messageType", "kat");
+
+        return jsonMain;
     }
 }
 

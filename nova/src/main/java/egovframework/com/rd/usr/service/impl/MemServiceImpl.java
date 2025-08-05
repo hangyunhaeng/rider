@@ -1,6 +1,7 @@
 package egovframework.com.rd.usr.service.impl;
 
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,6 +17,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import egovframework.com.cmm.LoginVO;
+import egovframework.com.cmm.service.EgovProperties;
 import egovframework.com.cmm.util.EgovUserDetailsHelper;
 import egovframework.com.rd.Util;
 import egovframework.com.rd.usr.service.DtyService;
@@ -325,6 +327,7 @@ public class MemServiceImpl extends EgovAbstractServiceImpl implements MemServic
         			kkoOne.setMbtlnum(Util.getOnlyNumber(vo.getMbtlnum()));
         			kkoOne.setParam0(vo.getMberNm());
         			kkoOne.setParam1("Daon"+pass+"!");
+        			kkoOne.setTemplateCode(EgovProperties.getProperty("Globals.passAlert"));
         			kkoList.add(kkoOne);
 
 
@@ -483,46 +486,11 @@ public class MemServiceImpl extends EgovAbstractServiceImpl implements MemServic
         	//3. 메세지 발송
 	        if(!Util.isEmpty(responseData.getSendAccessToken()) && !Util.isEmpty(responseData.getSendRefreshToken())) {
 
-		        JSONArray jsonArray = new JSONArray();
-		        for(int i = 0; i < kkoList.size() ; i++) {
-		        	KkoVO kkoVo = kkoList.get(i);
-    		        JSONObject jsonObject = new JSONObject();
-
-    		        JSONObject variablesObject = new JSONObject();
-    		        variablesObject.put("성명", kkoVo.getParam0());
-    		        variablesObject.put("임시패스워드", kkoVo.getParam1());
-    		        jsonObject.put("variables", variablesObject);
-    		        jsonObject.put("phone", kkoVo.getMbtlnum());
-    		        jsonObject.put("mberId", kkoVo.getMberId());
-
-    		        jsonArray.add(jsonObject);
-		        }
-
-		        JSONObject jsonbutton1 = new JSONObject();
-		        jsonbutton1.put("name", "접속");
-		        jsonbutton1.put("type", "WL");
-		        jsonbutton1.put("urlMobile", "https://riderbank.co.kr");
-		        jsonbutton1.put("urlPc", "https://riderbank.co.kr");
-
-		        JSONObject jsonMain = new JSONObject();
-		        jsonMain.put("phoneList",jsonArray);
-		        jsonMain.put("callback","01091835541");
-
-		        JSONObject jsonKakaoMessage = new JSONObject();
-		        jsonKakaoMessage.put("button1", jsonbutton1);
-		        jsonKakaoMessage.put("body", "[라이더뱅크 가입안내]\\n\\n\n\n"
-		        		+ "#{성명}님 라이더뱅크에 등록되셨습니다.\\n\n"
-		        		+ "RADER BANK에 접속하여 임시패스워드로 로그인 후 임시패스워드를 다시 설정해 주시기 바랍니다.\\n\\n\n\n"
-		        		+ "- 임시패스워드 : #{임시패스워드}");
-		        jsonKakaoMessage.put("templateCode", "34e0133b42a141fbb718");
-		        jsonKakaoMessage.put("senderKey", "64e98b5f16c490c13b4333fb1971fb862050389b");
-		        jsonMain.put("kakaoMessage", jsonKakaoMessage);
-		        jsonMain.put("messageType", "kat");
+	        	JSONObject jsonMain = Util.makeKko(kkoList);
 
 		        LOGGER.debug("json : "+jsonMain.toString());
     	        //3. 성공시 메세지 발송
     		    dtyService.doznHttpRequestMsg(jsonMain, responseData.getKkoId(), responseData.getSendAccessToken(), responseData.getSendRefreshToken());
-
 
 
 	        } else {	//토큰을 못받아서 발송 못했을 경우에도 사용자 정보를 이력에 쌓아줘야 나중에 찾음
@@ -705,6 +673,9 @@ public class MemServiceImpl extends EgovAbstractServiceImpl implements MemServic
 	public EtcVO requestEtcList(List<EtcVO> list) throws Exception {
 		EtcVO returnVo = new EtcVO();
 		LoginVO user = (LoginVO)EgovUserDetailsHelper.getAuthenticatedUser();
+
+		List<KkoVO> kkoList = new ArrayList<KkoVO>();
+
 		for( int i =0 ; i < list.size() ; i++ ) {
 			EtcVO one = list.get(i);
 			one.setLastUpdusrId(user.getId());
@@ -736,8 +707,58 @@ public class MemServiceImpl extends EgovAbstractServiceImpl implements MemServic
 				memDAO.insertEtc(one);
 			}
 
+			//승인요청시
+			if("TRUE".equals(one.getChk().toUpperCase())) {
+
+				EtcVO etcVo = memDAO.selectEtcOneByEtcId(one);
+				if(!Util.isEmpty(etcVo.getMbtlnum())) {
+	    			//0. 카카오 발송 정보 저장
+	    			KkoVO kkoOne = new KkoVO();
+	    			kkoOne.setMberId(etcVo.getMberId());
+	    			kkoOne.setMbtlnum(Util.getOnlyNumber(etcVo.getMbtlnum()));
+	    			kkoOne.setParam0(etcVo.getGubunNm());
+	    			kkoOne.setParam1(etcVo.getMberNm());
+	    			kkoOne.setParam2(Util.currencyFormatter( new BigDecimal(etcVo.getPaybackCostAll())));
+	    			kkoOne.setTemplateCode(EgovProperties.getProperty("Globals.etcAlert"));
+	    			kkoList.add(kkoOne);
+				}
+			}
+
 			returnVo = one;
 		}
+
+
+
+        //알림톡 발송
+        if(kkoList.size() > 0) {
+	        //2. 알림톡 토큰 가져오기
+        	DoznTokenVO responseData = dtyService.getMsgTocken();
+
+        	//3. 메세지 발송
+	        if(!Util.isEmpty(responseData.getSendAccessToken()) && !Util.isEmpty(responseData.getSendRefreshToken())) {
+
+	        	JSONObject jsonMain = Util.makeKko(kkoList);
+
+		        LOGGER.debug("json : "+jsonMain.toString());
+    	        //3. 성공시 메세지 발송
+    		    dtyService.doznHttpRequestMsg(jsonMain, responseData.getKkoId(), responseData.getSendAccessToken(), responseData.getSendRefreshToken());
+
+
+	        } else {	//토큰을 못받아서 발송 못했을 경우에도 사용자 정보를 이력에 쌓아줘야 나중에 찾음
+		        for(int i = 0; i < kkoList.size() ; i++) {
+		        	KkoVO kkoVo = kkoList.get(i);
+		            //거래이력 누적
+		        	kkoVo.setKkoId(egovKkoIdGnrService.getNextStringId());
+		        	kkoVo.setUpKkoId(responseData.getKkoId());
+		        	kkoVo.setGubun("2");	//메세지
+		        	kkoVo.setUrl("/api/v1/send");
+		        	kkoVo.setCreatId(user.getId());
+		        	kkoVo.setBigo("대여 승인요청 알림 미발송");
+		        	kkoVo.setSendDt(Util.getDay());
+		            payDAO.insertKko(kkoVo);
+		        }
+	        }
+        }
 
 		return returnVo;
 

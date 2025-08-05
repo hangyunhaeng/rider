@@ -621,4 +621,14 @@
 		ORDER BY rnum desc
 	</select>
 
+	<select id="selectEtcOneByEtcId" parameterType="egovframework.com.rd.usr.service.vo.EtcVO" resultType="egovframework.com.rd.usr.service.vo.EtcVO">
+		SELECT
+		case when a.gubun ='D' then '대여' when a.gubun ='R' then '리스' when a.gubun ='E' then '기타' ELSE '' end AS gubun_NM
+			, a.payback_cost_all, b.MBER_NM, b.MBTLNUM, a.MBER_ID
+		FROM RD_ETC a
+		LEFT JOIN COMTNGNRLMBER b ON a.MBER_ID = b.mber_id
+		WHERE 1=1
+		AND ETC_ID = #{etcId}
+	</select>
+
 </mapper>

@@ -413,6 +413,14 @@ public class MemDAO extends EgovComAbstractDAO {
 	public List<DayPayVO> selectEtcInputList(DayPayVO vo) throws Exception {
 		return selectList("memDAO.selectEtcInputList", vo);
 	}
-
+	/**
+	 * 대출 단건 상세 조회
+	 * @param vo
+	 * @return
+	 * @throws Exception
+	 */
+	public EtcVO selectEtcOneByEtcId(EtcVO vo) throws Exception {
+		return selectOne("memDAO.selectEtcOneByEtcId", vo);
+	}
 }
 
