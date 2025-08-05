@@ -32,7 +32,7 @@
 		{ headerName: "code", field: "code", minWidth: 120, hide:true},
 		{ headerName: "referenceKey", field: "referenceKey", minWidth: 120, hide:true},
 		{ headerName: "userKey", field: "userKey", minWidth: 120, hide:true},
-		{ headerName: "상태", field: "status", minWidth: 60, valueGetter:(params) => { return params.data.gubun== "1" ?"발송(접수)":params.data.gubun== "3" ? "완료" : "재발송"}},
+		{ headerName: "상태", field: "status", minWidth: 60, valueGetter:(params) => { return params.data.status== "1" ?"발송(접수)": params.data.status== "3" ? "완료" : params.data.status== "2" ? "재발송" :"" }},
 		{ headerName: "알림톡CODE", field: "kaorsltcode", minWidth: 80},
 		{ headerName: "비고", field: "bigo", minWidth: 170},
 		{ headerName: "발송일", field: "sendDt", minWidth: 120, valueGetter:(params) => { return getStringDate(params.data.sendDt)}},
