@@ -464,7 +464,7 @@
 					JOIN COMTNFILE f ON wi.ATCH_FILE_ID = f.ATCH_FILE_ID
 						WHERE 1=1
 							AND wr.FIX_DAY is null
-							AND e.USE_AT ='Y'
+							AND f.USE_AT ='Y'
 							AND (wi.ACCOUNTS_ST_DT BETWEEN #{searchFromDate} AND #{searchToDate} or wi.ACCOUNTS_ED_DT BETWEEN #{searchFromDate} AND #{searchToDate})
 							<if test="searchNm != null and searchNm != ''">
 							AND d.MBER_NM LIKE '%' #{searchNm} '%'
