@@ -24,9 +24,9 @@
 		{ headerName: "정산종료일", field: "accountsEdDt", minWidth: 90},
 		{ headerName: "파일명", field: "orignlFileNm", minWidth: 400, cellClass: 'ag-cell-left tdul'},
 		{ headerName: "오류메세지", field: "erorrMsg", minWidth: 270, cellClass: 'ag-cell-left'},
-		{ headerName: "삭제", field: "delete", minWidth: 80, cellClass: 'tdul'
-			, cellRenderer:(params) => { return '<div onclick="clickDeleteWeek(\''+params.data.atchFileId+'\')">삭제</div>';}
-		},
+// 		{ headerName: "삭제", field: "delete", minWidth: 80, cellClass: 'tdul'
+// 			, cellRenderer:(params) => { return '<div onclick="clickDeleteWeek(\''+params.data.atchFileId+'\')">삭제</div>';}
+// 		},
 		{ headerName: "등록일", field: "creatDt", minWidth: 90, valueGetter:(params) => { return getStringDate(params.node.data.creatDt)} },
 		{ headerName: "atchFileId", field: "atchFileId", minWidth: 90, hide:true},
 		{ headerName: "weekId", field: "weekId", minWidth: 90, hide:true}
@@ -39,9 +39,9 @@
 		{ headerName: "배달건수", field: "cnt", minWidth: 90},
 		{ headerName: "파일명", field: "orignlFileNm", minWidth: 400, cellClass: 'ag-cell-left tdul'},
 		{ headerName: "오류메세지", field: "erorrMsg", minWidth: 270, cellClass: 'ag-cell-left'},
-		{ headerName: "삭제", field: "delete", minWidth: 80, cellClass: 'tdul'
-			, cellRenderer:(params) => { return '<div onclick="clickDeleteDay(\''+params.data.atchFileId+'\')">삭제</div>';}
-		},
+// 		{ headerName: "삭제", field: "delete", minWidth: 80, cellClass: 'tdul'
+// 			, cellRenderer:(params) => { return '<div onclick="clickDeleteDay(\''+params.data.atchFileId+'\')">삭제</div>';}
+// 		},
 		{ headerName: "등록일", field: "creatDt", minWidth: 90, valueGetter:(params) => { return getStringDate(params.node.data.creatDt)} },
 		{ headerName: "atchFileId", field: "atchFileId", minWidth: 90, hide:true}
 	];
