@@ -49,7 +49,7 @@
 			AND DATE_FORMAT(a.CREAT_DT,'%Y%m%d') BETWEEN #{searchFromDate} AND #{searchToDate}
 			<if test="searchRegistrationSn != null and searchRegistrationSn != ''">
 			AND a.COOPERATOR_ID IN (
-				SELECT COOPERATOR_ID from rd_cooperator
+				SELECT COOPERATOR_ID from RD_COOPERATOR
 				WHERE REGISTRATION_SN = #{searchRegistrationSn}
 			)
 			</if>
