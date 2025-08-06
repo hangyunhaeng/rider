@@ -593,7 +593,7 @@
 					<if test='searchGubun != null and searchGubun != "all"'>
 					AND GUBUN = #{searchGubun}
 					</if>
-				ORDER BY FIX , lv
+				ORDER BY FIX DESC, lv
 		<if test="schIdx !=0 and schPagePerCnt != 0">
 			) m
 		) m
@@ -624,4 +624,23 @@
 					AND GUBUN = #{searchGubun}
 					</if>
 	</select>
+
+	<select id="selectBalanceConfirmTarget" parameterType="egovframework.com.rd.usr.service.vo.Sch" resultType="egovframework.com.rd.usr.service.vo.BalanceVO">
+		SELECT b.COOPERATOR_ID, b.mber_id
+		FROM RD_COOPERATOR a
+		LEFT JOIN RD_COOPERATOR_RIDER_CONNECT b ON a.COOPERATOR_ID = b.COOPERATOR_ID
+		WHERE a.USE_AT = 'Y'
+		AND b.USE_AT ='Y'
+
+		UNION ALL
+
+		SELECT COOPERATOR_ID, #{cooperatorMberId}
+		FROM RD_COOPERATOR
+		WHERE USE_AT = 'Y'
+	</select>
+	<insert id="insertBalanceConfirm" parameterType="egovframework.com.rd.usr.service.vo.BalanceVO">
+		INSERT INTO RD_BALANCE_CONFIRM
+		(COOPERATOR_ID, MBER_ID, DAY, BALANCE0, BALANCE1, ABLE_BALANCE0, ABLE_BALANCE1)
+		VALUES(#{cooperatorId}, #{mberId}, #{day}, #{balance0}, #{balance1}, #{ableBalance0}, #{ableBalance1})
+	</insert>
 </mapper>

@@ -29,4 +29,12 @@ public class BalanceVO extends Sch implements Serializable {
 
 	private String rn;
 
+
+	private BigDecimal ableBalance0;
+	private BigDecimal ableBalance1;
+	private String day;
+	private String gubunNm;
+	private String cooperatorNm;
+	private String mberNm;
+
 }

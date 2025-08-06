@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="stsDAO">
+	<select id="selectBalanceConfirmList" parameterType="egovframework.com.rd.usr.service.vo.BalanceVO" resultType="egovframework.com.rd.usr.service.vo.BalanceVO">
+		<if test="schIdx !=0 and schPagePerCnt != 0">
+		SELECT * FROM (
+			SELECT ROWNUM() RN,m.*
+			FROM (
+		</if>
+				SELECT a.COOPERATOR_ID, a.MBER_ID, a.DAY, a.BALANCE0, a.BALANCE1, a.ABLE_BALANCE0, a.ABLE_BALANCE1
+					, b.MBER_NM, c.COOPERATOR_NM
+					, if(a.mber_id = #{cooperatorMberId}, '협력사', '라이더') AS GUBUN_NM
+				FROM RD_BALANCE_CONFIRM a
+				LEFT JOIN COMTNGNRLMBER b ON a.mber_id = b.MBER_ID
+				LEFT JOIN RD_COOPERATOR c ON a.COOPERATOR_ID = c.COOPERATOR_ID
+				WHERE DAY BETWEEN #{searchFromDate} AND #{searchToDate}
+				<if test='searchCooperatorId != "all" and searchGubun == "R"'>
+				AND a.mber_id != #{cooperatorMberId}
+				</if>
+				<if test='searchCooperatorId != "all" and searchGubun == "C"'>
+				AND a.mber_id = #{cooperatorMberId}
+				</if>
+
+		<if test="schIdx !=0 and schPagePerCnt != 0">
+			) m
+		) m
+		<![CDATA[WHERE RN > #{schIdx}*#{schPagePerCnt} -#{schPagePerCnt} AND RN <= #{schIdx}*#{schPagePerCnt}]]>
+		</if>
+	</select>
+
+
+	<select id="selectBalanceConfirmListCnt" parameterType="egovframework.com.rd.usr.service.vo.BalanceVO" resultType="egovframework.com.rd.usr.service.vo.BalanceVO">
+		SELECT COUNT(COOPERATOR_ID) AS TOTAL_CNT
+		FROM RD_BALANCE_CONFIRM
+		WHERE DAY BETWEEN #{searchFromDate} AND #{searchToDate}
+			<if test='searchCooperatorId != "all" and searchGubun == "R"'>
+			AND mber_id != #{cooperatorMberId}
+			</if>
+			<if test='searchCooperatorId != "all" and searchGubun == "C"'>
+			AND mber_id = #{cooperatorMberId}
+			</if>
+	</select>
+</mapper>

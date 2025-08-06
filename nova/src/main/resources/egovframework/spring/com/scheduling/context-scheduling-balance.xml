@@ -2,59 +2,26 @@
 <beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.0.xsd">
 
-	<!-- 이체 실패 재처리 -->
-	<bean id="myThreadBean" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
-		<property name="targetObject" ref="myThread" />
+	<!-- 잔액 검증 스케줄러 -->
+	<bean id="balanceConfirmBean" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+		<property name="targetObject" ref="balanceConfirm" />
 		<property name="targetMethod" value="execute" />
 		<property name="concurrent" value="false" />
 	</bean>
 
-	<bean id="myThreadTrigger" class="org.springframework.scheduling.quartz.SimpleTriggerFactoryBean">
-		<property name="jobDetail" ref="myThreadBean" />
-		<!-- 시작하고 1분후에 실행한다. (milisecond) -->
-		<property name="startDelay" value="1000" />
-		<!-- 매 360(6분)초마다 실행한다. (milisecond) 데몬 형식으로 계속 기동 중 -->
-		<property name="repeatInterval" value="1000" />
+	<bean id="balanceConfirmTrigger" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+		<property name="jobDetail" ref="balanceConfirmBean" />
+		<property name="cronExpression" value="0 0 4 * * ?" />
+		<!-- 초(0~59), 분(0~59), 시간(0~23), 일(1~31), 월(1~12), 요일(0~7) : 0 일요일, 6토요일 -->
 	</bean>
 
 
-<!-- 	<bean id="myThreadScheduler" class="org.springframework.scheduling.quartz.SchedulerFactoryBean"> -->
-<!-- 		<property name="triggers"> -->
-<!-- 			<list> -->
-<!-- 				<ref bean="myThreadTrigger" /> -->
-<!-- 			</list> -->
-<!-- 		</property> -->
-<!-- 	</bean> -->
-
-
-
-
-
-	<!-- 이체 실패 재처리 -->
-	<bean id="myThreadBean0" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
-		<property name="targetObject" ref="myThread" />
-		<property name="targetMethod" value="execute" />
-		<property name="concurrent" value="false" />
+	<bean id="balanceConfirmScheduler" class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
+		<property name="triggers">
+			<list>
+				<ref bean="balanceConfirmTrigger" />
+			</list>
+		</property>
 	</bean>
-
-	<bean id="myThreadTrigger0" class="org.springframework.scheduling.quartz.SimpleTriggerFactoryBean">
-		<property name="jobDetail" ref="myThreadBean0" />
-		<!-- 시작하고 1분후에 실행한다. (milisecond) -->
-		<property name="startDelay" value="1000" />
-		<!-- 매 360(6분)초마다 실행한다. (milisecond) 데몬 형식으로 계속 기동 중 -->
-		<property name="repeatInterval" value="1000" />
-	</bean>
-
-
-<!-- 	<bean id="myThreadScheduler0" class="org.springframework.scheduling.quartz.SchedulerFactoryBean"> -->
-<!-- 		<property name="triggers"> -->
-<!-- 			<list> -->
-<!-- 				<ref bean="myThreadTrigger0" /> -->
-<!-- 			</list> -->
-<!-- 		</property> -->
-<!-- 	</bean> -->
-
-
-
 
 </beans>

@@ -327,6 +327,18 @@ public class PayDAO extends EgovComAbstractDAO {
 		KkoVO reVo = selectOne("payDAO.selectKkoListCnt", vo);
 		return reVo.getTotalCnt();
 	}
+	/**
+	 * 잔액 체크 할 대상 조회
+	 * @param vo
+	 * @return
+	 * @throws Exception
+	 */
+	public List<BalanceVO> selectBalanceConfirmTarget(Sch vo) throws Exception {
+		return selectList("payDAO.selectBalanceConfirmTarget", vo);
+	}
+	public int insertBalanceConfirm(BalanceVO vo) throws Exception {
+		return insert("payDAO.insertBalanceConfirm", vo);
+	}
 }
 
 

@@ -247,9 +247,9 @@ public class Util {
         JSONObject jsonKakaoMessage = new JSONObject();
         jsonKakaoMessage.put("button1", jsonbutton1);
         if(EgovProperties.getProperty("Globals.passAlert").equals(templateCode)) {
-	        jsonKakaoMessage.put("body", "[라이더뱅크 가입안내]\\n\\n\n\n"
-	        		+ "#{성명}님 라이더뱅크에 등록되셨습니다.\\n\n"
-	        		+ "RADER BANK에 접속하여 임시패스워드로 로그인 후 임시패스워드를 다시 설정해 주시기 바랍니다.\\n\\n\n\n"
+	        jsonKakaoMessage.put("body", "[라이더뱅크 가입안내]\n\n"
+	        		+ "#{성명}님 라이더뱅크에 등록되셨습니다.\n"
+	        		+ "RADER BANK에 접속하여 임시패스워드로 로그인 후 임시패스워드를 다시 설정해 주시기 바랍니다.\n\n"
 	        		+ "- 임시패스워드 : #{임시패스워드}");
         } else if(EgovProperties.getProperty("Globals.etcAlert").equals(templateCode)) {
 	        jsonKakaoMessage.put("body", "[라이더뱅크 #{구분명} 상환 승인 요청]\r\n\n\n"
