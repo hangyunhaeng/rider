@@ -4,12 +4,10 @@ import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
 import java.math.BigDecimal;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLDecoder;
-import java.nio.charset.StandardCharsets;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.MessageDigest;
@@ -2758,8 +2756,6 @@ public class DtyServiceImpl extends EgovAbstractServiceImpl implements DtyServic
 		}
 
 
-
-
 		//라이더 잔액 조정(선출금, 기타리스 만큼 주금액에서 차감, 일금액에 +)
 		dtyDAO.updateFixDayBalance2(weekInfoVO);
 
@@ -2819,11 +2815,21 @@ public class DtyServiceImpl extends EgovAbstractServiceImpl implements DtyServic
 	 */
 	public void deleteWeekAtchFile(WeekInfoVO weekInfoVO) throws Exception {
 
+
+		LOGGER.debug("0. db rock test");
+		//0. 파일 삭제 전 db rock을 건다 (확정과 삭제가 동시에 진행되면 않됨)
+		List<BalanceVO> balanceList = dtyDAO.selectForUpdateWeekByAtchFileId(weekInfoVO);
+
+		LOGGER.debug("1. db rock test : rock");
+
 		WeekInfoVO cnt = dtyDAO.selectFixWeekInfo(weekInfoVO);
 		if(cnt.getTotalCnt() > 0) {
 			throw new IllegalArgumentException("확정 데이터가 있어 삭제를 취소합니다") ;
 		}
 		dtyDAO.deleteAtchFile(weekInfoVO);
+		dtyDAO.deleteWeekRiderInfo(weekInfoVO);
+		dtyDAO.deleteWeekInfo(weekInfoVO);
+		LOGGER.debug("2. db rock test : unrock");
 	}
 	/**
 	 * 일정산 파일 삭제
@@ -2834,11 +2840,18 @@ public class DtyServiceImpl extends EgovAbstractServiceImpl implements DtyServic
 	 */
 	public void deleteDayAtchFile(WeekInfoVO weekInfoVO) throws Exception {
 
+		LOGGER.debug("0. db rock test");
+		//0. 파일 삭제 전 db rock을 건다 (확정과 삭제가 동시에 진행되면 않됨)
+		List<BalanceVO> balanceList = dtyDAO.selectForUpdateDayByAtchFileId(weekInfoVO);
+
+		LOGGER.debug("1. db rock test : rock");
+
 		WeekInfoVO cnt = dtyDAO.selectFixDeleveryInfo(weekInfoVO);
 		if(cnt.getTotalCnt() > 0) {
 			throw new IllegalArgumentException("확정 데이터가 있어 삭제를 취소합니다") ;
 		}
 		dtyDAO.deleteAtchFile(weekInfoVO);
 		dtyDAO.deleteDeliveryInfo(weekInfoVO);
+		LOGGER.debug("2. db rock test : unrock");
 	}
 }

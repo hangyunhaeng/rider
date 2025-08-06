@@ -620,5 +620,31 @@ public class DtyDAO extends EgovComAbstractDAO {
 	public int deleteDeliveryInfo(WeekInfoVO weekInfoVO) throws Exception {
 		return delete("dtyDAO.deleteDeliveryInfo", weekInfoVO);
 	}
+	/**
+	 * 파일 기준 db rock
+	 * @param vo
+	 * @return
+	 * @throws Exception
+	 */
+	public List<BalanceVO> selectForUpdateDayByAtchFileId(WeekInfoVO vo) throws Exception {
+		return selectList("dtyDAO.selectForUpdateDayByAtchFileId", vo);
+	}
+	/**
+	 * 파일 기준 db rock
+	 * @param vo
+	 * @return
+	 * @throws Exception
+	 */
+	public List<BalanceVO> selectForUpdateWeekByAtchFileId(WeekInfoVO vo) throws Exception {
+		return selectList("dtyDAO.selectForUpdateWeekByAtchFileId", vo);
+	}
+
+	public int deleteWeekRiderInfo(WeekInfoVO weekInfoVO) throws Exception {
+		return delete("dtyDAO.deleteDeliveryInfo", weekInfoVO);
+	}
+	public int deleteWeekInfo(WeekInfoVO weekInfoVO) throws Exception {
+		return delete("dtyDAO.deleteWeekInfo", weekInfoVO);
+	}
+
 }
 

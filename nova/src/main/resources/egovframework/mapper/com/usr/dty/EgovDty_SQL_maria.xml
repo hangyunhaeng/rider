@@ -1221,9 +1221,42 @@
 		AND a.FIX_DAY IS NOT NULL
 	</select>
 
-	<update id="deleteDeliveryInfo" parameterType="egovframework.com.rd.usr.service.vo.WeekInfoVO">
+	<delete id="deleteDeliveryInfo" parameterType="egovframework.com.rd.usr.service.vo.WeekInfoVO">
 		DELETE from RD_DELIVERY_INFO
 		WHERE ATCH_FILE_ID = #{searchAtchFileId}
-	</update>
+	</delete>
+
+	<select id="selectForUpdateDayByAtchFileId" parameterType="egovframework.com.rd.usr.service.vo.WeekInfoVO" resultType="egovframework.com.rd.usr.service.vo.BalanceVO">
+		SELECT *
+		FROM RD_BALNCE
+		WHERE (COOPERATOR_ID, MBER_ID) IN (
+			SELECT COOPERATOR_ID, MBER_ID
+			FROM RD_DELIVERY_INFO a
+			WHERE a.ATCH_FILE_ID = #{searchAtchFileId}
+		)
+		FOR UPDATE
+	</select>
+	<select id="selectForUpdateWeekByAtchFileId" parameterType="egovframework.com.rd.usr.service.vo.WeekInfoVO" resultType="egovframework.com.rd.usr.service.vo.BalanceVO">
+		SELECT *
+		FROM RD_BALNCE
+		WHERE (COOPERATOR_ID, MBER_ID) IN (
+			SELECT a.COOPERATOR_ID, b.MBER_ID
+			FROM RD_WEEK_INFO a
+			LEFT JOIN RD_WEEK_RIDER_INFO b on a.WEEK_ID = b.WEEK_ID
+			WHERE a.ATCH_FILE_ID = #{searchAtchFileId}
+		)
+		FOR UPDATE
+	</select>
+
+	<delete id="deleteWeekRiderInfo" parameterType="egovframework.com.rd.usr.service.vo.WeekInfoVO">
+		DELETE FROM RD_WEEK_RIDER_INFO
+		WHERE WEEK_ID IN (SELECT WEEK_ID FROM RD_WEEK_INFO WHERE ATCH_FILE_ID = #{searchAtchFileId})
+	</delete>
+
+
+	<delete id="deleteWeekInfo" parameterType="egovframework.com.rd.usr.service.vo.WeekInfoVO">
+		DELETE FROM RD_WEEK_INFO
+		WHERE ATCH_FILE_ID = #{searchAtchFileId}
+	</delete>
 
 </mapper>
