@@ -1820,8 +1820,8 @@ public class DtyServiceImpl extends EgovAbstractServiceImpl implements DtyServic
             connection = (HttpURLConnection) url.openConnection();
             connection.setRequestMethod("POST");
             connection.setRequestProperty("Content-Type","application/json");
-            connection.setConnectTimeout(15000); // 연결 타임아웃 (15초)
-            connection.setReadTimeout(15000);    // 읽기 타임아웃 (15초)
+            connection.setConnectTimeout(19000); // 연결 타임아웃 (19초)
+            connection.setReadTimeout(19000);    // 읽기 타임아웃 (19초)
             connection.setDoOutput(true);
 
             DataOutputStream wr = new DataOutputStream (connection.getOutputStream());
@@ -2016,17 +2016,26 @@ public class DtyServiceImpl extends EgovAbstractServiceImpl implements DtyServic
 		        vo.setSendTm(jsonObj.get("send_tm").toString());
 		        vo.setNatvTrNo(jsonObj.get("natv_tr_no").toString());
 
-		        //선입금 완료시 협력사 잔액 조정
-		        vo.setCooperatorMberId(EgovProperties.getProperty("Globals.cooperatorId"));
-		        vo.setLastUpdusrId(user.getId());
-		        dtyDAO.selectForUpdateBalanceDayTran(vo);
-		        dtyDAO.updateBalanceDayTran(vo);
-
 	        } else {
 		        vo.setErrorCode(jsonObj.get("error_code").toString());
 		        vo.setErrorMessage(jsonObj.get("error_message").toString());
 	        }
 	        dtyDAO.updateTransfer(vo);
+
+	        if("200".equals(vo.getStatus()) ) {
+		        //선입금 완료시 협력사 잔액 조정
+		        vo.setCooperatorMberId(EgovProperties.getProperty("Globals.cooperatorId"));
+		        vo.setLastUpdusrId(user.getId());
+		        dtyDAO.selectForUpdateBalanceDayTran(vo);
+//		        dtyDAO.updateBalanceDayTran(vo);
+		        ProfitVO profitVO = dtyDAO.selectBalanceDayTran(vo);
+
+		        //협력사 잔액 조정
+		        if(profitVO != null) {
+		    		setBalance(profitVO.getCooperatorId(), EgovProperties.getProperty("Globals.cooperatorId"), user.getId(), new BigDecimal(profitVO.getCost()), new BigDecimal(0));
+		        }
+	        }
+
         }
         return vo;
 	}

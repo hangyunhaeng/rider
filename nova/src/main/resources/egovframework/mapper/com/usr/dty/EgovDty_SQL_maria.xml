@@ -740,8 +740,8 @@
 							GROUP BY a.COOPERATOR_ID, a.MBER_ID
 		)b
 		SET a.BALANCE0 = a.BALANCE0 - b.able_price
-		, LAST_UPDT_PNTTM = SYSDATE()
-		, LAST_UPDUSR_ID = #{lastUpdusrId}
+		, a.LAST_UPDT_PNTTM = SYSDATE()
+		, a.LAST_UPDUSR_ID = #{lastUpdusrId}
 		WHERE a.COOPERATOR_ID = b.COOPERATOR_ID
 		AND a.MBER_ID = b.MBER_ID
 	</update>
@@ -807,8 +807,8 @@
 		)b
 		SET a.BALANCE0 = a.BALANCE0 + b.able_price_day
 		, a.BALANCE1 = a.BALANCE1 - b.able_price
-		, LAST_UPDT_PNTTM = SYSDATE()
-		, LAST_UPDUSR_ID = #{lastUpdusrId}
+		, a.LAST_UPDT_PNTTM = SYSDATE()
+		, a.LAST_UPDUSR_ID = #{lastUpdusrId}
 		WHERE a.COOPERATOR_ID = b.COOPERATOR_ID
 		AND a.MBER_ID = b.MBER_ID
 
@@ -893,18 +893,33 @@
 	</select>
 	<update id="updateBalanceDayTran" parameterType="egovframework.com.rd.usr.service.vo.DoszTransferVO">
 		UPDATE RD_BALNCE a, (
-				SELECT cooperator_id, #{cooperatorMberId}, day_fee FROM RD_DAY_PAY
+				SELECT a.cooperator_id, #{cooperatorMberId} AS MBER_ID, b.cost
+				FROM RD_DAY_PAY a
+				LEFT JOIN RD_COOPERATOR_PROFIT b ON a.DYP_ID = b.DYP_ID
 				WHERE (tran_day, telegram_no) IN  (
 					SELECT tran_day, telegram_no FROM RD_TRANSFER
 					WHERE TRAN_DAY = #{tranDay} AND TELEGRAM_NO = #{telegram_no}
 				)
-				AND use_At ='Y'
+				AND a.USE_AT ='Y'
 			)b
-		set a.BALANCE0 = a.BALANCE0 + b.day_fee
-			, LAST_UPDT_PNTTM = SYSDATE()
-			, LAST_UPDUSR_ID = #{lastUpdusrId}
+		set a.BALANCE0 = a.BALANCE0 + b.cost
+			, a.LAST_UPDT_PNTTM = SYSDATE()
+			, a.LAST_UPDUSR_ID = #{lastUpdusrId}
+		WHERE a.COOPERATOR_ID = b.COOPERATOR_ID
+		AND a.mber_id = b.MBER_ID
 
 	</update>
+
+	<select id="selectBalanceDayTran" parameterType="egovframework.com.rd.usr.service.vo.DoszTransferVO" resultType="egovframework.com.rd.usr.service.vo.ProfitVO">
+			SELECT a.cooperator_id, #{cooperatorMberId} AS MBER_ID, b.cost, tran_day, telegram_no
+			FROM RD_DAY_PAY a
+			LEFT JOIN RD_COOPERATOR_PROFIT b ON a.DYP_ID = b.DYP_ID
+			WHERE (tran_day, telegram_no) IN  (
+				SELECT tran_day, telegram_no FROM RD_TRANSFER
+				WHERE TRAN_DAY = #{tranDay} AND TELEGRAM_NO = #{telegram_no}
+			)
+			AND a.use_At ='Y'
+	</select>
 	<insert id="insertSchAccout" parameterType="egovframework.com.rd.usr.service.vo.DoszSchAccoutVO">
 		INSERT INTO RD_SCH_ACCOUNT
 		(TRAN_DAY, TELEGRAM_NO, BANK_CODE, ACCOUNT, AMOUNT, RES_ALL_YN, CREAT_DT, CREAT_ID)
@@ -1030,8 +1045,8 @@
 				WHERE TRAN_DAY = #{tranDay} AND  TELEGRAM_NO = #{telegram_no} AND USE_AT ='Y'
 			) b
 		SET a.BALANCE1 = a.BALANCE1 + b.FEE + b.SEND_PRICE
-			, LAST_UPDT_PNTTM = SYSDATE()
-			, LAST_UPDUSR_ID = #{lastUpdusrId}
+			, a.LAST_UPDT_PNTTM = SYSDATE()
+			, a.LAST_UPDUSR_ID = #{lastUpdusrId}
 		WHERE a.COOPERATOR_ID = b.COOPERATOR_ID
 		AND a.MBER_ID = b.MBER_ID
 	</update>
@@ -1041,8 +1056,8 @@
 				WHERE TRAN_DAY = #{tranDay} AND  TELEGRAM_NO = #{telegram_no} AND USE_AT ='Y'
 			) b
 		SET a.BALANCE0 = a.BALANCE0 + b.SEND_FEE + b.SEND_PRICE
-			, LAST_UPDT_PNTTM = SYSDATE()
-			, LAST_UPDUSR_ID = #{lastUpdusrId}
+			, a.LAST_UPDT_PNTTM = SYSDATE()
+			, a.LAST_UPDUSR_ID = #{lastUpdusrId}
 		WHERE a.COOPERATOR_ID = b.COOPERATOR_ID
 		AND a.MBER_ID = b.MBER_ID
 	</update>
