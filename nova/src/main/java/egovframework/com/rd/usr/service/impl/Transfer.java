@@ -10,6 +10,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import egovframework.com.cmm.service.EgovProperties;
 import egovframework.com.rd.Util;
+import egovframework.com.rd.usr.service.vo.BalanceVO;
 import egovframework.com.rd.usr.service.vo.DoszResultVO;
 import egovframework.com.rd.usr.service.vo.DoszTransferVO;
 import egovframework.com.rd.usr.service.vo.DoznHistoryVO;
@@ -69,7 +70,7 @@ public class Transfer extends EgovAbstractServiceImpl {
 			//0. 사용자 select for update 로 rock
 			Sch sch = new Sch();
 			sch.setCooperatorMberId(EgovProperties.getProperty("Globals.cooperatorId"));
-			payDAO.selectForUpdateBalanceTranster(sch);
+			List<BalanceVO> forUpadteList = payDAO.selectForUpdateBalanceTranster(sch);
 
 			List<DoszResultVO> list = payDAO.selectTransterProsseceResult();
 
@@ -193,8 +194,8 @@ public class Transfer extends EgovAbstractServiceImpl {
             connection = (HttpURLConnection) url.openConnection();
             connection.setRequestMethod("POST");
             connection.setRequestProperty("Content-Type","application/json");
-            connection.setConnectTimeout(15000); // 연결 타임아웃 (15초)
-            connection.setReadTimeout(15000);    // 읽기 타임아웃 (15초)
+            connection.setConnectTimeout(19000); // 연결 타임아웃 (15초)
+            connection.setReadTimeout(19000);    // 읽기 타임아웃 (15초)
             connection.setDoOutput(true);
 
             DataOutputStream wr = new DataOutputStream (connection.getOutputStream());
