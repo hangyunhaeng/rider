@@ -108,8 +108,11 @@
 	</insert>
 
 	<select id="selectAblePrice" parameterType="egovframework.com.rd.usr.service.vo.MyInfoVO" resultType="egovframework.com.rd.usr.service.vo.MyInfoVO">
-		SELECT SUM(DAY_ABLE_PRICE) AS DAY_ABLE_PRICE, SUM(WEEK_ABLE_PRICE) AS WEEK_ABLE_PRICE
+		SELECT /*SUM(DAY_ABLE_PRICE) AS DAY_ABLE_PRICE, SUM(WEEK_ABLE_PRICE) AS WEEK_ABLE_PRICE*/
+
 		<![CDATA[
+			 if(SUM(WEEK_ABLE_PRICE) < 0 , SUM(DAY_ABLE_PRICE)+SUM(WEEK_ABLE_PRICE), SUM(DAY_ABLE_PRICE)) AS DAY_ABLE_PRICE
+			, if(SUM(WEEK_ABLE_PRICE) < 0 , SUM(WEEK_ABLE_PRICE)-SUM(WEEK_ABLE_PRICE), SUM(WEEK_ABLE_PRICE)) AS WEEK_ABLE_PRICE
 			/* 출금가능여부는 라이더가 직접 출금할때만 사용한다 */
 			, (	SELECT case when a.USE_AT != 'Y' then 'N'
 							when b.USE_AT != 'Y' then 'N'
