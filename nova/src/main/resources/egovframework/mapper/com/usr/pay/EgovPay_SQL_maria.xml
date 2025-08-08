@@ -110,7 +110,7 @@
 	</select>
 	<select id="selectTransterProsseceResult" resultMap="doszResultVO">
 		SELECT TELEGRAM_NO, TRAN_DAY FROM RD_TRANSFER
-		WHERE STATUS = '999' OR STATUS IS null
+		WHERE STATUS = '999'
 
 		UNION ALL
 
