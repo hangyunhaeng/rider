@@ -149,11 +149,12 @@ function 비밀번호찾기페이지이동(){
 
       <div class="container">
         <div class="row gy-4 d-flex justify-content-between">
-          <div class="col-lg-6 order-2 order-lg-1 d-flex flex-column justify-content-center">
-            <h2 data-aos="fade-up">라이더</h2>
-            <p data-aos="fade-up" data-aos-delay="100">배달비 관리</br>배달정보 조회</br></p>
 
-			<div class="formdiv form-search d-flex align-items-stretch mb-3" data-aos="fade-up" data-aos-delay="200">
+          <div class="col-lg-6 order-2 order-lg-1 d-flex flex-column justify-content-center">
+            <h2 data-aos="">라이더</h2>
+            <p data-aos="" data-aos-delay="100">배달비 관리</br>배달정보 조회</br></p>
+
+			<div class="formdiv form-search d-flex align-items-stretch mb-3" data-aos="" data-aos-delay="200">
 				<input type="hidden" id="message" name="message" value="<c:out value='${message}'/>">
 				<input name="userSe" type="hidden" value="GNR" />
 				<input name="j_username" type="hidden" />
@@ -170,7 +171,7 @@ function 비밀번호찾기페이지이동(){
 <!-- 			</div> -->
 
 <!-- 			<div class="sectionrow gy-4"> -->
-<!-- 				<div class="col-lg-4 col-md-6 d-flex" data-aos="fade-up" data-aos-delay="100"> -->
+<!-- 				<div class="col-lg-4 col-md-6 d-flex" data-aos="" data-aos-delay="100"> -->
 <!-- 					<a href="javascript:라이더등록페이지이동();" class="" style="color:#ffffff"><span>라이더 등록</span><i class="bi bi-arrow-right"></i></a> -->
 <!-- 				</div> -->
 <!-- 			</div> -->
@@ -182,9 +183,10 @@ function 비밀번호찾기페이지이동(){
 
           </div>
 
-          <div class="col-lg-5 order-1 order-lg-2 hero-img" data-aos="zoom-out" style="height:200px;">
-            <img src="<c:url value='/images/admin/hero-img.svg' />" class="img-fluid mb-3 mb-lg-0" alt="">
+          <div class="col-lg-5 order-1 order-lg-2 hero-img" data-aos="zoom-out">
+            <img src="<c:url value='/images/admin/KakaoTalk_20250808_075730068.jpg' />" class="img-fluid mb-3 mb-lg-0" alt="">
           </div>
+
 
 
         </div>
@@ -240,7 +242,7 @@ function 비밀번호찾기페이지이동(){
   <script src="<c:url value='/vendor/admin/swiper/swiper-bundle.min.js' />"></script>
 
   <!-- Main JS File -->
-  <script src="<c:url value='/js/admin/main.js"' />></script>
+  <script src="<c:url value='/js/admin/main.js"' />"></script>
 
 
 	<!-- 팝업 폼 -->

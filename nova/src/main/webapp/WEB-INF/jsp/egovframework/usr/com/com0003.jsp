@@ -165,7 +165,7 @@ function 로그인() {
           </div>
 
           <div class="col-lg-5 order-1 order-lg-2 hero-img" data-aos="zoom-out">
-            <img src="<c:url value='/images/admin/hero-img.svg' />" class="img-fluid mb-3 mb-lg-0" alt="">
+            <img src="<c:url value='/images/admin/KakaoTalk_20250808_075723664.jpg' />" class="img-fluid mb-3 mb-lg-0" alt="">
           </div>
 
         </div>
