@@ -211,7 +211,7 @@ public class EgovRdrController {
 		// 1. 사용자 확인
 		if(!Util.isGnr(request.getSession()))
 			return "egovframework/com/cmm/error/accessDenied";
-
+		model.addAttribute("doNice", Util.isReal());
 		return "egovframework/gnr/com/com0008";
 	}
 

@@ -79,6 +79,10 @@
 
 						if(response.data.resultCode == "success"){
 							//location.replace("${pageContext.request.contextPath}/com/com0009.do");
+							if(${doNice} != true){
+								goActStep2();
+								return;
+							}
 							doNext();
 						}
 			        })

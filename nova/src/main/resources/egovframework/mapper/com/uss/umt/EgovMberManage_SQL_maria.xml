@@ -251,6 +251,8 @@ FROM(
                    PASSWORD   =  #{password}
                  , CHG_PWD_LAST_PNTTM = sysdate()
                  , MBER_CONFIRM_AT = #{mberConfirmAt}
+                 , lock_cnt= NULL
+                 , lock_at = NULL
             WHERE  ESNTL_ID  = #{uniqId}
 
     </update>
