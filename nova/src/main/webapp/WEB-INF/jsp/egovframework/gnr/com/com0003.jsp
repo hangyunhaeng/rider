@@ -184,7 +184,7 @@ function 비밀번호찾기페이지이동(){
           </div>
 
           <div class="col-lg-5 order-1 order-lg-2 hero-img" data-aos="zoom-out">
-            <img src="<c:url value='/images/admin/KakaoTalk_20250808_075730068.jpg' />" class="img-fluid mb-3 mb-lg-0" alt="">
+            <img src="<c:url value='/images/admin/KakaoTalk_20250811_184013573_01.jpg' />" class="img-fluid mb-3 mb-lg-0" alt="">
           </div>
 
 
