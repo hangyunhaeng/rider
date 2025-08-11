@@ -57,6 +57,7 @@
 		{
 		    headerName: '보험,세금',
 		    children: [
+		    	{ headerName: "세금신고<br>협력사", field: "feeCooperatorAt", minWidth: 60, cellDataType: 'boolean', editable: (params) => {return ('${loginVO.authorCode}' =='ROLE_ADMIN')? true: false}},
 				{ headerName: "고용(%)", field: "feeEmploymentInsurance", minWidth: 90, editable: true
 					, cellClass: (params) => {return agGrideditClass(params, "ag-cell-right");}
 					, valueGetter:(params) => { return currencyFormatter(params.data.feeEmploymentInsurance);}

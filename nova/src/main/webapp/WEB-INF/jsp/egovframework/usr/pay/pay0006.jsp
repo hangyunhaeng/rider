@@ -316,7 +316,7 @@
 						<th>출금금액</th>
 						<td>
 							<input name="cooperatorId" type="hidden"/>
-							<input name="cost" type="text" style="width:calc(100% - 236px);" maxlength="15" oninput="">
+							<input name="cost" type="text" style="width:calc(100% - 240px);" maxlength="15" oninput="">
 							<sm>&nbsp;&nbsp;계좌이체 수수료 - 300원</sm>
 							<button class="btn ty1">출금요청</button>
 						</td>

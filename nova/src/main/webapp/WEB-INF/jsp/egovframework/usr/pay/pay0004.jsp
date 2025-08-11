@@ -676,6 +676,8 @@
 								<option value="C">콜수수료</option>
 								<option value="E">기타수수료</option>
 								<option value="D">선지급수수료</option>
+								<option value="B">부가세</option>
+								<option value="O">원천세</option>
 							</select>
 						</td>
 					</tr>

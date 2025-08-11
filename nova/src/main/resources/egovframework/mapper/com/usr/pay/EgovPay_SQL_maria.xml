@@ -289,7 +289,7 @@
 		SELECT a.coofit_id, a.PROFIT_ID, a.COOPERATOR_ID, a.MBER_ID, a.GUBUN, a.COST, a.DELIVERY_COST, a.DELIVERY_CNT, a.DELIVERY_DAY, a.DYP_ID, a.WKP_ID, a.FEE_ID, a.RIDER_FEE_ID
 		, DATE_FORMAT(a.CREAT_DT, '%Y%m%d') AS CREAT_DT, a.CREAT_ID
 		, b.MBER_NM, c.COOPERATOR_NM
-		, case when a.gubun = 'C' then '콜수수료' when a.gubun ='E' then '기타수수료' when a.gubun ='D' then '선지급수수료' ELSE '' END GUBUN_NM
+		, case when a.gubun = 'C' then '콜수수료' when a.gubun ='E' then '기타수수료' when a.gubun ='D' then '선지급수수료' when a.gubun ='B' then '부가세' when a.gubun ='O' then '원천세' ELSE '' END GUBUN_NM
 		FROM RD_COOPERATOR_PROFIT a
 		LEFT JOIN COMTNGNRLMBER b ON a.mber_id = b.mber_id
 		LEFT JOIN RD_COOPERATOR c ON a.cooperator_id = c.COOPERATOR_ID
@@ -317,7 +317,7 @@
 		SELECT cooperator_id, cooperator_nm, SUM(plus) - SUM(minus) AS COOP_ABLE_PRICE
 		FROM (
 			SELECT aa.cooperator_id, aa.cooperator_nm
-			,sum(if(a.gubun = 'C' OR a.gubun = 'E' OR (a.gubun = 'D' AND c.status_cd = '0000' AND c.STATUS = '200'), cost, 0)) plus	/*선지급금은 이체완료건만 산정*/
+			,sum(if(a.gubun = 'C' OR a.gubun = 'E' OR a.gubun = 'B' OR a.gubun = 'O' OR (a.gubun = 'D' AND c.status_cd = '0000' AND c.STATUS = '200'), cost, 0)) plus	/*선지급금은 이체완료건만 산정*/
 			, 0 minus
 			FROM  RD_COOPERATOR aa
 			left join RD_COOPERATOR_PROFIT a ON aa.cooperator_id = a.cooperator_id

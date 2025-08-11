@@ -73,6 +73,8 @@ public class CooperatorVO extends Sch implements Serializable {
 	//프로그램료
 	private int feeProgram;
 
+	//세금신고 협력사
+	private boolean feeCooperatorAt;
 
 	//RD_RIDER_FEE
 	private String riderFeeId;
