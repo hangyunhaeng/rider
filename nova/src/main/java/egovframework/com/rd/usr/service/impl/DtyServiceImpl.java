@@ -2259,10 +2259,11 @@ public class DtyServiceImpl extends EgovAbstractServiceImpl implements DtyServic
         	kkoVo.setUpKkoId(kkoId);
         	kkoVo.setGubun("2");	//메세지
         	kkoVo.setUrl("/api/v1/send");
+        	kkoVo.setTemplateCode(((JSONObject)jsonParameters.get("kakaoMessage")).get("templateCode").toString());
         	kkoVo.setSendAccessToken(sendAccessToken);
         	kkoVo.setSendRefreshToken(sendRefreshToken);
         	kkoVo.setCreatId(user.getId());
-        	kkoVo.setBigo("패스워드 알림 발송대기");
+        	kkoVo.setBigo("알림 발송대기");
         	kkoVo.setSendDt(Util.getDay());
             JSONArray jsonSendList = new JSONArray(jsonParameters.get("phoneList").toString());
             for (int i = 0; i < jsonSendList.length(); ++i) {
@@ -2315,7 +2316,7 @@ public class DtyServiceImpl extends EgovAbstractServiceImpl implements DtyServic
     		        	kkoVo.setUserKey((String)jsonObject.get((i+1)+""));
     		        	kkoVo.setUpKkoId(kkoId);
     		        	kkoVo.setMbtlnum((String)jsonObject.get("phone"));
-    		        	kkoVo.setBigo("패스워드 알림 발송완료");
+    		        	kkoVo.setBigo("알림 발송완료");
     		            payDAO.updateKkoUsr(kkoVo);
     		        }
 
