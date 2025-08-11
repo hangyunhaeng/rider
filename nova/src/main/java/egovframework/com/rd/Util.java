@@ -226,6 +226,8 @@ public class Util {
 	        	variablesObject.put("구분명", kkoVo.getParam0());
 	        	variablesObject.put("성명", kkoVo.getParam1());
 	        	variablesObject.put("금액", kkoVo.getParam2());
+	        } else if(EgovProperties.getProperty("Globals.inqAlert").equals(templateCode)) {
+	        	variablesObject.put("성명", kkoVo.getParam0());
 	        }
 	        jsonObject.put("variables", variablesObject);
 	        jsonObject.put("phone", kkoVo.getMbtlnum());
@@ -256,6 +258,9 @@ public class Util {
 	        		+ "#{성명}님 라이더뱅크에서 #{구분명} #{금액}원에 대한 상환 승인 요청이 있습니다.\r\n\n"
 	        		+ "라이더뱅크 > 대여,리스 현황 메뉴에서 확인 하신 후에 승인해 주시기 바랍니다.\r\n\n"
 	        		+ "미승인시 출금 기능이 제한 됩니다.");
+        } else if(EgovProperties.getProperty("Globals.inqAlert").equals(templateCode)) {
+	        jsonKakaoMessage.put("body", "[라이더뱅크 안내]\r\n\n"
+	        		+ "#{성명}님 1:1문의에 대한 답변이 등록되었습니다.");
         }
         jsonKakaoMessage.put("templateCode", templateCode);
         jsonKakaoMessage.put("senderKey", EgovProperties.getProperty("Globals.senderKey"));

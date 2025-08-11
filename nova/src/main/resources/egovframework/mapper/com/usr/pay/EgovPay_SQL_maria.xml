@@ -507,9 +507,9 @@
 	</select>
 	<insert id="insertKko" parameterType="egovframework.com.rd.usr.service.vo.KkoVO">
 		INSERT INTO RD_KKO
-		(KKO_ID, UP_KKO_ID, MBER_ID, GUBUN, MBTLNUM, URL, SEND_ACCESS_TOKEN, SEND_REFRESH_TOKEN, SEND_LONGTXT, RECV_LONGTXT
+		(KKO_ID, UP_KKO_ID, MBER_ID, GUBUN, MBTLNUM, URL, TEMPLATE_CODE, SEND_ACCESS_TOKEN, SEND_REFRESH_TOKEN, SEND_LONGTXT, RECV_LONGTXT
 			, CODE, USER_KEY, STATUS, KAORSLTCODE, BIGO, SEND_DT, CREAT_DT, CREAT_ID)
-		values(#{kkoId}, #{upKkoId}, #{mberId}, #{gubun}, #{mbtlnum}, #{url}, #{sendAccessToken}, #{sendRefreshToken}, #{sendLongtxt}, #{recvLongtxt}
+		values(#{kkoId}, #{upKkoId}, #{mberId}, #{gubun}, #{mbtlnum}, #{url}, #{templateCode}, #{sendAccessToken}, #{sendRefreshToken}, #{sendLongtxt}, #{recvLongtxt}
 			, #{code}, #{userKey}, #{status}, #{kaorsltcode}, #{bigo}, #{sendDt},SYSDATE(), #{creatId})
 	</insert>
 	<update id="updateKko" parameterType="egovframework.com.rd.usr.service.vo.KkoVO">
@@ -583,10 +583,11 @@
 					FROM RD_KKO a
 					INNER JOIN cte ON a.UP_KKO_ID = cte.KKO_ID
 				)
-				SELECT cte.*, a.MBER_NM, b.CD_NM
+				SELECT cte.*, a.MBER_NM, b.CD_NM, c.CD_NM AS TEMBLATE_NM
 				FROM cte
 				LEFT JOIN COMTNGNRLMBER a ON cte.MBER_ID = a.MBER_ID
 				LEFT JOIN RD_CD b ON cte.KAORSLTCODE = b.CD AND b.CD_GROUP = 'KKO_CD'
+				LEFT JOIN RD_CD c ON cte.TEMPLATE_CODE = c.CD AND c.CD_GROUP = 'KKO_TP'
 
 				WHERE 1=1
 					AND SEND_DT BETWEEN #{searchFromDate} AND #{searchToDate}

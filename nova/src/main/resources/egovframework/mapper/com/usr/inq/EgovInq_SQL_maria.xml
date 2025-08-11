@@ -15,6 +15,13 @@
 		WHERE INQ_ID = #{inqId}
 	</update>
 
+	<select id="selectInquiryByUpInqId" parameterType="egovframework.com.rd.usr.service.vo.InquiryVO" resultType = "egovframework.com.rd.usr.service.vo.InquiryVO">
+		SELECT INQ_ID, UP_INQ_ID, TITLE, LONGTXT, a.USE_AT, a.CREAT_DT, a.CREAT_ID, mber_nm AS CREAT_NM, MBTLNUM
+		FROM RD_INQUIRY a
+		LEFT JOIN COMTNGNRLMBER b ON a.CREAT_ID = b.MBER_ID
+		WHERE INQ_ID = #{upInqId}
+	</select>
+
 	<select id="selectInquiryByInqId" parameterType="egovframework.com.rd.usr.service.vo.InquiryVO" resultType = "egovframework.com.rd.usr.service.vo.InquiryVO">
 		SELECT INQ_ID, UP_INQ_ID, TITLE, LONGTXT, USE_AT, CREAT_DT, CREAT_ID
 		FROM RD_INQUIRY

@@ -54,4 +54,5 @@ public class KkoVO extends Sch implements Serializable {
 	private String mberNm;
 	private String cdNm;
 	private String templateCode;
+	private String temblateNm;
 }

@@ -1,20 +1,27 @@
 package egovframework.com.rd.usr.service.impl;
 
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.annotation.Resource;
 
 import org.egovframe.rte.fdl.cmmn.EgovAbstractServiceImpl;
 import org.egovframe.rte.fdl.idgnr.EgovIdGnrService;
+import org.json.simple.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import egovframework.com.cmm.LoginVO;
+import egovframework.com.cmm.service.EgovProperties;
+import egovframework.com.cmm.util.EgovUserDetailsHelper;
 import egovframework.com.rd.Util;
+import egovframework.com.rd.usr.service.DtyService;
 import egovframework.com.rd.usr.service.InqService;
+import egovframework.com.rd.usr.service.vo.DoznTokenVO;
 import egovframework.com.rd.usr.service.vo.InquiryVO;
+import egovframework.com.rd.usr.service.vo.KkoVO;
 
 /**
  * @Class Name : DtyServiceImpl.java
@@ -37,9 +44,17 @@ public class InqServiceImpl extends EgovAbstractServiceImpl implements InqServic
 
 	@Resource(name = "InqDAO")
 	private InqDAO inqDAO;
+	@Resource(name = "PayDAO")
+	private PayDAO payDAO;
+
+    @Resource(name = "DtyService")
+    private DtyService dtyService;
     /** ID Generation */
 	@Resource(name="egovInqIdGnrService")
 	private EgovIdGnrService egovInqIdGnrService;
+	@Resource(name="egovInqIdGnrService")
+	private EgovIdGnrService egovKkoIdGnrService;
+
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(InqServiceImpl.class);
 
@@ -79,6 +94,7 @@ public class InqServiceImpl extends EgovAbstractServiceImpl implements InqServic
 	 */
 	public void saveInquiry(InquiryVO vo) throws Exception {
 
+		LoginVO user = (LoginVO)EgovUserDetailsHelper.getAuthenticatedUser();
 		if(Util.isEmpty(vo.getInqId())) {
         	String inqId = egovInqIdGnrService.getNextStringId();
         	vo.setInqId(inqId);
@@ -86,6 +102,50 @@ public class InqServiceImpl extends EgovAbstractServiceImpl implements InqServic
         } else {
         	inqDAO.updateInquiry(vo);
         }
+		if(vo.getUpInqId() != null) {
+
+			//알림톡 발송 대상 조회
+			InquiryVO upVo = inqDAO.selectInquiryByUpInqId(vo);
+			if(!Util.isEmpty(Util.getOnlyNumber(upVo.getMbtlnum())) ) {
+				List<KkoVO> kkoList = new ArrayList<KkoVO>();
+				KkoVO kkoOne = new KkoVO();
+				kkoOne.setMberId(upVo.getCreatId());
+				kkoOne.setMbtlnum(Util.getOnlyNumber(upVo.getMbtlnum()));
+				kkoOne.setParam0(upVo.getCreatNm());
+				kkoOne.setTemplateCode(EgovProperties.getProperty("Globals.inqAlert"));
+				kkoList.add(kkoOne);
+
+		        //알림톡 발송
+		        //2. 알림톡 토큰 가져오기
+	        	DoznTokenVO responseData = dtyService.getMsgTocken();
+
+	        	//3. 메세지 발송
+		        if(!Util.isEmpty(responseData.getSendAccessToken()) && !Util.isEmpty(responseData.getSendRefreshToken())) {
+
+		        	JSONObject jsonMain = Util.makeKko(kkoList);
+
+			        LOGGER.debug("json : "+jsonMain.toString());
+	    	        //3. 성공시 메세지 발송
+	    		    dtyService.doznHttpRequestMsg(jsonMain, responseData.getKkoId(), responseData.getSendAccessToken(), responseData.getSendRefreshToken());
+
+
+		        } else {	//토큰을 못받아서 발송 못했을 경우에도 사용자 정보를 이력에 쌓아줘야 나중에 찾음
+			        for(int i = 0; i < kkoList.size() ; i++) {
+			        	KkoVO kkoVo = kkoList.get(i);
+			            //거래이력 누적
+			        	kkoVo.setKkoId(egovKkoIdGnrService.getNextStringId());
+			        	kkoVo.setUpKkoId(responseData.getKkoId());
+			        	kkoVo.setGubun("2");	//메세지
+			        	kkoVo.setUrl("/api/v1/send");
+			        	kkoVo.setCreatId(user.getId());
+			        	kkoVo.setBigo("알림 미발송");
+			        	kkoVo.setSendDt(Util.getDay());
+			            payDAO.insertKko(kkoVo);
+			        }
+		        }
+			}//end if(!Util.isEmpty(upVo.getMbtlnum()) )
+		}
+
 
 	}
 	/**

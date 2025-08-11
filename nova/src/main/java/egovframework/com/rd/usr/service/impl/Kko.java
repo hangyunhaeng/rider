@@ -131,7 +131,7 @@ public class Kko extends EgovAbstractServiceImpl {
         		        kkoVo.setMbtlnum(data.get("PHONE").toString());
         		        kkoVo.setKaorsltcode(data.get("KAORSLTCODE").toString());
         		        kkoVo.setRecvLongtxt(response.toString());
-			        	kkoVo.setBigo("패스워드 알림 발송완료");
+			        	kkoVo.setBigo("알림 발송완료");
 			            payDAO.updateKkoReport(kkoVo);
 
     		        }

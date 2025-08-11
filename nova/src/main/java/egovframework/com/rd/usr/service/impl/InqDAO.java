@@ -64,6 +64,15 @@ public class InqDAO extends EgovComAbstractDAO {
 	public InquiryVO selectInquiryByInqId(InquiryVO vo) throws Exception {
 		return selectOne("inqDAO.selectInquiryByInqId", vo);
 	}
+	/**
+	 * 1:1문의 답변의 원본 조회 by upInqId
+	 * @param vo
+	 * @return
+	 * @throws Exception
+	 */
+	public InquiryVO selectInquiryByUpInqId(InquiryVO vo) throws Exception {
+		return selectOne("inqDAO.selectInquiryByUpInqId", vo);
+	}
 
 	/**
 	 * 1:1문의 리스트

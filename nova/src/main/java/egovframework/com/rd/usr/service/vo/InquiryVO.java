@@ -47,4 +47,6 @@ public class InquiryVO extends Sch implements Serializable {
 	//rownum
 	private String rn;
 
+	private String mbtlnum;
+
 }

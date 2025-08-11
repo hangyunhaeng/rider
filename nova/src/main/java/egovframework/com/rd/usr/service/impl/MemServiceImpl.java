@@ -502,7 +502,7 @@ public class MemServiceImpl extends EgovAbstractServiceImpl implements MemServic
 		        	kkoVo.setGubun("2");	//메세지
 		        	kkoVo.setUrl("/api/v1/send");
 		        	kkoVo.setCreatId(user.getId());
-		        	kkoVo.setBigo("패스워드 알림 미발송");
+		        	kkoVo.setBigo("알림 미발송");
 		        	kkoVo.setSendDt(Util.getDay());
 		            payDAO.insertKko(kkoVo);
 		        }

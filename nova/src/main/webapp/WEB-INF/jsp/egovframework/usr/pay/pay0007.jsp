@@ -25,6 +25,7 @@
 		{ headerName: "ID", field: "mberId", minWidth: 80},
 		{ headerName: "이름", field: "mberNm", minWidth: 80},
 		{ headerName: "구분", field: "gubun", minWidth: 80, valueGetter:(params) => { return params.data.gubun== "1" ?"토큰":"알림톡"}},
+		{ headerName: "템플릿", field: "temblateNm", minWidth: 80},
 		{ headerName: "발송번호", field: "mbtlnum", minWidth: 120},
 		{ headerName: "url", field: "url", minWidth: 120, hide:true},
 		{ headerName: "발송메세지", field: "sendLongtxt", minWidth: 160},
