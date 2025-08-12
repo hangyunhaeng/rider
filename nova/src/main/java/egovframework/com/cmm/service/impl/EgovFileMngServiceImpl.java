@@ -166,4 +166,26 @@ public class EgovFileMngServiceImpl extends EgovAbstractServiceImpl implements E
 	public List<FileVO> selectFileListByInserDate(FileVO vo) throws Exception {
 		return fileMngDAO.selectFileListByInserDate(vo);
 	}
+
+	/**
+	 * 미확정 주정산 파일명 가져오기
+	 *
+	 * @param vo
+	 * @return
+	 * @throws Exception
+	 */
+	public List<FileVO> selectWeekFileLIstByNullFixDay(FileVO vo) throws Exception {
+		return fileMngDAO.selectWeekFileLIstByNullFixDay(vo);
+	}
+
+	/**
+	 * 확정된 주정산 파일명 가져오기
+	 *
+	 * @param vo
+	 * @return
+	 * @throws Exception
+	 */
+	public List<FileVO> selectWeekFileListByFixDay(FileVO vo) throws Exception {
+		return fileMngDAO.selectWeekFileListByFixDay(vo);
+	}
 }

@@ -93,6 +93,9 @@ public class WeekRiderInfoVO extends Sch implements Serializable {
 	private BigDecimal withholdingTax;
 	/** 라이더별지급금액(K):(G-J) */
 	private BigDecimal givePay;
+
+	/** 배포용 운영비 */
+	private BigDecimal operatingCostAdd;
 	/** 등록일 */
 	private String creatDt;
 	/** 생성자 ID */

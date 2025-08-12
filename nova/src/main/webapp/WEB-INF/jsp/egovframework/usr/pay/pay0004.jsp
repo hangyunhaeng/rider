@@ -40,7 +40,7 @@
 		{ headerName: "riderFeeId", field: "riderFeeId", minWidth: 120, hide:true},
 		{ headerName: "협력사아이디", field: "cooperatorId", minWidth: 140},
 		{ headerName: "협력사명", field: "cooperatorNm", minWidth: 140},
-		{ headerName: "라이더ID", field: "mberId", minWidth: 140},
+		{ headerName: "라이더ID", field: "mberId", minWidth: 140, valueGetter:(params) => { return params.data.mberId == '${notMberId}' ? '' :params.data.mberId; }},
 		{ headerName: "라이더명", field: "mberNm", minWidth: 140},
 		{ headerName: "구분", field: "gubun", minWidth: 140, hide:true},
 		{ headerName: "구분", field: "gubunNm", minWidth: 140},

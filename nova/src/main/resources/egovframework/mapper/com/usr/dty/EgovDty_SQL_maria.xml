@@ -165,10 +165,11 @@
 						WHERE 1=1
 							AND e.USE_AT ='Y'
 							AND wr.FIX_DAY is NULL
-							AND (wi.ACCOUNTS_ST_DT BETWEEN #{searchFromDate} AND #{searchToDate} or wi.ACCOUNTS_ED_DT BETWEEN #{searchFromDate} AND #{searchToDate})
-							<if test="searchNm != null and searchNm != ''">
-							AND d.MBER_NM like '%' #{searchNm} '%'
-							</if>
+							AND wi.ATCH_FILE_ID = #{searchAtchFileId}
+<!-- 							AND (wi.ACCOUNTS_ST_DT BETWEEN #{searchFromDate} AND #{searchToDate} or wi.ACCOUNTS_ED_DT BETWEEN #{searchFromDate} AND #{searchToDate}) -->
+<!-- 							<if test="searchNm != null and searchNm != ''"> -->
+<!-- 							AND d.MBER_NM like '%' #{searchNm} '%' -->
+<!-- 							</if> -->
 		) b
 		SET FIX_DAY = DATE_FORMAT(SYSDATE(), '%Y%m%d')
 		where a.week_id = b.week_id
@@ -184,7 +185,8 @@
 			WHERE 1=1
 				AND wi.FIX_DAY is NULL
 				AND a.USE_AT ='Y'
-				AND (wi.ACCOUNTS_ST_DT BETWEEN #{searchFromDate} AND #{searchToDate} or wi.ACCOUNTS_ED_DT BETWEEN #{searchFromDate} AND #{searchToDate})
+				AND wi.ATCH_FILE_ID = #{searchAtchFileId}
+<!-- 				AND (wi.ACCOUNTS_ST_DT BETWEEN #{searchFromDate} AND #{searchToDate} or wi.ACCOUNTS_ED_DT BETWEEN #{searchFromDate} AND #{searchToDate}) -->
 			GROUP BY wi.WEEK_ID
 		)b
 		SET a.FIX_DAY = DATE_FORMAT(SYSDATE(), '%Y%m%d')
@@ -233,6 +235,34 @@
 			,#{ownerEmploymentInsuranceAccounts},#{riderEmploymentInsuranceAccounts},#{sumEmploymentInsuranceAccounts}
 			,#{ownerIndustrialInsuranceAccounts},#{riderIndustrialInsuranceAccounts},#{sumIndustrialInsuranceAccounts}
 			,#{operatingCost},#{accountsCost},#{incomeTax},#{residenceTax},#{withholdingTax},#{givePay},SYSDATE(),#{creatId})
+	</insert>
+
+	<insert id="insertWeekInfoOut" parameterType="egovframework.com.rd.usr.service.vo.WeekInfoVO">
+			INSERT INTO RD_WEEK_INFO_OUT
+			(WEEK_ID,COOPERATOR_ID,ACCOUNTS_ST_DT,ACCOUNTS_ED_DT ,DELIVERY_COST ,ADD_ACCOUNTS ,OPERATING_COST,MANAGEMENT_COST
+			,OPERATING_FEE,ETC_COST,TIME_INSURANCE,OWNER_EMPLOYMENT_INSURANCE,RIDER_EMPLOYMENT_INSURANCE,OWNER_INDUSTRIAL_INSURANCE
+			,RIDER_INDUSTRIAL_INSURANCE,WITHHOLDING_TAX_INSURANCE_SUM,EMPLOYMENT_INSURANCE_ACCOUNTS,INDUSTRIAL_INSURANCE_ACCOUNTS
+			,G,ACCOUNTS_SCHEDULE_COST,TAX_BILL_SUPPLY,TAX_BILL_ADD ,TAX_BILL_SUM ,NOTE,ATCH_FILE_ID,OPERATING_COST_ADD,CREAT_DT,CREAT_ID)
+			VALUES
+			(#{weekId},#{cooperatorId},#{accountsStDt},#{accountsEdDt},#{deliveryCost},#{addAccounts},#{operatingCost},#{managementCost}
+			,#{operatingFee},#{etcCost},#{timeInsurance},#{ownerEmploymentInsurance},#{riderEmploymentInsurance},#{ownerIndustrialInsurance}
+			,#{riderIndustrialInsurance},#{withholdingTaxInsuranceSum},#{employmentInsuranceAccounts},#{industrialInsuranceAccounts}
+			,#{g},#{accountsScheduleCost},#{taxBillSupply},#{taxBillAdd},#{taxBillSum},#{note},#{atchFileId},#{operatingCostAdd},SYSDATE(),#{creatId})
+	</insert>
+
+	<insert id="insertWeekRiderInfoOut" parameterType="egovframework.com.rd.usr.service.vo.WeekRiderInfoVO">
+			INSERT INTO RD_WEEK_RIDER_INFO_OUT
+			(WEEK_ID,NO,MBER_ID,MBER_NM,CNT,DELIVERY_COST,ADD_COST,SUM_COST,TIME_INSURANCE,NECESSARY_EXPENSES,PAY,OWNER_EMPLOYMENT_INSURANCE
+			,RIDER_EMPLOYMENT_INSURANCE,OWNER_INDUSTRIAL_INSURANCE,RIDER_INDUSTRIAL_INSURANCE,WITHHOLDING_TAX_INSURANCE_SUM
+			,OWNER_EMPLOYMENT_INSURANCE_ACCOUNTS,RIDER_EMPLOYMENT_INSURANCE_ACCOUNTS,SUM_EMPLOYMENT_INSURANCE_ACCOUNTS
+			,OWNER_INDUSTRIAL_INSURANCE_ACCOUNTS,RIDER_INDUSTRIAL_INSURANCE_ACCOUNTS,SUM_INDUSTRIAL_INSURANCE_ACCOUNTS
+			,OPERATING_COST,ACCOUNTS_COST,INCOME_TAX,RESIDENCE_TAX,WITHHOLDING_TAX,GIVE_PAY,OPERATING_COST_ADD,CREAT_DT,CREAT_ID)
+			VALUES
+			(#{weekId},#{no},#{mberId},#{mberNm},#{cnt},#{deliveryCost},#{addCost},#{sumCost},#{timeInsurance},#{necessaryExpenses},#{pay},#{ownerEmploymentInsurance}
+			,#{riderEmploymentInsurance},#{ownerIndustrialInsurance},#{riderIndustrialInsurance},#{withholdingTaxInsuranceSum}
+			,#{ownerEmploymentInsuranceAccounts},#{riderEmploymentInsuranceAccounts},#{sumEmploymentInsuranceAccounts}
+			,#{ownerIndustrialInsuranceAccounts},#{riderIndustrialInsuranceAccounts},#{sumIndustrialInsuranceAccounts}
+			,#{operatingCost},#{accountsCost},#{incomeTax},#{residenceTax},#{withholdingTax},#{givePay},#{operatingCostAdd},SYSDATE(),#{creatId})
 	</insert>
 
 
@@ -287,13 +317,14 @@
 		JOIN COMTNFILE b ON a.ATCH_FILE_ID = b.ATCH_FILE_ID
 		WHERE 1=1
 			AND b.USE_AT ='Y'
-			AND (ACCOUNTS_ST_DT BETWEEN #{searchFromDate} AND #{searchToDate} or ACCOUNTS_ED_DT BETWEEN #{searchFromDate} AND #{searchToDate})
-			<if test="searchFixGubun == 'YES'">
-			AND FIX_DAY is not null
-			</if>
-			<if test="searchFixGubun == 'NO'">
+			AND a.ATCH_FILE_ID = #{searchAtchFileId}
+<!-- 			AND (ACCOUNTS_ST_DT BETWEEN #{searchFromDate} AND #{searchToDate} or ACCOUNTS_ED_DT BETWEEN #{searchFromDate} AND #{searchToDate}) -->
+<!-- 			<if test="searchFixGubun == 'YES'"> -->
+<!-- 			AND FIX_DAY is not null -->
+<!-- 			</if> -->
+<!-- 			<if test="searchFixGubun == 'NO'"> -->
 			AND FIX_DAY is null
-			</if>
+<!-- 			</if> -->
 			<if test="schAuthorCode == 'ROLE_USER'">
 			/* 협력사 조건 *//* COOPERATOR_ID로 조건을 만든건 ★정산 파일을 올릴때 권한이 있는 협력사ID 데이터만 올릴수 있음!!★ - 나머지는 오류 처리할꺼임  */
 			AND COOPERATOR_ID IN (
@@ -316,16 +347,17 @@
 		JOIN COMTNFILE d ON a.ATCH_FILE_ID = d.ATCH_FILE_ID
 		WHERE 1 = 1
 			AND d.USE_AT = 'Y'
-			AND (a.ACCOUNTS_ST_DT BETWEEN #{searchFromDate} AND #{searchToDate} or a.ACCOUNTS_ED_DT BETWEEN #{searchFromDate} AND #{searchToDate})
-			<if test="searchFixGubun == 'YES'">
-			AND b.FIX_DAY is not null
-			</if>
-			<if test="searchFixGubun == 'NO'">
+			AND a.ATCH_FILE_ID = #{searchAtchFileId}
+<!-- 			AND (a.ACCOUNTS_ST_DT BETWEEN #{searchFromDate} AND #{searchToDate} or a.ACCOUNTS_ED_DT BETWEEN #{searchFromDate} AND #{searchToDate}) -->
+<!-- 			<if test="searchFixGubun == 'YES'"> -->
+<!-- 			AND b.FIX_DAY is not null -->
+<!-- 			</if> -->
+<!-- 			<if test="searchFixGubun == 'NO'"> -->
 			AND b.FIX_DAY is null
-			</if>
-			<if test="searchNm != null and searchNm != ''">
-			AND c.MBER_NM LIKE '%' #{searchNm} '%'
-			</if>
+<!-- 			</if> -->
+<!-- 			<if test="searchNm != null and searchNm != ''"> -->
+<!-- 			AND c.MBER_NM LIKE '%' #{searchNm} '%' -->
+<!-- 			</if> -->
 			<if test="schAuthorCode == 'ROLE_USER'">
 			/* 협력사 조건 *//* COOPERATOR_ID로 조건을 만든건 ★정산 파일을 올릴때 권한이 있는 협력사ID 데이터만 올릴수 있음!!★ - 나머지는 오류 처리할꺼임  */
 			AND COOPERATOR_ID IN (
@@ -462,20 +494,35 @@
 						WHERE 1=1
 							AND wr.FIX_DAY is null
 							AND f.USE_AT ='Y'
-							AND (wi.ACCOUNTS_ST_DT BETWEEN #{searchFromDate} AND #{searchToDate} or wi.ACCOUNTS_ED_DT BETWEEN #{searchFromDate} AND #{searchToDate})
-							<if test="searchNm != null and searchNm != ''">
-							AND d.MBER_NM LIKE '%' #{searchNm} '%'
-							</if>
+							AND wi.ATCH_FILE_ID = #{searchAtchFileId}
+<!-- 							AND (wi.ACCOUNTS_ST_DT BETWEEN #{searchFromDate} AND #{searchToDate} or wi.ACCOUNTS_ED_DT BETWEEN #{searchFromDate} AND #{searchToDate}) -->
+<!-- 							<if test="searchNm != null and searchNm != ''"> -->
+<!-- 							AND d.MBER_NM LIKE '%' #{searchNm} '%' -->
+<!-- 							</if> -->
 				GROUP BY wi.COOPERATOR_ID, wr.mber_id
 			) d ON a.COOPERATOR_ID = d.COOPERATOR_ID AND b.MBER_ID = d.MBER_ID
 		WHERE 1=1
 			AND b.FIX_DAY is null
 			AND d.USE_AT ='Y'
-			AND (a.ACCOUNTS_ST_DT BETWEEN #{searchFromDate} AND #{searchToDate} or a.ACCOUNTS_ED_DT BETWEEN #{searchFromDate} AND #{searchToDate})
-			<if test="searchNm != null and searchNm != ''">
-			AND c.MBER_NM LIKE '%' #{searchNm} '%'
-			</if>
+			AND a.ATCH_FILE_ID = #{searchAtchFileId}
+<!-- 			AND (a.ACCOUNTS_ST_DT BETWEEN #{searchFromDate} AND #{searchToDate} or a.ACCOUNTS_ED_DT BETWEEN #{searchFromDate} AND #{searchToDate}) -->
+<!-- 			<if test="searchNm != null and searchNm != ''"> -->
+<!-- 			AND c.MBER_NM LIKE '%' #{searchNm} '%' -->
+<!-- 			</if> -->
 	</select>
+
+	<select id="selectCalBase" parameterType="egovframework.com.rd.usr.service.vo.WeekInfoVO" resultType="egovframework.com.rd.usr.service.vo.WeekInfoVO">
+		SELECT wi.COOPERATOR_ID, sum(wr.cnt) AS DELIVERY_CNT, a.FEE_COOPERATOR_AT, a.FEE_PROGRAM, a.FEE_ID, wi.ACCOUNTS_ED_DT
+		FROM RD_WEEK_INFO wi
+		JOIN RD_WEEK_RIDER_INFO wr ON wi.WEEK_ID = wr.week_id
+		JOIN RD_COOPERATOR_FEE a ON wi.COOPERATOR_ID = a.COOPERATOR_ID AND a.use_at ='Y'
+		JOIN COMTNFILE f ON wi.ATCH_FILE_ID = f.ATCH_FILE_ID
+			WHERE 1=1
+				AND wr.FIX_DAY is null
+				AND f.USE_AT ='Y'
+				AND wi.ATCH_FILE_ID = #{searchAtchFileId}
+	</select>
+
 	<select id="selectForUPdateBalanceWeekByParam" parameterType="egovframework.com.rd.usr.service.vo.BalanceVO" resultType="egovframework.com.rd.usr.service.vo.BalanceVO">
 		SELECT *
 		FROM RD_BALNCE
@@ -490,10 +537,11 @@
 			WHERE 1=1
 				AND b.FIX_DAY is null
 				AND d.USE_AT ='Y'
-				AND (a.ACCOUNTS_ST_DT BETWEEN #{searchFromDate} AND #{searchToDate} or a.ACCOUNTS_ED_DT BETWEEN #{searchFromDate} AND #{searchToDate})
-				<if test="searchNm != null and searchNm != ''">
-				AND c.MBER_NM LIKE '%' #{searchNm} '%'
-				</if>
+				AND d.ATCH_FILE_ID = #{searchAtchFileId}
+<!-- 				AND (a.ACCOUNTS_ST_DT BETWEEN #{searchFromDate} AND #{searchToDate} or a.ACCOUNTS_ED_DT BETWEEN #{searchFromDate} AND #{searchToDate}) -->
+<!-- 				<if test="searchNm != null and searchNm != ''"> -->
+<!-- 				AND c.MBER_NM LIKE '%' #{searchNm} '%' -->
+<!-- 				</if> -->
 				GROUP BY a.COOPERATOR_ID, b.MBER_ID
 		)
 		FOR UPDATE
@@ -695,10 +743,11 @@
 							AND wr.FIX_DAY is NULL
 							AND b.USE_AT ='Y'
 							AND a.WEEK_YN = 'N'
-							AND (wi.ACCOUNTS_ST_DT BETWEEN #{searchFromDate} AND #{searchToDate} or wi.ACCOUNTS_ED_DT BETWEEN #{searchFromDate} AND #{searchToDate})
-							<if test="searchNm != null and searchNm != ''">
-							AND d.MBER_NM LIKE '%' #{searchNm} '%'
-							</if>
+							AND wi.ATCH_FILE_ID = #{searchAtchFileId}
+<!-- 							AND (wi.ACCOUNTS_ST_DT BETWEEN #{searchFromDate} AND #{searchToDate} or wi.ACCOUNTS_ED_DT BETWEEN #{searchFromDate} AND #{searchToDate}) -->
+<!-- 							<if test="searchNm != null and searchNm != ''"> -->
+<!-- 							AND d.MBER_NM LIKE '%' #{searchNm} '%' -->
+<!-- 							</if> -->
 							<![CDATA[
 							AND if(wi.accounts_st_dt <= a.DAY AND wi.accounts_ed_dt >= a.DAY, 1, 0) =1]]>
 
@@ -726,11 +775,12 @@
 							AND wr.FIX_DAY is NULL
 							AND b.USE_AT ='Y'
 							AND a.WEEK_YN = 'N'
-							AND (wi.ACCOUNTS_ST_DT BETWEEN #{searchFromDate} AND #{searchToDate} or wi.ACCOUNTS_ED_DT BETWEEN #{searchFromDate} AND #{searchToDate})
+							AND wi.ATCH_FILE_ID = #{searchAtchFileId}
+<!-- 							AND (wi.ACCOUNTS_ST_DT BETWEEN #{searchFromDate} AND #{searchToDate} or wi.ACCOUNTS_ED_DT BETWEEN #{searchFromDate} AND #{searchToDate}) -->
 
-							<if test="searchNm != null and searchNm != ''">
-							AND d.MBER_NM LIKE '%' #{searchNm} '%'
-							</if>
+<!-- 							<if test="searchNm != null and searchNm != ''"> -->
+<!-- 							AND d.MBER_NM LIKE '%' #{searchNm} '%' -->
+<!-- 							</if> -->
 
 							<![CDATA[
 							AND if(wi.accounts_st_dt <= a.DAY AND wi.accounts_ed_dt >= a.DAY, 1, 0) =1]]>
@@ -768,10 +818,11 @@
 						WHERE 1=1
 							AND wr.FIX_DAY is NULL
 							AND b.USE_AT = 'Y'
-							AND (wi.ACCOUNTS_ST_DT BETWEEN #{searchFromDate} AND #{searchToDate} or wi.ACCOUNTS_ED_DT BETWEEN #{searchFromDate} AND #{searchToDate})
-							<if test="searchNm != null and searchNm != ''">
-							AND d.MBER_NM LIKE '%' #{searchNm} '%'
-							</if>
+							AND wi.ATCH_FILE_ID = #{searchAtchFileId}
+<!-- 							AND (wi.ACCOUNTS_ST_DT BETWEEN #{searchFromDate} AND #{searchToDate} or wi.ACCOUNTS_ED_DT BETWEEN #{searchFromDate} AND #{searchToDate}) -->
+<!-- 							<if test="searchNm != null and searchNm != ''"> -->
+<!-- 							AND d.MBER_NM LIKE '%' #{searchNm} '%' -->
+<!-- 							</if> -->
 
 		) b
 		SET a.WEEK_YN ='Y'
@@ -795,11 +846,12 @@
 					LEFT JOIN COMTNFILE b ON wi.atch_file_id = b.atch_file_id
 						WHERE 1=1
 							AND wr.FIX_DAY is NULL
-						AND b.USE_AT ='Y'
-							AND (wi.ACCOUNTS_ST_DT BETWEEN #{searchFromDate} AND #{searchToDate} or wi.ACCOUNTS_ED_DT BETWEEN #{searchFromDate} AND #{searchToDate})
-							<if test="searchNm != null and searchNm != ''">
-							AND d.MBER_NM LIKE '%' #{searchNm} '%'
-							</if>
+							AND b.USE_AT ='Y'
+							AND wi.ATCH_FILE_ID = #{searchAtchFileId}
+<!-- 							AND (wi.ACCOUNTS_ST_DT BETWEEN #{searchFromDate} AND #{searchToDate} or wi.ACCOUNTS_ED_DT BETWEEN #{searchFromDate} AND #{searchToDate}) -->
+<!-- 							<if test="searchNm != null and searchNm != ''"> -->
+<!-- 							AND d.MBER_NM LIKE '%' #{searchNm} '%' -->
+<!-- 							</if> -->
 							and a.WEEK_YN ='N'
 							AND a.USE_AT ='Y'
 							AND a.IO_GUBUN = '2'
@@ -838,10 +890,11 @@
 						WHERE 1=1
 							AND e.USE_AT ='Y'
 							AND wr.FIX_DAY is NULL
-							AND (wi.ACCOUNTS_ST_DT BETWEEN #{searchFromDate} AND #{searchToDate} or wi.ACCOUNTS_ED_DT BETWEEN #{searchFromDate} AND #{searchToDate})
-							<if test="searchNm != null and searchNm != ''">
-							AND d.MBER_NM like '%' #{searchNm} '%'
-							</if>
+							and wi.ATCH_FILE_ID = #{searchAtchFileId}
+<!-- 							AND (wi.ACCOUNTS_ST_DT BETWEEN #{searchFromDate} AND #{searchToDate} or wi.ACCOUNTS_ED_DT BETWEEN #{searchFromDate} AND #{searchToDate}) -->
+<!-- 							<if test="searchNm != null and searchNm != ''"> -->
+<!-- 							AND d.MBER_NM like '%' #{searchNm} '%' -->
+<!-- 							</if> -->
 
 		)
 	</select>
@@ -1273,5 +1326,52 @@
 		DELETE FROM RD_WEEK_INFO
 		WHERE ATCH_FILE_ID = #{searchAtchFileId}
 	</delete>
+
+
+	<select id="selectWeekInfoOutByParam" parameterType="egovframework.com.rd.usr.service.vo.WeekInfoVO" resultType="egovframework.com.rd.usr.service.vo.WeekInfoVO">
+		SELECT
+			WEEK_ID,COOPERATOR_ID,ACCOUNTS_ST_DT,ACCOUNTS_ED_DT ,DELIVERY_COST ,ADD_ACCOUNTS ,OPERATING_COST,MANAGEMENT_COST
+			,OPERATING_FEE,ETC_COST,TIME_INSURANCE,OWNER_EMPLOYMENT_INSURANCE,RIDER_EMPLOYMENT_INSURANCE,OWNER_INDUSTRIAL_INSURANCE
+			,RIDER_INDUSTRIAL_INSURANCE,WITHHOLDING_TAX_INSURANCE_SUM,EMPLOYMENT_INSURANCE_ACCOUNTS,INDUSTRIAL_INSURANCE_ACCOUNTS
+			,G,ACCOUNTS_SCHEDULE_COST,TAX_BILL_SUPPLY,TAX_BILL_ADD ,TAX_BILL_SUM ,NOTE,a.ATCH_FILE_ID,a.CREAT_DT,a.CREAT_ID
+			,OPERATING_COST_ADD
+		FROM RD_WEEK_INFO_OUT a
+		JOIN COMTNFILE b ON a.ATCH_FILE_ID = b.ATCH_FILE_ID
+		WHERE 1=1
+			AND b.USE_AT ='Y'
+			AND a.ATCH_FILE_ID = #{searchAtchFileId}
+			<if test="schAuthorCode == 'ROLE_USER'">
+			/* 협력사 조건 *//* COOPERATOR_ID로 조건을 만든건 ★정산 파일을 올릴때 권한이 있는 협력사ID 데이터만 올릴수 있음!!★ - 나머지는 오류 처리할꺼임  */
+			AND COOPERATOR_ID IN (
+				SELECT COOPERATOR_ID FROM RD_COOPERATOR a
+				WHERE a.REGISTRATION_SN = #{schIhidNum} AND use_at ='Y'
+			)
+			</if>
+	</select>
+
+	<select id="selectWeekRiderInfoOutByParam" parameterType="egovframework.com.rd.usr.service.vo.WeekInfoVO" resultType="egovframework.com.rd.usr.service.vo.WeekRiderInfoVO">
+		SELECT
+			b.WEEK_ID,b.NO,a.cooperator_id,b.MBER_ID,b.MBER_NM,b.CNT,b.DELIVERY_COST,b.ADD_COST,b.SUM_COST,b.TIME_INSURANCE,b.NECESSARY_EXPENSES,b.PAY,b.OWNER_EMPLOYMENT_INSURANCE
+			,b.RIDER_EMPLOYMENT_INSURANCE,b.OWNER_INDUSTRIAL_INSURANCE,b.RIDER_INDUSTRIAL_INSURANCE,b.WITHHOLDING_TAX_INSURANCE_SUM
+			,b.OWNER_EMPLOYMENT_INSURANCE_ACCOUNTS,b.RIDER_EMPLOYMENT_INSURANCE_ACCOUNTS,b.SUM_EMPLOYMENT_INSURANCE_ACCOUNTS
+			,b.OWNER_INDUSTRIAL_INSURANCE_ACCOUNTS,b.RIDER_INDUSTRIAL_INSURANCE_ACCOUNTS,b.SUM_INDUSTRIAL_INSURANCE_ACCOUNTS
+			,b.OPERATING_COST,b.ACCOUNTS_COST,b.INCOME_TAX,b.RESIDENCE_TAX,b.WITHHOLDING_TAX,b.GIVE_PAY,b.CREAT_DT,b.CREAT_ID
+			,b.OPERATING_COST_ADD
+		FROM RD_WEEK_INFO_OUT a
+		LEFT JOIN RD_WEEK_RIDER_INFO_OUT b on a.week_id = b.week_id
+		LEFT JOIN COMTNGNRLMBER c ON b.MBER_ID = c.MBER_ID
+		JOIN COMTNFILE d ON a.ATCH_FILE_ID = d.ATCH_FILE_ID
+		WHERE 1 = 1
+			AND d.USE_AT = 'Y'
+			AND a.ATCH_FILE_ID = #{searchAtchFileId}
+			<if test="schAuthorCode == 'ROLE_USER'">
+			/* 협력사 조건 *//* COOPERATOR_ID로 조건을 만든건 ★정산 파일을 올릴때 권한이 있는 협력사ID 데이터만 올릴수 있음!!★ - 나머지는 오류 처리할꺼임  */
+			AND COOPERATOR_ID IN (
+				SELECT COOPERATOR_ID FROM RD_COOPERATOR a
+				WHERE a.REGISTRATION_SN = #{schIhidNum} AND use_at ='Y'
+			)
+			</if>
+			order by b.WEEK_ID asc, LPAD(b.NO, 4,0) ASC
+	</select>
 
 </mapper>

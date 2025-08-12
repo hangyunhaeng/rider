@@ -303,4 +303,20 @@ public interface DtyService {
 	 * @throws Exception
 	 */
 	public void deleteDayAtchFile(WeekInfoVO weekInfoVO) throws Exception ;
+
+	/**
+	 * 확정된 협력사용 주정산 데이터 조회
+	 * @param vo
+	 * @return
+	 * @throws Exception
+	 */
+	public List<WeekInfoVO> selectWeekInfoOutByParam(WeekInfoVO vo) throws Exception ;
+
+	/**
+	 * 확정된 협력사용 주정산 데이터 조회
+	 * @param vo
+	 * @return
+	 * @throws Exception
+	 */
+	public List<WeekRiderInfoVO> selectWeekRiderInfoOutByParam(WeekInfoVO vo) throws Exception ;
 }

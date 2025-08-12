@@ -91,4 +91,13 @@ public class WeekInfoVO extends Sch implements Serializable {
 	/** 생성자 ID */
 	private String creatId;
 	private String lastUpdusrId;
+
+	/** 협력사 배포용 주정산 파일 만들기용 변수 */
+	private int deliveryCnt;
+	private boolean feeCooperatorAt;
+	private int feeProgram;
+	private String feeId;
+
+	/** 배포용 운영비 */
+	private BigDecimal operatingCostAdd;
 }

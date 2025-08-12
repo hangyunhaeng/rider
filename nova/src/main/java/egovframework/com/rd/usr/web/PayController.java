@@ -276,6 +276,7 @@ public class PayController {
         if(!Util.isUsr()) {
         	return "egovframework/com/cmm/error/accessDenied";
         }
+        model.addAttribute("notMberId", EgovProperties.getProperty("Globals.cooperatorId"));
         return "egovframework/usr/pay/pay0004";
 	}
 

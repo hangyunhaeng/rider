@@ -29,6 +29,9 @@
   	} else if(filename.indexOf('pay0006.do') == 0) {
 	  	$('.pay').addClass('active');
 	  	$('.pay0006').addClass('active');
+  	} else if(filename.indexOf('dty0006.do') == 0) {
+	  	$('.pay').addClass('active');
+	  	$('.dty0006').addClass('active');
   	} else if(filename.indexOf('dty0004.do') == 0) {
 	  	$('.dty').addClass('active');
 	  	$('.dty0004').addClass('active');
@@ -98,11 +101,12 @@ System.out.println("==================================");
 					</li>
 		            <li class="dropdown"><a href="" onclick="javascript:return false;" class="pay"><span>수익현황</span> <i class="bi bi-chevron-down toggle-dropdown"></i></a>
 			          	<ul>
-			              <li style="display:none;"><a href="${pageContext.request.contextPath}/usr/pay0003.do" class="pay0003">운영사수익현황</a></li>
-						  <li><a href="${pageContext.request.contextPath}/usr/pay0004.do" class="pay0004">협력사수익현황</a></li>
+			              <li style="display:none;"><a href="${pageContext.request.contextPath}/usr/pay0003.do" class="pay0003">운영사수익현황(세금)</a></li>
+						  <li><a href="${pageContext.request.contextPath}/usr/pay0004.do" class="pay0004">협력사수익현황(세금)</a></li>
 						  <li><a href="${pageContext.request.contextPath}/usr/pay0005.do" class="pay0005">협력사 기타(대여, 리스) 현황</a></li>
 						  <li><a href="${pageContext.request.contextPath}/usr/pay0001.do" class="pay0001">라이더 출금내역<br></a></li>
 						  <li><a href="${pageContext.request.contextPath}/usr/pay0006.do" class="pay0006">협력사 출금내역<br></a></li>
+						  <li><a href="${pageContext.request.contextPath}/usr/dty0006.do" class="dty0006">협력사 주정산 조회<br></a></li>
 			            </ul>
 		            </li>
 		            <li class="dropdown" style="display:none;"><a href="" onclick="javascript:return false;" class="dty"><span>관리</span> <i class="bi bi-chevron-down toggle-dropdown"></i></a>

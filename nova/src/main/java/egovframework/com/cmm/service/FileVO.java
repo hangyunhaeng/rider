@@ -67,6 +67,7 @@ public class FileVO extends ComDefaultVO {
     public String fileGubun = "";
 
     public String erorrMsg;
+    public String searchDate;
 
     /**
      * atchFileId attribute를 리턴한다.
@@ -260,6 +261,14 @@ public class FileVO extends ComDefaultVO {
 
 	public void setErorrMsg(String erorrMsg) {
 		this.erorrMsg = erorrMsg;
+	}
+
+	public String getSearchDate() {
+		return searchDate;
+	}
+
+	public void setSearchDate(String searchDate) {
+		this.searchDate = searchDate;
 	}
 
 }

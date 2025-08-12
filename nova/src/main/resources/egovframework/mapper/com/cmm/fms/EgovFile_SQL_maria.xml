@@ -190,13 +190,61 @@
 				a.USE_AT = 'Y'
 			<if test="schAuthorCode == 'ROLE_USER'">
 			/* 협력사 조건 */
-			AND CREAT_ID IN (
+			AND a.CREAT_ID IN (
 				SELECT emplyr_id FROM COMTNEMPLYRINFO
 				WHERE IHIDNUM = #{schIhidNum}
 			)
 			</if>
 			ORDER BY a.CREAT_DT DESC
 
+ 	</select>
+ 	<select id="selectWeekFileLIstByNullFixDay" parameterType="FileVO" resultMap="fileList">
+			SELECT
+				a.ATCH_FILE_ID AS seleceKey, b.ORIGNL_FILE_NM AS selectValue
+			FROM
+				COMTNFILE a, COMTNFILEDETAIL b, RD_WEEK_INFO c
+			WHERE 1=1
+
+				AND b.FILE_GUBUN = 'WEEK'
+			AND
+				a.ATCH_FILE_ID = b.ATCH_FILE_ID
+			AND a.ATCH_FILE_ID = c.ATCH_FILE_ID
+			AND c.FIX_DAY IS null
+			AND
+				a.USE_AT = 'Y'
+			<if test="schAuthorCode == 'ROLE_USER'">
+			/* 협력사 조건 */
+			AND c.COOPERATOR_ID IN (
+				SELECT COOPERATOR_ID FROM RD_COOPERATOR
+				WHERE REGISTRATION_SN = #{schIhidNum}
+			)
+			</if>
+			ORDER BY a.CREAT_DT DESC
+ 	</select>
+ 	<select id="selectWeekFileListByFixDay" parameterType="FileVO" resultMap="fileList">
+			SELECT
+				a.ATCH_FILE_ID AS seleceKey, b.ORIGNL_FILE_NM AS selectValue
+			FROM
+				COMTNFILE a, COMTNFILEDETAIL b, RD_WEEK_INFO c, RD_WEEK_INFO_OUT d
+			WHERE 1=1
+
+				AND b.FILE_GUBUN = 'WEEK'
+			AND
+				a.ATCH_FILE_ID = b.ATCH_FILE_ID
+			AND a.ATCH_FILE_ID = c.ATCH_FILE_ID
+			AND c.FIX_DAY IS not null
+			AND c.week_id = d.week_id
+			AND (c.ACCOUNTS_ST_DT BETWEEN CONCAT(#{searchDate}, '01') AND CONCAT(#{searchDate}, '31') OR c.ACCOUNTS_ED_DT BETWEEN CONCAT(#{searchDate}, '01') AND CONCAT(#{searchDate}, '31'))
+			AND
+				a.USE_AT = 'Y'
+			<if test="schAuthorCode == 'ROLE_USER'">
+			/* 협력사 조건 */
+			AND c.COOPERATOR_ID IN (
+				SELECT COOPERATOR_ID FROM RD_COOPERATOR
+				WHERE REGISTRATION_SN = #{schIhidNum}
+			)
+			</if>
+			ORDER BY a.CREAT_DT DESC
  	</select>
 
 </mapper>

@@ -151,33 +151,55 @@
 		searchToDate.setDate(today.getFullYear()+"-"+(today.getMonth()+1)+"-"+today.getDate());
 
 
-		//주정산 조회일 세팅
-		var searchFromDate1 = flatpickr("#searchFromDate1", {
-			locale: "ko",
-			allowInput: false,
-		    altInput: true,              // 기존 입력을 숨기고 새 입력을 만듦
-		    altFormat: 'Y-m-d',      // 날짜 선택 후 표시 형태
-		    dateFormat: 'Y-m-d',     // date format 형식
-		    disableMobile: true          // 모바일 지원
+// 		//주정산 조회일 세팅
+// 		var searchFromDate1 = flatpickr("#searchFromDate1", {
+// 			locale: "ko",
+// 			allowInput: false,
+// 		    altInput: true,              // 기존 입력을 숨기고 새 입력을 만듦
+// 		    altFormat: 'Y-m-d',      // 날짜 선택 후 표시 형태
+// 		    dateFormat: 'Y-m-d',     // date format 형식
+// 		    disableMobile: true          // 모바일 지원
 
-		});
-		var searchToDate1 = flatpickr("#searchToDate1", {
-			"locale": "ko",
-			allowInput: false,
-		    altInput: true,              // 기존 입력을 숨기고 새 입력을 만듦
-		    altFormat: 'Y-m-d',      // 날짜 선택 후 표시 형태
-		    dateFormat: 'Y-m-d',     // date format 형식
-		    disableMobile: true          // 모바일 지원
-		});
-		searchFromDate1.setDate(towWeekAgo.getFullYear()+"-"+(towWeekAgo.getMonth()+1)+"-"+towWeekAgo.getDate());
-		searchToDate1.setDate(today.getFullYear()+"-"+(today.getMonth()+1)+"-"+today.getDate());
+// 		});
+// 		var searchToDate1 = flatpickr("#searchToDate1", {
+// 			"locale": "ko",
+// 			allowInput: false,
+// 		    altInput: true,              // 기존 입력을 숨기고 새 입력을 만듦
+// 		    altFormat: 'Y-m-d',      // 날짜 선택 후 표시 형태
+// 		    dateFormat: 'Y-m-d',     // date format 형식
+// 		    disableMobile: true          // 모바일 지원
+// 		});
+// 		searchFromDate1.setDate(towWeekAgo.getFullYear()+"-"+(towWeekAgo.getMonth()+1)+"-"+towWeekAgo.getDate());
+// 		searchToDate1.setDate(today.getFullYear()+"-"+(today.getMonth()+1)+"-"+today.getDate());
 
+		loadFileList();
 
 		//그리드 설정
 		setGrid();
 		setGrid2();
 		setGrid3();
 	});
+
+
+	//미확정 주정산 파일 조회
+	function loadFileList(){
+
+		const params = new URLSearchParams();
+
+		// 로딩 시작
+        $('.loading-wrap--js').show();
+        axios.post('${pageContext.request.contextPath}/usr/dty0005_0005.do',params).then(function(response) {
+        	// 로딩 종료
+            $('.loading-wrap--js').hide();
+        	populateSelectOptions('serchFileName', response.data.fileList);
+        })
+        .catch(function(error) {
+            console.error('There was an error fetching the data:', error);
+        }).finally(function() {
+        	// 로딩 종료
+            $('.loading-wrap--js').hide();
+        });
+	}
 
 	function setGrid(){
 		// 사용자 정의 컴포넌트를 글로벌 네임스페이스에 추가
@@ -429,17 +451,23 @@
 
 	//주정산 내역 조회
 	function doSearchWeek(){
+// 	    if(!limit2Week($('#searchFromDate1').val(), $('#searchToDate1').val())){
+// 	    	return;
+// 	    }
 
-	    if(!limit2Week($('#searchFromDate1').val(), $('#searchToDate1').val())){
-	    	return;
-	    }
+		if($('#serchFileName').val() == '' || $('#serchFileName').val() == null){
+			alert("선택된 파일이 없습니다.");
+			return;
+		}
 
 		const params = new URLSearchParams();
 
-		params.append('searchFromDate', getOnlyNumber($('#searchFromDate1').val()));//배달일
-		params.append('searchToDate', getOnlyNumber($('#searchToDate1').val()));	//배달일
-		params.append('searchNm', $('#searchNm1').val());			//라이더
-		params.append('searchFixGubun', $('#searchFixGubun1').val());		//확정여부
+// 		params.append('searchFromDate', getOnlyNumber($('#searchFromDate1').val()));//배달일
+// 		params.append('searchToDate', getOnlyNumber($('#searchToDate1').val()));	//배달일
+// 		params.append('searchNm', $('#searchNm1').val());			//라이더
+// 		params.append('searchFixGubun', $('#searchFixGubun1').val());		//확정여부
+		params.append('searchAtchFileId', $('#serchFileName').val());
+
 		// 로딩 시작
         $('.loading-wrap--js').show();
         axios.post('${pageContext.request.contextPath}/usr/dty0005_0002.do',params).then(function(response) {
@@ -584,25 +612,33 @@
 
 	function doFixWeek(){
 
-	    if(!limit2Week($('#searchFromDate1').val(), $('#searchToDate1').val())){
-	    	return;
-	    }
+		debugger;
+// 	    if(!limit2Week($('#searchFromDate1').val(), $('#searchToDate1').val())){
+// 	    	return;
+// 	    }
 
-		if($('#searchFixGubun1').val() != 'NO'){
-			alert('대상확정은 미확정 대상으로만 진행 할 수 있습니다\n확정을 취소합니다');
-			return;
-		}
+// 		if($('#searchFixGubun1').val() != 'NO'){
+// 			alert('대상확정은 미확정 대상으로만 진행 할 수 있습니다\n확정을 취소합니다');
+// 			return;
+// 		}
 
-		if(!confirm('대상확정은 조회 대상이 아닌 검색 조건 대상으로 진행됩니다!\n확정 하시겠습니까?')){
+// 		if(!confirm('대상확정은 조회 대상이 아닌 검색 조건 대상으로 진행됩니다!\n확정 하시겠습니까?')){
+// 			return;
+// 		}
+
+		if($('#serchFileName').val() == '' || $('#serchFileName').val() == null){
+			alert("선택된 파일이 없습니다.");
 			return;
 		}
 
 		const params = new URLSearchParams();
 
-		params.append('searchFromDate', getOnlyNumber($('#searchFromDate1').val()));//배달일
-		params.append('searchToDate', getOnlyNumber($('#searchToDate1').val()));	//배달일
-		params.append('searchNm', $('#searchNm1').val());			//라이더
-		params.append('searchFixGubun', $('#searchFixGubun1').val());		//확정여부
+// 		params.append('searchFromDate', getOnlyNumber($('#searchFromDate1').val()));//배달일
+// 		params.append('searchToDate', getOnlyNumber($('#searchToDate1').val()));	//배달일
+// 		params.append('searchNm', $('#searchNm1').val());			//라이더
+// 		params.append('searchFixGubun', $('#searchFixGubun1').val());		//확정여부
+		params.append('searchAtchFileId', $('#serchFileName').val());
+
 		// 로딩 시작
         $('.loading-wrap--js').show();
         axios.post('${pageContext.request.contextPath}/usr/dty0005_0004.do',params).then(function(response) {
@@ -637,6 +673,9 @@
 					grid3.setGridOption("rowData", data);
 	            }
         	}
+
+        	// 미확정 파일 리로드
+        	loadFileList();
 
         })
         .catch(function(error) {
@@ -730,24 +769,40 @@
 						<col style="width: 13%">
 						<col style="width: 37%">
 					</colgroup>
+<!-- 					<tr> -->
+<!-- 						<th>기간</th> -->
+<!-- 						<td colspan='3'> -->
+<!-- 							<div> -->
+<!-- 								<input id="searchFromDate1" class="form-control search fs-9 float-start w40p"" type="date" placeholder="Search" aria-label="Search" _mstplaceholder="181961" _mstaria-label="74607"> -->
+<!-- 								<sm class="float-start">&nbsp;~&nbsp;</sm> -->
+<!-- 								<input id="searchToDate1" class="form-control search fs-9 float-start w40p" type="date" placeholder="Search" aria-label="Search" _mstplaceholder="181961" _mstaria-label="74607"> -->
+<!-- 							</div> -->
+<!-- 						</td> -->
+<!-- 					</tr> -->
+<!-- 					<tr style="display:none;"> -->
+<!-- 						<th>라이더</th> -->
+<!-- 						<td> -->
+<!-- 							<input id="searchNm1" type="text" value=""> -->
+<!-- 						</td> -->
+<!-- 						<th>확정여부</th> -->
+<!-- 						<td> -->
+<!-- 							<select style='width: 100%' id='searchFixGubun1'> -->
+<!-- 								<option value="NO">미확정</option> -->
+<!-- 								<option value="YES">확정</option> -->
+<!-- 							</select> -->
+<!-- 						</td> -->
+<!-- 					</tr> -->
 					<tr>
-						<th>기간</th>
+						<th>파일</th>
 						<td colspan='3'>
-							<div>
-								<input id="searchFromDate1" class="form-control search fs-9 float-start w40p"" type="date" placeholder="Search" aria-label="Search" _mstplaceholder="181961" _mstaria-label="74607">
-								<sm class="float-start">&nbsp;~&nbsp;</sm>
-								<input id="searchToDate1" class="form-control search fs-9 float-start w40p" type="date" placeholder="Search" aria-label="Search" _mstplaceholder="181961" _mstaria-label="74607">
-							</div>
+
+							<select style='width: 100%' id='serchFileName' name='serchFileName'></select>
 						</td>
 					</tr>
 					<tr>
-						<th>라이더</th>
-						<td>
-							<input id="searchNm1" type="text" value="">
-						</td>
 						<th>확정여부</th>
-						<td>
-							<select style='width: 100%' id='searchFixGubun1'>
+						<td colspan='3'>
+							<select style='width: 100%' id='searchFixGubun1' readonly disabled>
 								<option value="NO">미확정</option>
 								<option value="YES">확정</option>
 							</select>

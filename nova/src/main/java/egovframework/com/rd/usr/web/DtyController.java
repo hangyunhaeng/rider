@@ -1167,4 +1167,136 @@ public class DtyController {
         return ResponseEntity.ok(map);
 	}
 
+	/**
+	 * 미확정 주정산 파일명 가져오기
+	 * @param request
+	 * @param sessionVO
+	 * @param model
+	 * @param status
+	 * @return
+	 * @throws Exception
+	 */
+	@RequestMapping("/usr/dty0005_0005.do")
+	 public ResponseEntity<?> dty0005_0005(@ModelAttribute("FileVO") FileVO fileVO, HttpServletRequest request) throws Exception{
+
+    	//로그인 체크
+        LoginVO user = (LoginVO)EgovUserDetailsHelper.getAuthenticatedUser();
+        Boolean isAuthenticated = EgovUserDetailsHelper.isAuthenticated();
+
+        if(!isAuthenticated) {
+        	return ResponseEntity.status(401).body("Unauthorized");
+        }
+
+        if(!Util.isUsr()) {
+        	return ResponseEntity.status(401).body("Unauthorized");
+        }
+
+        //return value
+        Map<String, Object> map =  new HashMap<String, Object>();
+
+        //총판 or 협력사
+        fileVO.setSchAuthorCode(user.getAuthorCode());
+        fileVO.setSchIhidNum(user.getIhidNum());
+        List<FileVO> fileList = fileMngService.selectWeekFileLIstByNullFixDay(fileVO);
+
+        map.put("fileList", fileList);
+        map.put("resultCode", "success");
+        return ResponseEntity.ok(map);
+    }
+
+    @RequestMapping("/usr/dty0006.do")
+    public String dty0006(@ModelAttribute("DeliveryInfoVO") DeliveryInfoVO deliveryInfoVO, HttpServletRequest request,ModelMap model) throws Exception {
+
+    	//로그인 체크
+        LoginVO user = (LoginVO)EgovUserDetailsHelper.getAuthenticatedUser();
+        Boolean isAuthenticated = EgovUserDetailsHelper.isAuthenticated();
+
+        if(!isAuthenticated) {
+        	return "egovframework/com/cmm/error/accessDenied";
+        }
+
+        if(!Util.isUsr()) {
+        	return "egovframework/com/cmm/error/accessDenied";
+        }
+
+        return "egovframework/usr/dty/dty0006";
+    }
+
+	/**
+	 * 특정 정산일의 확정된 주정산 파일명 가져오기
+	 * @param request
+	 * @param sessionVO
+	 * @param model
+	 * @param status
+	 * @return
+	 * @throws Exception
+	 */
+	@RequestMapping("/usr/dty0006_0001.do")
+	 public ResponseEntity<?> dty0006_0001(@ModelAttribute("FileVO") FileVO fileVO, HttpServletRequest request, SessionVO sessionVO, ModelMap model, SessionStatus status) throws Exception{
+
+    	//로그인 체크
+        LoginVO user = (LoginVO)EgovUserDetailsHelper.getAuthenticatedUser();
+        Boolean isAuthenticated = EgovUserDetailsHelper.isAuthenticated();
+
+        if(!isAuthenticated) {
+        	return ResponseEntity.status(401).body("Unauthorized");
+        }
+
+        if(!Util.isUsr()) {
+        	return ResponseEntity.status(401).body("Unauthorized");
+        }
+
+        //return value
+        Map<String, Object> map =  new HashMap<String, Object>();
+
+        //총판 or 협력사
+        fileVO.setSchAuthorCode(user.getAuthorCode());
+        fileVO.setSchIhidNum(user.getIhidNum());
+        List<FileVO> fileList = fileMngService.selectWeekFileListByFixDay(fileVO);
+
+        map.put("fileList", fileList);
+        map.put("resultCode", "success");
+        return ResponseEntity.ok(map);
+    }
+
+	/**
+	 * 주정산 내역 조회
+	 * @param request
+	 * @param sessionVO
+	 * @param model
+	 * @param status
+	 * @return
+	 * @throws Exception
+	 */
+	@RequestMapping("/usr/dty0006_0002.do")
+	public ResponseEntity<?> dty0006_0002(@ModelAttribute("WeekInfoVO") WeekInfoVO weekInfoVO, HttpServletRequest request, SessionVO sessionVO, ModelMap model, SessionStatus status) throws Exception{
+
+    	//로그인 체크
+        LoginVO user = (LoginVO)EgovUserDetailsHelper.getAuthenticatedUser();
+        Boolean isAuthenticated = EgovUserDetailsHelper.isAuthenticated();
+
+        if(!isAuthenticated) {
+        	return ResponseEntity.status(401).body("Unauthorized");
+        }
+
+        if(!Util.isUsr()) {
+        	return ResponseEntity.status(401).body("Unauthorized");
+        }
+
+        //총판 or 협력사
+        weekInfoVO.setSchAuthorCode(user.getAuthorCode());
+        weekInfoVO.setSchIhidNum(user.getIhidNum());
+
+        List<WeekInfoVO> list = dtyService.selectWeekInfoOutByParam(weekInfoVO);
+        List<WeekRiderInfoVO> listRider = dtyService.selectWeekRiderInfoOutByParam(weekInfoVO);
+        //return value
+        Map<String, Object> map =  new HashMap<String, Object>();
+
+        map.put("list", list);
+        map.put("listRider", listRider);
+        map.put("resultCode", "success");
+        return ResponseEntity.ok(map);
+	}
+
+
 }
