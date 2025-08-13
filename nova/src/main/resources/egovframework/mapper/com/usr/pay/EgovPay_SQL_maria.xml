@@ -97,8 +97,12 @@
 				WHERE REGISTRATION_SN = #{searchRegistrationSn}
 			)
 			</if>
+
 		) tab
 		WHERE 1=1
+			<if test="searchDwGubun != null and searchDwGubun != ''">
+			AND dw_gubun = #{searchDwGubun}
+			</if>
 			<if test="schAuthorCode == 'ROLE_USER'">
 			/* 협력사 조건 */
 			AND COOPERATOR_ID IN (

@@ -42,7 +42,6 @@ public class Sch implements Serializable {
 	private String searchNm;
 	private String searchMberId;
 	private String searchRegistrationSn;
-	private String searchDeliveryState;
 
 
 
@@ -51,6 +50,8 @@ public class Sch implements Serializable {
     /** select box용도 */
 	private String selectValue;
 	private String schCdGroup;
+	private String searchDeliveryState;
+	private String searchDwGubun;
 
 
 
