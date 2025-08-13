@@ -256,7 +256,10 @@
 	<select id="selectDoznDs" parameterType="egovframework.com.rd.usr.service.vo.DoszDSResultVO" resultType="egovframework.com.rd.usr.service.vo.DoszDSResultVO">
 		SELECT DS_DT, DS_TM, PAYMENT_SUCC_CNT, PAYMENT_SUCC_AMOUNT, PAYMENT_FAIL_CNT, PAYMENT_FAIL_AMOUNT, DEPOSITOR_SUCC_CNT, DEPOSITOR_TIME_CNT, DEPOSITOR_FAIL_CNT
 			, DAON_SUCC_CNT, DAON_SUCC_AMOUNT, DAON_FAIL_CNT, DAON_FAIL_AMOUNT, CREAT_DT
-		FROM RD_DOZN_DS;
+		FROM RD_DOZN_DS
+		WHERE 1=1
+		AND DS_DT BETWEEN #{searchFromDate} and  #{searchToDate}
+		;
 	</select>
 	<select id="selectProfitList" parameterType="egovframework.com.rd.usr.service.vo.ProfitVO" resultType="egovframework.com.rd.usr.service.vo.ProfitVO">
 
