@@ -42,6 +42,7 @@ public class Sch implements Serializable {
 	private String searchNm;
 	private String searchMberId;
 	private String searchRegistrationSn;
+	private String searchDeliveryState;
 
 
 

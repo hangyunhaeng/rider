@@ -124,11 +124,6 @@
 
 	//파일별 업로드 내역 조회
 	function doSearch(){
-		if($('#searchRegistrationSn').val().trim() != '' && $('#searchRegistrationSn').val().trim().length != 10){
-			alert("식별번호는 10자리입니다");
-			$('#searchRegistrationSn').focus()
-			return ;
-		}
 
 	    if(!limit2Week($('#searchFromDate').val(), $('#searchToDate').val())){
 	    	return;
@@ -139,7 +134,7 @@
 		params.append('searchFromDate', getOnlyNumber($('#searchFromDate').val()));
 		params.append('searchToDate', getOnlyNumber($('#searchToDate').val()));
 		params.append('searchNm', $('#searchNm').val().trim());
-		params.append('searchRegistrationSn', getOnlyNumber($('#searchRegistrationSn').val().trim()));
+		params.append('searchDeliveryState', $('#searchDeliveryState').val());
 
 		// 로딩 시작
         $('.loading-wrap--js').show();
@@ -251,10 +246,13 @@
 								<input id="searchToDate" class="form-control search fs-9 float-start w40p" type="date" placeholder="Search" aria-label="Search" _mstplaceholder="181961" _mstaria-label="74607">
 							</div>
 						</td>
-						<th>식별번호</th>
+						<th>배달상태</th>
 						<td>
-<!-- 							<input id="searchRegistrationSn" type="text" oninput="this.value = this.value.replace(/[^0-9-]/g, '').replace(/(\..*)\./g, '$1');"> -->
-							<input id="searchRegistrationSn" type="text">
+							<select id="searchDeliveryState" name='searchDeliveryState' style='width: 100%'>
+								<option value="">전체</option>
+								<option value="전달완료">전달완료</option>
+								<option value="배달취소">배달취소</option>
+							</select>
 						</td>
 					</tr>
 				</table>

@@ -113,6 +113,9 @@
 					WHERE REGISTRATION_SN = #{searchRegistrationSn}
 				)
 			</if>
+			<if test="searchDeliveryState != null and searchDeliveryState != ''">
+				AND DELIVERY_STATE = #{searchDeliveryState}
+			</if>
 			<if test="searchFixGubun == 'YES'">
 				AND a.FIX_DAY is not null
 			</if>
