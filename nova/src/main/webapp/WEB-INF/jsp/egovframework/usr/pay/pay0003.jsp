@@ -527,8 +527,8 @@
 
 	        	} else if(response.data.base.gubun == 'D'){	//선지급수수료
 	        		$('#근거금액').html(currencyFormatter(response.data.base.cost));
-	        		var iFee = Math.floor(response.data.base.cost*0.01*grid2.getRowNode(0).data.feeAdminstrator - response.data.base.cost*0.01*grid2.getRowNode(0).data.feeAdminstrator*0.01*grid2.getRowNode(0).data.feeCooperator);
-	        		$('#계산식').html("("+response.data.base.cost+" * 0.01 * "+grid2.getRowNode(0).data.feeAdminstrator+") - (" + currencyFormatter(response.data.base.cost)+" * 0.01 * "+grid2.getRowNode(0).data.feeAdminstrator+" * 0.01 * "+grid2.getRowNode(0).data.feeCooperator+") = "+currencyFormatter(iFee));
+	        		var iFee = Math.ceil(response.data.base.cost*0.01*grid2.getRowNode(0).data.feeAdminstrator) - Math.floor(response.data.base.cost*0.01*grid2.getRowNode(0).data.feeAdminstrator*0.01*grid2.getRowNode(0).data.feeCooperator);
+	        		$('#계산식').html("("+currencyFormatter(response.data.base.cost)+" * 0.01 * "+grid2.getRowNode(0).data.feeAdminstrator+") - (" + currencyFormatter(response.data.base.cost)+" * 0.01 * "+grid2.getRowNode(0).data.feeAdminstrator+" * 0.01 * "+grid2.getRowNode(0).data.feeCooperator+") = "+currencyFormatter(iFee));
 
 					//협력사 수수료 색상 바꾸기
 					const imsiColumnDefs = grid2.getColumnDefs(); // 현재 컬럼정의 가져오깅(당근 배열임)
