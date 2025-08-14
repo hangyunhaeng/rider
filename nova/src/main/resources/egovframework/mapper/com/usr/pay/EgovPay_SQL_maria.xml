@@ -259,6 +259,7 @@
 		FROM RD_DOZN_DS
 		WHERE 1=1
 		AND DS_DT BETWEEN #{searchFromDate} and  #{searchToDate}
+		ORDER BY DS_DT DESC
 		;
 	</select>
 	<select id="selectProfitList" parameterType="egovframework.com.rd.usr.service.vo.ProfitVO" resultType="egovframework.com.rd.usr.service.vo.ProfitVO">
@@ -319,6 +320,7 @@
 				WHERE REGISTRATION_SN = #{searchRegistrationSn}
 			)
 			</if>
+			ORDER BY a.DELIVERY_DAY DESC
 	</select>
 	<select id="cooperatorAblePrice" parameterType="egovframework.com.rd.usr.service.vo.MyInfoVO" resultType="egovframework.com.rd.usr.service.vo.MyInfoVO">
 		SELECT cooperator_id, cooperator_nm, SUM(plus) - SUM(minus) AS COOP_ABLE_PRICE
