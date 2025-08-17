@@ -1,5 +1,6 @@
 package egovframework.com.rd.usr.web;
 
+import java.security.SecureRandom;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -22,6 +23,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 
 import egovframework.com.cmm.LoginVO;
+import egovframework.com.cmm.service.EgovProperties;
 import egovframework.com.cmm.util.EgovUserDetailsHelper;
 import egovframework.com.rd.Util;
 import egovframework.com.rd.usr.service.DtyService;
@@ -574,6 +576,43 @@ public class MemController {
         return ResponseEntity.ok(map);
     }
 
+
+    /**
+     * 관리자가 라이더 로그인을 위한 key 생성
+     * @param request
+     * @param model
+     * @return
+     * @throws Exception
+     */
+    @RequestMapping("/usr/mem0002_0008.do")
+    public ResponseEntity<?> mem0002_0008(@ModelAttribute("cooperatorVO")CooperatorVO cooperatorVO, HttpServletRequest request,ModelMap model) throws Exception {
+
+    	//로그인 체크
+        LoginVO user = (LoginVO)EgovUserDetailsHelper.getAuthenticatedUser();
+        Boolean isAuthenticated = EgovUserDetailsHelper.isAuthenticated();
+
+        if(!isAuthenticated) {
+        	return ResponseEntity.status(401).body("Unauthorized");
+        }
+
+        if(!Util.isUsr()) {
+        	return ResponseEntity.status(401).body("Unauthorized");
+        }
+        //return value
+        Map<String, Object> map =  new HashMap<String, Object>();
+
+        try {
+
+        	String key = memService.getRandomKey(cooperatorVO);
+        	map.put("key", key);
+	        map.put("resultCode", "success");
+	    } catch(IllegalArgumentException e) {
+	    	map.put("resultCode", "fail");
+	    	map.put("resultMsg", e.getMessage());
+	    	return ResponseEntity.ok(map);
+	    }
+        return ResponseEntity.ok(map);
+    }
 	/**
 	 * 라이더 관리
 	 * @param request
@@ -595,6 +634,13 @@ public class MemController {
         if(!Util.isUsr()) {
         	return "egovframework/com/cmm/error/accessDenied";
         }
+
+        if(Util.isReal())
+        	model.addAttribute("riderUrl", "https://"+EgovProperties.getProperty("Globals.gnrDomain"));
+        else
+        	model.addAttribute("riderUrl", "http://"+EgovProperties.getProperty("Globals.gnrDevDomain"));
+        model.addAttribute("doNice", Util.isReal());
+        model.addAttribute("user", user);
         return "egovframework/usr/mem/mem0002";
 	}
     /**

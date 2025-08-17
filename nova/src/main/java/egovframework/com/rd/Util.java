@@ -1,6 +1,7 @@
 package egovframework.com.rd;
 
 import java.math.BigDecimal;
+import java.security.SecureRandom;
 import java.text.DecimalFormat;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -268,6 +269,17 @@ public class Util {
         jsonMain.put("messageType", "kat");
 
         return jsonMain;
+    }
+
+    public static String getRandomKey() {
+    	SecureRandom random = new SecureRandom();
+    	String charar = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+";
+    	StringBuilder sb = new StringBuilder(30);
+    	for (int i = 0; i < 30; i++) {
+    	    int randomIndex = random.nextInt(charar.length());
+    	    sb.append(charar.charAt(randomIndex));
+    	}
+    	return sb.toString();
     }
 }
 

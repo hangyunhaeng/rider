@@ -99,7 +99,7 @@
             , valueParser: (params) => { return gridWan(params);}
 		},
 		{ headerName: "기타<br/>(대여,리스)", field: "etcCall", minWidth: 90
-			, cellRenderer:(params) => { return '<div class="row justify-content-between align-items-md-center btn-reveal-trigger border-translucent gx-0 flex-1 cursor-pointer" data-bs-toggle="modal" data-bs-target="#exampleModal" onclick="clickEtc(\''+params.data.cooperatorId+'\', \''+params.data.mberId+'\')">관리</div>';}
+			, cellRenderer:(params) => { return '<div class="btn btn-primary mb-2 mb-sm-0 mx-1 fs-9" data-bs-toggle="modal" data-bs-target="#exampleModal" onclick="clickEtc(\''+params.data.cooperatorId+'\', \''+params.data.mberId+'\')">관리</div>';}
 		},
 
 		{ headerName: "사용여부", field: "useAt", minWidth: 90, editable: true
@@ -107,6 +107,9 @@
 		,cellEditor: 'agSelectCellEditor'
 		,cellEditorParams: params => { return {values: ['Y', 'N']}; }
 		, cellClass: (params) => {return agGrideditClass(params)}},
+		{ headerName: "접속", field: "con", minWidth: 90, hide: true
+			, cellRenderer:(params) => {return '<div class="btn btn-primary mb-2 mb-sm-0 mx-1 fs-9" type="submit" onclick="clickCon(\''+params.data.mberId+'\')">접속</div>';}
+		},
 		{ headerName: "생성자", field: "creatId", minWidth: 90, hide:true}
 	];
 
@@ -700,6 +703,8 @@
         const gridDiv = document.querySelector('#myGrid1');
         grid1 = agGrid.createGrid(gridDiv, gridOptions);
 
+        if('${loginVO.authorCode}' =='ROLE_ADMIN')
+        	grid1.setColumnVisible('con', true);
         grid1.hideOverlay();
 
 	}
@@ -801,6 +806,40 @@
 		});
 	}
 
+	function clickCon(mberId){
+
+		const params = new URLSearchParams();
+		params.append("mberId", mberId);
+		// 로딩 시작
+        $('.loading-wrap--js').show();
+        axios.post('${pageContext.request.contextPath}/usr/mem0002_0008.do',params).then(function(response) {
+
+            if(chkLogOut(response.data)){
+            	return;
+            }
+
+        	// 로딩 종료
+            $('.loading-wrap--js').hide();
+        	if(response.data.resultCode == "success"){
+        		window.open("${riderUrl}/com/com0004.do", "myForm");
+        		$('#myForm').empty();
+				$('#myForm').attr("action","${riderUrl}/com/com0004.do");
+	            $('#myForm').attr("target", "myForm");
+	            $('#myForm').append($("<input/>", {type:"hidden", name:"id", value:mberId}));
+	            $('#myForm').append($("<input/>", {type:"hidden", name:"emplyrId", value:"${loginVO.id}"}));
+	            $('#myForm').append($("<input/>", {type:"hidden", name:"gubun", value:"admin"}));
+	            $('#myForm').append($("<input/>", {type:"hidden", name:"userSe", value:"GNR"}));
+	            $('#myForm').append($("<input/>", {type:"hidden", name:"key", value:response.data.key}));
+				$('#myForm').submit();
+        	}
+        })
+        .catch(function(error) {
+            console.error('There was an error fetching the data:', error);
+        }).finally(function() {
+        	// 로딩 종료
+            $('.loading-wrap--js').hide();
+        });
+	}
 	</script>
 <body class="index-page">
 

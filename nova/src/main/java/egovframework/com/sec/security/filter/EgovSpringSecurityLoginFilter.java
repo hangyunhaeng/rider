@@ -26,6 +26,8 @@ import egovframework.com.cmm.EgovMessageSource;
 import egovframework.com.cmm.LoginVO;
 import egovframework.com.cmm.config.EgovLoginConfig;
 import egovframework.com.cmm.util.EgovUserDetailsHelper;
+import egovframework.com.rd.Util;
+import egovframework.com.rd.usr.service.vo.Sch;
 import egovframework.com.uat.uia.service.EgovLoginService;
 import egovframework.com.utl.sim.service.EgovClntInfo;
 import org.egovframe.rte.psl.dataaccess.util.EgovMap;
@@ -145,19 +147,23 @@ public class EgovSpringSecurityLoginFilter implements Filter {
 
 					// 보안점검 후속 조치(Password 검증)
 					if ((id == null || "".equals(id)) && (password == null || "".equals(password))) {
-						RequestDispatcher dispatcher = httpRequest.getRequestDispatcher(loginURL);
-						httpRequest.setAttribute("loginMessage", "");
-						dispatcher.forward(httpRequest, httpResponse);
-						//chain.doFilter(request, response);
-						return;
+						if(!"admin".equals(httpRequest.getParameter("gubun"))) {
+							RequestDispatcher dispatcher = httpRequest.getRequestDispatcher(loginURL);
+							httpRequest.setAttribute("loginMessage", "");
+							dispatcher.forward(httpRequest, httpResponse);
+							//chain.doFilter(request, response);
+							return;
+						}
 					}
 					else if (password == null || password.equals("") || password.length() < 8 || password.length() > 20) {
-						httpRequest.setAttribute("loginMessage", egovMessageSource.getMessage("fail.common.login.password",request.getLocale()));
-						RequestDispatcher dispatcher = httpRequest.getRequestDispatcher(loginURL);
+						if(!"admin".equals(httpRequest.getParameter("gubun"))) {
+							httpRequest.setAttribute("loginMessage", egovMessageSource.getMessage("fail.common.login.password",request.getLocale()));
+							RequestDispatcher dispatcher = httpRequest.getRequestDispatcher(loginURL);
 
-						dispatcher.forward(httpRequest, httpResponse);
-						//chain.doFilter(request, response);
-						return;
+							dispatcher.forward(httpRequest, httpResponse);
+							//chain.doFilter(request, response);
+							return;
+						}
 					}
 
 					LoginVO loginVO = new LoginVO();
@@ -172,24 +178,26 @@ public class EgovSpringSecurityLoginFilter implements Filter {
 				    if(egovLoginConfig.isLock()){
 				        try{
 				        	LOGGER.debug("필더먼저?");
-				             Map<?,?> mapLockUserInfo = (EgovMap)loginService.selectLoginIncorrect(loginVO);
-				             if(mapLockUserInfo != null){
-				                //로그인인증제한 처리
-				                String sLoginIncorrectCode = loginService.processLoginIncorrect(loginVO, mapLockUserInfo);
-				                if(!sLoginIncorrectCode.equals("E")){
-				                    if(sLoginIncorrectCode.equals("L")){
-				                        request.setAttribute("loginMessage", egovMessageSource.getMessageArgs("fail.common.loginIncorrect", new Object[] {egovLoginConfig.getLockCount(),request.getLocale()}));
-				                    }else if(sLoginIncorrectCode.equals("C")){
-				                        request.setAttribute("loginMessage", egovMessageSource.getMessage("fail.common.login",request.getLocale()));
-				                    }
-				                    httpRequest.getRequestDispatcher(loginURL).forward(request, response);
-				                    return;
-				                }
-				            }else{
-				                request.setAttribute("loginMessage", egovMessageSource.getMessage("fail.common.login",request.getLocale()));
-				                httpRequest.getRequestDispatcher(loginURL).forward(request, response);
-				                return;
-				            }
+				        	if(!"admin".equals(httpRequest.getParameter("gubun"))) {
+					             Map<?,?> mapLockUserInfo = (EgovMap)loginService.selectLoginIncorrect(loginVO);
+					             if(mapLockUserInfo != null){
+					                //로그인인증제한 처리
+					                String sLoginIncorrectCode = loginService.processLoginIncorrect(loginVO, mapLockUserInfo);
+					                if(!sLoginIncorrectCode.equals("E")){
+					                    if(sLoginIncorrectCode.equals("L")){
+					                        request.setAttribute("loginMessage", egovMessageSource.getMessageArgs("fail.common.loginIncorrect", new Object[] {egovLoginConfig.getLockCount(),request.getLocale()}));
+					                    }else if(sLoginIncorrectCode.equals("C")){
+					                        request.setAttribute("loginMessage", egovMessageSource.getMessage("fail.common.login",request.getLocale()));
+					                    }
+					                    httpRequest.getRequestDispatcher(loginURL).forward(request, response);
+					                    return;
+					                }
+					            }else{
+					                request.setAttribute("loginMessage", egovMessageSource.getMessage("fail.common.login",request.getLocale()));
+					                httpRequest.getRequestDispatcher(loginURL).forward(request, response);
+					                return;
+					            }
+				        	}
 				        } catch(IllegalArgumentException e) {
 				            LOGGER.error("[IllegalArgumentException] : "+ e.getMessage());
 				        } catch(Exception ex) {
@@ -205,7 +213,27 @@ public class EgovSpringSecurityLoginFilter implements Filter {
 				    //------------------------------------------------------------------
 					try {
 						//사용자 입력 id, password로 DB 인증을 실행함
-						loginVO = loginService.actionLogin(loginVO);
+						if(!"admin".equals(httpRequest.getParameter("gubun"))) {
+							loginVO = loginService.actionLogin(loginVO);
+						} else {
+							//관리자가 라이더 로그인 할때 key 조회
+							Sch schVo = new Sch();
+							schVo.setSearchId(httpRequest.getParameter("emplyrId"));
+							schVo.setSearchDate(Util.getDay());
+							schVo.setSearchMberId(loginVO.getId());
+							schVo.setSeleceKey(httpRequest.getParameter("key"));
+							int a = loginService.selectAdminKey(schVo);
+							LOGGER.debug("★★★★★★★★ "+a+" ★★★★★★★★");
+							if(a > 0) {
+								loginVO = loginService.actionLoginAdmin(loginVO);
+							}else{
+				                request.setAttribute("loginMessage", egovMessageSource.getMessage("fail.common.login",request.getLocale()));
+				                httpRequest.getRequestDispatcher(loginURL).forward(request, response);
+				                return;
+				            }
+
+
+						}
 						//사용자 IP 기록
 						String userIp = EgovClntInfo.getClntIP(httpRequest);
                         loginVO.setIp(userIp);

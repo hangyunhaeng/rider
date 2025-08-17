@@ -211,6 +211,21 @@
 		</if>
 	</select>
 
+	<select id="actionLoginAdmin" resultMap="login">
+			SELECT mber_id AS id
+			     , mber_nm AS name
+			     , ihidNum AS ihidNum
+			     , password AS password
+			     , mber_email_adres AS email
+			     , 'GNR' AS userSe
+			     , '-' AS orgnztId
+			     , esntl_id AS uniqId
+			     , MBER_CONFIRM_AT AS mberConfirmAt
+			  FROM COMTNGNRLMBER
+			 WHERE mber_id = #{id}
+			   AND mber_sttus = 'P'
+	</select>
+
 	<!-- 비밀번호 찾기 -->
 	<select id="searchPassword" resultMap="password">
 		<!-- 일반회원 -->

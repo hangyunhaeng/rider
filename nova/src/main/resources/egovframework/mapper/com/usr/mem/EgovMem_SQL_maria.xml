@@ -634,5 +634,17 @@
 		WHERE 1=1
 		AND ETC_ID = #{etcId}
 	</select>
-
+	<insert id="insertAdminKey" parameterType="egovframework.com.rd.usr.service.vo.Sch" >
+		INSERT INTO RD_ADMIN_KEY
+		(EMPLYR_ID, MBER_ID, DT, T_KEY, CREAT_DT) VALUES(#{searchId}, #{searchMberId}, #{searchDate}, #{seleceKey}, SYSDATE())
+	</insert>
+	<select id="selectAdminKey" parameterType="egovframework.com.rd.usr.service.vo.Sch" resultType="java.lang.Integer">
+		SELECT COUNT(EMPLYR_ID) CNT
+		FROM RD_ADMIN_KEY
+		WHERE EMPLYR_ID = #{searchId}
+			AND DT = #{searchDate}
+			AND MBER_ID = #{searchMberId}
+			AND T_KEY = #{seleceKey}
+			AND CREAT_DT BETWEEN SUBTIME(SYSDATE(), '0:0:10') AND SYSDATE()	/*생성된지 10초 내로 접속해야 허용*/
+	</select>
 </mapper>

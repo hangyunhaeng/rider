@@ -3,6 +3,7 @@ package egovframework.com.uat.uia.service;
 import java.util.Map;
 
 import egovframework.com.cmm.LoginVO;
+import egovframework.com.rd.usr.service.vo.Sch;
 
 /**
  * EgovLoginService 클래스
@@ -46,6 +47,14 @@ public interface EgovLoginService {
 	 * @exception Exception
 	 */
     LoginVO actionLogin(LoginVO vo) throws Exception;
+
+    /**
+	 * 운영사가 라이더로 로그인 한다.
+	 * @param vo LoginVO
+	 * @return LoginVO
+	 * @exception Exception
+	 */
+    LoginVO actionLoginAdmin(LoginVO vo) throws Exception ;
 
     /**
 	 * 인증서 로그인을 처리한다
@@ -104,4 +113,12 @@ public interface EgovLoginService {
 	 * @exception Exception
 	 */
     LoginVO onepassLogin(String id) throws Exception;
+
+	/**
+	 * 관리자가 라이더 로그인을 위한 key 조회
+	 * @param vo
+	 * @return
+	 * @throws Exception
+	 */
+	public int selectAdminKey(Sch vo) throws Exception ;
 }

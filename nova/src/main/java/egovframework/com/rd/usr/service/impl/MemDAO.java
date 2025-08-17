@@ -13,6 +13,7 @@ import egovframework.com.rd.usr.service.vo.DayPayVO;
 import egovframework.com.rd.usr.service.vo.DeliveryInfoVO;
 import egovframework.com.rd.usr.service.vo.EtcVO;
 import egovframework.com.rd.usr.service.vo.InquiryVO;
+import egovframework.com.rd.usr.service.vo.Sch;
 import egovframework.com.uat.uia.web.EgoRDLoginController;
 import egovframework.com.uss.umt.service.MberManageVO;
 
@@ -421,6 +422,26 @@ public class MemDAO extends EgovComAbstractDAO {
 	 */
 	public EtcVO selectEtcOneByEtcId(EtcVO vo) throws Exception {
 		return selectOne("memDAO.selectEtcOneByEtcId", vo);
+	}
+
+	/**
+	 * 관리자가 라이더 로그인을 위한 key 생성
+	 * @param etcVO
+	 * @return
+	 * @throws Exception
+	 */
+	public int insertAdminKey(Sch vo) throws Exception {
+		return insert("memDAO.insertAdminKey", vo);
+	}
+
+	/**
+	 * 관리자가 라이더 로그인을 위한 key 조회
+	 * @param vo
+	 * @return
+	 * @throws Exception
+	 */
+	public int selectAdminKey(Sch vo) throws Exception {
+		return selectOne("memDAO.selectAdminKey", vo);
 	}
 }
 

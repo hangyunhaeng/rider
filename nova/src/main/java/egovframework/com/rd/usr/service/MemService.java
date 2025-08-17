@@ -177,4 +177,11 @@ public interface MemService {
 	 * @throws Exception
 	 */
 	public List<DayPayVO> selectEtcInputList(DayPayVO vo) throws Exception ;
+	/**
+	 * 관리자가 라이더 로그인을 위한 key 생성
+	 * @param vo
+	 * @return
+	 * @throws Exception
+	 */
+	public String getRandomKey(CooperatorVO vo) throws Exception ;
 }

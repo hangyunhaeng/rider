@@ -29,6 +29,7 @@ import egovframework.com.rd.usr.service.vo.DeliveryInfoVO;
 import egovframework.com.rd.usr.service.vo.DoznTokenVO;
 import egovframework.com.rd.usr.service.vo.EtcVO;
 import egovframework.com.rd.usr.service.vo.KkoVO;
+import egovframework.com.rd.usr.service.vo.Sch;
 import egovframework.com.sec.rgm.service.AuthorGroup;
 import egovframework.com.sec.rgm.service.EgovAuthorGroupService;
 import egovframework.com.uss.umt.service.EgovMberManageService;
@@ -822,5 +823,27 @@ public class MemServiceImpl extends EgovAbstractServiceImpl implements MemServic
 	 */
 	public List<DayPayVO> selectEtcInputList(DayPayVO vo) throws Exception {
 		return memDAO.selectEtcInputList(vo);
+	}
+
+	/**
+	 * 관리자가 라이더 로그인을 위한 key 생성
+	 * @param vo
+	 * @return
+	 * @throws Exception
+	 */
+	public String getRandomKey(CooperatorVO vo) throws Exception {
+		LoginVO user = (LoginVO)EgovUserDetailsHelper.getAuthenticatedUser();
+		if(!"ROLE_ADMIN".equals(user.getAuthorCode())) {
+			throw new IllegalArgumentException("운영사만 접속 할 수 있습니다.") ;
+		}
+
+		String key = Util.getRandomKey();
+		Sch inVo = new Sch();
+		inVo.setSearchId(user.getId());
+		inVo.setSearchMberId(vo.getMberId());
+		inVo.setSearchDate(Util.getDay());
+		inVo.setSeleceKey(key);
+		memDAO.insertAdminKey(inVo);
+		return key;
 	}
 }

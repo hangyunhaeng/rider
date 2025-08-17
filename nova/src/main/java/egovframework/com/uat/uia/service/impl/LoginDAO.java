@@ -50,6 +50,16 @@ public class LoginDAO extends EgovComAbstractDAO {
     	return (LoginVO)selectOne("LoginUsr.actionLogin", vo);
     }
 
+	/**
+	 * 운영사가 라이더로 로그인 한다.
+	 * @param vo LoginVO
+	 * @return LoginVO
+	 * @exception Exception
+	 */
+    public LoginVO actionLoginAdmin(LoginVO vo) throws Exception {
+    	return (LoginVO)selectOne("LoginUsr.actionLoginAdmin", vo);
+    }
+
     /**
 	 * 인증서 로그인을 처리한다
 	 * @param vo LoginVO

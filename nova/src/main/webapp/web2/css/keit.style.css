@@ -492,7 +492,7 @@ h4 + .pagetotal + .btnwrap.ty1{margin-top:-7px}/*keit 180525: margin-top*/
 td [class^="btn"]:first-child{margin-left:0!important}/*keit 180528:newly added*/
 table + .rbtn > [class="btn"]{padding:0 9px 0 25px;background:#4fa251 url(/web2/images/ic_btn_tb.png) no-repeat 0 -600px;font-size:12px;line-height:22px}/*keit 230518: color����*/
 .searchbox .btn.bl{height:26px!important;padding:0 9px!important;font-size:12px;font-weight:normal!important;background:#4f5a6f!important;border-radius:0!important;line-height:25px!important;min-width:auto}/*keit 180517*/
-.search_box .btn{padding:0 20px!important;min-width:76px!important;text-align:center;line-height:20px!important;background:#37a178!important;}/*keit 180521: newly added*/
+.search_box .btn{padding:0 20px!important;/*min-width:76px!important;*/text-align:center;line-height:20px!important;background:#37a178!important;}/*keit 180521: newly added*/
 /* HAS TO BE DELETED :end */
 
 .btn:not(div){padding:0 20px;min-width:76px;text-align:center;line-height:22px} /*keit 180511:padding-top,min-width,text-align,line-height*/

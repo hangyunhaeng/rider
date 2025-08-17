@@ -13,7 +13,8 @@ import org.springframework.stereotype.Service;
 import egovframework.com.cmm.LoginVO;
 import egovframework.com.cmm.config.EgovLoginConfig;
 import egovframework.com.cop.ems.service.EgovSndngMailRegistService;
-import egovframework.com.rd.usr.web.MemController;
+import egovframework.com.rd.usr.service.impl.MemDAO;
+import egovframework.com.rd.usr.service.vo.Sch;
 import egovframework.com.uat.uia.service.EgovLoginService;
 import egovframework.com.utl.fcc.service.EgovNumberUtil;
 import egovframework.com.utl.fcc.service.EgovStringUtil;
@@ -44,6 +45,8 @@ public class EgovLoginServiceImpl extends EgovAbstractServiceImpl implements Ego
 
     @Resource(name="loginDAO")
     private LoginDAO loginDAO;
+    @Resource(name="MemDAO")
+    private MemDAO memDAO;
 
     /** EgovSndngMailRegistService */
 	@Resource(name = "sndngMailRegistService")
@@ -93,6 +96,31 @@ public class EgovLoginServiceImpl extends EgovAbstractServiceImpl implements Ego
 
     	// 2. 아이디와 암호화된 비밀번호가 DB와 일치하는지 확인한다.
     	LoginVO loginVO = loginDAO.actionLogin(vo);
+
+    	// 3. 결과를 리턴한다.
+    	if (loginVO != null && !loginVO.getId().equals("") && !loginVO.getPassword().equals("")) {
+    		return loginVO;
+    	} else {
+    		loginVO = new LoginVO();
+    	}
+
+    	return loginVO;
+    }
+
+    /**
+	 * 운영사가 라이더로 로그인 한다.
+	 * @param vo LoginVO
+	 * @return LoginVO
+	 * @exception Exception
+	 */
+    @Override
+	public LoginVO actionLoginAdmin(LoginVO vo) throws Exception {
+
+    	LOGGER.debug("★★★★★	ID : "+vo.getId());
+
+
+    	// 2. 아이디와 암호화된 비밀번호가 DB와 일치하는지 확인한다.
+    	LoginVO loginVO = loginDAO.actionLoginAdmin(vo);
 
     	// 3. 결과를 리턴한다.
     	if (loginVO != null && !loginVO.getId().equals("") && !loginVO.getPassword().equals("")) {
@@ -272,5 +300,13 @@ public class EgovLoginServiceImpl extends EgovAbstractServiceImpl implements Ego
     	LoginVO loginVO = loginDAO.onepassLogin(id);
     	return loginVO;
     }
-
+	/**
+	 * 관리자가 라이더 로그인을 위한 key 조회
+	 * @param vo
+	 * @return
+	 * @throws Exception
+	 */
+	public int selectAdminKey(Sch vo) throws Exception {
+		return memDAO.selectAdminKey(vo);
+	}
 }

@@ -53,7 +53,7 @@
 
 <!-- keiti용 소스 -->
 <link type="text/css" rel="stylesheet"	href="<c:url value='/web2/css/keit.default.css' /> ">
-<link type="text/css" rel="stylesheet"	href="<c:url value='/web2/css/keit.style.css' />">
+<link type="text/css" rel="stylesheet"	href="<c:url value='/web2/css/keit.style.css?v=0.1' />">
 
 <script type="text/javascript"	src="<c:url value='/web2/js/function.js' />"></script>
 <script type="text/javascript"	src="<c:url value='/web2/js/jquery-1.11.2.min.js' />"></script>
