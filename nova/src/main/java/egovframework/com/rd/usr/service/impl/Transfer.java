@@ -163,6 +163,7 @@ public class Transfer extends EgovAbstractServiceImpl {
 		            		// 거래내역 삭제(협력사)
 		            		payDAO.updateBalanceCooperatorPayByTransfer(tranResult);
 		            		payDAO.updateCooperatorPayByTransfer(tranResult);
+		            		dtyDAO.deleteProfitByCoop(tranResult);
 		            	}
 		            }
 

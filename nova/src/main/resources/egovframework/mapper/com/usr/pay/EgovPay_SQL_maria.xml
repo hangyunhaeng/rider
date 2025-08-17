@@ -323,11 +323,16 @@
 			ORDER BY a.DELIVERY_DAY DESC
 	</select>
 	<select id="cooperatorAblePrice" parameterType="egovframework.com.rd.usr.service.vo.MyInfoVO" resultType="egovframework.com.rd.usr.service.vo.MyInfoVO">
-		SELECT cooperator_id, cooperator_nm, SUM(plus) - SUM(minus) AS COOP_ABLE_PRICE
+		SELECT tab.cooperator_id, tab.cooperator_nm
+		, SUM(day_plus) - SUM(day_minus) - CEILING(SUM(day_plus)*nvl(a.FEE_ADMINSTRATOR*0.01, 0)) AS DAY_ABLE_PRICE
+		, SUM(week_plus) - SUM(week_minus) AS WEEK_ABLE_PRICE
+		, a.FEE_ADMINSTRATOR, a.FEE_ID
 		FROM (
 			SELECT aa.cooperator_id, aa.cooperator_nm
-			,sum(if(a.gubun = 'C' OR a.gubun = 'E' OR a.gubun = 'B' OR a.gubun = 'O' OR (a.gubun = 'D' AND c.status_cd = '0000' AND c.STATUS = '200'), cost, 0)) plus	/*선지급금은 이체완료건만 산정*/
-			, 0 minus
+			,sum(if(a.week_yn ='N', if(a.gubun = 'C' OR a.gubun = 'E' OR a.gubun = 'B' OR a.gubun = 'O' OR (a.gubun = 'D' AND c.status_cd = '0000' AND c.STATUS = '200'), cost, 0), 0)) day_plus	/*선지급금은 이체완료건만 산정*/
+			,sum(if(a.week_yn ='Y', if(a.gubun = 'C' OR a.gubun = 'E' OR a.gubun = 'B' OR a.gubun = 'O' OR (a.gubun = 'D' AND c.status_cd = '0000' AND c.STATUS = '200'), cost, 0), 0)) week_plus	/*선지급금은 이체완료건만 산정*/
+			, 0 day_minus
+			, 0 week_minus
 			FROM  RD_COOPERATOR aa
 			left join RD_COOPERATOR_PROFIT a ON aa.cooperator_id = a.cooperator_id
 			LEFT JOIN RD_DAY_PAY b  ON a.DYP_ID = b.DYP_ID AND b.USE_AT ='Y'
@@ -348,8 +353,10 @@
 			UNION all
 
 			SELECT aa.cooperator_id, aa.cooperator_nm
-			, 0 plus
-			, nvl(sum(a.send_fee+a.send_price), 0) minus
+			, 0 day_plus
+			, 0 week_plus
+			, nvl(sum(if(week_yn ='N', a.send_fee+a.send_price, 0)), 0) day_minus
+			, nvl(sum(if(week_yn ='Y', a.send_fee+a.send_price+day_fee, 0)), 0) week_minus
 			FROM RD_COOPERATOR aa
 			left join RD_COOPERATOR_PAY a ON aa.cooperator_id = a.cooperator_id AND a.USE_AT ='Y'
 			WHERE 1=1
@@ -365,13 +372,14 @@
 			</if>
 			GROUP BY aa.cooperator_id
 		) tab
+		LEFT JOIN RD_COOPERATOR_FEE a ON tab.COOPERATOR_ID = a.COOPERATOR_ID AND a.use_at ='Y'
 		GROUP by cooperator_id
 
 	</select>
 	<insert id="isnertCooperatorPay" parameterType="egovframework.com.rd.usr.service.vo.CooperatorPayVO">
 		INSERT INTO RD_COOPERATOR_PAY
-		(COP_ID, COOPERATOR_ID, SEND_FEE, SEND_PRICE, TRAN_DAY, TELEGRAM_NO, USE_AT, CREAT_DT, CREAT_ID)
-		VALUES(#{copId}, #{cooperatorId}, #{sendFee}, #{sendPrice}, #{tranDay}, #{telegramNo}, #{useAt}, SYSDATE(), #{creatId})
+		(COP_ID, COOPERATOR_ID, DAY_FEE, SEND_FEE, SEND_PRICE, TRAN_DAY, TELEGRAM_NO, USE_AT, CREAT_DT, CREAT_ID)
+		VALUES(#{copId}, #{cooperatorId}, #{dayFee}, #{sendFee}, #{sendPrice}, #{tranDay}, #{telegramNo}, #{useAt}, SYSDATE(), #{creatId})
 	</insert>
 
 	<update id="updateCooperatorPayByTransfer" parameterType="egovframework.com.rd.usr.service.vo.DoszTransferVO">

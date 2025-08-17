@@ -45,6 +45,8 @@ public class CooperatorPayVO extends Sch implements Serializable {
 
 	//입력된 출금요청액
 	private int inputPrice;
+	//선지급 수수료
+	private int dayFee;
 
 
 	private String cooperatorNm;

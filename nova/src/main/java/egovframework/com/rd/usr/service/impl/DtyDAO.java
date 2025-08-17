@@ -543,6 +543,17 @@ public class DtyDAO extends EgovComAbstractDAO {
 	public int deleteProfit(DoszTransferVO vo) throws Exception {
 		return update("dtyDAO.deleteProfit", vo);
 	}
+
+	/**
+	 * 협력사 입금 실패서 선지급 수수료 삭제(운영사)
+	 * @param vo
+	 * @return
+	 * @throws Exception
+	 */
+	public int deleteProfitByCoop(DoszTransferVO vo) throws Exception {
+		return update("dtyDAO.deleteProfitByCoop", vo);
+	}
+
 	/**
 	 * 라이더 입금 실패서 선지급 수수료 삭제(협력사)
 	 * @param vo
@@ -690,6 +701,24 @@ public class DtyDAO extends EgovComAbstractDAO {
 	 */
 	public List<WeekRiderInfoVO> selectWeekRiderInfoOutByParam(WeekInfoVO vo) throws Exception {
 		return selectList("dtyDAO.selectWeekRiderInfoOutByParam", vo);
+	}
+	/**
+	 * 협력사 입금이력(RD_COOPERATOR_PROFIT) 정산 완료로 세팅
+	 * @param weekInfoVO
+	 * @return
+	 * @throws Exception
+	 */
+	public int updateFixCooperatorProfitConfirm(WeekInfoVO weekInfoVO) throws Exception {
+		return update("dtyDAO.updateFixCooperatorProfitConfirm", weekInfoVO);
+	}
+	/**
+	 * 협력사 출금이력(RD_COOPERATOR_PAY) 정산 완료로 세팅
+	 * @param weekInfoVO
+	 * @return
+	 * @throws Exception
+	 */
+	public int updateFixCooperatorPayConfirm(WeekInfoVO weekInfoVO) throws Exception {
+		return update("dtyDAO.updateFixCooperatorPayConfirm", weekInfoVO);
 	}
 }
 

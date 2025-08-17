@@ -39,6 +39,8 @@ public class WeekInfoVO extends Sch implements Serializable {
 	private String weekId;
 	/** 협력사아이디 */
 	private String cooperatorId;
+	/** 협력사아이디 */
+	private String cooperatorNm;
 	/** 정산시작일 */
 	private String accountsStDt;
 	/** 정산종료일 */

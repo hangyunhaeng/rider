@@ -38,6 +38,9 @@ public class MyInfoVO extends Sch implements Serializable {
 	private String registrationSn;
 	private String ceoNm;
 
+	private float feeAdminstrator;
+	private String feeId;
+
 
 	private String cooperatorId;
 

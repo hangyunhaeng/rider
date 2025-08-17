@@ -19,6 +19,7 @@
 	var columnDefs= [
 		{ headerName: "NO", field: "no", minWidth: 70, valueGetter:(params) => { return params.node.rowIndex + 1} },
 		{ headerName: "협력사아이디", field: "cooperatorId", minWidth: 120},
+		{ headerName: "협력사명", field: "cooperatorNm", minWidth: 120},
 		{ headerName: "정산시작일", field: "accountsStDt", minWidth: 90},
 		{ headerName: "정산종료일", field: "accountsEdDt", minWidth: 90},
 		{ headerName: "배달료(A-1)", field: "deliveryCost", minWidth: 120, cellClass: 'ag-cell-right', valueGetter:(params) => { return currencyFormatter(params.data.deliveryCost)}},
@@ -166,12 +167,14 @@
 	        	if (response.data.list.length == 0) {
 	        		grid.setGridOption('rowData',[]);  	// 데이터가 없는 경우 빈 배열 설정
 					var sum = [{cooperatorId:"합계"
+						, accountsStDt : ''
+						, accountsEdDt : ''
 						, deliveryCost : 0
 						, addAccounts : 0
-						, operatingCost : 0
 						, managementCost : 0
+// 						, operatingCost : 0
 						, operatingCostAdd : 0
-						, operatingFee : 0
+// 						, operatingFee : 0
 						, etcCost : 0
 						, timeInsurance : 0
 						, ownerEmploymentInsurance : 0
@@ -181,7 +184,7 @@
 						, withholdingTaxInsuranceSum : 0
 						, employmentInsuranceAccounts : 0
 						, industrialInsuranceAccounts : 0
-						, g : 0
+// 						, g : 0
 						, accountsScheduleCost : 0
 						, taxBillSupply : 0
 						, taxBillAdd : 0
@@ -195,12 +198,14 @@
 					var lst = response.data.list;	//정상데이터
 
 					var sum = [{cooperatorId:"합계"
+						, accountsStDt : ''
+						, accountsEdDt : ''
 						, deliveryCost: response.data.list.reduce((acc, num) => Number(acc, 10) + Number(num.deliveryCost, 10), 0)
 						, addAccounts: response.data.list.reduce((acc, num) => Number(acc, 10) + Number(num.addAccounts, 10), 0)
-						, operatingCost: response.data.list.reduce((acc, num) => Number(acc, 10) + Number(num.operatingCost, 10), 0)
 						, managementCost: response.data.list.reduce((acc, num) => Number(acc, 10) + Number(num.managementCost, 10), 0)
+// 						, operatingCost: response.data.list.reduce((acc, num) => Number(acc, 10) + Number(num.operatingCost, 10), 0)
 						, operatingCostAdd: response.data.list.reduce((acc, num) => Number(acc, 10) + Number(num.operatingCostAdd, 10), 0)
-						, operatingFee: response.data.list.reduce((acc, num) => Number(acc, 10) + Number(num.operatingFee, 10), 0)
+// 						, operatingFee: response.data.list.reduce((acc, num) => Number(acc, 10) + Number(num.operatingFee, 10), 0)
 						, etcCost: response.data.list.reduce((acc, num) => Number(acc, 10) + Number(num.etcCost, 10), 0)
 						, timeInsurance: response.data.list.reduce((acc, num) => Number(acc, 10) + Number(num.timeInsurance, 10), 0)
 						, ownerEmploymentInsurance: response.data.list.reduce((acc, num) => Number(acc, 10) + Number(num.ownerEmploymentInsurance, 10), 0)
@@ -210,7 +215,7 @@
 						, withholdingTaxInsuranceSum: response.data.list.reduce((acc, num) => Number(acc, 10) + Number(num.withholdingTaxInsuranceSum, 10), 0)
 						, employmentInsuranceAccounts: response.data.list.reduce((acc, num) => Number(acc, 10) + Number(num.employmentInsuranceAccounts, 10), 0)
 						, industrialInsuranceAccounts: response.data.list.reduce((acc, num) => Number(acc, 10) + Number(num.industrialInsuranceAccounts, 10), 0)
-						, g: response.data.list.reduce((acc, num) => Number(acc, 10) + Number(num.g, 10), 0)
+// 						, g: response.data.list.reduce((acc, num) => Number(acc, 10) + Number(num.g, 10), 0)
 						, accountsScheduleCost: response.data.list.reduce((acc, num) => Number(acc, 10) + Number(num.accountsScheduleCost, 10), 0)
 						, taxBillSupply: response.data.list.reduce((acc, num) => Number(acc, 10) + Number(num.taxBillSupply, 10), 0)
 						, taxBillAdd: response.data.list.reduce((acc, num) => Number(acc, 10) + Number(num.taxBillAdd, 10), 0)
@@ -224,6 +229,8 @@
 	        	if (response.data.listRider.length == 0) {
 	        		grid1.setGridOption('rowData',[]);  	// 데이터가 없는 경우 빈 배열 설정
 					var sum = [{cooperatorId:"합계"
+						, mberId : ''
+						, mberNm : ''
 						, cnt : 0
 						, deliveryCost : 0
 						, addCos : 0
@@ -242,7 +249,7 @@
 						, ownerIndustrialInsuranceAccounts : 0
 						, riderIndustrialInsuranceAccounts : 0
 						, sumIndustrialInsuranceAccounts : 0
-						, operatingCost : 0
+						, operatingCostAdd : 0
 						, accountsCost : 0
 						, incomeTax : 0
 						, residenceTax : 0
@@ -257,6 +264,8 @@
 					var lst = response.data.listRider;	//정상데이터
 
 					var sum = [{cooperatorId:"합계"
+						, mberId : ''
+						, mberNm : ''
 						, cnt: response.data.listRider.reduce((acc, num) => Number(acc, 10) + Number(num.cnt, 10), 0)
 						, deliveryCost: response.data.listRider.reduce((acc, num) => Number(acc, 10) + Number(num.deliveryCost, 10), 0)
 						, addCost: response.data.listRider.reduce((acc, num) => Number(acc, 10) + Number(num.addCost, 10), 0)
@@ -275,7 +284,7 @@
 						, ownerIndustrialInsuranceAccounts: response.data.listRider.reduce((acc, num) => Number(acc, 10) + Number(num.ownerIndustrialInsuranceAccounts, 10), 0)
 						, riderIndustrialInsuranceAccounts: response.data.listRider.reduce((acc, num) => Number(acc, 10) + Number(num.riderIndustrialInsuranceAccounts, 10), 0)
 						, sumIndustrialInsuranceAccounts: response.data.listRider.reduce((acc, num) => Number(acc, 10) + Number(num.sumIndustrialInsuranceAccounts, 10), 0)
-						, operatingCost: response.data.listRider.reduce((acc, num) => Number(acc, 10) + Number(num.operatingCost, 10), 0)
+						, operatingCostAdd: response.data.listRider.reduce((acc, num) => Number(acc, 10) + Number(num.operatingCostAdd, 10), 0)
 						, accountsCost: response.data.listRider.reduce((acc, num) => Number(acc, 10) + Number(num.accountsCost, 10), 0)
 						, incomeTax: response.data.listRider.reduce((acc, num) => Number(acc, 10) + Number(num.incomeTax, 10), 0)
 						, residenceTax: response.data.listRider.reduce((acc, num) => Number(acc, 10) + Number(num.residenceTax, 10), 0)
@@ -388,6 +397,124 @@
 		return false;
 	}
 
+
+    function downloadExcel() {
+    	var fileName;
+        const rows = [];
+        const sum = [];
+        const rows1 = [];
+        const sum1 = [];
+        grid.forEachNode((node) => {
+            rows.push([node.data.cooperatorId, getStringDate(node.data.accountsStDt), getStringDate(node.data.accountsEdDt)
+            	, currencyFormatter(node.data.deliveryCost)
+            	, currencyFormatter(node.data.addAccounts)
+            	, currencyFormatter(node.data.managementCost)
+            	, currencyFormatter(node.data.operatingCostAdd)
+            	, currencyFormatter(node.data.etcCost)
+            	, currencyFormatter(node.data.timeInsurance)
+            	, currencyFormatter(node.data.ownerEmploymentInsurance)
+            	, currencyFormatter(node.data.riderEmploymentInsurance)
+            	, currencyFormatter(node.data.ownerIndustrialInsurance)
+            	, currencyFormatter(node.data.riderIndustrialInsurance)
+            	, currencyFormatter(node.data.withholdingTaxInsuranceSum)
+            	, currencyFormatter(node.data.employmentInsuranceAccounts)
+            	, currencyFormatter(node.data.industrialInsuranceAccounts)
+            	, currencyFormatter(node.data.accountsScheduleCost)
+            	, currencyFormatter(node.data.taxBillSupply)
+            	, currencyFormatter(node.data.taxBillAdd)
+            	, currencyFormatter(node.data.taxBillSum)]);
+            fileName = node.data.cooperatorId+"_"+node.data.cooperatorNm+"_"+node.data.accountsStDt+"_"+node.data.accountsEdDt+'.xlsx';
+
+        });
+
+        $.each(grid.getGridOption('pinnedBottomRowData')[0], function(index, item){
+        	if(item == '합계')
+        		sum.push(item);
+        	else
+        		sum.push(currencyFormatter(item));
+        });
+        rows.push(sum);
+
+
+        grid1.forEachNode((node) => {
+            rows1.push([node.data.no, node.data.mberId, node.data.mberNm
+            	, currencyFormatter(node.data.cnt)
+            	, currencyFormatter(node.data.deliveryCost)
+            	, currencyFormatter(node.data.addCost)
+            	, currencyFormatter(node.data.sumCost)
+            	, currencyFormatter(node.data.timeInsurance)
+            	, currencyFormatter(node.data.necessaryExpenses)
+            	, currencyFormatter(node.data.pay)
+            	, currencyFormatter(node.data.ownerEmploymentInsurance)
+            	, currencyFormatter(node.data.riderEmploymentInsurance)
+            	, currencyFormatter(node.data.ownerIndustrialInsurance)
+            	, currencyFormatter(node.data.riderIndustrialInsurance)
+            	, currencyFormatter(node.data.withholdingTaxInsuranceSum)
+            	, currencyFormatter(node.data.ownerEmploymentInsuranceAccounts)
+            	, currencyFormatter(node.data.riderEmploymentInsuranceAccounts)
+            	, currencyFormatter(node.data.sumEmploymentInsuranceAccounts)
+            	, currencyFormatter(node.data.ownerIndustrialInsuranceAccounts)
+            	, currencyFormatter(node.data.riderIndustrialInsuranceAccounts)
+            	, currencyFormatter(node.data.sumIndustrialInsuranceAccounts)
+            	, currencyFormatter(node.data.operatingCostAdd)
+            	, currencyFormatter(node.data.accountsCost)
+            	, currencyFormatter(node.data.incomeTax)
+            	, currencyFormatter(node.data.residenceTax)
+            	, currencyFormatter(node.data.withholdingTax)
+            	, currencyFormatter(node.data.givePay)]);
+        });
+
+
+        $.each(grid1.getGridOption('pinnedBottomRowData')[0], function(index, item){
+        	if(item == '합계')
+        		sum1.push(item);
+        	else
+        		sum1.push(currencyFormatter(item));
+        });
+        rows1.push(sum1);
+
+        // 첫 번째 행을 추가하여 헤더를 포함
+        rows.unshift(['협력사아이디', '정산시작일', '정산종료일'
+        	, '배달료(A-1)', '추가정산(A-2)', '관리비(B)', '운영비©', '부가세액(C)', '시간제보험료', '사업주부담고용보험료(1)', '라이더부담고용보험료(2)', '사업주부담산재보험료(3)', '라이더부담산재보험료(4)'
+        	, '원천징수보험료합계(1+2+3+4)(D)', '고용보험소급정산(E)', '산재보험소급정산(F)', '정산예정금액(A+B-C)-시간제보험료-(D+E+F+G)', '세금계산서공급가액', '세금계산서부가세액', '세금계산서공급대가']);
+        rows1.unshift(['NO', 'User ID', '라이더명', '처리건수', '배달료A'
+        	, '추가지지급B', '총배달료C<br/>(A+B)', '시간제보험료', '필요경비', '보수액', '사업주부담<br/>고용보험료(1)', '라이더부담<br/>고용보험료(2)', '사업주부담<br/>산재보험료(3)'
+        	, '라이더부담<br/>산재보험료(4)', '원천징수보험료 합계<br/>(1+2+3+4)(D)', '사업주부담 고용보험<br/>소급정산(5)', '라이더부담 고용보험<br/>소급정산(6)', '합계 고용보험<br/>소급정산(E)'
+        	, '사업주부담 산재보험<br/>소급정산(7)', '라이더부담 산재보험<br/>소급정산(8)', '합계 산재보험<br/>소급정산(F)'
+        	, '운영비(9)', '라이더별정산금액(G)<br/>C-(2+4+6+8+9)', '소득세(H)<br/>C*3%', '주민세(I)<br/>H*10%', '원천징수세액(J)<br/>(H+I)', '라이더별지급금액(K)<br/>(G-J)']);
+
+
+
+        const ws = XLSX.utils.aoa_to_sheet(rows);
+        const ws1 = XLSX.utils.aoa_to_sheet(rows1);
+
+        // 모든 셀의 형식을 텍스트로 설정
+        const range = XLSX.utils.decode_range(ws['!ref']);
+        for (let R = range.s.r; R <= range.e.r; ++R) {
+            for (let C = range.s.c; C <= range.e.c; ++C) {
+                const cell_address = {c: C, r: R};
+                const cell_ref = XLSX.utils.encode_cell(cell_address);
+                if (!ws[cell_ref]) continue;
+                //ws[cell_ref].t = 's';  // 셀 형식을 텍스트로 설정
+            }
+        }
+
+        // 모든 셀의 형식을 텍스트로 설정
+        const range1 = XLSX.utils.decode_range(ws1['!ref']);
+        for (let R = range1.s.r; R <= range1.e.r; ++R) {
+            for (let C = range1.s.c; C <= range1.e.c; ++C) {
+                const cell_address = {c: C, r: R};
+                const cell_ref = XLSX.utils.encode_cell(cell_address);
+                if (!ws1[cell_ref]) continue;
+                //ws1[cell_ref].t = 's';  // 셀 형식을 텍스트로 설정
+            }
+        }
+
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, "Sheet1");
+        XLSX.utils.book_append_sheet(wb, ws1, "Sheet2");
+        XLSX.writeFile(wb, fileName);
+    }
 	</script>
 <body class="index-page">
 
@@ -432,6 +559,7 @@
 				</table>
 
 				<div class="btnwrap">
+					<button class="btn btn-primary" onclick="downloadExcel();">엑셀 다운로드</button>
 					<button id="loadDataBtn" class="btn ty1">조회</button>
 
 				</div>

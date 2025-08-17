@@ -122,8 +122,8 @@ public class BalanceConfirm extends EgovAbstractServiceImpl {
 						BalanceConfirm.setDay(Util.getDay());
 						BalanceConfirm.setBalance0(balanceTable.getBalance0());
 						BalanceConfirm.setBalance1(balanceTable.getBalance1());
-						BalanceConfirm.setAbleBalance0(new BigDecimal(balanceAble.get(0).getCoopAblePrice()) );
-						BalanceConfirm.setAbleBalance1(new BigDecimal(0) );
+						BalanceConfirm.setAbleBalance0(new BigDecimal(balanceAble.get(0).getDayAblePrice()) );
+						BalanceConfirm.setAbleBalance1(new BigDecimal(balanceAble.get(0).getWeekAblePrice()) );
 						payDAO.insertBalanceConfirm(BalanceConfirm);
 					}
 				}

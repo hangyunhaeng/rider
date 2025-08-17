@@ -766,6 +766,30 @@
 		AND a.DYP_ID = b.DYP_ID
 	</update>
 
+	<update id="updateFixCooperatorProfitConfirm" parameterType="egovframework.com.rd.usr.service.vo.WeekInfoVO">
+		UPDATE RD_COOPERATOR_PROFIT a, (
+			SELECT wi.*
+				FROM RD_WEEK_INFO wi
+				JOIN COMTNFILE b ON wi.ATCH_FILE_ID = b.ATCH_FILE_ID
+					WHERE 1=1
+						AND wi.FIX_DAY is NULL
+						AND b.USE_AT ='Y'
+						AND wi.ATCH_FILE_ID = #{searchAtchFileId}
+			) b
+		SET a.WEEK_YN ='Y'
+		, a.WEEK_ID = b.WEEK_ID
+		, a.LAST_UPDT_PNTTM = SYSDATE()
+		, a.LAST_UPDUSR_ID = #{lastUpdusrId}
+
+		WHERE a.COOPERATOR_ID = b.COOPERATOR_ID
+		AND a.WEEK_YN ='N'
+		AND a.USE_AT ='Y'
+		<![CDATA[
+		AND case when a.GUBUN IN ('C', 'E') AND b.accounts_st_dt <= a.DELIVERY_DAY AND b.accounts_ed_dt >= a.DELIVERY_DAY then 1
+						when a.GUBUN IN ('D', 'B', 'O') then 1
+						ELSE 0 END = 1	]]>
+	</update>
+
 	<update id="updateFixDayBalance"  parameterType="egovframework.com.rd.usr.service.vo.WeekInfoVO">
 		UPDATE RD_BALNCE a, (
 				SELECT a.COOPERATOR_ID, a.MBER_ID, SUM(able_price) AS able_price
@@ -839,6 +863,25 @@
 		AND a.COOPERATOR_ID = b.COOPERATOR_ID
 		AND a.mber_id = b.mber_id
 	</update>
+	<update id="updateFixCooperatorPayConfirm" parameterType="egovframework.com.rd.usr.service.vo.WeekInfoVO">
+		update RD_COOPERATOR_PAY a, (
+			SELECT wi.*
+				FROM RD_WEEK_INFO wi
+				JOIN COMTNFILE b ON wi.ATCH_FILE_ID = b.ATCH_FILE_ID
+					WHERE 1=1
+						AND wi.FIX_DAY is NULL
+						AND b.USE_AT ='Y'
+						AND wi.ATCH_FILE_ID = #{searchAtchFileId}
+			) b
+		SET a.WEEK_YN ='Y'
+		, a.WEEK_ID = b.week_Id
+		, a.LAST_UPDT_PNTTM = SYSDATE()
+		, a.LAST_UPDUSR_ID = #{lastUpdusrId}
+		WHERE a.COOPERATOR_ID = b.COOPERATOR_ID
+		AND a.WEEK_YN ='N'
+		AND a.USE_AT ='Y'
+	</update>
+
 	<update id="updateFixDayBalance2" parameterType="egovframework.com.rd.usr.service.vo.WeekInfoVO">
 		UPDATE RD_BALNCE a, (
 				SELECT a.COOPERATOR_ID, a.MBER_ID, SUM(day_fee+send_fee+send_price) able_price, SUM(send_fee+send_price) able_price_day
@@ -1169,14 +1212,14 @@
 
 	<insert id="insertProfit" parameterType="egovframework.com.rd.usr.service.vo.ProfitVO">
 		INSERT INTO RD_PROFIT
-		(PROFIT_ID, COOPERATOR_ID, MBER_ID, GUBUN, COST, DELIVERY_COST, DELIVERY_CNT, DELIVERY_DAY, DYP_ID, FEE_ID, RIDER_FEE_ID, CREAT_DT, CREAT_ID)
-		VALUES(#{profitId}, #{cooperatorId}, #{mberId}, #{gubun}, #{cost}, #{deliveryCost}, #{deliveryCnt}, #{deliveryDay}, #{dypId}, #{feeId}, #{riderFeeId}, SYSDATE(), #{creatId})
+		(PROFIT_ID, COOPERATOR_ID, MBER_ID, GUBUN, COST, DELIVERY_COST, DELIVERY_CNT, DELIVERY_DAY, DYP_ID, FEE_ID, RIDER_FEE_ID, COP_ID, CREAT_DT, CREAT_ID)
+		VALUES(#{profitId}, #{cooperatorId}, #{mberId}, #{gubun}, #{cost}, #{deliveryCost}, #{deliveryCnt}, #{deliveryDay}, #{dypId}, #{feeId}, #{riderFeeId}, #{copId}, SYSDATE(), #{creatId})
 	</insert>
 
 	<insert id="insertCooperatorProfit" parameterType="egovframework.com.rd.usr.service.vo.ProfitVO">
 		INSERT INTO RD_COOPERATOR_PROFIT
-		(COOFIT_ID, PROFIT_ID, COOPERATOR_ID, MBER_ID, GUBUN, COST, DELIVERY_COST, DELIVERY_CNT, DELIVERY_DAY, DYP_ID, FEE_ID, RIDER_FEE_ID, CREAT_DT, CREAT_ID)
-		VALUES(#{coofitId}, #{profitId}, #{cooperatorId}, #{mberId}, #{gubun}, #{cost}, #{deliveryCost}, #{deliveryCnt}, #{deliveryDay}, #{dypId}, #{feeId}, #{riderFeeId}, SYSDATE(), #{creatId})
+		(COOFIT_ID, PROFIT_ID, COOPERATOR_ID, MBER_ID, GUBUN, COST, DELIVERY_COST, DELIVERY_CNT, DELIVERY_DAY, DYP_ID, FEE_ID, RIDER_FEE_ID, WEEK_YN, CREAT_DT, CREAT_ID)
+		VALUES(#{coofitId}, #{profitId}, #{cooperatorId}, #{mberId}, #{gubun}, #{cost}, #{deliveryCost}, #{deliveryCnt}, #{deliveryDay}, #{dypId}, #{feeId}, #{riderFeeId}, #{weekYn}, SYSDATE(), #{creatId})
 	</insert>
 
 	<update id="deleteProfit" parameterType="egovframework.com.rd.usr.service.vo.DoszTransferVO">
@@ -1185,6 +1228,15 @@
 		WHERE PROFIT_ID IN (
 			SELECT b.PROFIT_ID FROM RD_DAY_PAY a
 			LEFT JOIN RD_PROFIT b ON a.DYP_ID = b.DYP_ID AND b.GUBUN = 'D' AND b.USE_AT ='Y'
+			WHERE TRAN_DAY = #{tranDay} AND TELEGRAM_NO = #{telegram_no}
+		)
+	</update>
+	<update id="deleteProfitByCoop" parameterType="egovframework.com.rd.usr.service.vo.DoszTransferVO">
+		UPDATE RD_PROFIT
+		SET USE_AT ='N'
+		WHERE PROFIT_ID IN (
+			SELECT b.PROFIT_ID FROM RD_COOPERATOR_PAY a
+			LEFT JOIN RD_PROFIT b ON a.cop_id = b.cop_id AND b.GUBUN = 'D' AND b.USE_AT ='Y'
 			WHERE TRAN_DAY = #{tranDay} AND TELEGRAM_NO = #{telegram_no}
 		)
 	</update>
@@ -1333,19 +1385,20 @@
 
 	<select id="selectWeekInfoOutByParam" parameterType="egovframework.com.rd.usr.service.vo.WeekInfoVO" resultType="egovframework.com.rd.usr.service.vo.WeekInfoVO">
 		SELECT
-			WEEK_ID,COOPERATOR_ID,ACCOUNTS_ST_DT,ACCOUNTS_ED_DT ,DELIVERY_COST ,ADD_ACCOUNTS ,OPERATING_COST,MANAGEMENT_COST
+			WEEK_ID,a.COOPERATOR_ID,ACCOUNTS_ST_DT,ACCOUNTS_ED_DT ,DELIVERY_COST ,ADD_ACCOUNTS ,OPERATING_COST,MANAGEMENT_COST
 			,OPERATING_FEE,ETC_COST,TIME_INSURANCE,OWNER_EMPLOYMENT_INSURANCE,RIDER_EMPLOYMENT_INSURANCE,OWNER_INDUSTRIAL_INSURANCE
 			,RIDER_INDUSTRIAL_INSURANCE,WITHHOLDING_TAX_INSURANCE_SUM,EMPLOYMENT_INSURANCE_ACCOUNTS,INDUSTRIAL_INSURANCE_ACCOUNTS
 			,G,ACCOUNTS_SCHEDULE_COST,TAX_BILL_SUPPLY,TAX_BILL_ADD ,TAX_BILL_SUM ,NOTE,a.ATCH_FILE_ID,a.CREAT_DT,a.CREAT_ID
-			,OPERATING_COST_ADD
+			,OPERATING_COST_ADD, c.COOPERATOR_NM
 		FROM RD_WEEK_INFO_OUT a
 		JOIN COMTNFILE b ON a.ATCH_FILE_ID = b.ATCH_FILE_ID
+		LEFT JOIN RD_COOPERATOR c ON a.COOPERATOR_ID = c.COOPERATOR_ID
 		WHERE 1=1
 			AND b.USE_AT ='Y'
 			AND a.ATCH_FILE_ID = #{searchAtchFileId}
 			<if test="schAuthorCode == 'ROLE_USER'">
 			/* 협력사 조건 *//* COOPERATOR_ID로 조건을 만든건 ★정산 파일을 올릴때 권한이 있는 협력사ID 데이터만 올릴수 있음!!★ - 나머지는 오류 처리할꺼임  */
-			AND COOPERATOR_ID IN (
+			AND a.COOPERATOR_ID IN (
 				SELECT COOPERATOR_ID FROM RD_COOPERATOR a
 				WHERE a.REGISTRATION_SN = #{schIhidNum} AND use_at ='Y'
 			)

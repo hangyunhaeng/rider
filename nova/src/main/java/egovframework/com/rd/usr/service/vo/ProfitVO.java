@@ -45,6 +45,9 @@ public class ProfitVO extends Sch implements Serializable {
 	private String feeId;
 	//수수료ID
 	private String riderFeeId;
+	private String copId;
+	// 정산완료
+	private String weekYn;
 	//등록일
 	private String creatDt;
 	//생성자 ID

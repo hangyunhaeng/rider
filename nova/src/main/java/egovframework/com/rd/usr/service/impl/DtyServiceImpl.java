@@ -2753,9 +2753,11 @@ public class DtyServiceImpl extends EgovAbstractServiceImpl implements DtyServic
 		//라이더 잔액 조정(일금액을 확정대상만큼 차감)
 		dtyDAO.updateFixDayBalance(weekInfoVO);
 
-		//일정산 입금이력을 정산 완료로 세팅 -- 협력사아이디, 기간으로 (TODO - 정합성체크 - 금액은 체크 않하나?)
+		//일정산 입금이력을 정산 완료로 세팅 -- 협력사아이디, 기간으로
 		dtyDAO.updateFixDayPayWeekConfirm(weekInfoVO);
 
+		//협력사 입금이력(RD_COOPERATOR_PROFIT) 정산 완료로 세팅
+		dtyDAO.updateFixCooperatorProfitConfirm(weekInfoVO);
 
 
 		//미정산 선출금(기타리스 포함) 출금이력조회하여 주정산 출금내역으로 insert
@@ -2772,9 +2774,10 @@ public class DtyServiceImpl extends EgovAbstractServiceImpl implements DtyServic
 		dtyDAO.updateFixDayBalance2(weekInfoVO);
 
 		//일정산 출금이력을 정산완료로 세팅
-		weekInfoVO.setLastUpdusrId(user.getId());
 		dtyDAO.updateFixDayPayWeekConfirm2(weekInfoVO);
 
+		//협력사 출금이력(RD_COOPERATOR_PAY) 정산 완료로 세팅
+		dtyDAO.updateFixCooperatorPayConfirm(weekInfoVO);
 
 
 
@@ -2854,6 +2857,7 @@ public class DtyServiceImpl extends EgovAbstractServiceImpl implements DtyServic
 	    		citVo.setDeliveryCnt(0);							//배달건수
 	    		citVo.setDeliveryDay(baseVo.getAccountsEdDt());		//배달일
 	    		citVo.setFeeId(baseVo.getFeeId());					//FEE_ID
+	    		citVo.setWeekYn("Y");								//정산완료
 	    		citVo.setCreatId(user.getId());
 	    		dtyDAO.insertCooperatorProfit(citVo);
         	}
@@ -2872,6 +2876,7 @@ public class DtyServiceImpl extends EgovAbstractServiceImpl implements DtyServic
 	    		citVo.setDeliveryCnt(0);							//배달건수
 	    		citVo.setDeliveryDay(baseVo.getAccountsEdDt());		//배달일
 	    		citVo.setFeeId(baseVo.getFeeId());					//FEE_ID
+	    		citVo.setWeekYn("Y");								//정산완료
 	    		citVo.setCreatId(user.getId());
 	    		dtyDAO.insertCooperatorProfit(citVo);
         	}
@@ -2906,8 +2911,8 @@ public class DtyServiceImpl extends EgovAbstractServiceImpl implements DtyServic
 	    		MyInfoVO ableVo = new MyInfoVO();
 	    		ableVo.setSearchCooperatorId(CoopId);
 	    		List<MyInfoVO> ablePriceForBal = payDAO.cooperatorAblePrice(ableVo);//리스트가 나오면 안됨.
-	    		mberBalance.setBalance0(new BigDecimal(ablePriceForBal.get(0).getCoopAblePrice()) );
-	    		mberBalance.setBalance1(new BigDecimal(0) );
+	    		mberBalance.setBalance0(new BigDecimal(ablePriceForBal.get(0).getDayAblePrice()) );
+	    		mberBalance.setBalance1(new BigDecimal(ablePriceForBal.get(0).getWeekAblePrice()) );
 
 			} else {
 				//라이더

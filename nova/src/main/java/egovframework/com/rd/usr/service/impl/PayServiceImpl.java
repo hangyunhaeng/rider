@@ -62,6 +62,9 @@ public class PayServiceImpl extends EgovAbstractServiceImpl implements PayServic
     /** ID Generation */
 	@Resource(name="egovCopIdGnrService")
 	private EgovIdGnrService egovCopIdGnrService;
+    /** ID Generation */
+	@Resource(name="egovFitIdGnrService")
+	private EgovIdGnrService egovFitIdGnrService;
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(PayServiceImpl.class);
 
@@ -137,6 +140,7 @@ public class PayServiceImpl extends EgovAbstractServiceImpl implements PayServic
 		dtyDAO.selectForUPdateBalanceByMberId(forUpdateVo);
 
 		int sendFee = Integer.parseInt(EgovProperties.getProperty("Globals.sendFee"));
+		int dayFee = 0;
 
 		int inputPrice = vo.getInputPrice();		//사용자가 입력한 출금 요청 금액
 		String tranDay = Util.getDay();
@@ -151,9 +155,19 @@ public class PayServiceImpl extends EgovAbstractServiceImpl implements PayServic
 		myInfoVO.setSchAuthorCode(user.getAuthorCode());
 		MyInfoVO ablePrice = payDAO.cooperatorAblePriceByCoopId(myInfoVO);
 
-		if(inputPrice+sendFee > ablePrice.getCoopAblePrice() ) {
-			throw new IllegalArgumentException("출금 가능 금액 초과") ;
+		if("DAY".equals(vo.getSearchGubun()) ) {
+			if(inputPrice+sendFee > ablePrice.getDayAblePrice() ) {
+				throw new IllegalArgumentException("출금 가능 금액 초과") ;
+			}
+			dayFee = (int)(Math.ceil(inputPrice*ablePrice.getFeeAdminstrator()*0.01));
+			vo.setDayFee( dayFee );
+		} else if("WEEK".equals(vo.getSearchGubun()) ) {
+			if(inputPrice+sendFee > ablePrice.getWeekAblePrice() ) {
+				throw new IllegalArgumentException("출금 가능 금액 초과") ;
+			}
+			vo.setDayFee(0);
 		}
+
 
 		vo.setCopId(egovCopIdGnrService.getNextStringId());
 		vo.setSendFee(sendFee);			//이체수수료
@@ -165,8 +179,28 @@ public class PayServiceImpl extends EgovAbstractServiceImpl implements PayServic
 		payDAO.isnertCooperatorPay(vo);
 
 
-		//협력사 잔액 조정
-		setBalance(vo.getCooperatorId(), EgovProperties.getProperty("Globals.cooperatorId"), user.getId(), new BigDecimal((inputPrice+sendFee)*-1), new BigDecimal(0));
+		//수익 등록(선지급)
+		ProfitVO fitVo = new ProfitVO();
+		if(dayFee > 0) {
+			fitVo.setProfitId(egovFitIdGnrService.getNextStringId());
+			fitVo.setCooperatorId(vo.getCooperatorId());//협력사
+			fitVo.setMberId(user.getId());				//라이더ID
+			fitVo.setGubun("D");						//선지급수수료
+			fitVo.setCost(dayFee); //금액
+			fitVo.setDeliveryDay(tranDay); 				//이체일
+			fitVo.setCopId(vo.getCopId());				//COP_ID
+			fitVo.setFeeId(ablePrice.getFeeId());		//FEE_ID
+			fitVo.setCreatId(user.getId());
+			dtyDAO.insertProfit(fitVo);
+		}
+
+		if("DAY".equals(vo.getSearchGubun()) ) {
+			//협력사 잔액 조정
+			setBalance(vo.getCooperatorId(), EgovProperties.getProperty("Globals.cooperatorId"), user.getId(), new BigDecimal((inputPrice+sendFee+dayFee)*-1), new BigDecimal(0));
+		} else {
+			//협력사 잔액 조정
+			setBalance(vo.getCooperatorId(), EgovProperties.getProperty("Globals.cooperatorId"), user.getId(), new BigDecimal(0), new BigDecimal((inputPrice+sendFee)*-1));
+		}
 
 		MyInfoVO bankInfo = rotService.selectMyInfo(myInfoVO);
 		DoszTransferVO doszTransferVO = new DoszTransferVO();
@@ -199,6 +233,7 @@ public class PayServiceImpl extends EgovAbstractServiceImpl implements PayServic
 		payDAO.updateBalanceCooperatorPayByTransfer(vo);
 
 		payDAO.updateCooperatorPayByTransfer(vo);
+		dtyDAO.deleteProfitByCoop(vo);
 	}
 
 	/**
@@ -293,8 +328,8 @@ public class PayServiceImpl extends EgovAbstractServiceImpl implements PayServic
 	    		MyInfoVO ableVo = new MyInfoVO();
 	    		ableVo.setSearchCooperatorId(CoopId);
 	    		List<MyInfoVO> ablePriceForBal = payDAO.cooperatorAblePrice(ableVo);//리스트가 나오면 안됨.
-	    		mberBalance.setBalance0(new BigDecimal(ablePriceForBal.get(0).getCoopAblePrice()) );
-	    		mberBalance.setBalance1(new BigDecimal(0) );
+	    		mberBalance.setBalance0(new BigDecimal(ablePriceForBal.get(0).getDayAblePrice()) );
+	    		mberBalance.setBalance1(new BigDecimal(ablePriceForBal.get(0).getWeekAblePrice()) );
 
 			} else {
 				//라이더

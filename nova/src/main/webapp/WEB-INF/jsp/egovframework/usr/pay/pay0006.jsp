@@ -91,17 +91,33 @@
 		var ablePriceList = JSON.parse('${ablePriceList}');
 		ablePriceList.resultList.forEach(function(dataInfo, idx){
 			var 내역 = $('#반복부').find('[repeatObj=true]:hidden:eq(0)').clone();
-			내역.find('sm[name=coopAblePrice]').html(currencyFormatter(dataInfo.coopAblePrice)+"("+dataInfo.cooperatorNm+")");
+			내역.find('sm[name=coopAblePrice]').html(currencyFormatter(dataInfo.dayAblePrice)+"("+dataInfo.cooperatorNm+")");
 			내역.find('input[name=cooperatorId]').val(dataInfo.cooperatorId);
+			내역.find('input[name=feeAdminstrator]').val(dataInfo.feeAdminstrator);
 			내역.find('input[name=cost]').on("input", function(e){
-				onInputVal(this, dataInfo.coopAblePrice-${sendFee});
+				onInputVal(this, dataInfo.dayAblePrice-${sendFee});
+				calPrice(this);
 			});
 			내역.find('button').on("click", function(e){
-				doAct(this);
+				doAct(this, 'DAY');
 			});
 
 			$('#반복부').append(내역);
 			내역.show();
+
+
+			var 내역1 = $('#반복부').find('[repeatObj=true]:hidden:eq(1)').clone();
+			내역1.find('sm[name=coopAblePrice]').html(currencyFormatter(dataInfo.weekAblePrice)+"("+dataInfo.cooperatorNm+")");
+			내역1.find('input[name=cooperatorId]').val(dataInfo.cooperatorId);
+			내역1.find('input[name=cost]').on("input", function(e){
+				onInputVal(this, dataInfo.weekAblePrice-${sendFee});
+			});
+			내역1.find('button').on("click", function(e){
+				doAct(this, 'WEEK');
+			});
+
+			$('#반복부').append(내역1);
+			내역1.show();
 		});
 		if('${loginVO.authorCode}' =='ROLE_USER'){
 			$('#div출금').show();
@@ -221,11 +237,19 @@
 		//콤마 붙여서 리턴
 		obj.value = currencyFormatter(parseInt(obj.value, 10));
 	}
+	function calPrice(obj){
+
+		debugger;
+		var feeAdminstrator = $(obj).closest('tr').find('input[name=feeAdminstrator]').val()
+		var cost = $(obj).closest('tr').find('input[name=cost]').val();
+
+		$(obj).closest('tr').find('sm[name=dayFee]').html('&nbsp;&nbsp;선지급 - '+currencyFormatter(Math.ceil(cost*feeAdminstrator*0.01))+'원')
+	}
 
 
 	var actObj;
 	//출금요청
-	function doAct(obj){
+	function doAct(obj, gubun){
 
 		if("${myInfoVO.accountNum}" == null || "${myInfoVO.accountNum}".trim() == '' ){
 			if(confirm('계좌가 등록되어있지 않습니다.\n내정보관리 메뉴에서 계좌등록을 하셔야 합니다.\n\n계좌등록화면으로 이동하시겠습니까?')){
@@ -248,6 +272,7 @@
 		const params = new URLSearchParams();
 		params.append('cooperatorId', $(obj).closest('tr').find('input[name=cooperatorId]').val());
 		params.append('inputPrice', $(obj).closest('tr').find('input[name=cost]').val().replace(/[^0-9]/g, '').replace(/(\..*)\./g, '$1'));
+		params.append('searchGubun', gubun);
 
 		// 로딩 시작
         $('.loading-wrap--js').show();
@@ -255,9 +280,10 @@
         	// 로딩 종료
             $('.loading-wrap--js').hide();
 			if(response.data.resultCode == "success"){
-				$(actObj).closest('tr').find('sm[name=coopAblePrice]').html(currencyFormatter(response.data.ablePrice.coopAblePrice)+"("+response.data.ablePrice.cooperatorNm+")");
+				var gubun = $(actObj).closest('tr').find('input[name="gubun"]').val();
+				$(actObj).closest('tr').find('sm[name=coopAblePrice]').html(currencyFormatter(gubun == 'DAY'? response.data.ablePrice.dayAblePrice : response.data.ablePrice.weekAblePrice)+"("+response.data.ablePrice.cooperatorNm+")");
 				$(actObj).closest('tr').find('input[name=cost]').on("input", function(e){
-					onInputVal(this, response.data.ablePrice.coopAblePrice-${sendFee});
+					onInputVal(this, (gubun == 'DAY'? response.data.ablePrice.dayAblePrice : response.data.ablePrice.weekAblePrice)-${sendFee});
 				});
 				$(actObj).closest('tr').find('input[name=cost]').val(0);
 				doSearch();
@@ -303,24 +329,42 @@
 				<table id="반복부">
 					<colgroup>
 						<col style="width: 13%">
-						<col style="width: 37%">
+						<col style="width: 17%">
 						<col style="width: 13%">
 						<col style="width: *">
 					</colgroup>
 
 					<tr repeatObj="true" style="display:none;">
-						<th>출금가능금액</th>
+						<th>선지급 가능금액</th>
 						<td>
 							<sm name="coopAblePrice"></sm>
 						</td>
 						<th>출금금액</th>
 						<td>
 							<input name="cooperatorId" type="hidden"/>
-							<input name="cost" type="text" style="width:calc(100% - 240px);" maxlength="15" oninput="">
-							<sm>&nbsp;&nbsp;계좌이체 수수료 - 300원</sm>
+							<input name="feeAdminstrator" type="hidden"/>
+							<input name="gubun" type="hidden" value="DAY"/>
+							<input name="cost" type="text" style="width:calc(100% - 240px - 100px);" maxlength="15" oninput="">
 							<button class="btn ty1">출금요청</button>
+							<sm name="dayFee">&nbsp;&nbsp;선지급 - 0원</sm>
+							<sm>,&nbsp;&nbsp;이체 수수료 - 300원</sm>
 						</td>
 					</tr>
+					<tr repeatObj="true" style="display:none;">
+						<th>확정 가능금액</th>
+						<td>
+							<sm name="coopAblePrice"></sm>
+						</td>
+						<th>출금금액</th>
+						<td>
+							<input name="cooperatorId" type="hidden"/>
+							<input name="gubun" type="hidden" value="WEEK"/>
+							<input name="cost" type="text" style="width:calc(100% - 240px);" maxlength="15" oninput="">
+							<button class="btn ty1">출금요청</button>
+							<sm>&nbsp;&nbsp;이체 수수료 - 300원</sm>
+						</td>
+					</tr>
+
 					<tr>
 						<th>은행</th>
 						<td>
