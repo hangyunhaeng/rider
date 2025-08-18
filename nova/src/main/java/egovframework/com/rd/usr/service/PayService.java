@@ -10,6 +10,7 @@ import egovframework.com.rd.usr.service.vo.HistoryVO;
 import egovframework.com.rd.usr.service.vo.KkoVO;
 import egovframework.com.rd.usr.service.vo.MyInfoVO;
 import egovframework.com.rd.usr.service.vo.ProfitVO;
+import egovframework.com.rd.usr.service.vo.WeekPayVO;
 
 public interface PayService {
 
@@ -141,4 +142,11 @@ public interface PayService {
 	 * @throws Exception
 	 */
 	public int selectKkoListCnt(KkoVO vo) throws Exception ;
+	/**
+	 * 확정 정보 조회
+	 * @param vo
+	 * @return
+	 * @throws Exception
+	 */
+	public List<WeekPayVO> selectWeekPayByMberId(WeekPayVO vo) throws Exception ;
 }

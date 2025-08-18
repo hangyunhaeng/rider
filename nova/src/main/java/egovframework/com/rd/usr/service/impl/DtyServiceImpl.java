@@ -1415,6 +1415,7 @@ public class DtyServiceImpl extends EgovAbstractServiceImpl implements DtyServic
 			citVo.setDypId(vo.getDypId());						//DYP_ID
 			citVo.setFeeId(resultFee.getFeeId());				//FEE_ID
 			citVo.setRiderFeeId(resultFee.getRiderFeeId());		//RIDER_FEE_ID
+			citVo.setWeekYn("N");
 			citVo.setCreatId(user.getId());
 			dtyDAO.insertCooperatorProfit(citVo);
 		}
@@ -2530,6 +2531,7 @@ public class DtyServiceImpl extends EgovAbstractServiceImpl implements DtyServic
 	    		citVo.setDypId(one.getDypId());				//DYP_ID
 	    		citVo.setFeeId(one.getFeeId());				//FEE_ID
 	    		citVo.setRiderFeeId(one.getRiderFeeId());	//RIDER_FEE_ID
+	    		citVo.setWeekYn("N");
 	    		citVo.setCreatId(user.getId());
 	    		dtyDAO.insertCooperatorProfit(citVo);
 
@@ -2631,6 +2633,7 @@ public class DtyServiceImpl extends EgovAbstractServiceImpl implements DtyServic
 		        		citVo.setCost(one.getPaybackCost());		//금액
 		        		citVo.setDeliveryDay(one.getDay());			//배달일
 		        		citVo.setWkpId(insertVo.getWkpId());				//DYP_ID
+		        		citVo.setWeekYn("N");
 		        		citVo.setCreatId(user.getId());
 		        		dtyDAO.insertCooperatorProfit(citVo);
 
@@ -2701,6 +2704,7 @@ public class DtyServiceImpl extends EgovAbstractServiceImpl implements DtyServic
 		        		citVo.setDypId(insertVo.getDypId());				//DYP_ID
 		        		citVo.setFeeId(resultFee.getFeeId());				//FEE_ID
 		        		citVo.setRiderFeeId(resultFee.getRiderFeeId());	//RIDER_FEE_ID
+		        		citVo.setWeekYn("N");
 		        		citVo.setCreatId(user.getId());
 		        		dtyDAO.insertCooperatorProfit(citVo);
 

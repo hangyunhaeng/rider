@@ -20,10 +20,12 @@ import egovframework.com.cmm.util.EgovUserDetailsHelper;
 import egovframework.com.rd.Util;
 import egovframework.com.rd.usr.service.DtyService;
 import egovframework.com.rd.usr.service.MemService;
+import egovframework.com.rd.usr.service.PayService;
 import egovframework.com.rd.usr.service.vo.DayPayVO;
 import egovframework.com.rd.usr.service.vo.DeliveryInfoVO;
 import egovframework.com.rd.usr.service.vo.EtcVO;
 import egovframework.com.rd.usr.service.vo.HistoryVO;
+import egovframework.com.rd.usr.service.vo.WeekPayVO;
 import egovframework.com.sec.rgm.service.EgovAuthorGroupService;
 
 
@@ -51,6 +53,8 @@ public class EgovPayController {
     private DtyService dtyService;
     @Resource(name = "MemService")
     private MemService memService;
+    @Resource(name = "PayService")
+    private PayService payService;
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(EgovPayController.class);
 
@@ -361,4 +365,61 @@ public class EgovPayController {
     	return ResponseEntity.ok(map);
 	}
 
+	/**
+	 * 확정 정보 조회
+	 * @param request
+	 * @param sessionVO
+	 * @param model
+	 * @return
+	 */
+	@RequestMapping("/gnr/pay0005.do")
+	public String pay0005(SessionVO sessionVO, ModelMap model) throws Exception{
+
+    	//로그인 체크
+        LoginVO user = (LoginVO)EgovUserDetailsHelper.getAuthenticatedUser();
+        Boolean isAuthenticated = EgovUserDetailsHelper.isAuthenticated();
+
+        if(!isAuthenticated) {
+        	return "egovframework/com/cmm/error/accessDenied";
+        }
+
+		// 1. 사용자 확인
+		if(!Util.isGnr()) {
+			return "egovframework/com/cmm/error/accessDenied";
+        }
+		return "egovframework/gnr/pay/pay0005";
+	}
+
+	/**
+	 * 확정 정보 조회
+	 * @param request
+	 * @param sessionVO
+	 * @param model
+	 * @return
+	 */
+	@RequestMapping("/gnr/pay0005_001.do")
+	public ResponseEntity<?> pay0005_001(@ModelAttribute("WeekPayVO") WeekPayVO weekPayVO, HttpServletRequest request) throws Exception{
+
+    	//로그인 체크
+        LoginVO user = (LoginVO)EgovUserDetailsHelper.getAuthenticatedUser();
+        Boolean isAuthenticated = EgovUserDetailsHelper.isAuthenticated();
+
+        if(!isAuthenticated) {
+        	return ResponseEntity.status(401).body("Unauthorized");
+        }
+
+        //return value
+        Map<String, Object> map =  new HashMap<String, Object>();
+
+
+        //라이더 권한
+        weekPayVO.setSchAuthorCode(user.getAuthorCode());
+        weekPayVO.setSchId(user.getId());
+        weekPayVO.setCooperatorId((String)request.getSession().getAttribute("cooperatorId"));
+        weekPayVO.setMberId(user.getId());
+
+        map.put("list", payService.selectWeekPayByMberId(weekPayVO));
+        map.put("resultCode", "success");
+    	return ResponseEntity.ok(map);
+	}
 }

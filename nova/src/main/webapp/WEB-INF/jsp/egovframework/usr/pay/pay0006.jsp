@@ -239,9 +239,8 @@
 	}
 	function calPrice(obj){
 
-		debugger;
 		var feeAdminstrator = $(obj).closest('tr').find('input[name=feeAdminstrator]').val()
-		var cost = $(obj).closest('tr').find('input[name=cost]').val();
+		var cost = $(obj).closest('tr').find('input[name=cost]').val().replace(/[^0-9]/g, '').replace(/(\..*)\./g, '$1');
 
 		$(obj).closest('tr').find('sm[name=dayFee]').html('&nbsp;&nbsp;선지급 - '+currencyFormatter(Math.ceil(cost*feeAdminstrator*0.01))+'원')
 	}
@@ -286,6 +285,7 @@
 					onInputVal(this, (gubun == 'DAY'? response.data.ablePrice.dayAblePrice : response.data.ablePrice.weekAblePrice)-${sendFee});
 				});
 				$(actObj).closest('tr').find('input[name=cost]').val(0);
+				calPrice($(actObj).closest('tr').find('input[name=cost]'));
 				doSearch();
 			} else{
 				if(response.data.resultMsg != '' && response.data.resultMsg != null)

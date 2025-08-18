@@ -29,6 +29,7 @@ import egovframework.com.rd.usr.service.vo.HistoryVO;
 import egovframework.com.rd.usr.service.vo.KkoVO;
 import egovframework.com.rd.usr.service.vo.MyInfoVO;
 import egovframework.com.rd.usr.service.vo.ProfitVO;
+import egovframework.com.rd.usr.service.vo.WeekPayVO;
 
 /**
  * @Class Name : DtyServiceImpl.java
@@ -371,5 +372,15 @@ public class PayServiceImpl extends EgovAbstractServiceImpl implements PayServic
 	 */
 	public int selectKkoListCnt(KkoVO vo) throws Exception {
 		return payDAO.selectKkoListCnt(vo);
+	}
+
+	/**
+	 * 확정 정보 조회
+	 * @param vo
+	 * @return
+	 * @throws Exception
+	 */
+	public List<WeekPayVO> selectWeekPayByMberId(WeekPayVO vo) throws Exception {
+		return payDAO.selectWeekPayByMberId(vo);
 	}
 }

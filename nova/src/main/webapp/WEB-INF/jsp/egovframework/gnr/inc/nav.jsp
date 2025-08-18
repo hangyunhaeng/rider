@@ -27,6 +27,8 @@
 	  	$('.pay0003').addClass('active');
   	} else if(filename.indexOf('pay0002.do') == 0) {
 	  	$('.pay0002').addClass('active');
+  	} else if(filename.indexOf('pay0005.do') == 0) {
+	  	$('.pay0005').addClass('active');
   	} else if(filename.indexOf('rot0002.do') == 0) {
 	  	$('.rot0002').addClass('active');
   	}
@@ -55,6 +57,7 @@
           </li>
           <li><a href="${pageContext.request.contextPath}/gnr/pay0003.do" class="pay0003">입금 내역</a></li>
           <li><a href="${pageContext.request.contextPath}/gnr/pay0002.do" class="pay0002">배달 정보 조회</a></li>
+          <li><a href="${pageContext.request.contextPath}/gnr/pay0005.do" class="pay0005">확정 정보 조회</a></li>
           <li><a href="${pageContext.request.contextPath}/gnr/rot0002.do" class="rot0002">내정보관리</a></li>
         </ul>
         <i class="mobile-nav-toggle d-xl-none bi bi-list"></i>

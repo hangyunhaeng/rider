@@ -324,8 +324,10 @@
 	</select>
 	<select id="cooperatorAblePrice" parameterType="egovframework.com.rd.usr.service.vo.MyInfoVO" resultType="egovframework.com.rd.usr.service.vo.MyInfoVO">
 		SELECT tab.cooperator_id, tab.cooperator_nm
-		, SUM(day_plus) - SUM(day_minus) - CEILING(SUM(day_plus)*nvl(a.FEE_ADMINSTRATOR*0.01, 0)) AS DAY_ABLE_PRICE
-		, SUM(week_plus) - SUM(week_minus) AS WEEK_ABLE_PRICE
+		/*, SUM(day_plus) - SUM(day_minus) - CEILING(SUM(day_plus)*nvl(a.FEE_ADMINSTRATOR*0.01, 0)) AS DAY_ABLE_PRICE
+		, SUM(week_plus) - SUM(week_minus) AS WEEK_ABLE_PRICE*/
+		<![CDATA[, if(SUM(week_plus) - SUM(week_minus) < 0 , (SUM(day_plus) - SUM(day_minus) - CEILING(SUM(day_plus)*nvl(a.FEE_ADMINSTRATOR*0.01, 0))) + (SUM(week_plus) - SUM(week_minus)), SUM(day_plus) - SUM(day_minus) - CEILING(SUM(day_plus)*nvl(a.FEE_ADMINSTRATOR*0.01, 0))) AS DAY_ABLE_PRICE
+		, if(SUM(week_plus) - SUM(week_minus) < 0 , 0, SUM(week_plus) - SUM(week_minus)) AS WEEK_ABLE_PRICE]]>
 		, a.FEE_ADMINSTRATOR, a.FEE_ID
 		FROM (
 			SELECT aa.cooperator_id, aa.cooperator_nm
@@ -661,4 +663,21 @@
 		(COOPERATOR_ID, MBER_ID, DAY, BALANCE0, BALANCE1, ABLE_BALANCE0, ABLE_BALANCE1)
 		VALUES(#{cooperatorId}, #{mberId}, #{day}, #{balance0}, #{balance1}, #{ableBalance0}, #{ableBalance1})
 	</insert>
+	<select id="selectWeekPayByMberId" parameterType="egovframework.com.rd.usr.service.vo.WeekPayVO" resultType="egovframework.com.rd.usr.service.vo.WeekPayVO">
+		SELECT tab.ACCOUNTS_ST_DT, tab.ACCOUNTS_ED_DT, tab.SUM_COST, tab.SEND_PRICE, tab.ABLE_PRICE
+		<![CDATA[, if(tab.ABLE_PRICE - tab.SEND_PRICE >= 0, tab.ABLE_PRICE - tab.SEND_PRICE, 0 ) TMP_ABLE_PRICE]]>
+		, DATE_FORMAT(tab.CREAT_DT, '%Y%m%d') AS CREAT_DT
+		from(
+			SELECT b.ACCOUNTS_ST_DT, b.ACCOUNTS_ED_DT, c.SUM_COST, SUM(NVL(d.DAY_FEE, 0)+NVL(d.SEND_FEE,0)+NVL(d.SEND_PRICE,0)) SEND_PRICE, a.ABLE_PRICE, a.CREAT_DT
+			FROM RD_WEEK_PAY a
+			LEFT JOIN RD_DAY_PAY d ON a.WEEK_ID = d.WEEK_ID AND d.IO_GUBUN = '2'
+			, RD_WEEK_INFO b, RD_WEEK_RIDER_INFO c
+			WHERE a.COOPERATOR_ID = #{cooperatorId} AND a.mber_id = #{mberId} AND a.IO_GUBUN ='1'
+			AND a.WEEK_ID IS NOT NULL
+			AND a.WEEK_ID = b.WEEK_ID AND b.FIX_DAY IS NOT NULL
+			AND b.WEEK_ID = c.WEEK_ID AND a.MBER_ID = c.MBER_ID
+			AND (a.ACCOUNTS_ST_DT BETWEEN #{searchFromDate} AND #{searchToDate} or a.ACCOUNTS_ED_DT BETWEEN #{searchFromDate} AND #{searchToDate})
+			GROUP BY WKP_ID
+		)tab
+	</select>
 </mapper>

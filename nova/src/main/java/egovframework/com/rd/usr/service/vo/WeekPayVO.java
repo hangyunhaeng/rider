@@ -31,6 +31,8 @@ public class WeekPayVO extends Sch implements Serializable {
 	private String ioGubun;
 	//출금가능금액
 	private BigDecimal ablePrice;
+	//출금가능금액
+	private BigDecimal tmpAblePrice;
 	//수수료
 	private int fee;
 	//출금액
@@ -66,4 +68,6 @@ public class WeekPayVO extends Sch implements Serializable {
 
 	//입력된 출금요청액
 	private int inputPrice;
+	// 총배달배
+	private BigDecimal sumCost;
 }

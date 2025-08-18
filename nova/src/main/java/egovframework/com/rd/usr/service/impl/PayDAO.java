@@ -19,6 +19,7 @@ import egovframework.com.rd.usr.service.vo.KkoVO;
 import egovframework.com.rd.usr.service.vo.MyInfoVO;
 import egovframework.com.rd.usr.service.vo.ProfitVO;
 import egovframework.com.rd.usr.service.vo.Sch;
+import egovframework.com.rd.usr.service.vo.WeekPayVO;
 import egovframework.com.uat.uia.web.EgoRDLoginController;
 
 
@@ -338,6 +339,16 @@ public class PayDAO extends EgovComAbstractDAO {
 	}
 	public int insertBalanceConfirm(BalanceVO vo) throws Exception {
 		return insert("payDAO.insertBalanceConfirm", vo);
+	}
+
+	/**
+	 * 확정 정보 조회
+	 * @param kkoVO
+	 * @return
+	 * @throws Exception
+	 */
+	public List<WeekPayVO> selectWeekPayByMberId(WeekPayVO vo) throws Exception {
+		return selectList("payDAO.selectWeekPayByMberId", vo);
 	}
 }
 
