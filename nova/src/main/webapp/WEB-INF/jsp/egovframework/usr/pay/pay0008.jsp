@@ -13,31 +13,30 @@
 
 
 	var pageInit = true;
-	var pagePerCnt = 15;
 	let gridOptions="";
 	var grid="";
 	let data;
 	var columnDefs= [
-		{ headerName: "NO", field: "rn", minWidth: 70 },
-		{ headerName: "fix", field: "fix", minWidth: 120, hide:true},
-		{ headerName: "kkoId", field: "kkoId", minWidth: 120, hide:true},
-		{ headerName: "upKkoId", field: "upKkoId", minWidth: 120, hide:true},
-		{ headerName: "ID", field: "mberId", minWidth: 80},
-		{ headerName: "이름", field: "mberNm", minWidth: 80},
-		{ headerName: "구분", field: "gubun", minWidth: 80, valueGetter:(params) => { return params.data.gubun== "1" ?"토큰":"알림톡"}},
-		{ headerName: "템플릿", field: "temblateNm", minWidth: 80},
-		{ headerName: "발송번호", field: "mbtlnum", minWidth: 120},
-		{ headerName: "url", field: "url", minWidth: 120, hide:true},
-		{ headerName: "발송메세지", field: "sendLongtxt", minWidth: 160},
-		{ headerName: "수신", field: "recvLongtxt", minWidth: 160},
-		{ headerName: "code", field: "code", minWidth: 120, hide:true},
-		{ headerName: "referenceKey", field: "referenceKey", minWidth: 120, hide:true},
-		{ headerName: "userKey", field: "userKey", minWidth: 120, hide:true},
-		{ headerName: "상태", field: "status", minWidth: 60, valueGetter:(params) => { return params.data.status== "1" ?"발송(접수)": params.data.status== "3" ? "완료" : params.data.status== "2" ? "재발송" :"" }},
-		{ headerName: "알림톡CODE", field: "kaorsltcode", minWidth: 80},
-		{ headerName: "비고", field: "bigo", minWidth: 170},
-		{ headerName: "발송일", field: "sendDt", minWidth: 120, valueGetter:(params) => { return getStringDate(params.data.sendDt)}},
-		{ headerName: "알림톡결과", field: "cdNm", minWidth: 80}
+		{ headerName: "NO", field: "no", minWidth: 70, valueGetter:(params) => { return params.node.rowIndex + 1} },
+		{ headerName: "copId", field: "copId", minWidth: 120, hide:true},
+		{ headerName: "금액", field: "sendPrice", minWidth: 140
+			, cellClass : "ag-cell-right"
+			, valueGetter:(params) => { return currencyFormatter(params.data.sendPrice);}
+		},
+		{ headerName: "수수료", field: "sendFee", minWidth: 90
+			, cellClass : "ag-cell-right"
+			, valueGetter:(params) => { return currencyFormatter(params.data.sendFee);}
+		},
+		{ headerName: "출금일", field: "tranDay", minWidth: 100, valueGetter:(params) => { return getStringDate(params.data.tranDay)}},
+		{ headerName: "출금은행", field: "rvBankNm", minWidth: 100},
+		{ headerName: "출금계좌", field: "rvAccount", minWidth: 140},
+		{ headerName: "status", field: "status", minWidth: 140, hide:true, hide:true},
+		{ headerName: "statusCd", field: "statusCd", minWidth: 140, hide:true},
+		{ headerName: "상태", field: "statusNm", minWidth: 140},
+		{ headerName: "오류메세지", field: "errorMessage", minWidth: 140},
+		{ headerName: "출금일", field: "sendDt", minWidth: 140, hide:true},
+		{ headerName: "출금시", field: "sendTm", minWidth: 140, hide:true}
+
 	];
 
 
@@ -68,33 +67,42 @@
 
 		// 1. 조회버튼
 		$('#loadDataBtn').on("click", function(){
-			doSearch(1, paging.objectCnt);
+			doSearch();
 		});
 
 		searchFromDate.setDate(towWeekAgo.getFullYear()+"-"+(towWeekAgo.getMonth()+1)+"-"+towWeekAgo.getDate());
 		searchToDate.setDate(today.getFullYear()+"-"+(today.getMonth()+1)+"-"+today.getDate());
 
-		//페이징설정
-		paging.createPaging('#paging', 1, pagePerCnt, doSearch);
-
 		//그리드 설정
 		setGrid();
 
+		var ablePrice = JSON.parse('${ablePrice}');
 
-		doSearch((${kkoVO.schIdx}==0)?1: ${kkoVO.schIdx}, paging.objectCnt);
+		var 내역 = $('#반복부').find('[repeatObj=true]:hidden:eq(0)').clone();
+		내역.find('sm[name=coopAblePrice]').html(currencyFormatter(ablePrice.result.salesAblePrice));
+		내역.find('input[name=cost]').on("input", function(e){
+			onInputVal(this, ablePrice.result.salesAblePrice-${sendFee});
+			calPrice(this);
+		});
+		내역.find('button').on("click", function(e){
+			doAct(this);
+		});
+
+		$('#반복부').append(내역);
+		내역.show();
+
+		if('${loginVO.authorCode}' =='ROLE_SALES'){
+			$('#div출금').show();
+		}
+
 	});
 
-
-
 	//내역 조회
-	function doSearch(schIdx, schPagePerCnt){
+	function doSearch(){
 
 		const params = new URLSearchParams();
 		params.append('searchFromDate', getOnlyNumber($('#searchFromDate').val()));
 		params.append('searchToDate', getOnlyNumber($('#searchToDate').val()));
-		params.append('searchGubun', $('#searchGubun').val());
-		params.append("schIdx", schIdx);
-		params.append("schPagePerCnt", schPagePerCnt);
 
 	    if(!limit2Week($('#searchFromDate').val(), $('#searchToDate').val())){
 	    	return;
@@ -102,7 +110,7 @@
 
 		// 로딩 시작
         $('.loading-wrap--js').show();
-		axios.post('${pageContext.request.contextPath}/usr/pay0007_0001.do',params).then(function(response) {
+        axios.post('${pageContext.request.contextPath}/usr/pay0008_0001.do',params).then(function(response) {
         	// 로딩 종료
             $('.loading-wrap--js').hide();
 
@@ -112,7 +120,7 @@
 
 			if(response.data.resultCode == "success"){
 
-	            document.getElementById('TT_CNT0').textContent = currencyFormatter(response.data.cnt);
+	            document.getElementById('TT_CNT0').textContent = currencyFormatter(response.data.list.length);
 
 	        	if (response.data.list.length == 0) {
 	        		grid.setGridOption('rowData',[]);  	// 데이터가 없는 경우 빈 배열 설정
@@ -121,7 +129,6 @@
 					var lst = response.data.list;	//정상데이터
 	                grid.setGridOption('rowData', lst);
 	            }
-	        	paging.setPageing(schIdx, response.data.cnt);
 			}
 
         })
@@ -162,8 +169,86 @@
 
 	}
 
+	function onInputVal(obj, maxInt){
+		//빈값이면 0으로
+		if(obj.value == "") obj.value = 0;
+		//모두 숫자로 변환
+		obj.value = obj.value.replace(/[^0-9]/g, '').replace(/(\..*)\./g, '$1');
+		maxInt = String(maxInt).replace(/[^0-9-]/g, '').replace(/(\..*)\./g, '$1');
+		maxInt = minWon0(maxInt);	//-는 없음
+
+		//최대값보다 큰값이 들어오면 최대값으로 변환
+		if(typeof(maxInt) != 'undefined'){
+			if(parseInt(obj.value, 10)> parseInt(maxInt, 10)){
+				obj.value = maxInt;
+			}
+		}
+
+		//콤마 붙여서 리턴
+		obj.value = currencyFormatter(parseInt(obj.value, 10));
+	}
+	function calPrice(obj){
+
+		var cost = $(obj).closest('tr').find('input[name=cost]').val().replace(/[^0-9]/g, '').replace(/(\..*)\./g, '$1');
+
+	}
 
 
+	var actObj;
+	//출금요청
+	function doAct(obj){
+
+		if("${myInfoVO.accountNum}" == null || "${myInfoVO.accountNum}".trim() == '' ){
+			if(confirm('계좌가 등록되어있지 않습니다.\n내정보관리 메뉴에서 계좌등록을 하셔야 합니다.\n\n계좌등록화면으로 이동하시겠습니까?')){
+				$('#myForm').attr("action", "${pageContext.request.contextPath}/usr/mem0004.do");
+				$('#myForm').submit();
+				return;
+			}
+			return;
+		}
+
+		if(Number($(obj).closest('tr').find('input[name=cost]').val().replace(/[^0-9]-/g, '').replace(/(\..*)\./g, '$1'), 10) <= 0){
+			alert('출금금액을 입력하세요');
+			$(obj).closest('tr').find('input[name=cost]').focus();
+			return;
+		}
+
+
+		actObj = obj;
+
+		const params = new URLSearchParams();
+		params.append('cooperatorId', $(obj).closest('tr').find('input[name=cooperatorId]').val());
+		params.append('inputPrice', $(obj).closest('tr').find('input[name=cost]').val().replace(/[^0-9]/g, '').replace(/(\..*)\./g, '$1'));
+
+		// 로딩 시작
+        $('.loading-wrap--js').show();
+        axios.post('${pageContext.request.contextPath}/usr/pay0008_0002.do',params).then(function(response) {
+        	// 로딩 종료
+            $('.loading-wrap--js').hide();
+			if(response.data.resultCode == "success"){
+				var gubun = $(actObj).closest('tr').find('input[name="gubun"]').val();
+				$(actObj).closest('tr').find('sm[name=coopAblePrice]').html(currencyFormatter(response.data.ablePrice.salesAblePrice));
+				$(actObj).closest('tr').find('input[name=cost]').on("input", function(e){
+					onInputVal(this, response.data.ablePrice.salesAblePrice-${sendFee});
+				});
+				$(actObj).closest('tr').find('input[name=cost]').val(0);
+				calPrice($(actObj).closest('tr').find('input[name=cost]'));
+				doSearch();
+			} else{
+				if(response.data.resultMsg != '' && response.data.resultMsg != null)
+					alert(response.data.resultMsg);
+				else alert("출금에 실패하였습니다");
+				return ;
+			}
+        })
+        .catch(function(error) {
+            console.error('There was an error fetching the data:', error);
+        }).finally(function() {
+        	// 로딩 종료
+            $('.loading-wrap--js').hide();
+        });
+        pageInit = false;
+	}
 	</script>
 <body class="index-page">
 
@@ -180,12 +265,49 @@
 	</form>
 
 	<div class="keit-header-body innerwrap clearfix">
-		<p class="tit">알림톡 발송 조회</p>
+		<p class="tit">영업사원 출금내역 현황</p>
 
 			<input name="pageUnit" type="hidden" value="1000"/>
 			<input name="pageSize" type="hidden" value="1000"/>
 			<!--과제관리_목록 -->
 			<div class="search_box ty2">
+
+			<div id="div출금" style="display:none;">
+				<table id="반복부">
+					<colgroup>
+						<col style="width: 13%">
+						<col style="width: 17%">
+						<col style="width: 13%">
+						<col style="width: *">
+					</colgroup>
+
+					<tr repeatObj="true" style="display:none;">
+						<th>출금가능금액</th>
+						<td>
+							<sm name="coopAblePrice"></sm>
+						</td>
+						<th>출금금액</th>
+						<td>
+							<input name="cost" type="text" style="width:calc(100% - 240px);" maxlength="15" oninput="">
+							<button class="btn ty1">출금요청</button>
+							<sm>&nbsp;&nbsp;이체 수수료 - 300원</sm>
+						</td>
+					</tr>
+					<tr>
+						<th>은행</th>
+						<td>
+							<sm>${myInfoVO.bnkNm}</sm>
+						</td>
+						<th>계좌번호</th>
+						<td>
+							<sm>${myInfoVO.accountNum} / ${myInfoVO.accountNm}</sm>
+						</td>
+					</tr>
+				</table>
+
+				<br/>
+				<br/>
+			</div>
 				<table>
 					<colgroup>
 						<col style="width: 13%">
@@ -195,22 +317,17 @@
 					</colgroup>
 
 					<tr>
-						<th>발송일</th>
-						<td>
+						<th>출금일</th>
+						<td colspan='3'>
 							<div>
 								<input id="searchFromDate" class="form-control search fs-9 float-start w40p"" type="date" placeholder="Search" aria-label="Search" _mstplaceholder="181961" _mstaria-label="74607">
 								<sm class="float-start">&nbsp;~&nbsp;</sm>
 								<input id="searchToDate" class="form-control search fs-9 float-start w40p" type="date" placeholder="Search" aria-label="Search" _mstplaceholder="181961" _mstaria-label="74607">
 							</div>
 						</td>
-						<th>구분</th>
-						<td>
-							<select id="searchGubun" name='searchGubun' style='width: 100%'>
-								<option value="all">전체</option>
-								<option value="1">토큰</option>
-								<option value="2">알림톡</option>
-							</select>
-						</td>
+					</tr>
+					<tr>
+
 					</tr>
 				</table>
 
@@ -227,8 +344,7 @@
 			<br>
 			<div id="loadingOverlay" style="display: none;">Loading...</div>
 			<div  class="ib_product">
-				<div id="myGrid" class="ag-theme-alpine" style="height: 550px; width: 100%;"></div>
-				<div id="paging" class="d-flex align-items-center justify-content-center mt-3"></div>
+				<div id="myGrid" class="ag-theme-alpine" style="height: 410px; width: 100%;"></div>
 			</div>
 			</div>
 

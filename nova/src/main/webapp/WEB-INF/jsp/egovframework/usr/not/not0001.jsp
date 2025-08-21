@@ -49,13 +49,6 @@
 	//onLoad
 	document.addEventListener('DOMContentLoaded', function() {
 
-		if('${loginVO.authorCode}' =='ROLE_ADMIN'){
-			$('nav > ul').find('li[class!=cooperator]:hidden').show();
-		}
-		if('${loginVO.authorCode}' =='ROLE_USER'){
-			$('nav > ul').find('li[class~=cooperator]:hidden').show();
-		}
-
 		//이벤트 설정
 		// 1. 계정 추가
 		$("#추가버튼").on("click", function(e){

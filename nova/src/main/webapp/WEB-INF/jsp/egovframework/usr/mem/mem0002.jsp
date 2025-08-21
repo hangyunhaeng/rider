@@ -35,6 +35,7 @@
 
 		{ headerName: "선지급수수료(%)", field: "feeAdminstrator", minWidth: 90},
 		{ headerName: "협력사<br/>선지급수수료(%)", field: "feeCooperator", minWidth: 90},
+		{ headerName: "영업사원<br/>선지급수수료(%)", field: "feeSalesman", minWidth: 90},
 		{ headerName: "고용보험(%)", field: "feeEmploymentInsurance", minWidth: 90},
 		{ headerName: "산재보험(%)", field: "feeIndustrialInsurance", minWidth: 90},
 		{ headerName: "원천세(%)", field: "feeWithholdingTax", minWidth: 90},
@@ -158,13 +159,6 @@
 
 	//onLoad
 	document.addEventListener('DOMContentLoaded', function() {
-
-		if('${loginVO.authorCode}' =='ROLE_ADMIN'){
-			$('nav > ul').find('li[class!=cooperator]:hidden').show();
-		}
-		if('${loginVO.authorCode}' =='ROLE_USER'){
-			$('nav > ul').find('li[class~=cooperator]:hidden').show();
-		}
 
 		//이벤트 설정
 		// 아이디 추가

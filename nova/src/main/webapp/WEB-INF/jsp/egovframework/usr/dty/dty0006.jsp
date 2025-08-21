@@ -77,13 +77,6 @@
 	//onLoad
 	document.addEventListener('DOMContentLoaded', function() {
 
-		if('${loginVO.authorCode}' =='ROLE_ADMIN'){
-			$('nav > ul').find('li[class!=cooperator]:hidden').show();
-		}
-		if('${loginVO.authorCode}' =='ROLE_USER'){
-			$('nav > ul').find('li[class~=cooperator]:hidden').show();
-		}
-
 		//일 세팅
 		var today = new Date();
 		var serchDate = flatpickr("#searchDate", {

@@ -20,16 +20,17 @@
 	var columnDefs= [
 		{ headerName: "NO", field: "no", minWidth: 70, valueGetter:(params) => { return params.node.rowIndex + 1} },
 		{ headerName: "오류", field: "err", minWidth: 120, hide:true},
+		{ headerName: "salfitId", field: "salfitId", minWidth: 120, hide:true},
 		{ headerName: "profitId", field: "profitId", minWidth: 120, hide:true},
-		{ headerName: "배달건수", field: "deliveryCnt", minWidth: 70
-			, valueGetter:(params) => { return params.data.deliveryCnt > 0 || params.data.deliveryCnt =='합계' ? params.data.deliveryCnt: ''}
-			, cellClass: 'ag-cell-right'
-		},
-		{ headerName: "배달일", field: "deliveryDay", minWidth: 120},
-		{ headerName: "배달비", field: "deliveryCost", minWidth: 120
-			, valueGetter:(params) => { return params.data.deliveryCnt > 0 ? currencyFormatter(params.data.deliveryCost): ''}
-			, cellClass: 'ag-cell-right'
-		},
+// 		{ headerName: "배달건수", field: "deliveryCnt", minWidth: 70
+// 			, valueGetter:(params) => { return params.data.deliveryCnt > 0 || params.data.deliveryCnt =='합계' ? params.data.deliveryCnt: ''}
+// 			, cellClass: 'ag-cell-right'
+// 		},
+		{ headerName: "출금일", field: "deliveryDay", minWidth: 120},
+// 		{ headerName: "배달비", field: "deliveryCost", minWidth: 120
+// 			, valueGetter:(params) => { return params.data.deliveryCnt > 0 ? currencyFormatter(params.data.deliveryCost): ''}
+// 			, cellClass: 'ag-cell-right'
+// 		},
 		{ headerName: "dypId", field: "dypId", minWidth: 120, hide:true},
 		{ headerName: "wkpId", field: "wkpId", minWidth: 120, hide:true},
 		{ headerName: "feeId", field: "feeId", minWidth: 120, hide:true},
@@ -43,7 +44,7 @@
 		{ headerName: "금액", field: "cost", minWidth: 80
 			, cellClass: (params) => {return agGridUnderBarClass(params, 'ag-cell-right')}
 			, valueGetter:(params) => { return currencyFormatter(params.data.cost)}
-			, cellRenderer:(params) => { return '<div data-bs-toggle="modal" data-bs-target="#exampleModal" onclick="clickFee(\''+params.data.profitId+'\')">'+currencyFormatter(params.data.cost)+'</div>';}
+			, cellRenderer:(params) => { return '<div data-bs-toggle="modal" data-bs-target="#exampleModal" onclick="clickFee(\''+params.data.salfitId+'\')">'+currencyFormatter(params.data.cost)+'</div>';}
 		},
 		{ headerName: "등록일", field: "creatDt", minWidth: 140, valueGetter:(params) => { return getStringDate(params.data.creatDt)}}
 	];
@@ -264,7 +265,7 @@
 
 		// 로딩 시작
         $('.loading-wrap--js').show();
-        axios.post('${pageContext.request.contextPath}/usr/pay0003_0001.do',params).then(function(response) {
+        axios.post('${pageContext.request.contextPath}/usr/pay0009_0001.do',params).then(function(response) {
         	// 로딩 종료
             $('.loading-wrap--js').hide();
 
@@ -440,15 +441,15 @@
 	}
 
 
-	function clickFee(profitId){
+	function clickFee(salfitId){
 
 
 		const params = new URLSearchParams();
-		params.append('profitId', profitId);
+		params.append('salfitId', salfitId);
 
 		// 로딩 시작
         $('.loading-wrap--js').show();
-        axios.post('${pageContext.request.contextPath}/usr/pay0004_0003.do',params).then(function(response) {
+        axios.post('${pageContext.request.contextPath}/usr/pay0004_0004.do',params).then(function(response) {
         	// 로딩 종료
             $('.loading-wrap--js').hide();
 
@@ -475,57 +476,15 @@
 	            	data = response.data.riderList;	//정상데이터
 					grid3.setGridOption("rowData", data);
 	            }
-	        	if(response.data.base.gubun == 'C'){	//콜수수료
-	        		$('#근거금액').html("배달비 : "+currencyFormatter(response.data.base.cost)+' / 배달건수 : '+response.data.base.deliveryCnt);
-	        		var iFee = response.data.base.deliveryCnt*grid3.getRowNode(0).data.feeCall - Math.floor(response.data.base.deliveryCnt*grid3.getRowNode(0).data.feeCall*0.01*grid2.getRowNode(0).data.feeCooperatorCall);
-	        		$('#계산식').html("("+currencyFormatter(response.data.base.deliveryCnt)+" * "+grid3.getRowNode(0).data.feeCall+") - ("+currencyFormatter(response.data.base.deliveryCnt) +" * "+currencyFormatter(grid3.getRowNode(0).data.feeCall)+" * 0.01 * "+grid2.getRowNode(0).data.feeCooperatorCall+") = "+currencyFormatter(iFee));
-
-					//협력사 수수료 색상 바꾸기
-					const imsiColumnDefs = grid2.getColumnDefs(); // 현재 컬럼정의 가져오깅(당근 배열임)
-					for (let colDef of imsiColumnDefs) {
-						if (colDef.field == "feeCall" || colDef.field == "feeCooperatorCall") {
-							colDef.cellClass = "edited-bg";
-						} else {
-							colDef.cellClass = "";
-						}
-					}
-	                grid2.setGridOption("columnDefs", imsiColumnDefs);
-
-					//라이더 수수료 색상 바꾸기
-					const imsiColumnDefs1 = grid3.getColumnDefs(); // 현재 컬럼정의 가져오깅(당근 배열임)
-					for (let colDef of imsiColumnDefs1) {
-						if (colDef.field == "feeCall") {
-							colDef.cellClass = "edited-bg";
-						} else {
-							colDef.cellClass = "";
-						}
-					}
-	                grid3.setGridOption("columnDefs", imsiColumnDefs1);
-
-	        	} else if(response.data.base.gubun == 'D'){	//선지급수수료
+	        	if(response.data.base.gubun == 'D'){	//선지급수수료
 	        		$('#근거금액').html(currencyFormatter(response.data.base.cost));
-	        		var iFee = Math.ceil(response.data.base.cost*0.01*grid2.getRowNode(0).data.feeAdminstrator) - Math.floor(response.data.base.cost*0.01*grid2.getRowNode(0).data.feeCooperator) - Math.floor(response.data.base.cost*0.01*grid2.getRowNode(0).data.feeSalesman);
-	        		$('#계산식').html("("+currencyFormatter(response.data.base.cost)+" * 0.01 * "+grid2.getRowNode(0).data.feeAdminstrator+") - ("+currencyFormatter(response.data.base.cost)+" * 0.01 * "+grid2.getRowNode(0).data.feeCooperator+") - ("+currencyFormatter(response.data.base.cost)+" * 0.01 * "+grid2.getRowNode(0).data.feeSalesman+") = "+currencyFormatter(iFee));
+	        		var iFee = Math.floor(response.data.base.cost*0.01*grid2.getRowNode(0).data.feeSalesman);
+	        		$('#계산식').html(currencyFormatter(response.data.base.cost)+" * 0.01 * "+grid2.getRowNode(0).data.feeSalesman+" = "+currencyFormatter(iFee));
 
 					//협력사 수수료 색상 바꾸기
 					const imsiColumnDefs = grid2.getColumnDefs(); // 현재 컬럼정의 가져오깅(당근 배열임)
 					for (let colDef of imsiColumnDefs) {
-						if (colDef.field == "feeAdminstrator" || colDef.field == "feeCooperator" || colDef.field == "feeSalesman") {
-							colDef.cellClass = "edited-bg";
-						} else {
-							colDef.cellClass = "";
-						}
-					}
-	                grid2.setGridOption("columnDefs", imsiColumnDefs);
-	        	} else if(response.data.base.gubun == 'P'){	//프로그램료
-	        		$('#근거금액').html("배달비 : "+currencyFormatter(response.data.base.cost)+' / 배달건수 : '+response.data.base.deliveryCnt);
-	        		var iFee = response.data.base.deliveryCnt*+grid2.getRowNode(0).data.feeProgram;
-	        		$('#계산식').html(response.data.base.deliveryCnt+" * "+grid2.getRowNode(0).data.feeProgram+" = "+currencyFormatter(iFee));
-
-					//협력사 수수료 색상 바꾸기
-					const imsiColumnDefs = grid2.getColumnDefs(); // 현재 컬럼정의 가져오깅(당근 배열임)
-					for (let colDef of imsiColumnDefs) {
-						if (colDef.field == "feeProgram") {
+						if (colDef.field == "feeSalesman" || colDef.field == "feeSalesman") {
 							colDef.cellClass = "edited-bg";
 						} else {
 							colDef.cellClass = "";
@@ -559,7 +518,7 @@
 	</form>
 
 	<div class="keit-header-body innerwrap clearfix">
-		<p class="tit">운영사수익현황</p>
+		<p class="tit">영업사원수익현황</p>
 
 			<input name="pageUnit" type="hidden" value="1000"/>
 			<input name="pageSize" type="hidden" value="1000"/>

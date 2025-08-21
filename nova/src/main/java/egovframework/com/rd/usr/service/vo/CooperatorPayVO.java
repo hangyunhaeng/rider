@@ -20,8 +20,12 @@ public class CooperatorPayVO extends Sch implements Serializable {
 
 	//출금ID
 	private String copId;
+	//출금ID
+	private String sapId;
 
 	private String cooperatorId;
+
+	private String emplyrId;
 	//이체수수료
 	private int sendFee;
 	//출금액

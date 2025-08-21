@@ -140,6 +140,15 @@ public class PayDAO extends EgovComAbstractDAO {
 		return selectList("payDAO.selectCooperatorProfitList", vo);
 	}
 	/**
+	 * 영업사원 수익 조회
+	 * @param vo
+	 * @return
+	 * @throws Exception
+	 */
+	public List<ProfitVO> selectSalesProfitList(ProfitVO vo) throws Exception {
+		return selectList("payDAO.selectSalesProfitList", vo);
+	}
+	/**
 	 * 협력사별 출금 가능금액 리스트
 	 * @param vo
 	 * @return
@@ -147,6 +156,15 @@ public class PayDAO extends EgovComAbstractDAO {
 	 */
 	public List<MyInfoVO> cooperatorAblePrice(MyInfoVO vo) throws Exception {
 		return selectList("payDAO.cooperatorAblePrice", vo);
+	}
+	/**
+	 * 영업사원 출금 가능금액
+	 * @param vo
+	 * @return
+	 * @throws Exception
+	 */
+	public MyInfoVO salesAblePrice(MyInfoVO vo) throws Exception {
+		return selectOne("payDAO.salesAblePrice", vo);
 	}
 
 	/**
@@ -167,6 +185,15 @@ public class PayDAO extends EgovComAbstractDAO {
 	public int isnertCooperatorPay(CooperatorPayVO vo) throws Exception {
 		return insert("payDAO.isnertCooperatorPay", vo);
 	}
+	/**
+	 * 영업사원 출금 이력생성
+	 * @param vo
+	 * @return
+	 * @throws Exception
+	 */
+	public int isnertSalesPay(CooperatorPayVO vo) throws Exception {
+		return insert("payDAO.isnertSalesPay", vo);
+	}
 
 	/**
 	 * 출금 실행된 협력사 출금건 use_at n로 세팅
@@ -177,6 +204,16 @@ public class PayDAO extends EgovComAbstractDAO {
 	public int updateCooperatorPayByTransfer(DoszTransferVO vo) throws Exception {
 		return update("payDAO.updateCooperatorPayByTransfer", vo);
 	}
+
+	/**
+	 * 출금 실행된 영업사원 출금건 use_at n로 세팅
+	 * @param vo
+	 * @return
+	 * @throws Exception
+	 */
+	public int updateSalesPayByTransfer(DoszTransferVO vo) throws Exception {
+		return update("payDAO.updateSalesPayByTransfer", vo);
+	}
 	/**
 	 * 협력사 거래 성공 실패시 잔액을 기록하기 위한 select for update
 	 * @param vo
@@ -186,6 +223,16 @@ public class PayDAO extends EgovComAbstractDAO {
 	public BalanceVO selectForUPdateBalanceByTran(DoszTransferVO vo) throws Exception {
 		return selectOne("payDAO.selectForUPdateBalanceByTran", vo);
 	}
+	/**
+	 * 영업사원 거래 성공 실패시 잔액을 기록하기 위한 select for update
+	 * @param vo
+	 * @return
+	 * @throws Exception
+	 */
+	public BalanceVO selectForUPdateSalesBalanceByTran(DoszTransferVO vo) throws Exception {
+		return selectOne("payDAO.selectForUPdateSalesBalanceByTran", vo);
+	}
+
 
 	/**
 	 * 협력사 잔액 보정
@@ -204,6 +251,16 @@ public class PayDAO extends EgovComAbstractDAO {
 	 */
 	public List<CooperatorPayVO> selectCooperatorPayList(CooperatorPayVO vo) throws Exception {
 		return selectList("payDAO.selectCooperatorPayList", vo);
+	}
+
+	/**
+	 * 영업사원 출금 리스트
+	 * @param vo
+	 * @return
+	 * @throws Exception
+	 */
+	public List<CooperatorPayVO> selectSalesPayList(CooperatorPayVO vo) throws Exception  {
+		return selectList("payDAO.selectSalesPayList", vo);
 	}
 
 	/**
@@ -259,6 +316,34 @@ public class PayDAO extends EgovComAbstractDAO {
 	 */
 	public ProfitVO selectCoopProfitBase(ProfitVO vo) throws Exception {
 		return selectOne("payDAO.selectCoopProfitBase", vo);
+	}
+
+	/**
+	 * 영업사원 수익 계산근거 조회(영업사원)
+	 * @param vo
+	 * @return
+	 * @throws Exception
+	 */
+	public List<CooperatorPayVO> selectSalesProfitFeeCoop(ProfitVO vo) throws Exception {
+		return selectList("payDAO.selectSalesProfitFeeCoop", vo);
+	}
+	/**
+	 * 영업사원 수익 계산근거 조회(라이더)
+	 * @param vo
+	 * @return
+	 * @throws Exception
+	 */
+	public List<CooperatorPayVO> selectSalesProfitFeeRider(ProfitVO vo) throws Exception {
+		return selectList("payDAO.selectSalesProfitFeeRider", vo);
+	}
+	/**
+	 * 영업사원 수익 계산근거
+	 * @param vo
+	 * @return
+	 * @throws Exception
+	 */
+	public ProfitVO selectSalesProfitBase(ProfitVO vo) throws Exception {
+		return selectOne("payDAO.selectSalesProfitBase", vo);
 	}
 	/**
 	 * 카톡 발송 이력 insert

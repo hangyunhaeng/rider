@@ -431,6 +431,13 @@
 				WHERE a.REGISTRATION_SN = #{schIhidNum} AND use_at ='Y'
 			)
 			</if>
+			<if test="schAuthorCode == 'ROLE_SALES'">
+			/* 영업사원 조건 */
+			AND COOPERATOR_ID IN (
+				SELECT COOPERATOR_ID FROM RD_COOPERATOR_SALES
+				WHERE EMPLYR_ID = #{searchId} AND USE_AT ='Y'
+			)
+			</if>
 
 		<if test="schAuthorCode == 'ROLE_ADMIN'">
 		UNION
@@ -1222,6 +1229,12 @@
 		VALUES(#{coofitId}, #{profitId}, #{cooperatorId}, #{mberId}, #{gubun}, #{cost}, #{deliveryCost}, #{deliveryCnt}, #{deliveryDay}, #{dypId}, #{feeId}, #{riderFeeId}, #{weekYn}, SYSDATE(), #{creatId})
 	</insert>
 
+	<insert id="insertSalesProfit" parameterType="egovframework.com.rd.usr.service.vo.ProfitVO">
+		INSERT INTO RD_SALES_PROFIT
+		(SALFIT_ID, PROFIT_ID, EMPLYR_ID, COOPERATOR_ID, MBER_ID, GUBUN, COST, DELIVERY_CNT, DELIVERY_DAY, DYP_ID, FEE_ID, RIDER_FEE_ID, CREAT_DT, CREAT_ID)
+		VALUES(#{salfitId}, #{profitId}, #{emplyrId}, #{cooperatorId}, #{mberId}, #{gubun}, #{cost}, #{deliveryCnt}, #{deliveryDay}, #{dypId}, #{feeId}, #{riderFeeId}, SYSDATE(), #{creatId})
+	</insert>
+
 	<update id="deleteProfit" parameterType="egovframework.com.rd.usr.service.vo.DoszTransferVO">
 		UPDATE RD_PROFIT
 		SET USE_AT ='N'
@@ -1243,9 +1256,18 @@
 	<update id="deleteCooperatorProfit" parameterType="egovframework.com.rd.usr.service.vo.DoszTransferVO">
 		UPDATE RD_COOPERATOR_PROFIT
 		SET USE_AT ='N'
-		WHERE PROFIT_ID IN (
-			SELECT b.PROFIT_ID FROM RD_DAY_PAY a
+		WHERE COOFIT_ID IN (
+			SELECT b.COOFIT_ID FROM RD_DAY_PAY a
 			LEFT JOIN RD_COOPERATOR_PROFIT b ON a.DYP_ID = b.DYP_ID AND b.GUBUN = 'D' AND b.use_at ='Y'
+			WHERE TRAN_DAY = #{tranDay} AND TELEGRAM_NO = #{telegram_no}
+		)
+	</update>
+	<update id="deleteSalesProfit" parameterType="egovframework.com.rd.usr.service.vo.DoszTransferVO">
+		UPDATE RD_SALES_PROFIT
+		SET USE_AT ='N'
+		WHERE SALFIT_ID IN (
+			SELECT b.SALFIT_ID FROM RD_DAY_PAY a
+			LEFT JOIN RD_SALES_PROFIT b ON a.DYP_ID = b.DYP_ID AND b.GUBUN = 'D' AND b.use_at ='Y'
 			WHERE TRAN_DAY = #{tranDay} AND TELEGRAM_NO = #{telegram_no}
 		)
 	</update>

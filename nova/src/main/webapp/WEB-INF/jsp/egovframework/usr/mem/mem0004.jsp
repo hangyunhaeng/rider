@@ -14,20 +14,13 @@
 
 	document.addEventListener('DOMContentLoaded', function() {
 
-		if('${loginVO.authorCode}' =='ROLE_ADMIN'){
-			$('nav > ul').find('li[class!=cooperator]:hidden').show();
-		}
-		if('${loginVO.authorCode}' =='ROLE_USER'){
-			$('nav > ul').find('li[class~=cooperator]:hidden').show();
-		}
-
 		$('#strMbtlnum').html(addHyphenToPhoneNumber("${myInfoVO.mbtlnum}"));
 		$('#mbtlnum').val(addHyphenToPhoneNumber("${myInfoVO.mbtlnum}"));
 
 		if('${loginVO.authorCode}' =='ROLE_ADMIN'){
 			$('#잔액조회').show();
 		}
-		if("${myInfoVO.authorCode}" == "ROLE_USER") {
+		if("${myInfoVO.authorCode}" == "ROLE_USER" || "${myInfoVO.authorCode}" == "ROLE_SALES") {
 			$('#계좌정보수정버튼').show();
 		}
 

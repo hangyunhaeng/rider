@@ -533,6 +533,15 @@ public class DtyDAO extends EgovComAbstractDAO {
 	public int insertCooperatorProfit(ProfitVO vo) throws Exception {
 		return update("dtyDAO.insertCooperatorProfit", vo);
 	}
+	/**
+	 * 영업사원 수익 등록
+	 * @param vo
+	 * @return
+	 * @throws Exception
+	 */
+	public int insertSalesProfit(ProfitVO vo) throws Exception {
+		return insert("dtyDAO.insertSalesProfit", vo);
+	}
 
 	/**
 	 * 라이더 입금 실패서 선지급 수수료 삭제(운영사)
@@ -562,6 +571,15 @@ public class DtyDAO extends EgovComAbstractDAO {
 	 */
 	public int deleteCooperatorProfit(DoszTransferVO vo) throws Exception {
 		return update("dtyDAO.deleteCooperatorProfit", vo);
+	}
+	/**
+	 * 라이더 입금 실패서 선지급 수수료 삭제(영업사원)
+	 * @param vo
+	 * @return
+	 * @throws Exception
+	 */
+	public int deleteSalesProfit(DoszTransferVO vo) throws Exception {
+		return update("dtyDAO.deleteSalesProfit", vo);
 	}
 	/**
 	 * 확정시 입출금 잔액을 기록하기 위한 select for update

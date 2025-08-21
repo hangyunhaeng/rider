@@ -66,6 +66,9 @@ public class PayServiceImpl extends EgovAbstractServiceImpl implements PayServic
     /** ID Generation */
 	@Resource(name="egovFitIdGnrService")
 	private EgovIdGnrService egovFitIdGnrService;
+    /** ID Generation */
+	@Resource(name="egovSapIdGnrService")
+	private EgovIdGnrService egovSapIdGnrService;
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(PayServiceImpl.class);
 
@@ -111,6 +114,15 @@ public class PayServiceImpl extends EgovAbstractServiceImpl implements PayServic
 		return payDAO.selectCooperatorProfitList(vo);
 	}
 	/**
+	 * 영업사원 수익 조회
+	 * @param vo
+	 * @return
+	 * @throws Exception
+	 */
+	public List<ProfitVO> selectSalesProfitList(ProfitVO vo) throws Exception {
+		return payDAO.selectSalesProfitList(vo);
+	}
+	/**
 	 * 협력사 출금 가능
 	 * @param vo
 	 * @return
@@ -123,7 +135,29 @@ public class PayServiceImpl extends EgovAbstractServiceImpl implements PayServic
     	map.put("resultList", result);
     	return map;
 	}
+	/**
+	 * 영업사원 출금 가능
+	 * @param vo
+	 * @return
+	 * @throws Exception
+	 */
+	public Map<String, Object> salesAblePrice(MyInfoVO vo) throws Exception {
 
+		MyInfoVO result = payDAO.salesAblePrice(vo);
+    	Map<String, Object> map = new HashMap<String, Object>();
+    	map.put("result", result);
+    	return map;
+	}
+
+	/**
+	 * 영업사원 출금 가능
+	 * @param vo
+	 * @return
+	 * @throws Exception
+	 */
+	public MyInfoVO salesAblePriceOne(MyInfoVO vo) throws Exception {
+		return payDAO.salesAblePrice(vo);
+	}
 
 	/**
 	 * 협력사 출금 실행
@@ -218,6 +252,70 @@ public class PayServiceImpl extends EgovAbstractServiceImpl implements PayServic
 
 		return doszTransferVO;
 	}
+
+	/**
+	 * 영업사원 출금 실행
+	 * @param vo
+	 * @return
+	 * @throws Exception
+	 */
+	public DoszTransferVO salesPay(CooperatorPayVO vo) throws Exception {
+		LoginVO user = (LoginVO)EgovUserDetailsHelper.getAuthenticatedUser();
+
+        //0. 사용자용 select for update 로 rock
+		BalanceVO forUpdateVo = new BalanceVO();
+		forUpdateVo.setCooperatorId(user.getId());
+		forUpdateVo.setMberId(EgovProperties.getProperty("Globals.cooperatorId"));
+		dtyDAO.selectForUPdateBalanceByMberId(forUpdateVo);
+
+		int sendFee = Integer.parseInt(EgovProperties.getProperty("Globals.sendFee"));
+
+		int inputPrice = vo.getInputPrice();		//사용자가 입력한 출금 요청 금액
+		String tranDay = Util.getDay();
+		String telegramNo = dtyDAO.selectTelegranNo();
+
+		//1.출금 가능금액 내의 금액인지 확인
+		MyInfoVO myInfoVO = new MyInfoVO();
+		myInfoVO.setMberId(user.getId());
+		myInfoVO.setEmplyrId(user.getId());
+		myInfoVO.setSchAuthorCode(user.getAuthorCode());
+		myInfoVO.setSchUserSe(user.getUserSe());
+		MyInfoVO ablePrice = payDAO.salesAblePrice(myInfoVO);
+
+		if(inputPrice+sendFee > ablePrice.getSalesAblePrice() ) {
+			throw new IllegalArgumentException("출금 가능 금액 초과") ;
+		}
+
+		vo.setSapId(egovSapIdGnrService.getNextStringId());
+		vo.setEmplyrId(user.getId());
+		vo.setSendFee(sendFee);			//이체수수료
+		vo.setSendPrice(inputPrice);
+		vo.setTranDay(tranDay);
+		vo.setTelegramNo(telegramNo);
+		vo.setUseAt("Y");
+		vo.setCreatId(user.getId());
+		payDAO.isnertSalesPay(vo);
+
+
+
+		//영업사원 잔액 조정
+//		setBalance(vo.getCooperatorId(), EgovProperties.getProperty("Globals.cooperatorId"), user.getId(), new BigDecimal(0), new BigDecimal((inputPrice+sendFee)*-1));
+
+		MyInfoVO bankInfo = rotService.selectMyInfo(myInfoVO);
+		DoszTransferVO doszTransferVO = new DoszTransferVO();
+		doszTransferVO.setTranDay(tranDay);
+		doszTransferVO.setTelegram_no(telegramNo);
+		doszTransferVO.setDrw_account_cntn(bankInfo.getAccountNm());		//출금계좌적요
+		doszTransferVO.setRv_bank_code(bankInfo.getBnkCd());				//입금은행 코드
+		doszTransferVO.setRv_account(bankInfo.getAccountNum());				//입금은행 계좌
+		doszTransferVO.setRv_account_cntn("주식회사 다온플랜");					//입금은행 적요
+		doszTransferVO.setAmount(Integer.toString(vo.getSendPrice()));
+		doszTransferVO.setRes_all_yn("y");
+		doszTransferVO.setCreatId(user.getId());
+		dtyDAO.insertTransfer(doszTransferVO);
+
+		return doszTransferVO;
+	}
 	/**
 	 * 출금 실행된 협력사 출금건 use_at n로 세팅
 	 * @param vo
@@ -235,6 +333,23 @@ public class PayServiceImpl extends EgovAbstractServiceImpl implements PayServic
 
 		payDAO.updateCooperatorPayByTransfer(vo);
 		dtyDAO.deleteProfitByCoop(vo);
+	}
+	/**
+	 * 출금 실행된 영업사원 출금건 use_at n로 세팅
+	 * @param vo
+	 * @return
+	 * @throws Exception
+	 */
+	public void updateSalesPayByTransfer(DoszTransferVO vo) throws Exception {
+
+		//0. 사용자 select for update 로 rock
+		vo.setCooperatorMberId(EgovProperties.getProperty("Globals.cooperatorId"));
+		payDAO.selectForUPdateSalesBalanceByTran(vo);
+
+		// 잔액 조정
+//		payDAO.updateBalanceCooperatorPayByTransfer(vo);
+
+		payDAO.updateSalesPayByTransfer(vo);
 	}
 
 	/**
@@ -257,7 +372,15 @@ public class PayServiceImpl extends EgovAbstractServiceImpl implements PayServic
 		return payDAO.selectCooperatorPayList(vo);
 	}
 
-
+	/**
+	 * 영업사원 출금 리스트
+	 * @param vo
+	 * @return
+	 * @throws Exception
+	 */
+	public List<CooperatorPayVO> selectSalesPayList(CooperatorPayVO vo) throws Exception  {
+		return payDAO.selectSalesPayList(vo);
+	}
 	/**
 	 * 운영사 수익 계산근거 조회(협력사)
 	 * @param vo
@@ -314,6 +437,33 @@ public class PayServiceImpl extends EgovAbstractServiceImpl implements PayServic
 		return payDAO.selectCoopProfitBase(vo);
 	}
 
+	/**
+	 * 영업사원 수익 계산근거 조회(영업사원)
+	 * @param vo
+	 * @return
+	 * @throws Exception
+	 */
+	public List<CooperatorPayVO> selectSalesProfitFeeCoop(ProfitVO vo) throws Exception {
+		return payDAO.selectSalesProfitFeeCoop(vo);
+	}
+	/**
+	 * 영업사원 수익 계산근거 조회(라이더)
+	 * @param vo
+	 * @return
+	 * @throws Exception
+	 */
+	public List<CooperatorPayVO> selectSalesProfitFeeRider(ProfitVO vo) throws Exception {
+		return payDAO.selectSalesProfitFeeRider(vo);
+	}
+	/**
+	 * 영업사원 수익 계산근거
+	 * @param vo
+	 * @return
+	 * @throws Exception
+	 */
+	public ProfitVO selectSalesProfitBase(ProfitVO vo) throws Exception {
+		return payDAO.selectSalesProfitBase(vo);
+	}
 
 	private void setBalance(String CoopId, String mberId, String mdfId, BigDecimal balance0, BigDecimal balance1) throws Exception {
 		//라이더 잔액 조정

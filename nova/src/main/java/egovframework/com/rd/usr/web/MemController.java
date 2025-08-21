@@ -1,6 +1,5 @@
 package egovframework.com.rd.usr.web;
 
-import java.security.SecureRandom;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -959,7 +958,6 @@ public class MemController {
 
         if("200".equals(doszSchAccoutVO.getStatus())) {
         	myInfoVO.setAccountNm(doszSchAccoutVO.getDepositor());
-        	myInfoVO.setEsntlId(user.getIhidNum());
         	rotService.saveBankByEsntlId(myInfoVO);
         	map.put("resultCode", "success");
         } else if("999".equals(doszSchAccoutVO.getStatus())) {
@@ -1057,4 +1055,174 @@ public class MemController {
         map.put("resultCode", "success");
         return ResponseEntity.ok(map);
 	}
+
+	/**
+	 * 영업사원 계정관리
+	 * @param request
+	 * @param model
+	 * @return
+	 * @throws Exception
+	 */
+    @RequestMapping("/usr/mem0005.do")
+    public String mem0005(@ModelAttribute("MyInfoVO") MyInfoVO myInfoVO, HttpServletRequest request,ModelMap model) throws Exception {
+
+    	//로그인 체크
+        LoginVO user = (LoginVO)EgovUserDetailsHelper.getAuthenticatedUser();
+        Boolean isAuthenticated = EgovUserDetailsHelper.isAuthenticated();
+
+        if(!isAuthenticated) {
+        	return "egovframework/com/cmm/error/accessDenied";
+        }
+
+        if(!Util.isUsr()) {
+        	return "egovframework/com/cmm/error/accessDenied";
+        }
+
+        return "egovframework/usr/mem/mem0005";
+	}
+
+    /**
+     * 영업사원 아이디 조회
+     * @param request
+     * @param model
+     * @return
+     * @throws Exception
+     */
+    @RequestMapping("/usr/mem0005_0001.do")
+    public ResponseEntity<?> mem0005_0001(@ModelAttribute("cooperatorVO")CooperatorVO cooperatorVO, HttpServletRequest request,ModelMap model) throws Exception {
+
+    	//로그인 체크
+        LoginVO user = (LoginVO)EgovUserDetailsHelper.getAuthenticatedUser();
+        Boolean isAuthenticated = EgovUserDetailsHelper.isAuthenticated();
+
+        if(!isAuthenticated) {
+        	return ResponseEntity.status(401).body("Unauthorized");
+        }
+
+        if(!Util.isUsr()) {
+        	return ResponseEntity.status(401).body("Unauthorized");
+        }
+        //return value
+        Map<String, Object> map =  new HashMap<String, Object>();
+
+        //총판 or 협력사
+        cooperatorVO.setSchAuthorCode(user.getAuthorCode());
+        cooperatorVO.setSchIhidNum(user.getIhidNum());
+
+        map.put("list", memService.selectSalesUsrList(cooperatorVO));
+        map.put("resultCode", "success");
+        return ResponseEntity.ok(map);
+    }
+
+    /**
+     * 영업사원 아이디 저장
+     * @param request
+     * @param model
+     * @return
+     * @throws Exception
+     */
+    @RequestMapping("/usr/mem0005_0002.do")
+    public ResponseEntity<?> mem0005_0002(@ModelAttribute("cooperatorVO")CooperatorVO cooperatorVO, HttpServletRequest request,ModelMap model, @RequestBody List<CooperatorVO> list) throws Exception {
+
+    	//로그인 체크
+        LoginVO user = (LoginVO)EgovUserDetailsHelper.getAuthenticatedUser();
+        Boolean isAuthenticated = EgovUserDetailsHelper.isAuthenticated();
+
+        if(!isAuthenticated) {
+        	return ResponseEntity.status(401).body("Unauthorized");
+        }
+
+        if(!Util.isUsr()) {
+        	return ResponseEntity.status(401).body("Unauthorized");
+        }
+        //return value
+        Map<String, Object> map =  new HashMap<String, Object>();
+        try {
+	        CooperatorVO searchVo = memService.saveSalesUsr(list, user);
+	        //총판 or 협력사
+	        searchVo.setSchAuthorCode(user.getAuthorCode());
+	        searchVo.setSchIhidNum(user.getIhidNum());
+
+	        map.put("list", memService.selectSalesUsrList(searchVo));
+	        map.put("resultCode", "success");
+	    } catch(IllegalArgumentException e) {
+	    	map.put("resultCode", "fail");
+	    	map.put("resultMsg", e.getMessage());
+	    	return ResponseEntity.ok(map);
+	    }
+
+        return ResponseEntity.ok(map);
+    }
+
+
+    /**
+     * 영업사원의 협력사 조회
+     * @param request
+     * @param model
+     * @return
+     * @throws Exception
+     */
+    @RequestMapping("/usr/mem0005_0003.do")
+    public ResponseEntity<?> mem0005_0003(@ModelAttribute("cooperatorVO")CooperatorVO cooperatorVO, HttpServletRequest request,ModelMap model) throws Exception {
+
+    	//로그인 체크
+        LoginVO user = (LoginVO)EgovUserDetailsHelper.getAuthenticatedUser();
+        Boolean isAuthenticated = EgovUserDetailsHelper.isAuthenticated();
+
+        if(!isAuthenticated) {
+        	return ResponseEntity.status(401).body("Unauthorized");
+        }
+
+        if(!Util.isUsr()) {
+        	return ResponseEntity.status(401).body("Unauthorized");
+        }
+        //return value
+        Map<String, Object> map =  new HashMap<String, Object>();
+
+        map.put("list", memService.selectCooperatorListBySalesMan(cooperatorVO));
+        map.put("resultCode", "success");
+        return ResponseEntity.ok(map);
+    }
+
+
+    /**
+     * 영업사원 협력사 연결 저장
+     * @param request
+     * @param model
+     * @return
+     * @throws Exception
+     */
+    @RequestMapping("/usr/mem0005_0004.do")
+    public ResponseEntity<?> mem0005_0004(@ModelAttribute("cooperatorVO")CooperatorVO cooperatorVO, HttpServletRequest request,ModelMap model, @RequestBody List<CooperatorVO> list) throws Exception {
+
+    	//로그인 체크
+        LoginVO user = (LoginVO)EgovUserDetailsHelper.getAuthenticatedUser();
+        Boolean isAuthenticated = EgovUserDetailsHelper.isAuthenticated();
+
+        if(!isAuthenticated) {
+        	return ResponseEntity.status(401).body("Unauthorized");
+        }
+
+        if(!Util.isUsr()) {
+        	return ResponseEntity.status(401).body("Unauthorized");
+        }
+        //return value
+        Map<String, Object> map =  new HashMap<String, Object>();
+        try {
+	        CooperatorVO searchVo = memService.saveCooperatorSalesUsr(list);
+	        //총판 or 협력사
+	        searchVo.setSchAuthorCode(user.getAuthorCode());
+	        searchVo.setSchIhidNum(user.getIhidNum());
+	        searchVo.setSchId(searchVo.getSchId());
+
+	        map.put("list", memService.selectCooperatorListBySalesMan(searchVo));
+	        map.put("resultCode", "success");
+	    } catch(IllegalArgumentException e) {
+	    	map.put("resultCode", "fail");
+	    	map.put("resultMsg", e.getMessage());
+	    	return ResponseEntity.ok(map);
+	    }
+
+        return ResponseEntity.ok(map);
+    }
 }

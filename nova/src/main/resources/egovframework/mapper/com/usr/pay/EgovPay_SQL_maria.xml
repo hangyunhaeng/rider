@@ -191,6 +191,22 @@
 							AND error_code IN ('VTIM', '0011')
 					)
 					GROUP BY COOPERATOR_ID
+
+					UNION
+
+					/*영업사원 출금*/
+					SELECT EMPLYR_ID AS COOPERATOR_ID, #{cooperatorMberId} AS MBER_ID FROM RD_SALES_PAY
+					WHERE (TELEGRAM_NO, TRAN_DAY) IN (
+
+							SELECT TELEGRAM_NO, TRAN_DAY FROM RD_TRANSFER
+							WHERE STATUS = '999'
+
+							UNION ALL
+
+							SELECT TELEGRAM_NO, TRAN_DAY FROM RD_TRANSFER
+							WHERE STATUS = '400'
+							AND error_code IN ('VTIM', '0011')
+					)
 				)
 		FOR UPDATE
 	</select>
@@ -260,7 +276,6 @@
 		WHERE 1=1
 		AND DS_DT BETWEEN #{searchFromDate} and  #{searchToDate}
 		ORDER BY DS_DT DESC
-		;
 	</select>
 	<select id="selectProfitList" parameterType="egovframework.com.rd.usr.service.vo.ProfitVO" resultType="egovframework.com.rd.usr.service.vo.ProfitVO">
 
@@ -320,8 +335,53 @@
 				WHERE REGISTRATION_SN = #{searchRegistrationSn}
 			)
 			</if>
+			<if test="schAuthorCode == 'ROLE_USER'">
+			/* 협력사 조건 */
+			AND a.COOPERATOR_ID IN (
+				SELECT COOPERATOR_ID FROM RD_COOPERATOR a
+				WHERE a.REGISTRATION_SN = #{schIhidNum} AND use_at ='Y'
+			)
+			</if>
 			ORDER BY a.DELIVERY_DAY DESC
 	</select>
+
+	<select id="selectSalesProfitList" parameterType="egovframework.com.rd.usr.service.vo.ProfitVO" resultType="egovframework.com.rd.usr.service.vo.ProfitVO">
+
+		SELECT a.SALFIT_ID, a.PROFIT_ID, a.COOPERATOR_ID, a.MBER_ID, a.GUBUN, a.COST, a.DELIVERY_CNT, a.DELIVERY_DAY, a.DYP_ID, a.WKP_ID, a.FEE_ID, a.RIDER_FEE_ID
+		, DATE_FORMAT(a.CREAT_DT, '%Y%m%d') AS CREAT_DT, a.CREAT_ID
+		, b.MBER_NM, c.COOPERATOR_NM
+		, case when a.gubun = 'C' then '콜수수료' when a.gubun ='E' then '기타수수료' when a.gubun ='D' then '선지급수수료' when a.gubun ='P' then '프로그램료' ELSE '' END GUBUN_NM
+		FROM RD_SALES_PROFIT a
+		LEFT JOIN COMTNGNRLMBER b ON a.mber_id = b.mber_id
+		LEFT JOIN RD_COOPERATOR c ON a.cooperator_id = c.COOPERATOR_ID
+		where 1=1
+			AND a.USE_AT ='Y'
+
+			<if test="searchGubun != 'all'">
+			AND a.gubun = #{searchGubun}
+			</if>
+			<if test='searchCooperatorId != null and searchCooperatorId != "all"'>
+			AND a.cooperator_id = #{searchCooperatorId}
+			</if>
+			<if test="searchNm != null and searchNm != ''">
+			AND b.mber_nm like '%' #{searchNm} '%'
+			</if>
+			AND a.DELIVERY_DAY BETWEEN #{searchFromDate} AND #{searchToDate}
+			<if test="searchRegistrationSn != null and searchRegistrationSn != ''">
+			AND a.COOPERATOR_ID IN (
+				SELECT COOPERATOR_ID from RD_COOPERATOR
+				WHERE REGISTRATION_SN = #{searchRegistrationSn}
+			)
+			</if>
+			<if test="schAuthorCode == 'ROLE_SALES'">
+			/* 영업사원 조건 */
+			AND a.COOPERATOR_ID IN (
+				SELECT COOPERATOR_ID FROM RD_COOPERATOR_SALES
+				WHERE EMPLYR_ID = #{searchId} AND USE_AT ='Y'
+			)
+			</if>
+	</select>
+
 	<select id="cooperatorAblePrice" parameterType="egovframework.com.rd.usr.service.vo.MyInfoVO" resultType="egovframework.com.rd.usr.service.vo.MyInfoVO">
 		SELECT tab.cooperator_id, tab.cooperator_nm
 		/*, SUM(day_plus) - SUM(day_minus) - CEILING(SUM(day_plus)*nvl(a.FEE_ADMINSTRATOR*0.01, 0)) AS DAY_ABLE_PRICE
@@ -336,7 +396,7 @@
 			, 0 day_minus
 			, 0 week_minus
 			FROM  RD_COOPERATOR aa
-			left join RD_COOPERATOR_PROFIT a ON aa.cooperator_id = a.cooperator_id
+			left join RD_COOPERATOR_PROFIT a ON aa.cooperator_id = a.cooperator_id AND a.USE_AT ='Y'
 			LEFT JOIN RD_DAY_PAY b  ON a.DYP_ID = b.DYP_ID AND b.USE_AT ='Y'
 			LEFT JOIN RD_TRANSFER c ON b.TRAN_DAY = c.TRAN_DAY AND b.TELEGRAM_NO = c.TELEGRAM_NO
 			WHERE 1=1
@@ -378,10 +438,47 @@
 		GROUP by cooperator_id
 
 	</select>
+	<select id="salesAblePrice" parameterType="egovframework.com.rd.usr.service.vo.MyInfoVO" resultType="egovframework.com.rd.usr.service.vo.MyInfoVO">
+
+		SELECT SUM(day_plus) - SUM(day_minus) AS SALES_ABLE_PRICE
+		FROM (
+			SELECT NVL(sum(if(a.gubun = 'C' OR a.gubun = 'E' OR a.gubun = 'B' OR a.gubun = 'O' OR (a.gubun = 'D' AND c.status_cd = '0000' AND c.STATUS = '200'), cost, 0)), 0) DAY_PLUS	/*선지급금은 이체완료건만 산정*/
+			, 0 DAY_MINUS
+			FROM RD_SALES_PROFIT a
+			LEFT JOIN RD_DAY_PAY b  ON a.DYP_ID = b.DYP_ID AND b.USE_AT ='Y'
+			LEFT JOIN RD_TRANSFER c ON b.TRAN_DAY = c.TRAN_DAY AND b.TELEGRAM_NO = c.TELEGRAM_NO
+			JOIN COMTNEMPLYRINFO d ON a.EMPLYR_ID = d.EMPLYR_ID
+			JOIN COMTNEMPLYRSCRTYESTBS e ON d.ESNTL_ID = e.SCRTY_DTRMN_TRGET_ID
+			WHERE 1=1
+				AND a.USE_AT = 'Y'
+				AND a.EMPLYR_ID = #{emplyrId}
+				AND e.AUTHOR_CODE = 'ROLE_SALES'
+
+
+			UNION all
+
+			SELECT 0 DAY_PLUS
+			, NVL(SUM( a.send_fee+a.send_price), 0) DAY_MINUS
+			FROM RD_SALES_PAY a
+			JOIN COMTNEMPLYRINFO d ON a.EMPLYR_ID = d.EMPLYR_ID
+			JOIN COMTNEMPLYRSCRTYESTBS e ON d.ESNTL_ID = e.SCRTY_DTRMN_TRGET_ID
+			WHERE 1=1
+				AND a.USE_AT = 'Y'
+				AND a.EMPLYR_ID = #{emplyrId}
+				AND e.AUTHOR_CODE = 'ROLE_SALES'
+		) tab
+	</select>
+
 	<insert id="isnertCooperatorPay" parameterType="egovframework.com.rd.usr.service.vo.CooperatorPayVO">
 		INSERT INTO RD_COOPERATOR_PAY
 		(COP_ID, COOPERATOR_ID, DAY_FEE, SEND_FEE, SEND_PRICE, TRAN_DAY, TELEGRAM_NO, USE_AT, CREAT_DT, CREAT_ID)
 		VALUES(#{copId}, #{cooperatorId}, #{dayFee}, #{sendFee}, #{sendPrice}, #{tranDay}, #{telegramNo}, #{useAt}, SYSDATE(), #{creatId})
+	</insert>
+
+	<insert id="isnertSalesPay" parameterType="egovframework.com.rd.usr.service.vo.CooperatorPayVO">
+		INSERT INTO RD_SALES_PAY
+		(SAP_ID, EMPLYR_ID, SEND_FEE, SEND_PRICE, TRAN_DAY, TELEGRAM_NO, USE_AT, CREAT_DT, CREAT_ID)
+		VALUES(#{sapId}, #{emplyrId}, #{sendFee}, #{sendPrice}, #{tranDay}, #{telegramNo}, #{useAt}, SYSDATE(), #{creatId})
 	</insert>
 
 	<update id="updateCooperatorPayByTransfer" parameterType="egovframework.com.rd.usr.service.vo.DoszTransferVO">
@@ -389,10 +486,24 @@
 		set USE_AT = 'N'
 		WHERE TRAN_DAY = #{tranDay} AND  TELEGRAM_NO = #{telegram_no} AND USE_AT ='Y'
 	</update>
+
+	<update id="updateSalesPayByTransfer" parameterType="egovframework.com.rd.usr.service.vo.DoszTransferVO">
+		UPDATE RD_SALES_PAY
+		set USE_AT = 'N'
+		WHERE TRAN_DAY = #{tranDay} AND  TELEGRAM_NO = #{telegram_no} AND USE_AT ='Y'
+	</update>
 	<select id="selectForUPdateBalanceByTran" parameterType="egovframework.com.rd.usr.service.vo.DoszTransferVO" resultType="egovframework.com.rd.usr.service.vo.BalanceVO">
 		SELECT * FROM RD_BALNCE
 		WHERE (COOPERATOR_ID, MBER_ID) IN (
 		SELECT COOPERATOR_ID, #{cooperatorMberId} AS MBER_ID FROM RD_COOPERATOR_PAY
+				WHERE TRAN_DAY = #{tranDay} AND  TELEGRAM_NO = #{telegram_no} AND USE_AT ='Y'
+				)
+		FOR UPDATE
+	</select>
+	<select id="selectForUPdateSalesBalanceByTran" parameterType="egovframework.com.rd.usr.service.vo.DoszTransferVO" resultType="egovframework.com.rd.usr.service.vo.BalanceVO">
+		SELECT * FROM RD_BALNCE
+		WHERE (COOPERATOR_ID, MBER_ID) IN (
+		SELECT EMPLYR_ID, #{cooperatorMberId} AS MBER_ID FROM RD_SALES_PAY
 				WHERE TRAN_DAY = #{tranDay} AND  TELEGRAM_NO = #{telegram_no} AND USE_AT ='Y'
 				)
 		FOR UPDATE
@@ -449,10 +560,34 @@
 		ORDER BY a.CREAT_DT desc
 	</select>
 
+	<select id="selectSalesPayList" parameterType="egovframework.com.rd.usr.service.vo.CooperatorPayVO" resultType="egovframework.com.rd.usr.service.vo.CooperatorPayVO">
+		SELECT a.SAP_ID
+		, a.send_fee, a.send_price
+		, case when b.STATUS='200' then '이체' when b.STATUS= '999' then '처리중' when b.STATUS= '400' AND b.error_code='VTIM' then '처리중' when b.STATUS= '400' AND b.error_code='0011' then '처리중' ELSE '실패' end  AS STATUS_NM
+		, b.TRAN_DAY , b.RV_ACCOUNT, b.STATUS, b.STATUS_cd, b.error_code
+		, e.CD_NM AS RV_BANK_NM
+		, b.SEND_DT, b.SEND_TM, b.CREAT_DT, b.error_message
+		FROM RD_SALES_PAY a
+		LEFT JOIN RD_TRANSFER b ON a.TRAN_DAY = b.TRAN_DAY AND a.TELEGRAM_NO = b.TELEGRAM_NO
+		LEFT JOIN RD_CD e ON b.RV_BANK_CODE = e.CD AND e.CD_GROUP ='BANK_CD'
+		WHERE 1=1
+
+				<if test='searchFromDate != null and searchFromDate != "all" and searchFromDate != null and searchFromDate != "all"'>
+				AND DATE_FORMAT(a.CREAT_DT,'%Y%m%d') BETWEEN #{searchFromDate} AND #{searchToDate}
+				</if>
+			<if test="schAuthorCode == 'ROLE_USER'">
+			AND 1=0
+			</if>
+			<if test="schAuthorCode == 'ROLE_SALES'">
+			AND a.EMPLYR_ID = #{emplyrId}
+			</if>
+		ORDER BY a.CREAT_DT desc
+	</select>
+
 
 	<select id="selectProfitFeeCoop" parameterType="egovframework.com.rd.usr.service.vo.ProfitVO"  resultType="egovframework.com.rd.usr.service.vo.CooperatorVO">
 		SELECT a.COOPERATOR_ID, COOPERATOR_NM, REGISTRATION_SN, COMPANY_NM, REGISTRATION_NM, CEO_NM, a.USE_AT, DATE_FORMAT(b.CREAT_DT, '%Y%m%d') AS CREAT_DT, a.CREAT_ID, 'R' GUBUN
-		, cp.FEE_ID, FEE_ADMINSTRATOR, FEE_COOPERATOR, FEE_EMPLOYMENT_INSURANCE, FEE_INDUSTRIAL_INSURANCE, FEE_WITHHOLDING_TAX, FEE_TIME_INSURANCE, FEE_CALL, FEE_COOPERATOR_CALL, FEE_PROGRAM
+		, cp.FEE_ID, FEE_ADMINSTRATOR, FEE_SALESMAN, FEE_COOPERATOR, FEE_EMPLOYMENT_INSURANCE, FEE_INDUSTRIAL_INSURANCE, FEE_WITHHOLDING_TAX, FEE_TIME_INSURANCE, FEE_CALL, FEE_COOPERATOR_CALL, FEE_PROGRAM
 		FROM RD_PROFIT cp
 		left join RD_COOPERATOR a ON cp.COOPERATOR_ID = a.COOPERATOR_ID
 		LEFT JOIN RD_COOPERATOR_FEE b ON cp.fee_id = b.fee_id
@@ -490,7 +625,7 @@
 
 	<select id="selectCoopProfitFeeCoop" parameterType="egovframework.com.rd.usr.service.vo.ProfitVO"  resultType="egovframework.com.rd.usr.service.vo.CooperatorVO">
 		SELECT a.COOPERATOR_ID, COOPERATOR_NM, REGISTRATION_SN, COMPANY_NM, REGISTRATION_NM, CEO_NM, a.USE_AT, DATE_FORMAT(b.CREAT_DT, '%Y%m%d') AS CREAT_DT, a.CREAT_ID, 'R' GUBUN
-		, cp.FEE_ID, FEE_ADMINSTRATOR, FEE_COOPERATOR, FEE_EMPLOYMENT_INSURANCE, FEE_INDUSTRIAL_INSURANCE, FEE_WITHHOLDING_TAX, FEE_TIME_INSURANCE, FEE_CALL, FEE_COOPERATOR_CALL, FEE_PROGRAM
+		, cp.FEE_ID, FEE_ADMINSTRATOR, FEE_SALESMAN, FEE_COOPERATOR, FEE_EMPLOYMENT_INSURANCE, FEE_INDUSTRIAL_INSURANCE, FEE_WITHHOLDING_TAX, FEE_TIME_INSURANCE, FEE_CALL, FEE_COOPERATOR_CALL, FEE_PROGRAM
 		FROM RD_COOPERATOR_PROFIT cp
 		left join RD_COOPERATOR a ON cp.COOPERATOR_ID = a.COOPERATOR_ID
 		LEFT JOIN RD_COOPERATOR_FEE b ON cp.fee_id = b.fee_id
@@ -523,6 +658,44 @@
 		LEFT JOIN RD_DAY_PAY b ON a.DYP_ID = b.DYP_ID
 		WHERE 1 = 1
 			AND a.coofit_id = #{coofitId}
+	</select>
+
+
+	<select id="selectSalesProfitFeeCoop" parameterType="egovframework.com.rd.usr.service.vo.ProfitVO"  resultType="egovframework.com.rd.usr.service.vo.CooperatorVO">
+		SELECT a.COOPERATOR_ID, COOPERATOR_NM, REGISTRATION_SN, COMPANY_NM, REGISTRATION_NM, CEO_NM, a.USE_AT, DATE_FORMAT(b.CREAT_DT, '%Y%m%d') AS CREAT_DT, a.CREAT_ID, 'R' GUBUN
+		, cp.FEE_ID, FEE_ADMINSTRATOR, FEE_SALESMAN, FEE_COOPERATOR, FEE_EMPLOYMENT_INSURANCE, FEE_INDUSTRIAL_INSURANCE, FEE_WITHHOLDING_TAX, FEE_TIME_INSURANCE, FEE_CALL, FEE_COOPERATOR_CALL, FEE_PROGRAM
+		FROM RD_SALES_PROFIT cp
+		left join RD_COOPERATOR a ON cp.COOPERATOR_ID = a.COOPERATOR_ID
+		LEFT JOIN RD_COOPERATOR_FEE b ON cp.fee_id = b.fee_id
+		WHERE 1 = 1
+			AND cp.salfit_id = #{salfitId}
+	</select>
+
+	<select id="selectSalesProfitFeeRider" parameterType="egovframework.com.rd.usr.service.vo.ProfitVO" resultType="egovframework.com.rd.usr.service.vo.CooperatorVO">
+
+		SELECT usr.mber_id, usr.mber_nm, usr.MBTLNUM
+		, NVL(fee.FEE_EMPLOYMENT_INSURANCE, b.FEE_EMPLOYMENT_INSURANCE) AS FEE_EMPLOYMENT_INSURANCE
+		, NVL(fee.FEE_INDUSTRIAL_INSURANCE, b.FEE_INDUSTRIAL_INSURANCE) AS FEE_INDUSTRIAL_INSURANCE
+		, NVL(fee.FEE_WITHHOLDING_TAX, b.FEE_WITHHOLDING_TAX) AS FEE_WITHHOLDING_TAX
+		, NVL(fee.FEE_TIME_INSURANCE, b.FEE_TIME_INSURANCE) AS FEE_TIME_INSURANCE
+		, NVL(fee.FEE_CALL, b.FEE_CALL) AS FEE_CALL
+
+		FROM RD_SALES_PROFIT cp
+		LEFT JOIN COMTNGNRLMBER usr ON cp.mber_id = usr.mber_id
+		LEFT JOIN RD_RIDER_FEE fee ON cp.COOPERATOR_ID = fee.COOPERATOR_ID AND cp.MBER_ID = fee.MBER_ID AND cp.RIDER_FEE_ID = fee.RIDER_FEE_ID
+		LEFT JOIN RD_COOPERATOR_FEE b ON cp.COOPERATOR_ID = b.COOPERATOR_ID AND cp.FEE_ID = b.FEE_ID
+		WHERE 1 = 1
+			AND cp.salfit_id = #{salfitId}
+	</select>
+	<select id="selectSalesProfitBase" parameterType="egovframework.com.rd.usr.service.vo.ProfitVO" resultType="egovframework.com.rd.usr.service.vo.ProfitVO">
+		SELECT a.GUBUN
+		, case when a.gubun ='E' then '기타수수료' when a.gubun ='D' then '선지급수수료' ELSE '' END GUBUN_NM
+		, case when a.GUBUN = 'D' then b.SEND_PRICE ELSE 0 END cost
+		, a.DELIVERY_CNT, a.DELIVERY_DAY
+		FROM RD_SALES_PROFIT a
+		LEFT JOIN RD_DAY_PAY b ON a.DYP_ID = b.DYP_ID
+		WHERE 1 = 1
+			AND a.salfit_id =  #{salfitId}
 	</select>
 	<insert id="insertKko" parameterType="egovframework.com.rd.usr.service.vo.KkoVO">
 		INSERT INTO RD_KKO
@@ -670,7 +843,7 @@
 		from(
 			SELECT b.ACCOUNTS_ST_DT, b.ACCOUNTS_ED_DT, c.SUM_COST, SUM(NVL(d.DAY_FEE, 0)+NVL(d.SEND_FEE,0)+NVL(d.SEND_PRICE,0)) SEND_PRICE, a.ABLE_PRICE, a.CREAT_DT
 			FROM RD_WEEK_PAY a
-			LEFT JOIN RD_DAY_PAY d ON a.WEEK_ID = d.WEEK_ID AND d.IO_GUBUN = '2'
+			LEFT JOIN RD_DAY_PAY d ON a.WEEK_ID = d.WEEK_ID AND d.IO_GUBUN = '2' AND a.MBER_ID = d.MBER_ID
 			, RD_WEEK_INFO b, RD_WEEK_RIDER_INFO c
 			WHERE a.COOPERATOR_ID = #{cooperatorId} AND a.mber_id = #{mberId} AND a.IO_GUBUN ='1'
 			AND a.WEEK_ID IS NOT NULL

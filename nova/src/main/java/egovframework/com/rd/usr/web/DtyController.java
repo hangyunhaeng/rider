@@ -117,6 +117,7 @@ public class DtyController {
         WeekInfoVO vo = new WeekInfoVO();
         vo.setSchAuthorCode(user.getAuthorCode());
         vo.setSchIhidNum(user.getIhidNum());
+        vo.setSearchId(user.getId());
 
         map.put("list", dtyService.selectCooperatorList(vo));
         map.put("resultCode", "success");

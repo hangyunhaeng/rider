@@ -21,13 +21,14 @@
 		{ headerName: "NO", field: "no", minWidth: 70, valueGetter:(params) => { return params.node.rowIndex + 1} },
 		{ headerName: "crud", field: "crud", minWidth: 90, hide:true},
 		{ headerName: "ID", field: "mberId", minWidth: 90, editable: (params) => {return (params.node.data.crud == 'c')? true: false}, cellClass: (params) => {return agGrideditClass(params)}},
-		{ headerName: "식별번호", field: "ihidnum", minWidth: 110, editable: (params) => {return ('${loginVO.authorCode}' == 'ROLE_ADMIN')? true: false}, cellClass: (params) => {return agGrideditClass(params)}
-            , valueParser: (params) => {
-                return gridRegistrationSn(params);
-            }
-        },
 		{ headerName: "이름", field: "userNm", minWidth: 90, editable: true, cellClass: (params) => {return agGrideditClass(params)}},
-		{ headerName: "핸드폰번호", field: "mbtlnum", minWidth: 90, editable: true, cellClass: (params) => {return agGrideditClass(params)}},
+		{ headerName: "핸드폰번호", field: "mbtlnum", minWidth: 90, editable: true
+			, cellClass: (params) => {return agGrideditClass(params)}
+	        , valueParser: (params) => {
+	            return gridValidPhoneNumber(params);
+	        }
+			,valueGetter:(params) => { return addHyphenToPhoneNumber(params.data.mbtlnum)}
+		},
 		{ headerName: "패스워드", field: "password", minWidth: 90, editable: true, cellClass: (params) => {return agGrideditClass(params)}
 			, valueParser: (params) =>{
 				return gridCheckPass(params);
@@ -38,7 +39,9 @@
 	];
 
 	var columnDefs1= [
-		{ headerName: "NO", field: "no", minWidth: 70, valueGetter:(params) => { return params.node.rowIndex + 1} },
+		{ headerName: "선택", field: "chkAt", minWidth: 60, cellDataType: 'boolean'
+			, editable: (params) => {return ('${loginVO.authorCode}' =='ROLE_ADMIN' && (params.node.data.schId == params.node.data.emplyrId || nullToString(params.node.data.emplyrId) == '') )? true: false}
+			, cellClass: (params) => {return agGrideditClass(params)}},
 		{ headerName: "crud", field: "crud", minWidth: 90, hide:true},
 		{ headerName: "협력사아이디", field: "cooperatorId", minWidth: 120},
 		{ headerName: "협력사이름", field: "cooperatorNm", minWidth: 90},
@@ -46,8 +49,9 @@
 		{ headerName: "상호", field: "companyNm", minWidth: 90},
 		{ headerName: "사업자이름", field: "registrationNm", minWidth: 90, cellClass: 'ag-cell-left', hide:true},
 		{ headerName: "대표자명", field: "ceoNm", minWidth: 90},
-		{ headerName: "사용여부", field: "useAt", minWidth: 90, valueGetter:(params) => { return (params.node.data.useAt=='Y')?"사용": "미사용"}},
-		{ headerName: "구분", field: "gubun", minWidth: 90, hide:true}
+		{ headerName: "구분", field: "gubun", minWidth: 90, hide:true},
+		{ headerName: "emplyrId", field: "emplyrId", minWidth: 90, hide:true},
+		{ headerName: "선택된아이디", field: "schId", minWidth: 90, hide:true},
 	];
 
 	//onLoad
@@ -56,14 +60,17 @@
 		//이벤트 설정
 		// 1. 계정 추가
 		$("#계정추가버튼").on("click", function(e){
-			addCooperator(grid);
+			addSalesUser(grid);
 		});
 		$("#계정삭제버튼").on("click", function(e){
-			delCooperator(grid);
+			delSalesUser(grid);
 		});
 
 		$("#계정저장버튼").on("click", function(e){
-			saveCooperatorUsr();
+			saveSalesUser();
+		});
+		$('#연결저장버튼').on("click", function(e){
+			saveCooperatorSales();
 		});
 
 
@@ -81,7 +88,7 @@
 
 		// 로딩 시작
         $('.loading-wrap--js').show();
-        axios.post('${pageContext.request.contextPath}/usr/mem0003_0001.do',params).then(function(response) {
+        axios.post('${pageContext.request.contextPath}/usr/mem0005_0001.do',params).then(function(response) {
         	// 로딩 종료
             $('.loading-wrap--js').hide();
 
@@ -108,13 +115,13 @@
         });
 	}
 
-	function loadCooperatorIdList(value){
+	function loadSalesCooperatorList(value){
 
 		const params = new URLSearchParams();
-		params.append("mberId", value);
+		params.append("schId", value);
 		// 로딩 시작
         $('.loading-wrap--js').show();
-        axios.post('${pageContext.request.contextPath}/usr/mem0003_0003.do',params).then(function(response) {
+        axios.post('${pageContext.request.contextPath}/usr/mem0005_0003.do',params).then(function(response) {
         	// 로딩 종료
             $('.loading-wrap--js').hide();
 
@@ -192,11 +199,11 @@
 		var nowSelNode = findRowNode(grid, 'mberId', params.node.data.mberId);
 		if(bfSelNode != nowSelNode){
 			bfSelNode = nowSelNode;
-			loadCooperatorIdList(params.node.data.mberId)
+			loadSalesCooperatorList(params.node.data.mberId)
 		}
 	}
 
-	function addCooperator(gridObj) {
+	function addSalesUser(gridObj) {
 		  const newStore = getAllRows(gridObj);
 		  const newItem = createNewRowData();
 	      newStore.push(newItem);
@@ -204,28 +211,24 @@
 	}
 
 
-	function delCooperator(gridObj){
+	function delSalesUser(gridObj){
 		gridObj.getRowNode(gridObj.getFocusedCell().rowIndex).setDataValue('emplyrSttusCode', 'N');
 		gridObj.getRowNode(gridObj.getFocusedCell().rowIndex).setDataValue('crud', 'd');
 
 	}
 
 	// 변경된 협력사 계정을 저장한다.
-	function saveCooperatorUsr(){
+	function saveSalesUser(){
 		grid.stopEditing();
 
 		setTimeout(function(){
 			var updateItem = getEditRows(grid);
-			debugger;
+
 			var isNOPass = false;
 			for(var i = 0; i < updateItem.length ; i++ ){
 
 				if(updateItem[i].mberId==null || updateItem[i].mberId.trim() == ''){
 					alert("아이디는 필수 입력항목입니다");
-					return;
-				}
-				if(updateItem[i].ihidnum==null || updateItem[i].ihidnum.trim() == ''){
-					alert("사업자번호는 필수 입력항목입니다");
 					return;
 				}
 				if(updateItem[i].userNm==null || updateItem[i].userNm.trim() == ''){
@@ -250,7 +253,7 @@
 
 			// 로딩 시작
 	        $('.loading-wrap--js').show();
-	        axios.post('${pageContext.request.contextPath}/usr/mem0003_0002.do',getEditRows(grid)).then(function(response) {
+	        axios.post('${pageContext.request.contextPath}/usr/mem0005_0002.do',getEditRows(grid)).then(function(response) {
 	        	// 로딩 종료
 	            $('.loading-wrap--js').hide();
 
@@ -280,6 +283,56 @@
 	        });
 		}, 100);
 	}
+
+	// 영업사원 협력사 연결 저장
+	function saveCooperatorSales(){
+		grid.stopEditing();
+
+		setTimeout(function(){
+			var updateItem = getEditRows(grid1);
+
+			if(updateItem.length <=0 ){
+				alert("저장할 항목이 없습니다");
+				return;
+			}
+
+			// 로딩 시작
+	        $('.loading-wrap--js').show();
+	        axios.post('${pageContext.request.contextPath}/usr/mem0005_0004.do',getEditRows(grid1)).then(function(response) {
+	        	// 로딩 종료
+	            $('.loading-wrap--js').hide();
+
+	            if(chkLogOut(response.data)){
+	            	return;
+	            }
+
+	        	if(response.data.resultCode == "success"){
+		        	if (response.data.list.length == 0) {
+		        		grid1.setGridOption('rowData',[]);  	// 데이터가 없는 경우 빈 배열 설정
+		        		grid1.showNoRowsOverlay();  			// 데이터가 없는 경우
+		            } else {
+
+						var lst = response.data.list;	//정상데이터
+						grid1.setGridOption("rowData", lst);
+		            }
+	        	} else {
+					if(response.data.resultMsg != '' && response.data.resultMsg != null)
+						alert(response.data.resultMsg);
+					else alert("비밀번호 저장에 실패하였습니다");
+					return ;
+	        	}
+	        })
+	        .catch(function(error) {
+	            console.error('There was an error fetching the data:', error);
+	        }).finally(function() {
+	        	// 로딩 종료
+	            $('.loading-wrap--js').hide();
+
+	        });
+		}, 100);
+
+	}
+
 
 	function setGrid(){
 		// 사용자 정의 컴포넌트를 글로벌 네임스페이스에 추가
@@ -347,7 +400,15 @@
 				overlayNoRowsTemplate: '<span class="ag-overlay-loading-center">데이터가 없습니다</span>',
 				suppressScrollOnNewData: true,
 			    onCellValueChanged: function (event) {
-			    	changeCrud(event, grid1, 'mberId');
+			    	changeCrud(event, grid1, 'cooperatorId');
+			    },
+			    getRowStyle: params => {
+			        if (params.node.data.crud == 'c' || params.node.data.crud == 'u') {
+			            return { background: '#e99494' };
+			        }
+			        if (params.node.data.crud == 'd') {
+			            return { background: '#65676b' };
+			        }
 			    }
             };
         const gridDiv = document.querySelector('#myGrid1');
@@ -374,7 +435,7 @@
 	</form>
 
 	<div class="keit-header-body innerwrap clearfix">
-		<p class="tit">협력사계정관리</p>
+		<p class="tit">영업사원계정 관리</p>
 
 		<input name="pageUnit" type="hidden" value="1000" /> <input
 			name="pageSize" type="hidden" value="1000" />
@@ -421,8 +482,9 @@
 				<!-- grid  -->
 
 				<div style="height: 0px;">
-					<span class="pagetotal" style='margin-right: 20px;'>조회가능한 협력사</span>
+					<span class="pagetotal" style='margin-right: 20px;'>협력사</span>
 					<div class="btnwrap">
+						<button id="연결저장버튼" class="btn ty1">저장</button>
 					</div>
 				</div>
 				<div class="ib_product">

@@ -25,6 +25,8 @@ public class CooperatorFeeVO extends Sch implements Serializable {
 
 	//운영사선지급수수료(%)
 	private float feeAdminstrator;
+	//영업사원선지급수수료(%)
+	private float feeSalesman;
 	//협력사선지급수수료(%)
 	private float feeCooperator;
 	//고용보험(%)

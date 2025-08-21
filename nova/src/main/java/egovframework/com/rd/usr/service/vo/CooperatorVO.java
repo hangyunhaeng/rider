@@ -58,6 +58,8 @@ public class CooperatorVO extends Sch implements Serializable {
 	private float feeAdminstrator;
 	//협력사선지급수수료(%)
 	private float feeCooperator;
+	//영업사원선지급수수료(%)
+	private float feeSalesman;
 	//고용보험(%)
 	private float feeEmploymentInsurance;
 	//산재보험(%)
@@ -79,6 +81,11 @@ public class CooperatorVO extends Sch implements Serializable {
 	//RD_RIDER_FEE
 	private String riderFeeId;
 
+	//영업사원 관리용
+	private String cslId;
+	private String emplyrId;
+	private String authorCode;
+	private boolean chkAt;
 
 	private List<CooperatorVO> cooperatorVO;
 }

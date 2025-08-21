@@ -9,9 +9,7 @@ import javax.annotation.Resource;
 
 import org.egovframe.rte.fdl.cmmn.EgovAbstractServiceImpl;
 import org.egovframe.rte.fdl.idgnr.EgovIdGnrService;
-import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -96,6 +94,9 @@ public class MemServiceImpl extends EgovAbstractServiceImpl implements MemServic
     /** ID Generation */
 	@Resource(name="egovKkoIdGnrService")
 	private EgovIdGnrService egovKkoIdGnrService;
+    /** ID Generation */
+	@Resource(name="egovCslIdGnrService")
+	private EgovIdGnrService egovCslIdGnrService;
 
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(MemServiceImpl.class);
@@ -301,7 +302,6 @@ public class MemServiceImpl extends EgovAbstractServiceImpl implements MemServic
 	 * @param list
 	 * @throws Exception
 	 */
-	@SuppressWarnings("unchecked")
 	public CooperatorVO saveCooperatoRider(List<CooperatorVO> list, LoginVO user) throws Exception {
 		CooperatorVO returnVo = new CooperatorVO();
 		List<KkoVO> kkoList = new ArrayList<KkoVO>();
@@ -845,5 +845,131 @@ public class MemServiceImpl extends EgovAbstractServiceImpl implements MemServic
 		inVo.setSeleceKey(key);
 		memDAO.insertAdminKey(inVo);
 		return key;
+	}
+	/**
+	 * 영업사원 리스트 조회
+	 * @param vo
+	 * @return
+	 * @throws Exception
+	 */
+	public List<CooperatorVO> selectSalesUsrList(CooperatorVO vo) throws Exception {
+		return memDAO.selectSalesUsrList(vo);
+	}
+
+	/**
+	 * 영업사원 ID 저장
+	 * @param vo
+	 * @return
+	 * @throws Exception
+	 */
+	public CooperatorVO saveSalesUsr(List<CooperatorVO> list, LoginVO user) throws Exception {
+		CooperatorVO returnVo = new CooperatorVO();
+
+		if(!"ROLE_ADMIN".equals(user.getAuthorCode())) {
+			throw new IllegalArgumentException("운영사만 등록 할 수 있습니다.") ;
+		}
+
+        for(int i = 0 ; i< list.size() ;i++) {
+
+        	CooperatorVO vo = list.get(i);
+        	vo.setMberId(vo.getMberId());
+        	vo.setCreatId(user.getId());
+        	vo.setLastUpdusrId(user.getId());
+
+
+        	//comtnemplyrinfo 등록
+            UserDefaultVO searchVO = new UserDefaultVO();
+            searchVO.setSearchCondition("0");
+            searchVO.setSearchKeyword(vo.getMberId());
+            UserManageVO userOne = userManageDAO.selectUserListRider(searchVO);
+        	if( userOne != null ) {
+        		userOne.setEmplyrNm(vo.getUserNm());
+        		userOne.setMoblphonNo(vo.getMbtlnum());
+        		userManageService.updateUser(userOne);
+
+
+        		//기존 사용자의 패스워드 변경
+        		if(!Util.isEmpty(vo.getPassword())) {
+        			userOne.setPassword(vo.getPassword());
+        			userManageService.updatePasswordInit(userOne);
+        		}
+
+        	} else {
+                UserManageVO voMem = new UserManageVO();
+                voMem.setEmplyrId(vo.getMberId());
+                voMem.setEmplyrNm(vo.getUserNm());
+                voMem.setPassword(Util.isEmpty(vo.getPassword())? "Daon2025!" : vo.getPassword());
+                voMem.setMoblphonNo(vo.getMbtlnum());
+                voMem.setEmplyrSttusCode("P");
+        		String uniqId = userManageService.insertUser(voMem);
+
+
+            	//COMTNEMPLYRSCRTYESTBS 등록
+                AuthorGroup authorGroup = new AuthorGroup();
+                authorGroup.setUniqId(uniqId);
+        		authorGroup.setAuthorCode("ROLE_SALES");
+        		authorGroup.setMberTyCode("USR02");
+        		egovAuthorGroupService.insertAuthorGroup(authorGroup);
+
+        	}
+        	returnVo = vo;
+        }
+        return returnVo;
+	}
+	/**
+	 * 영업사원의 협력사 조회
+	 * @param vo
+	 * @return
+	 * @throws Exception
+	 */
+	public List<CooperatorVO> selectCooperatorListBySalesMan(CooperatorVO vo) throws Exception {
+		return memDAO.selectCooperatorListBySalesMan(vo);
+	}
+	/**
+	 * 영업사원 협력사 연결 저장
+	 * @param list
+	 * @return
+	 * @throws Exception
+	 */
+	public CooperatorVO saveCooperatorSalesUsr(List<CooperatorVO> list) throws Exception {
+		CooperatorVO returnVo = new CooperatorVO();
+		LoginVO user = (LoginVO)EgovUserDetailsHelper.getAuthenticatedUser();
+
+		if(!"ROLE_ADMIN".equals(user.getAuthorCode())) {
+			throw new IllegalArgumentException("운영사만 등록 할 수 있습니다.") ;
+		}
+
+        for(int i = 0 ; i< list.size() ;i++) {
+
+        	CooperatorVO vo = list.get(i);
+        	vo.setCreatId(user.getId());
+        	vo.setLastUpdusrId(user.getId());
+
+        	if(vo.isChkAt()) {
+            	//연결
+        		CooperatorVO selvo = memDAO.selectCooperatorSalesByCooperator(vo);
+    			if(selvo != null && !selvo.getEmplyrId().equals(vo.getSchId())){
+    				throw new IllegalArgumentException("이미 등록된 영업사원이 있는 협력사 입니다["+selvo.getCooperatorNm()+" | "+ selvo.getUserNm()+"]") ;
+    			} else if(selvo != null && selvo.getEmplyrId().equals(vo.getSchId())){
+    				//이미 해당 영업사원으로 지정된경우 pass
+    			} else if(selvo == null){
+    				// 연결 등록
+    				vo.setCslId(egovCslIdGnrService.getNextStringId());
+    				vo.setEmplyrId(vo.getSchId());
+    				vo.setUseAt("Y");
+    				memDAO.insertCooperatorSales(vo);
+    			} else {
+    				throw new IllegalArgumentException("예상치 못한 오류가 발생했습니다. 개발자에게 연락 요망") ;
+    			}
+
+        	} else {
+        		//연결해제
+        		memDAO.updateCooperatorSalesNoByEmplyrIdCoop(vo);
+        	}
+
+        	returnVo = vo;
+        }
+
+		return returnVo;
 	}
 }

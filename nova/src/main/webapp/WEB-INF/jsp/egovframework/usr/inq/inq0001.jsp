@@ -33,13 +33,6 @@
 	//onLoad
 	document.addEventListener('DOMContentLoaded', function() {
 
-		if('${loginVO.authorCode}' =='ROLE_ADMIN'){
-			$('nav > ul').find('li[class!=cooperator]:hidden').show();
-		}
-		if('${loginVO.authorCode}' =='ROLE_USER'){
-			$('nav > ul').find('li[class~=cooperator]:hidden').show();
-		}
-
 		$('#reTitle').parent().find('span').text($('#reTitle').val().length+"/"+maxLength0);
         $('#reLongtxt').parent().find('span').text($('#reLongtxt').val().length+"/"+maxLength1);
 

@@ -443,5 +443,61 @@ public class MemDAO extends EgovComAbstractDAO {
 	public int selectAdminKey(Sch vo) throws Exception {
 		return selectOne("memDAO.selectAdminKey", vo);
 	}
+
+	/**
+	 * 영업사원 리스트 조회
+	 * @param vo
+	 * @return
+	 * @throws Exception
+	 */
+	public List<CooperatorVO> selectSalesUsrList(CooperatorVO vo) throws Exception {
+		return selectList("memDAO.selectSalesUsrList", vo);
+	}
+	/**
+	 * 영업사원의 협력사 조회
+	 * @param vo
+	 * @return
+	 * @throws Exception
+	 */
+	public List<CooperatorVO> selectCooperatorListBySalesMan(CooperatorVO vo) throws Exception {
+		return selectList("memDAO.selectCooperatorListBySalesMan", vo);
+	}
+
+	/**
+	 * 영업사원에 연결된 협력사 조회 by 협력사ID
+	 * @param vo
+	 * @return
+	 * @throws Exception
+	 */
+	public CooperatorVO selectCooperatorSalesByCooperator(CooperatorVO vo) throws Exception {
+		return selectOne("memDAO.selectCooperatorSalesByCooperator", vo);
+	}
+	/**
+	 * 영업사원에 연결된 협력사 삭제 처리 by cslId
+	 * @param vo
+	 * @return
+	 * @throws Exception
+	 */
+	public int updateCooperatorSalesNo(CooperatorVO vo) throws Exception {
+		return update("memDAO.updateCooperatorSalesNo", vo);
+	}
+	/**
+	 * 영업사원에 연결된 협력사 삭제 처리by 영업사원 아이디, 협력사 아이디)
+	 * @param vo
+	 * @return
+	 * @throws Exception
+	 */
+	public int updateCooperatorSalesNoByEmplyrIdCoop(CooperatorVO vo) throws Exception {
+		return update("memDAO.updateCooperatorSalesNoByEmplyrIdCoop", vo);
+	}
+	/**
+	 * 영업사원에 협력사 연결 등록
+	 * @param vo
+	 * @return
+	 * @throws Exception
+	 */
+	public int insertCooperatorSales(CooperatorVO vo ) throws Exception {
+		return insert("memDAO.insertCooperatorSales", vo);
+	}
 }
 

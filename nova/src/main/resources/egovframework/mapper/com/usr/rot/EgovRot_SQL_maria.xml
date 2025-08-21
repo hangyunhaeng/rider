@@ -23,11 +23,16 @@
 			, MBTLNUM, b.BNK_CD, if(d.AUTHOR_CODE ='ROLE_ADMIN', #{accountNum}, b.ACCOUNT_NUM) AS ACCOUNT_NUM
 			, b.ACCOUNT_NM, c.CD_NM AS BNK_NM, d.AUTHOR_CODE, if(d.AUTHOR_CODE ='ROLE_ADMIN', '운영사', '협력사') AS AUTHOR_CODE_NM
 			from COMTNEMPLYRINFO usr
-					LEFT JOIN RD_BNK b ON usr.IHIDNUM = b.ESNTL_ID AND b.USE_AT ='Y'
 		<if test="schAuthorCode =='ROLE_ADMIN'">
+					LEFT JOIN RD_BNK b ON usr.IHIDNUM = b.ESNTL_ID AND b.USE_AT ='Y'
 					LEFT JOIN RD_CD c ON #{bnkCd} = c.cd AND c.CD_GROUP ='BANK_CD'
 		</if>
 		<if test="schAuthorCode =='ROLE_USER'">
+					LEFT JOIN RD_BNK b ON usr.IHIDNUM = b.ESNTL_ID AND b.USE_AT ='Y'
+					LEFT JOIN RD_CD c ON b.bnk_cd = c.cd AND c.CD_GROUP ='BANK_CD'
+		</if>
+		<if test="schAuthorCode =='ROLE_SALES'">
+					LEFT JOIN RD_BNK b ON usr.ESNTL_ID = b.ESNTL_ID AND b.USE_AT ='Y'
 					LEFT JOIN RD_CD c ON b.bnk_cd = c.cd AND c.CD_GROUP ='BANK_CD'
 		</if>
 					JOIN COMTNEMPLYRSCRTYESTBS d ON usr.ESNTL_ID = d.SCRTY_DTRMN_TRGET_ID
@@ -165,7 +170,9 @@
 			SELECT sub_tab.*
 				/*선지급수수료(%)  =  수익*/
 				, CEILING(#{inputPrice}*FEE_ADMINSTRATOR) AS DAY_FEE
-				, floor(CEILING(#{inputPrice}*FEE_ADMINSTRATOR) * FEE_COOPERATOR) FEE_COOPERATOR_COST
+				, FLOOR(#{inputPrice}*FEE_COOPERATOR)  AS FEE_COOPERATOR_COST
+				, FLOOR(#{inputPrice}*FEE_SALESMAN)  AS FEE_SALESMAN_COST
+				, EMPLYR_ID
 			FROM (
 				SELECT nvl(b.FEE_ADMINSTRATOR*0.01, 0) AS FEE_ADMINSTRATOR /* 선지급수수료(%) */
 				, nvl(nvl(c.FEE_EMPLOYMENT_INSURANCE, b.FEE_EMPLOYMENT_INSURANCE)*0.01, 0) AS FEE_EMPLOYMENT_INSURANCE/* 고용보험(%) */
@@ -174,10 +181,12 @@
 				, nvl(nvl(c.FEE_TIME_INSURANCE, b.FEE_TIME_INSURANCE), 0) AS FEE_TIME_INSURANCE/* 시간제보험(원 최대7,000) */
 				, nvl(nvl(c.FEE_CALL, b.FEE_CALL), 0) AS FEE_CALL/* 건당 콜수수료(원) */
 				, nvl(b.FEE_COOPERATOR*0.01, 0) AS FEE_COOPERATOR
-				, b.FEE_ID, c.RIDER_FEE_ID
+				, nvl(b.FEE_SALESMAN*0.01, 0) AS FEE_SALESMAN
+				, b.FEE_ID, c.RIDER_FEE_ID, d.EMPLYR_ID
 				from COMTNGNRLMBER a
 				LEFT JOIN RD_COOPERATOR_FEE b ON b.COOPERATOR_ID = #{cooperatorId} AND b.use_at ='Y'
 				LEFT JOIN RD_RIDER_FEE c ON b.COOPERATOR_ID = c.COOPERATOR_ID  AND a.MBER_ID = c.MBER_ID AND  c.use_at ='Y'
+				LEFT JOIN RD_COOPERATOR_SALES d ON b.COOPERATOR_ID = d.COOPERATOR_ID AND d.USE_AT ='Y'
 				WHERE a.MBER_ID = #{mberId} /*AND b.COOPERATOR_ID = #{cooperatorId}*/
 			) sub_tab
 	</select>

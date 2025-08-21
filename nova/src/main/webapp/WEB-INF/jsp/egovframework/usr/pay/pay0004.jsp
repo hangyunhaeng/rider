@@ -77,50 +77,35 @@
 		{ headerName: "출금가능금액", field: "xxx", minWidth: 90, cellClass: 'ag-cell-right', hide:true},
 		{ headerName: "feeId", field: "feeId", minWidth: 90, hide:true},
 		{ headerName: "선지급수수료(%)", field: "feeAdminstrator", minWidth: 90, maxWidth: 95
-			, cellClass: (params) => {return agGrideditClass(params, "ag-cell-right");}
 			, valueGetter:(params) => { return currencyFormatter(params.data.feeAdminstrator);}
-            , valueParser: (params) => { return gridPercent(params);}
 		},
 		{ headerName: "협력사<br/>선지급수수료(%)", field: "feeCooperator", minWidth: 90, maxWidth: 95
-			, cellClass: (params) => {return agGrideditClass(params, "ag-cell-right");}
 			, valueGetter:(params) => { return currencyFormatter(params.data.feeCooperator);}
-            , valueParser: (params) => { return gridPercent(params);}
+		},
+		{ headerName: "영업사원<br/>선지급수수료(%)", field: "feeSalesman", minWidth: 87, maxWidth: 87
+			, valueGetter:(params) => { return currencyFormatter(params.data.feeSalesman);}
 		},
 		{ headerName: "고용보험(%)", field: "feeEmploymentInsurance", minWidth: 90, maxWidth: 95
-			, cellClass: (params) => {return agGrideditClass(params, "ag-cell-right");}
 			, valueGetter:(params) => { return currencyFormatter(params.data.feeEmploymentInsurance);}
-            , valueParser: (params) => { return gridPercent(params);}
 		},
 		{ headerName: "산재보험(%)", field: "feeIndustrialInsurance", minWidth: 90, maxWidth: 95
-			, cellClass: (params) => {return agGrideditClass(params, "ag-cell-right");}
 			, valueGetter:(params) => { return currencyFormatter(params.data.feeIndustrialInsurance);}
-            , valueParser: (params) => { return gridPercent(params);}
 		},
 		{ headerName: "원천세(%)", field: "feeWithholdingTax", minWidth: 90, maxWidth: 94
-			, cellClass: (params) => {return agGrideditClass(params, "ag-cell-right");}
 			, valueGetter:(params) => { return currencyFormatter(params.data.feeWithholdingTax);}
-            , valueParser: (params) => { return gridPercent(params);}
 		},
 		{ headerName: "시간제보험(원)", field: "feeTimeInsurance", minWidth: 90, maxWidth: 93
-			, cellClass: (params) => {return agGrideditClass(params, "ag-cell-right");}
 			, valueGetter:(params) => { return currencyFormatter(params.data.feeTimeInsurance);}
-            , valueParser: (params) => { return gridWan(params);}
 		},
 		{ headerName: "콜수수료(원)", field: "feeCall", minWidth: 90, maxWidth: 93
-			, cellClass: (params) => {return agGrideditClass(params, "ag-cell-right");}
 			, valueGetter:(params) => { return currencyFormatter(params.data.feeCall);}
-            , valueParser: (params) => { return gridWan(params);}
 		},
 		{ headerName: "협력사<br/>콜수수료(%)", field: "feeCooperatorCall", minWidth: 90, maxWidth: 95
-			, cellClass: (params) => {return agGrideditClass(params, "ag-cell-right");}
 			, valueGetter:(params) => { return currencyFormatter(params.data.feeCooperatorCall);}
-            , valueParser: (params) => { return gridPercent(params);}
 		},
 		{ headerName: "사용여부", field: "useAt", minWidth: 90, hide:true
-		, valueGetter:(params) => { return (params.node.data.useAt=='Y')?"사용": "미사용"}
-		, cellEditor: 'agSelectCellEditor'
-		, cellEditorParams: params => { return {values: ['Y', 'N']}; }
-		, cellClass: (params) => {return agGrideditClass(params)}},
+			, valueGetter:(params) => { return (params.node.data.useAt=='Y')?"사용": "미사용"}
+		},
 		{ headerName: "등록일", field: "creatDt", minWidth: 100, maxWidth: 100
 	        , valueGetter:(params) => { return getStringDate(params.data.creatDt)}
 	    },
@@ -197,13 +182,6 @@
 
 	//onLoad
 	document.addEventListener('DOMContentLoaded', function() {
-
-		if('${loginVO.authorCode}' =='ROLE_ADMIN'){
-			$('nav > ul').find('li[class!=cooperator]:hidden').show();
-		}
-		if('${loginVO.authorCode}' =='ROLE_USER'){
-			$('nav > ul').find('li[class~=cooperator]:hidden').show();
-		}
 
 		//업로드일 세팅
 		var today = new Date();
@@ -522,13 +500,13 @@
 
 	        	} else if(response.data.base.gubun == 'D'){	//선지급수수료
 	        		$('#근거금액').html(currencyFormatter(response.data.base.cost));
-	        		var iFee = Math.floor(response.data.base.cost*0.01*grid2.getRowNode(0).data.feeAdminstrator*0.01*grid2.getRowNode(0).data.feeCooperator);
-	        		$('#계산식').html(currencyFormatter(response.data.base.cost)+" * 0.01 * "+grid2.getRowNode(0).data.feeAdminstrator+" * 0.01 * "+grid2.getRowNode(0).data.feeCooperator+" = "+currencyFormatter(iFee));
+	        		var iFee = Math.floor(response.data.base.cost*0.01*grid2.getRowNode(0).data.feeCooperator);
+	        		$('#계산식').html(currencyFormatter(response.data.base.cost)+" * 0.01 * "+grid2.getRowNode(0).data.feeCooperator+" = "+currencyFormatter(iFee));
 
 					//협력사 수수료 색상 바꾸기
 					const imsiColumnDefs = grid2.getColumnDefs(); // 현재 컬럼정의 가져오깅(당근 배열임)
 					for (let colDef of imsiColumnDefs) {
-						if (colDef.field == "feeAdminstrator" || colDef.field == "feeCooperator") {
+						if (colDef.field == "feeCooperator") {
 							colDef.cellClass = "edited-bg";
 						} else {
 							colDef.cellClass = "";

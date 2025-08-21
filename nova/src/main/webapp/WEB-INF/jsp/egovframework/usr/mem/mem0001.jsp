@@ -41,7 +41,7 @@
 		{
 		    headerName: '선지급수수료',
 		    children: [
-				{ headerName: "전체(%)", field: "feeAdminstrator", minWidth: 90, editable: (params) => {return ('${loginVO.authorCode}' =='ROLE_ADMIN')? true: false}
+				{ headerName: "전체(%)", field: "feeAdminstrator", minWidth: 100, editable: (params) => {return ('${loginVO.authorCode}' =='ROLE_ADMIN')? true: false}
 					, cellClass: (params) => {return agGrideditClass(params, "ag-cell-right");}
 					, valueGetter:(params) => { return currencyFormatter(params.data.feeAdminstrator);}
 		            , valueParser: (params) => { return gridPercent(params);}
@@ -51,13 +51,22 @@
 					, cellClass: (params) => {return agGrideditClass(params, "ag-cell-right");}
 					, valueGetter:(params) => { return currencyFormatter(params.data.feeCooperator);}
 		            , valueParser: (params) => { return gridPercent(params);}
+				},
+
+				{ headerName: "영업사원(%)", field: "feeSalesman", minWidth: 90, editable: (params) => {return ('${loginVO.authorCode}' =='ROLE_ADMIN')? true: false}
+					, cellClass: (params) => {return agGrideditClass(params, "ag-cell-right");}
+					, valueGetter:(params) => { return currencyFormatter(params.data.feeSalesman);}
+		            , valueParser: (params) => { return gridPercent(params);}
 				}
 		    ]
 		},
 		{
 		    headerName: '보험,세금',
 		    children: [
-		    	{ headerName: "세금신고<br>협력사", field: "feeCooperatorAt", minWidth: 60, cellDataType: 'boolean', editable: (params) => {return ('${loginVO.authorCode}' =='ROLE_ADMIN')? true: false}},
+		    	{ headerName: "세금신고<br>협력사", field: "feeCooperatorAt", minWidth: 60, cellDataType: 'boolean'
+		    		, editable: (params) => {return ('${loginVO.authorCode}' =='ROLE_ADMIN')? true: false}
+		    		, cellClass: (params) => {return agGrideditClass(params)}
+		    	},
 				{ headerName: "고용(%)", field: "feeEmploymentInsurance", minWidth: 90, editable: true
 					, cellClass: (params) => {return agGrideditClass(params, "ag-cell-right");}
 					, valueGetter:(params) => { return currencyFormatter(params.data.feeEmploymentInsurance);}
@@ -153,13 +162,6 @@
 
 	//onLoad
 	document.addEventListener('DOMContentLoaded', function() {
-
-		if('${loginVO.authorCode}' =='ROLE_ADMIN'){
-			$('nav > ul').find('li[class!=cooperator]:hidden').show();
-		}
-		if('${loginVO.authorCode}' =='ROLE_USER'){
-			$('nav > ul').find('li[class~=cooperator]:hidden').show();
-		}
 
 		//이벤트 설정
 		// 1. 협력사 추가

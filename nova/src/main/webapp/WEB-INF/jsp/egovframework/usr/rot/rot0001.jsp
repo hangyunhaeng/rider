@@ -32,12 +32,6 @@
 	//onLoad
 	document.addEventListener('DOMContentLoaded', function() {
 		loadNotice();
-		if('${loginVO.authorCode}' =='ROLE_ADMIN'){
-			$('nav > ul').find('li[class!=cooperator]:hidden').show();
-		}
-		if('${loginVO.authorCode}' =='ROLE_USER'){
-			$('nav > ul').find('li[class~=cooperator]:hidden').show();
-		}
 	});
 	function loadNotice(){
 

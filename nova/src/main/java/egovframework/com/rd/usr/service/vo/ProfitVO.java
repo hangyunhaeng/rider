@@ -23,6 +23,12 @@ public class ProfitVO extends Sch implements Serializable {
 	private String profitId;
 	//COO_FIT_ID
 	private String coofitId;
+	//SALFIT_ID
+	private String salfitId;
+
+	//영업사원 id
+	private String emplyrId;
+
 	//협력사아이디
 	private String cooperatorId;
 	//User ID
@@ -55,4 +61,7 @@ public class ProfitVO extends Sch implements Serializable {
 	private String mberNm;
 	private String cooperatorNm;
 	private String gubunNm;
+
+
+
 }

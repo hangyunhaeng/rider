@@ -184,4 +184,33 @@ public interface MemService {
 	 * @throws Exception
 	 */
 	public String getRandomKey(CooperatorVO vo) throws Exception ;
+
+	/**
+	 * 영업사원 리스트 조회
+	 * @param vo
+	 * @return
+	 * @throws Exception
+	 */
+	public List<CooperatorVO> selectSalesUsrList(CooperatorVO vo) throws Exception ;
+	/**
+	 * 영업사원 ID 저장
+	 * @param vo
+	 * @return
+	 * @throws Exception
+	 */
+	public CooperatorVO saveSalesUsr(List<CooperatorVO> list, LoginVO user) throws Exception ;
+	/**
+	 * 영업사원의 협력사 조회
+	 * @param vo
+	 * @return
+	 * @throws Exception
+	 */
+	public List<CooperatorVO> selectCooperatorListBySalesMan(CooperatorVO vo) throws Exception ;
+	/**
+	 * 영업사원 협력사 연결 저장
+	 * @param list
+	 * @return
+	 * @throws Exception
+	 */
+	public CooperatorVO saveCooperatorSalesUsr(List<CooperatorVO> list) throws Exception ;
 }

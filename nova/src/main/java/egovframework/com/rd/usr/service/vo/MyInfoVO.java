@@ -19,6 +19,7 @@ import lombok.Setter;
 public class MyInfoVO extends Sch implements Serializable {
 
 	private String mberId;
+	private String emplyrId;
 	private String mberNm;
 	private String mberEmailAdres;
 	private String mbtlnum;
@@ -50,6 +51,8 @@ public class MyInfoVO extends Sch implements Serializable {
 	private int weekAblePrice;
 	//협력사 지급가능금액
 	private int coopAblePrice;
+	//영업사원 지급가능금액
+	private int salesAblePrice;
 	private String useAt;
 	private String gubun;
 	private String authorCode;

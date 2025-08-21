@@ -152,6 +152,7 @@ public class Transfer extends EgovAbstractServiceImpl {
 		            		dtyDAO.updateDayPayByTransfer(tranResult);	//실패 확정시 거래내역 삭제
 		            		dtyDAO.deleteProfit(tranResult);
 		            		dtyDAO.deleteCooperatorProfit(tranResult);
+		            		dtyDAO.deleteSalesProfit(tranResult);
 
 		            		// 라이더 잔액 조정
 		            		dtyDAO.updateBalanceWeekPayByTransfer(tranResult);
@@ -164,6 +165,9 @@ public class Transfer extends EgovAbstractServiceImpl {
 		            		payDAO.updateBalanceCooperatorPayByTransfer(tranResult);
 		            		payDAO.updateCooperatorPayByTransfer(tranResult);
 		            		dtyDAO.deleteProfitByCoop(tranResult);
+
+		            		//영업사원
+		            		payDAO.updateSalesPayByTransfer(tranResult);
 		            	}
 		            }
 

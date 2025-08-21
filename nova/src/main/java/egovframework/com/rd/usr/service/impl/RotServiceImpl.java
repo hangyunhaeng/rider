@@ -117,7 +117,11 @@ public class RotServiceImpl extends EgovAbstractServiceImpl implements RotServic
 		LoginVO user = (LoginVO)EgovUserDetailsHelper.getAuthenticatedUser();
 		vo.setCreatId(user.getId());
 		vo.setLastUpdusrId(user.getId());
-
+		if("ROLE_SALES".equals(vo.getSchAuthorCode()) ) {
+			vo.setEsntlId(user.getUniqId());
+		} else {
+			vo.setEsntlId(user.getIhidNum());
+		}
 
 		List<MyInfoVO> bnkList = rotDAO.selectBankByEsntlId(vo);
 		if(bnkList.size() > 1) {	// 기존 계좌가 2개면????? 무조건 지우고 새로 넣는다
