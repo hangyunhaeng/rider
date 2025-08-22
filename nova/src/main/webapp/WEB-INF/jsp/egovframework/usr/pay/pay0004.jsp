@@ -473,7 +473,7 @@
 	            }
 	        	if(response.data.base.gubun == 'C'){	//콜수수료
 	        		$('#근거금액').html("배달비 : "+currencyFormatter(response.data.base.cost)+' / 배달건수 : '+response.data.base.deliveryCnt);
-	        		var iFee = Math.floor(response.data.base.deliveryCnt*grid3.getRowNode(0).data.feeCall*0.01*grid2.getRowNode(0).data.feeCooperatorCall);
+	        		var iFee = Math.floor(response.data.base.deliveryCnt*grid3.getRowNode(0).data.feeCall*(+(0.01*grid2.getRowNode(0).data.feeCooperatorCall).toFixed(5)));
 	        		$('#계산식').html(currencyFormatter(response.data.base.deliveryCnt) +" * "+currencyFormatter(grid3.getRowNode(0).data.feeCall)+" * 0.01 * "+grid2.getRowNode(0).data.feeCooperatorCall+" = "+currencyFormatter(iFee));
 
 					//협력사 수수료 색상 바꾸기
@@ -500,7 +500,7 @@
 
 	        	} else if(response.data.base.gubun == 'D'){	//선지급수수료
 	        		$('#근거금액').html(currencyFormatter(response.data.base.cost));
-	        		var iFee = Math.floor(response.data.base.cost*0.01*grid2.getRowNode(0).data.feeCooperator);
+	        		var iFee = Math.floor((+(response.data.base.cost*0.01*grid2.getRowNode(0).data.feeCooperator).toFixed(5)));
 	        		$('#계산식').html(currencyFormatter(response.data.base.cost)+" * 0.01 * "+grid2.getRowNode(0).data.feeCooperator+" = "+currencyFormatter(iFee));
 
 					//협력사 수수료 색상 바꾸기

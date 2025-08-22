@@ -478,7 +478,7 @@
 	            }
 	        	if(response.data.base.gubun == 'D'){	//선지급수수료
 	        		$('#근거금액').html(currencyFormatter(response.data.base.cost));
-	        		var iFee = Math.floor(response.data.base.cost*0.01*grid2.getRowNode(0).data.feeSalesman);
+	        		var iFee = Math.floor((+(response.data.base.cost*0.01*grid2.getRowNode(0).data.feeSalesman).toFixed(5)));
 	        		$('#계산식').html(currencyFormatter(response.data.base.cost)+" * 0.01 * "+grid2.getRowNode(0).data.feeSalesman+" = "+currencyFormatter(iFee));
 
 					//협력사 수수료 색상 바꾸기

@@ -477,7 +477,7 @@
 	            }
 	        	if(response.data.base.gubun == 'C'){	//콜수수료
 	        		$('#근거금액').html("배달비 : "+currencyFormatter(response.data.base.cost)+' / 배달건수 : '+response.data.base.deliveryCnt);
-	        		var iFee = response.data.base.deliveryCnt*grid3.getRowNode(0).data.feeCall - Math.floor(response.data.base.deliveryCnt*grid3.getRowNode(0).data.feeCall*0.01*grid2.getRowNode(0).data.feeCooperatorCall);
+	        		var iFee = response.data.base.deliveryCnt*grid3.getRowNode(0).data.feeCall - Math.floor(response.data.base.deliveryCnt*grid3.getRowNode(0).data.feeCall*(+(0.01*grid2.getRowNode(0).data.feeCooperatorCall).toFixed(5)));
 	        		$('#계산식').html("("+currencyFormatter(response.data.base.deliveryCnt)+" * "+grid3.getRowNode(0).data.feeCall+") - ("+currencyFormatter(response.data.base.deliveryCnt) +" * "+currencyFormatter(grid3.getRowNode(0).data.feeCall)+" * 0.01 * "+grid2.getRowNode(0).data.feeCooperatorCall+") = "+currencyFormatter(iFee));
 
 					//협력사 수수료 색상 바꾸기
@@ -503,20 +503,39 @@
 	                grid3.setGridOption("columnDefs", imsiColumnDefs1);
 
 	        	} else if(response.data.base.gubun == 'D'){	//선지급수수료
-	        		$('#근거금액').html(currencyFormatter(response.data.base.cost));
-	        		var iFee = Math.ceil(response.data.base.cost*0.01*grid2.getRowNode(0).data.feeAdminstrator) - Math.floor(response.data.base.cost*0.01*grid2.getRowNode(0).data.feeCooperator) - Math.floor(response.data.base.cost*0.01*grid2.getRowNode(0).data.feeSalesman);
-	        		$('#계산식').html("("+currencyFormatter(response.data.base.cost)+" * 0.01 * "+grid2.getRowNode(0).data.feeAdminstrator+") - ("+currencyFormatter(response.data.base.cost)+" * 0.01 * "+grid2.getRowNode(0).data.feeCooperator+") - ("+currencyFormatter(response.data.base.cost)+" * 0.01 * "+grid2.getRowNode(0).data.feeSalesman+") = "+currencyFormatter(iFee));
+	        		if(nullToString(response.data.base.dypId) != ''){
+		        		$('#근거금액').html(currencyFormatter(response.data.base.cost));
+		        		var iFee = Math.ceil(response.data.base.cost*(+(0.01*grid2.getRowNode(0).data.feeAdminstrator).toFixed(5))) - Math.floor((+(response.data.base.cost*0.01*grid2.getRowNode(0).data.feeCooperator).toFixed(5))) - Math.floor((+(response.data.base.cost*0.01*grid2.getRowNode(0).data.feeSalesman).toFixed(5)));
+		        		$('#계산식').html("("+currencyFormatter(response.data.base.cost)+" * 0.01 * "+grid2.getRowNode(0).data.feeAdminstrator+") - ("+currencyFormatter(response.data.base.cost)+" * 0.01 * "+grid2.getRowNode(0).data.feeCooperator+") - ("+currencyFormatter(response.data.base.cost)+" * 0.01 * "+grid2.getRowNode(0).data.feeSalesman+") = "+currencyFormatter(iFee));
 
-					//협력사 수수료 색상 바꾸기
-					const imsiColumnDefs = grid2.getColumnDefs(); // 현재 컬럼정의 가져오깅(당근 배열임)
-					for (let colDef of imsiColumnDefs) {
-						if (colDef.field == "feeAdminstrator" || colDef.field == "feeCooperator" || colDef.field == "feeSalesman") {
-							colDef.cellClass = "edited-bg";
-						} else {
-							colDef.cellClass = "";
+						//협력사 수수료 색상 바꾸기
+						const imsiColumnDefs = grid2.getColumnDefs(); // 현재 컬럼정의 가져오깅(당근 배열임)
+						for (let colDef of imsiColumnDefs) {
+							if (colDef.field == "feeAdminstrator" || colDef.field == "feeCooperator" || colDef.field == "feeSalesman") {
+								colDef.cellClass = "edited-bg";
+							} else {
+								colDef.cellClass = "";
+							}
 						}
-					}
-	                grid2.setGridOption("columnDefs", imsiColumnDefs);
+		                grid2.setGridOption("columnDefs", imsiColumnDefs);
+	        		} else if(nullToString(response.data.base.copId) != ''){
+	        			debugger;
+		        		$('#근거금액').html(currencyFormatter(response.data.base.cost));
+		        		var iFee = Math.ceil(response.data.base.cost*(+(0.01 * grid2.getRowNode(0).data.feeAdminstrator).toFixed(5))) - Math.floor((+(response.data.base.cost*0.01*grid2.getRowNode(0).data.feeSalesman).toFixed(5)));
+		        		$('#계산식').html("("+currencyFormatter(response.data.base.cost)+" * 0.01 * "+grid2.getRowNode(0).data.feeAdminstrator+") - ("+currencyFormatter(response.data.base.cost)+" * 0.01 * "+grid2.getRowNode(0).data.feeSalesman+") = "+currencyFormatter(iFee));
+
+						//협력사 수수료 색상 바꾸기
+						const imsiColumnDefs = grid2.getColumnDefs(); // 현재 컬럼정의 가져오깅(당근 배열임)
+						for (let colDef of imsiColumnDefs) {
+							if (colDef.field == "feeAdminstrator" || colDef.field == "feeSalesman") {
+								colDef.cellClass = "edited-bg";
+							} else {
+								colDef.cellClass = "";
+							}
+						}
+		                grid2.setGridOption("columnDefs", imsiColumnDefs);
+
+	        		}
 	        	} else if(response.data.base.gubun == 'P'){	//프로그램료
 	        		$('#근거금액').html("배달비 : "+currencyFormatter(response.data.base.cost)+' / 배달건수 : '+response.data.base.deliveryCnt);
 	        		var iFee = response.data.base.deliveryCnt*+grid2.getRowNode(0).data.feeProgram;

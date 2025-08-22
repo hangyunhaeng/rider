@@ -564,6 +564,16 @@ public class DtyDAO extends EgovComAbstractDAO {
 	}
 
 	/**
+	 * 협력사 입금 실패서 선지급 수수료 삭제(영업사원)
+	 * @param vo
+	 * @return
+	 * @throws Exception
+	 */
+	public int deleteSalesProfitByCoop(DoszTransferVO vo) throws Exception {
+		return update("dtyDAO.deleteSalesProfitByCoop", vo);
+	}
+
+	/**
 	 * 라이더 입금 실패서 선지급 수수료 삭제(협력사)
 	 * @param vo
 	 * @return

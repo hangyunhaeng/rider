@@ -1231,8 +1231,8 @@
 
 	<insert id="insertSalesProfit" parameterType="egovframework.com.rd.usr.service.vo.ProfitVO">
 		INSERT INTO RD_SALES_PROFIT
-		(SALFIT_ID, PROFIT_ID, EMPLYR_ID, COOPERATOR_ID, MBER_ID, GUBUN, COST, DELIVERY_CNT, DELIVERY_DAY, DYP_ID, FEE_ID, RIDER_FEE_ID, CREAT_DT, CREAT_ID)
-		VALUES(#{salfitId}, #{profitId}, #{emplyrId}, #{cooperatorId}, #{mberId}, #{gubun}, #{cost}, #{deliveryCnt}, #{deliveryDay}, #{dypId}, #{feeId}, #{riderFeeId}, SYSDATE(), #{creatId})
+		(SALFIT_ID, PROFIT_ID, EMPLYR_ID, COOPERATOR_ID, MBER_ID, GUBUN, COST, DELIVERY_CNT, DELIVERY_DAY, DYP_ID, FEE_ID, RIDER_FEE_ID, COP_ID, CREAT_DT, CREAT_ID)
+		VALUES(#{salfitId}, #{profitId}, #{emplyrId}, #{cooperatorId}, #{mberId}, #{gubun}, #{cost}, #{deliveryCnt}, #{deliveryDay}, #{dypId}, #{feeId}, #{riderFeeId}, #{copId}, SYSDATE(), #{creatId})
 	</insert>
 
 	<update id="deleteProfit" parameterType="egovframework.com.rd.usr.service.vo.DoszTransferVO">
@@ -1250,6 +1250,15 @@
 		WHERE PROFIT_ID IN (
 			SELECT b.PROFIT_ID FROM RD_COOPERATOR_PAY a
 			LEFT JOIN RD_PROFIT b ON a.cop_id = b.cop_id AND b.GUBUN = 'D' AND b.USE_AT ='Y'
+			WHERE TRAN_DAY = #{tranDay} AND TELEGRAM_NO = #{telegram_no}
+		)
+	</update>
+	<update id="deleteSalesProfitByCoop" parameterType="egovframework.com.rd.usr.service.vo.DoszTransferVO">
+		UPDATE RD_SALES_PROFIT
+		SET USE_AT ='N'
+		WHERE SALFIT_ID IN (
+			SELECT b.SALFIT_ID FROM RD_COOPERATOR_PAY a
+			LEFT JOIN RD_SALES_PROFIT b ON a.cop_id = b.cop_id AND b.GUBUN = 'D' AND b.USE_AT ='Y'
 			WHERE TRAN_DAY = #{tranDay} AND TELEGRAM_NO = #{telegram_no}
 		)
 	</update>

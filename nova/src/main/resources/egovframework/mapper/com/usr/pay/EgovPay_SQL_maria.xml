@@ -388,7 +388,7 @@
 		, SUM(week_plus) - SUM(week_minus) AS WEEK_ABLE_PRICE*/
 		<![CDATA[, if(SUM(week_plus) - SUM(week_minus) < 0 , (SUM(day_plus) - SUM(day_minus) - CEILING(SUM(day_plus)*nvl(a.FEE_ADMINSTRATOR*0.01, 0))) + (SUM(week_plus) - SUM(week_minus)), SUM(day_plus) - SUM(day_minus) - CEILING(SUM(day_plus)*nvl(a.FEE_ADMINSTRATOR*0.01, 0))) AS DAY_ABLE_PRICE
 		, if(SUM(week_plus) - SUM(week_minus) < 0 , 0, SUM(week_plus) - SUM(week_minus)) AS WEEK_ABLE_PRICE]]>
-		, a.FEE_ADMINSTRATOR, a.FEE_ID
+		, a.FEE_ADMINSTRATOR, a.FEE_SALESMAN, a.FEE_ID, b.EMPLYR_ID
 		FROM (
 			SELECT aa.cooperator_id, aa.cooperator_nm
 			,sum(if(a.week_yn ='N', if(a.gubun = 'C' OR a.gubun = 'E' OR a.gubun = 'B' OR a.gubun = 'O' OR (a.gubun = 'D' AND c.status_cd = '0000' AND c.STATUS = '200'), cost, 0), 0)) day_plus	/*선지급금은 이체완료건만 산정*/
@@ -435,6 +435,7 @@
 			GROUP BY aa.cooperator_id
 		) tab
 		LEFT JOIN RD_COOPERATOR_FEE a ON tab.COOPERATOR_ID = a.COOPERATOR_ID AND a.use_at ='Y'
+		LEFT JOIN RD_COOPERATOR_SALES b ON tab.COOPERATOR_ID = b.COOPERATOR_ID AND b.USE_AT ='Y'
 		GROUP by cooperator_id
 
 	</select>
@@ -446,6 +447,20 @@
 			, 0 DAY_MINUS
 			FROM RD_SALES_PROFIT a
 			LEFT JOIN RD_DAY_PAY b  ON a.DYP_ID = b.DYP_ID AND b.USE_AT ='Y'
+			LEFT JOIN RD_TRANSFER c ON b.TRAN_DAY = c.TRAN_DAY AND b.TELEGRAM_NO = c.TELEGRAM_NO
+			JOIN COMTNEMPLYRINFO d ON a.EMPLYR_ID = d.EMPLYR_ID
+			JOIN COMTNEMPLYRSCRTYESTBS e ON d.ESNTL_ID = e.SCRTY_DTRMN_TRGET_ID
+			WHERE 1=1
+				AND a.USE_AT = 'Y'
+				AND a.EMPLYR_ID = #{emplyrId}
+				AND e.AUTHOR_CODE = 'ROLE_SALES'
+
+			UNION all
+
+			SELECT NVL(sum(if(a.gubun = 'C' OR a.gubun = 'E' OR a.gubun = 'B' OR a.gubun = 'O' OR (a.gubun = 'D' AND c.status_cd = '0000' AND c.STATUS = '200'), cost, 0)), 0) DAY_PLUS	/*선지급금은 이체완료건만 산정*/
+			, 0 DAY_MINUS
+			FROM RD_SALES_PROFIT a
+			LEFT JOIN RD_COOPERATOR_PAY b  ON a.COP_ID = b.COP_ID AND b.USE_AT ='Y'
 			LEFT JOIN RD_TRANSFER c ON b.TRAN_DAY = c.TRAN_DAY AND b.TELEGRAM_NO = c.TELEGRAM_NO
 			JOIN COMTNEMPLYRINFO d ON a.EMPLYR_ID = d.EMPLYR_ID
 			JOIN COMTNEMPLYRSCRTYESTBS e ON d.ESNTL_ID = e.SCRTY_DTRMN_TRGET_ID
@@ -614,12 +629,13 @@
 	<select id="selectProfitBase" parameterType="egovframework.com.rd.usr.service.vo.ProfitVO" resultType="egovframework.com.rd.usr.service.vo.ProfitVO">
 		SELECT a.GUBUN
 		, case when a.gubun = 'C' then '콜수수료' when a.gubun ='E' then '기타수수료' when a.gubun ='D' then '선지급수수료' when a.gubun ='P' then '프로그램료' ELSE '' END GUBUN_NM
-		, case when a.GUBUN = 'C' or a.GUBUN = 'P' then a.DELIVERY_COST when a.GUBUN = 'D' then b.SEND_PRICE ELSE 0 END cost
-		, a.DELIVERY_CNT, a.DELIVERY_DAY
+		, case when a.GUBUN = 'C' or a.GUBUN = 'P' then a.DELIVERY_COST when a.GUBUN = 'D' and a.DYP_ID is not null then b.SEND_PRICE when a.GUBUN = 'D' and a.cop_id is not null then c.SEND_PRICE ELSE 0 END cost
+		, a.DELIVERY_CNT, a.DELIVERY_DAY, a.DYP_ID, a.COP_ID
 		FROM RD_PROFIT a
 		LEFT JOIN RD_DAY_PAY b ON a.DYP_ID = b.DYP_ID
+		LEFT JOIN RD_COOPERATOR_PAY c ON a.COP_ID = c.COP_ID
 		WHERE 1 = 1
-			AND a.profit_id = #{profitId}
+			AND a.PROFIT_ID = #{profitId}
 	</select>
 
 
@@ -690,10 +706,11 @@
 	<select id="selectSalesProfitBase" parameterType="egovframework.com.rd.usr.service.vo.ProfitVO" resultType="egovframework.com.rd.usr.service.vo.ProfitVO">
 		SELECT a.GUBUN
 		, case when a.gubun ='E' then '기타수수료' when a.gubun ='D' then '선지급수수료' ELSE '' END GUBUN_NM
-		, case when a.GUBUN = 'D' then b.SEND_PRICE ELSE 0 END cost
+		, case when a.GUBUN = 'D' and a.DYP_ID IS NOT NULL then b.SEND_PRICE WHEN a.GUBUN = 'D' and a.COP_ID IS NOT NULL THEN c.SEND_PRICE ELSE 0 END cost
 		, a.DELIVERY_CNT, a.DELIVERY_DAY
 		FROM RD_SALES_PROFIT a
 		LEFT JOIN RD_DAY_PAY b ON a.DYP_ID = b.DYP_ID
+		LEFT JOIN RD_COOPERATOR_PAY c ON a.COP_ID = c.COP_ID
 		WHERE 1 = 1
 			AND a.salfit_id =  #{salfitId}
 	</select>
