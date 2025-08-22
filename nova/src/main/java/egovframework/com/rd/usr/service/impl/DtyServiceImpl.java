@@ -1426,7 +1426,7 @@ public class DtyServiceImpl extends EgovAbstractServiceImpl implements DtyServic
 		//영업사원 수익등록(선지급)
 		if(resultFee.getFeeCooperatorCost() > 0) {
 			if(Util.isEmpty(resultFee.getEmplyrId())) {
-				throw new IllegalArgumentException("영업사원이 등록되어있지 않습니다\n운영사에 문의 하시기 바랍니다.") ;
+				throw new IllegalArgumentException("영업사원이 등록되어 있지 않아 출금할 수 없습니다.\n운영사에 문의 하시기 바랍니다.") ;
 			}
 			ProfitVO citVo = new ProfitVO();
 			citVo.setSalfitId(egovSitIdGnrService.getNextStringId());

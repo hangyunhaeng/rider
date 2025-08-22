@@ -29,6 +29,11 @@
 			, cellClass : "ag-cell-right"
 			, valueGetter:(params) => { return currencyFormatter(params.data.sendFee);}
 		},
+		{ headerName: "선지급수수료", field: "dayFee", minWidth: 90
+			, cellClass : "ag-cell-right"
+			, valueGetter:(params) => { return currencyFormatter(params.data.dayFee);}
+		},
+
 		{ headerName: "출금일", field: "tranDay", minWidth: 100, valueGetter:(params) => { return getStringDate(params.data.tranDay)}},
 		{ headerName: "출금은행", field: "rvBankNm", minWidth: 100},
 		{ headerName: "출금계좌", field: "rvAccount", minWidth: 140},

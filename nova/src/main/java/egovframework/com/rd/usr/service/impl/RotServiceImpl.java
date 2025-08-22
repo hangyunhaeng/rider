@@ -117,10 +117,10 @@ public class RotServiceImpl extends EgovAbstractServiceImpl implements RotServic
 		LoginVO user = (LoginVO)EgovUserDetailsHelper.getAuthenticatedUser();
 		vo.setCreatId(user.getId());
 		vo.setLastUpdusrId(user.getId());
-		if("ROLE_SALES".equals(vo.getSchAuthorCode()) ) {
-			vo.setEsntlId(user.getUniqId());
-		} else {
+		if("ROLE_USER".equals(user.getAuthorCode()) && "USR".equals(user.getUserSe())  ) {	//협력사는 식별번호를 키로 가짐
 			vo.setEsntlId(user.getIhidNum());
+		} else {
+			vo.setEsntlId(user.getUniqId());
 		}
 
 		List<MyInfoVO> bnkList = rotDAO.selectBankByEsntlId(vo);
