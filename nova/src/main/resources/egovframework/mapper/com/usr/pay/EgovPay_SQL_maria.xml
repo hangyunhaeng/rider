@@ -486,8 +486,8 @@
 
 	<insert id="isnertCooperatorPay" parameterType="egovframework.com.rd.usr.service.vo.CooperatorPayVO">
 		INSERT INTO RD_COOPERATOR_PAY
-		(COP_ID, COOPERATOR_ID, DAY_FEE, SEND_FEE, SEND_PRICE, TRAN_DAY, TELEGRAM_NO, USE_AT, CREAT_DT, CREAT_ID)
-		VALUES(#{copId}, #{cooperatorId}, #{dayFee}, #{sendFee}, #{sendPrice}, #{tranDay}, #{telegramNo}, #{useAt}, SYSDATE(), #{creatId})
+		(COP_ID, COOPERATOR_ID, DAY_FEE, SEND_FEE, SEND_PRICE, TRAN_DAY, TELEGRAM_NO, WEEK_YN, USE_AT, CREAT_DT, CREAT_ID)
+		VALUES(#{copId}, #{cooperatorId}, #{dayFee}, #{sendFee}, #{sendPrice}, #{tranDay}, #{telegramNo}, #{weekYn}, #{useAt}, SYSDATE(), #{creatId})
 	</insert>
 
 	<insert id="isnertSalesPay" parameterType="egovframework.com.rd.usr.service.vo.CooperatorPayVO">

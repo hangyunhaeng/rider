@@ -202,11 +202,13 @@ public class PayServiceImpl extends EgovAbstractServiceImpl implements PayServic
 			dayFeeSalesman = (int)(Math.floor(inputPrice*ablePrice.getFeeSalesman()*0.01));
 			dayFeeAdminstrator = (int)(Math.ceil(inputPrice*ablePrice.getFeeAdminstrator()*0.01)) - (int)(Math.floor(inputPrice*ablePrice.getFeeSalesman()*0.01));
 			vo.setDayFee( dayFeeAll );
+			vo.setWeekYn("N");
 		} else if("WEEK".equals(vo.getSearchGubun()) ) {
 			if(inputPrice+sendFee > ablePrice.getWeekAblePrice() ) {
 				throw new IllegalArgumentException("출금 가능 금액 초과") ;
 			}
 			vo.setDayFee(0);
+			vo.setWeekYn("Y");
 		}
 
 

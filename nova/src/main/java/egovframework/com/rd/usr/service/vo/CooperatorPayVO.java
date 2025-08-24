@@ -36,6 +36,8 @@ public class CooperatorPayVO extends Sch implements Serializable {
 	private String tranDay;
 	//거래고유번호
 	private String telegramNo;
+	//확정여부
+	private String weekYn;
 	//사용여부
 	private String useAt;
 	//생성시점
