@@ -4,6 +4,7 @@ package egovframework.com.rd.usr.service.impl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -43,15 +44,15 @@ import org.json.simple.parser.JSONParser;
  *  -------    --------    ---------------------------
  * </pre>
  */
-@Service("dayDS")
-public class DayDS extends EgovAbstractServiceImpl {
+@Service("dayDSSchedul")
+public class DayDSSchedul extends EgovAbstractServiceImpl {
 
 	@Resource(name = "PayDAO")
 	private PayDAO payDAO;
 	@Resource(name = "DtyDAO")
 	private DtyDAO dtyDAO;
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(DayDS.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(DayDSSchedul.class);
 
 
 	/**
@@ -59,6 +60,7 @@ public class DayDS extends EgovAbstractServiceImpl {
 	 * Spring(Quartz)에서 제공하는 MethodInvokingJobDetailFactoryBean 사용으로 호출된다.
 	 * 관련 설정은 context-schedule.xml 참조
 	 */
+	@Transactional
 	public void execute() {
 
 		try {

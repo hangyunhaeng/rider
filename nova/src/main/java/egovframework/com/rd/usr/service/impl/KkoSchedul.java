@@ -37,13 +37,13 @@ import org.json.simple.parser.JSONParser;
  *  -------    --------    ---------------------------
  * </pre>
  */
-@Service("kko")
-public class Kko extends EgovAbstractServiceImpl {
+@Service("kkoSchedul")
+public class KkoSchedul extends EgovAbstractServiceImpl {
 
 	@Resource(name = "PayDAO")
 	private PayDAO payDAO;
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(Kko.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(KkoSchedul.class);
 
 
 	/**

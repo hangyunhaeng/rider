@@ -1,6 +1,7 @@
 package egovframework.com.rd.usr.service.vo;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -50,6 +51,11 @@ public class MyInfoVO extends Sch implements Serializable {
 	private int dayAblePrice;
 	//정산확정지급 가능금액
 	private int weekAblePrice;
+	//선지급가능금액(잔액테이블입력용)
+	private BigDecimal balanceDayAblePrice;
+	//정산확정지급 가능금액(잔액테이블입력용)
+	private BigDecimal balanceWeekAblePrice;
+	private BigDecimal dayMinus;
 	//협력사 지급가능금액
 	private int coopAblePrice;
 	//영업사원 지급가능금액

@@ -3,14 +3,14 @@
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.0.xsd">
 
 	<!-- 알림톡 발송 상태 확인 -->
-	<bean id="kkoBean" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
-		<property name="targetObject" ref="kko" />
+	<bean id="kkoSchedulBean" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+		<property name="targetObject" ref="kkoSchedul" />
 		<property name="targetMethod" value="execute" />
 		<property name="concurrent" value="false" />
 	</bean>
 
-	<bean id="kkoTrigger" class="org.springframework.scheduling.quartz.SimpleTriggerFactoryBean">
-		<property name="jobDetail" ref="kkoBean" />
+	<bean id="kkoSchedulTrigger" class="org.springframework.scheduling.quartz.SimpleTriggerFactoryBean">
+		<property name="jobDetail" ref="kkoSchedulBean" />
 		<!-- 시작하고 1초후에 실행한다. (milisecond) -->
 		<property name="startDelay" value="1000" />
 		<!-- 매 1분마다 실행한다. (milisecond) 데몬 형식으로 계속 기동 중 -->
@@ -18,10 +18,10 @@
 	</bean>
 
 
-	<bean id="kkoScheduler" class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
+	<bean id="kkoSchedulScheduler" class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
 		<property name="triggers">
 			<list>
-				<ref bean="kkoTrigger" />
+				<ref bean="kkoSchedulTrigger" />
 			</list>
 		</property>
 	</bean>

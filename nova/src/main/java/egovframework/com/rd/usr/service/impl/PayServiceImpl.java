@@ -18,6 +18,7 @@ import egovframework.com.cmm.LoginVO;
 import egovframework.com.cmm.service.EgovProperties;
 import egovframework.com.cmm.util.EgovUserDetailsHelper;
 import egovframework.com.rd.Util;
+import egovframework.com.rd.usr.service.DtyService;
 import egovframework.com.rd.usr.service.PayService;
 import egovframework.com.rd.usr.service.RotService;
 import egovframework.com.rd.usr.service.vo.BalanceVO;
@@ -55,6 +56,8 @@ public class PayServiceImpl extends EgovAbstractServiceImpl implements PayServic
 	private DtyDAO dtyDAO;
 	@Resource(name = "RotService")
 	private RotService rotService;
+	@Resource(name = "DtyService")
+	private DtyService dtyService;
 
 
 
@@ -173,7 +176,7 @@ public class PayServiceImpl extends EgovAbstractServiceImpl implements PayServic
         //0. 사용자용 select for update 로 rock
 		BalanceVO forUpdateVo = new BalanceVO();
 		forUpdateVo.setCooperatorId(vo.getCooperatorId());
-		forUpdateVo.setMberId(EgovProperties.getProperty("Globals.cooperatorId"));
+		forUpdateVo.setEsntlId(EgovProperties.getProperty("Globals.cooperatorId"));
 		dtyDAO.selectForUPdateBalanceByMberId(forUpdateVo);
 
 		int sendFee = Integer.parseInt(EgovProperties.getProperty("Globals.sendFee"));
@@ -260,10 +263,11 @@ public class PayServiceImpl extends EgovAbstractServiceImpl implements PayServic
 
 		if("DAY".equals(vo.getSearchGubun()) ) {
 			//협력사 잔액 조정
-			setBalance(vo.getCooperatorId(), EgovProperties.getProperty("Globals.cooperatorId"), user.getId(), new BigDecimal((inputPrice+sendFee+dayFeeAll)*-1), new BigDecimal(0));
+//			dtyService.setBalance(vo.getCooperatorId(), EgovProperties.getProperty("Globals.cooperatorId"), EgovProperties.getProperty("Globals.cooperatorId"), user.getId(), new BigDecimal((inputPrice+sendFee)*-1), new BigDecimal(0));
+			//선지급은 잔액 조정이 아닌 실시간 계산으로 차감한다. RD_COOPERATOR_PAY의 WEEK_YN이 N인것만
 		} else {
 			//협력사 잔액 조정
-			setBalance(vo.getCooperatorId(), EgovProperties.getProperty("Globals.cooperatorId"), user.getId(), new BigDecimal(0), new BigDecimal((inputPrice+sendFee)*-1));
+			dtyService.setBalance(vo.getCooperatorId(), EgovProperties.getProperty("Globals.cooperatorId"), EgovProperties.getProperty("Globals.cooperatorId"), user.getId(), new BigDecimal(0), new BigDecimal((inputPrice+sendFee)*-1));
 		}
 
 		MyInfoVO bankInfo = rotService.selectMyInfo(myInfoVO);
@@ -294,7 +298,7 @@ public class PayServiceImpl extends EgovAbstractServiceImpl implements PayServic
         //0. 사용자용 select for update 로 rock
 		BalanceVO forUpdateVo = new BalanceVO();
 		forUpdateVo.setCooperatorId(user.getId());
-		forUpdateVo.setMberId(EgovProperties.getProperty("Globals.cooperatorId"));
+		forUpdateVo.setEsntlId(EgovProperties.getProperty("Globals.cooperatorId"));
 		dtyDAO.selectForUPdateBalanceByMberId(forUpdateVo);
 
 		int sendFee = Integer.parseInt(EgovProperties.getProperty("Globals.sendFee"));
@@ -493,44 +497,6 @@ public class PayServiceImpl extends EgovAbstractServiceImpl implements PayServic
 	 */
 	public ProfitVO selectSalesProfitBase(ProfitVO vo) throws Exception {
 		return payDAO.selectSalesProfitBase(vo);
-	}
-
-	private void setBalance(String CoopId, String mberId, String mdfId, BigDecimal balance0, BigDecimal balance1) throws Exception {
-		//라이더 잔액 조정
-		BalanceVO mberBalance = new BalanceVO();
-		mberBalance.setMberId(mberId);
-		mberBalance.setCooperatorId(CoopId);
-		if(dtyDAO.selectBalanceById(mberBalance) == null) {
-			//insert 잔액
-
-
-			if(EgovProperties.getProperty("Globals.cooperatorId").equals(mberId) ) {
-				//협력사
-	    		MyInfoVO ableVo = new MyInfoVO();
-	    		ableVo.setSearchCooperatorId(CoopId);
-	    		List<MyInfoVO> ablePriceForBal = payDAO.cooperatorAblePrice(ableVo);//리스트가 나오면 안됨.
-	    		mberBalance.setBalance0(new BigDecimal(ablePriceForBal.get(0).getDayAblePrice()) );
-	    		mberBalance.setBalance1(new BigDecimal(ablePriceForBal.get(0).getWeekAblePrice()) );
-
-			} else {
-				//라이더
-	    		//1.출금 가능금액 내의 금액인지 확인
-	    		MyInfoVO ableVo = new MyInfoVO();
-	    		ableVo.setMberId(mberId);
-	    		ableVo.setSearchCooperatorId(CoopId);
-	    		MyInfoVO ablePriceForBal = rotService.selectAblePrice(ableVo);
-	    		mberBalance.setBalance0(new BigDecimal(ablePriceForBal.getDayAblePrice()) );
-	    		mberBalance.setBalance1(new BigDecimal(ablePriceForBal.getWeekAblePrice()) );
-			}
-    		dtyDAO.insertBalance(mberBalance);
-		} else {
-			//+잔액
-			mberBalance.setCooperatorId(CoopId);
-			mberBalance.setLastUpdusrId(mdfId);
-			mberBalance.setBalance0(balance0);
-			mberBalance.setBalance1(balance1);
-			dtyDAO.updateBalance(mberBalance);
-		}
 	}
 
 

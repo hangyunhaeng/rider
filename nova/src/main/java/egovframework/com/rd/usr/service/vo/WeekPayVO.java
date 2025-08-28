@@ -25,6 +25,8 @@ public class WeekPayVO extends Sch implements Serializable {
 	private String cooperatorId;
 	//회원ID
 	private String mberId;
+	//ESNTL_ID
+	private String esntlId;
 	//업무구분
 	private String dwGubun;
 	//입출금구분: 1: 입금, 2: 출금

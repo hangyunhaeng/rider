@@ -24,6 +24,8 @@ public class DayPayVO extends Sch implements Serializable {
 	private String cooperatorId;
 	//회원ID
 	private String mberId;
+	//ESNTL_ID
+	private String esntlId;
 	//날짜
 	private String day;
 	//입출금구분

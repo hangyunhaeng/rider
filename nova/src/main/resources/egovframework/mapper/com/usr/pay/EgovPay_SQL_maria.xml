@@ -123,10 +123,10 @@
 		AND error_code IN ('VTIM', '0011')
 	</select>
 	<select id="selectForUpdateBalanceTranster" parameterType="egovframework.com.rd.usr.service.vo.Sch" resultType="egovframework.com.rd.usr.service.vo.BalanceVO">
-		SELECT * FROM RD_BALNCE
-		WHERE (COOPERATOR_ID, MBER_ID) IN (
+		SELECT * FROM RD_BALANCE
+		WHERE (COOPERATOR_ID, ESNTL_ID) IN (
 					/*일정산*/
-					SELECT COOPERATOR_ID, MBER_ID FROM RD_DAY_PAY
+					SELECT a.COOPERATOR_ID, b.ESNTL_ID FROM RD_DAY_PAY a JOIN COMTNGNRLMBER b ON a.mber_id = b.MBER_ID
 					WHERE (TELEGRAM_NO, TRAN_DAY) IN (
 
 							SELECT TELEGRAM_NO, TRAN_DAY FROM RD_TRANSFER
@@ -143,7 +143,7 @@
 					UNION
 
 					/*주정산*/
-					SELECT COOPERATOR_ID, MBER_ID FROM RD_WEEK_PAY
+					SELECT a.COOPERATOR_ID, b.ESNTL_ID FROM RD_WEEK_PAY a JOIN COMTNGNRLMBER b ON a.MBER_ID = b.MBER_ID
 					WHERE (TELEGRAM_NO, TRAN_DAY) IN (
 
 							SELECT TELEGRAM_NO, TRAN_DAY FROM RD_TRANSFER
@@ -160,7 +160,7 @@
 					UNION
 
 					/*협력사 선입금 수수료 */
-					SELECT COOPERATOR_ID, #{cooperatorMberId} AS MBER_ID FROM RD_DAY_PAY
+					SELECT COOPERATOR_ID, #{cooperatorMberId} AS ESNTL_ID FROM RD_DAY_PAY
 					WHERE (TELEGRAM_NO, TRAN_DAY) IN (
 
 							SELECT TELEGRAM_NO, TRAN_DAY FROM RD_TRANSFER
@@ -178,7 +178,7 @@
 					UNION
 
 					/*협력사 출금 */
-					SELECT COOPERATOR_ID, #{cooperatorMberId} AS MBER_ID FROM RD_COOPERATOR_PAY
+					SELECT COOPERATOR_ID, #{cooperatorMberId} AS ESNTL_ID FROM RD_COOPERATOR_PAY
 					WHERE (TELEGRAM_NO, TRAN_DAY) IN (
 
 							SELECT TELEGRAM_NO, TRAN_DAY FROM RD_TRANSFER
@@ -195,7 +195,7 @@
 					UNION
 
 					/*영업사원 출금*/
-					SELECT EMPLYR_ID AS COOPERATOR_ID, #{cooperatorMberId} AS MBER_ID FROM RD_SALES_PAY
+					SELECT #{cooperatorMberId} AS COOPERATOR_ID,  b.ESNTL_ID FROM RD_SALES_PAY a JOIN COMTNEMPLYRINFO b ON a.EMPLYR_ID = b.EMPLYR_ID
 					WHERE (TELEGRAM_NO, TRAN_DAY) IN (
 
 							SELECT TELEGRAM_NO, TRAN_DAY FROM RD_TRANSFER
@@ -384,8 +384,9 @@
 
 	<select id="cooperatorAblePrice" parameterType="egovframework.com.rd.usr.service.vo.MyInfoVO" resultType="egovframework.com.rd.usr.service.vo.MyInfoVO">
 		SELECT tab.cooperator_id, tab.cooperator_nm
-		/*, SUM(day_plus) - SUM(day_minus) - CEILING(SUM(day_plus)*nvl(a.FEE_ADMINSTRATOR*0.01, 0)) AS DAY_ABLE_PRICE
-		, SUM(week_plus) - SUM(week_minus) AS WEEK_ABLE_PRICE*/
+		, SUM(day_plus) AS BALANCE_DAY_ABLE_PRICE
+		, SUM(day_minus) AS DAY_MINUS
+		, SUM(week_plus) - SUM(week_minus) AS BALANCE_WEEK_ABLE_PRICE
 		<![CDATA[, if(SUM(week_plus) - SUM(week_minus) < 0 , (SUM(day_plus) - SUM(day_minus) - CEILING(SUM(day_plus)*nvl(a.FEE_ADMINSTRATOR*0.01, 0))) + (SUM(week_plus) - SUM(week_minus)), SUM(day_plus) - SUM(day_minus) - CEILING(SUM(day_plus)*nvl(a.FEE_ADMINSTRATOR*0.01, 0))) AS DAY_ABLE_PRICE
 		, if(SUM(week_plus) - SUM(week_minus) < 0 , 0, SUM(week_plus) - SUM(week_minus)) AS WEEK_ABLE_PRICE]]>
 		, a.FEE_ADMINSTRATOR, a.FEE_SALESMAN, a.FEE_ID, b.EMPLYR_ID
@@ -508,30 +509,31 @@
 		WHERE TRAN_DAY = #{tranDay} AND  TELEGRAM_NO = #{telegram_no} AND USE_AT ='Y'
 	</update>
 	<select id="selectForUPdateBalanceByTran" parameterType="egovframework.com.rd.usr.service.vo.DoszTransferVO" resultType="egovframework.com.rd.usr.service.vo.BalanceVO">
-		SELECT * FROM RD_BALNCE
-		WHERE (COOPERATOR_ID, MBER_ID) IN (
-		SELECT COOPERATOR_ID, #{cooperatorMberId} AS MBER_ID FROM RD_COOPERATOR_PAY
+		SELECT * FROM RD_BALANCE
+		WHERE (COOPERATOR_ID, ESNTL_ID) IN (
+		SELECT COOPERATOR_ID, #{cooperatorMberId} AS ESNTL_ID FROM RD_COOPERATOR_PAY
 				WHERE TRAN_DAY = #{tranDay} AND  TELEGRAM_NO = #{telegram_no} AND USE_AT ='Y'
 				)
 		FOR UPDATE
 	</select>
 	<select id="selectForUPdateSalesBalanceByTran" parameterType="egovframework.com.rd.usr.service.vo.DoszTransferVO" resultType="egovframework.com.rd.usr.service.vo.BalanceVO">
-		SELECT * FROM RD_BALNCE
-		WHERE (COOPERATOR_ID, MBER_ID) IN (
-		SELECT EMPLYR_ID, #{cooperatorMberId} AS MBER_ID FROM RD_SALES_PAY
-				WHERE TRAN_DAY = #{tranDay} AND  TELEGRAM_NO = #{telegram_no} AND USE_AT ='Y'
+		SELECT * FROM RD_BALANCE
+		WHERE (COOPERATOR_ID, ESNTL_ID) IN (
+		SELECT #{cooperatorMberId} AS COOPERATOR_ID, b.ESNTL_ID FROM RD_SALES_PAY a, COMTNEMPLYRINFO b
+				WHERE a.EMPLYR_ID = b.EMPLYR_ID
+				AND TRAN_DAY = #{tranDay} AND  TELEGRAM_NO = #{telegram_no} AND USE_AT ='Y'
 				)
 		FOR UPDATE
 	</select>
 	<update id="updateBalanceCooperatorPayByTransfer" parameterType="egovframework.com.rd.usr.service.vo.DoszTransferVO">
-		UPDATE RD_BALNCE a, (
-				SELECT COOPERATOR_ID, #{cooperatorMberId} AS MBER_ID, SEND_FEE+SEND_PRICE AS SUM_COST
+		UPDATE RD_BALANCE a, (
+				SELECT COOPERATOR_ID, #{cooperatorMberId} AS ESNTL_ID, SEND_FEE+SEND_PRICE AS SUM_COST, week_yn
 				from RD_COOPERATOR_PAY
 				WHERE TRAN_DAY = #{tranDay} AND  TELEGRAM_NO = #{telegram_no} AND USE_AT ='Y'
 		)b
-		SET BALANCE0 = BALANCE0 + SUM_COST
+		SET BALANCE1 = BALANCE1 + if(week_yn =  'Y', SUM_COST, 0 )
 		WHERE a.COOPERATOR_ID = b.COOPERATOR_ID
-		AND a.MBER_ID = b.MBER_ID
+		AND a.ESNTL_ID = b.ESNTL_ID
 	</update>
 	<select id="selectCooperatorPayList" parameterType="egovframework.com.rd.usr.service.vo.CooperatorPayVO" resultType="egovframework.com.rd.usr.service.vo.CooperatorPayVO">
 		SELECT aa.cooperator_nm
@@ -836,22 +838,23 @@
 	</select>
 
 	<select id="selectBalanceConfirmTarget" parameterType="egovframework.com.rd.usr.service.vo.Sch" resultType="egovframework.com.rd.usr.service.vo.BalanceVO">
-		SELECT b.COOPERATOR_ID, b.mber_id
+		SELECT b.COOPERATOR_ID, b.mber_id, c.ESNTL_ID
 		FROM RD_COOPERATOR a
 		LEFT JOIN RD_COOPERATOR_RIDER_CONNECT b ON a.COOPERATOR_ID = b.COOPERATOR_ID
+		JOIN COMTNGNRLMBER c ON b.MBER_ID = c.MBER_ID
 		WHERE a.USE_AT = 'Y'
 		AND b.USE_AT ='Y'
 
 		UNION ALL
 
-		SELECT COOPERATOR_ID, #{cooperatorMberId}
+		SELECT COOPERATOR_ID, #{cooperatorMberId} AS mber_id, #{cooperatorMberId} AS ESNTL_ID
 		FROM RD_COOPERATOR
 		WHERE USE_AT = 'Y'
 	</select>
 	<insert id="insertBalanceConfirm" parameterType="egovframework.com.rd.usr.service.vo.BalanceVO">
 		INSERT INTO RD_BALANCE_CONFIRM
-		(COOPERATOR_ID, MBER_ID, DAY, BALANCE0, BALANCE1, ABLE_BALANCE0, ABLE_BALANCE1)
-		VALUES(#{cooperatorId}, #{mberId}, #{day}, #{balance0}, #{balance1}, #{ableBalance0}, #{ableBalance1})
+		(COOPERATOR_ID, ESNTL_ID, DAY, BALANCE0, BALANCE1, ABLE_BALANCE0, ABLE_BALANCE1)
+		VALUES(#{cooperatorId}, #{esntlId}, #{day}, #{balance0}, #{balance1}, #{ableBalance0}, #{ableBalance1})
 	</insert>
 	<select id="selectWeekPayByMberId" parameterType="egovframework.com.rd.usr.service.vo.WeekPayVO" resultType="egovframework.com.rd.usr.service.vo.WeekPayVO">
 		SELECT tab.ACCOUNTS_ST_DT, tab.ACCOUNTS_ED_DT, tab.SUM_COST, tab.SEND_PRICE, tab.ABLE_PRICE

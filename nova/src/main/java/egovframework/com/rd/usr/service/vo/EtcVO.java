@@ -25,6 +25,8 @@ public class EtcVO extends Sch implements Serializable {
 	private String cooperatorId;
 	//User ID
 	private String mberId;
+	//ESNTL_ID
+	private String esntlId;
 	//수수료 종류(대여:D, 리스,:R 기타:E)
 	private String gubun;
 	private String gubunNm;

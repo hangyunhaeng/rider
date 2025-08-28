@@ -16,6 +16,7 @@ import egovframework.com.rd.usr.service.vo.DoszSchAccoutVO;
 import egovframework.com.rd.usr.service.vo.DoszTransferVO;
 import egovframework.com.rd.usr.service.vo.EtcVO;
 import egovframework.com.rd.usr.service.vo.HistoryVO;
+import egovframework.com.rd.usr.service.vo.MyInfoVO;
 import egovframework.com.rd.usr.service.vo.ProfitVO;
 import egovframework.com.rd.usr.service.vo.SearchKeyVO;
 import egovframework.com.rd.usr.service.vo.UploadStateVO;
@@ -317,6 +318,16 @@ public class DtyDAO extends EgovComAbstractDAO {
 	public int updateFixDayPayWeekConfirm2(WeekInfoVO vo)throws Exception {
 		return update("dtyDAO.updateFixDayPayWeekConfirm2", vo);
 	}
+	/**
+	 * 정산완료로 세팅 시 협력사 선지급에서 확정금액으로 넘어갈 잔액 조회
+	 * 협력사아이디
+	 * @param vo
+	 * @return
+	 * @throws Exception
+	 */
+	public MyInfoVO selectFixDayFixCooperator(WeekInfoVO vo)throws Exception {
+		return selectOne("dtyDAO.selectFixDayFixCooperator", vo);
+	}
 
 	/**
 	 * 일정산 출금이력을 정산완료로 정정시 라이더 잔액 조정
@@ -399,6 +410,16 @@ public class DtyDAO extends EgovComAbstractDAO {
 	 */
 	public ProfitVO selectBalanceDayTran(DoszTransferVO vo)throws Exception {
 		return selectOne("dtyDAO.selectBalanceDayTran", vo);
+	}
+
+	/**
+	 * 선출금 성공시 협력사 영업사원 선출금 수수료 금액 조회
+	 * @param vo
+	 * @return
+	 * @throws Exception
+	 */
+	public ProfitVO selectBalanceDayTranSaleMan(DoszTransferVO vo)throws Exception {
+		return selectOne("dtyDAO.selectBalanceDayTranSaleMan", vo);
 	}
 
 	/**
@@ -617,6 +638,16 @@ public class DtyDAO extends EgovComAbstractDAO {
 	 */
 	public BalanceVO selectBalanceById(BalanceVO vo) throws Exception {
 		return selectOne("dtyDAO.selectBalanceById", vo);
+	}
+
+	/**
+	 * 특정 대상 잔액 조회(협력사)
+	 * @param vo
+	 * @return
+	 * @throws Exception
+	 */
+	public BalanceVO selectBalanceByCooprator(BalanceVO vo) throws Exception {
+		return selectOne("dtyDAO.selectBalanceByCooprator", vo);
 	}
 	/**
 	 * 잔액 생성

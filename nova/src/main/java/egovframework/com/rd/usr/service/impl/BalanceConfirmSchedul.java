@@ -23,6 +23,7 @@ import java.io.DataOutputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.List;
@@ -47,8 +48,8 @@ import org.json.simple.parser.JSONParser;
  *  -------    --------    ---------------------------
  * </pre>
  */
-@Service("balanceConfirm")
-public class BalanceConfirm extends EgovAbstractServiceImpl {
+@Service("balanceConfirmSchedul")
+public class BalanceConfirmSchedul extends EgovAbstractServiceImpl {
 
 
 	@Resource(name = "PayDAO")
@@ -59,7 +60,7 @@ public class BalanceConfirm extends EgovAbstractServiceImpl {
 	private DtyDAO dtyDAO;
 
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(BalanceConfirm.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(BalanceConfirmSchedul.class);
 
 
 	/**
@@ -80,7 +81,7 @@ public class BalanceConfirm extends EgovAbstractServiceImpl {
 
 			for(int i = 0 ; i < list.size() ; i++) {
 				BalanceVO one = list.get(i);
-				if(!EgovProperties.getProperty("Globals.cooperatorId").equals(one.getMberId())) {
+				if(!EgovProperties.getProperty("Globals.cooperatorId").equals(one.getEsntlId())) {
 
 					//라이더 실시간 잔액 조회
 					MyInfoVO myInfoVO = new MyInfoVO();
@@ -95,12 +96,13 @@ public class BalanceConfirm extends EgovAbstractServiceImpl {
 						//라이더 잔액 검증 테이블 insert
 						BalanceVO BalanceConfirm = new BalanceVO();
 						BalanceConfirm.setCooperatorId(one.getCooperatorId());
-						BalanceConfirm.setMberId(one.getMberId());
+//						BalanceConfirm.setMberId(one.getMberId());
+						BalanceConfirm.setEsntlId(one.getEsntlId());
 						BalanceConfirm.setDay(Util.getDay());
 						BalanceConfirm.setBalance0(balanceTable.getBalance0());
 						BalanceConfirm.setBalance1(balanceTable.getBalance1());
-						BalanceConfirm.setAbleBalance0(new BigDecimal(balanceAble.getDayAblePrice()) );
-						BalanceConfirm.setAbleBalance1(new BigDecimal(balanceAble.getWeekAblePrice()) );
+						BalanceConfirm.setAbleBalance0(balanceAble.getBalanceDayAblePrice() );
+						BalanceConfirm.setAbleBalance1(balanceAble.getBalanceWeekAblePrice() );
 						payDAO.insertBalanceConfirm(BalanceConfirm);
 					}
 
@@ -109,21 +111,26 @@ public class BalanceConfirm extends EgovAbstractServiceImpl {
 					//협력사 실시간 잔액 조회
 					MyInfoVO myInfoVO = new MyInfoVO();
 					myInfoVO.setSearchCooperatorId(one.getCooperatorId());
-					List<MyInfoVO> balanceAble = payDAO.cooperatorAblePrice(myInfoVO);
+					MyInfoVO balanceAble = payDAO.cooperatorAblePriceByCoopId(myInfoVO);
 
 					//협력사 잔액 DB조회
 					BalanceVO balanceTable = dtyDAO.selectBalanceById(one);
+					BalanceVO balanceCoopr = dtyDAO.selectBalanceByCooprator(one);
 
 					//협력사 잔액 검증 테이블 insert
 					if(balanceTable != null) {
+						BigDecimal b0 = balanceTable.getBalance0().subtract(new BigDecimal(balanceCoopr.getCost())).subtract(
+								balanceTable.getBalance0().multiply(new BigDecimal(balanceCoopr.getFeeAdminstrator())).divide(new BigDecimal(100), 0, RoundingMode.UP)
+						);
 						BalanceVO BalanceConfirm = new BalanceVO();
 						BalanceConfirm.setCooperatorId(one.getCooperatorId());
-						BalanceConfirm.setMberId(one.getMberId());
+//						BalanceConfirm.setMberId(one.getMberId());
+						BalanceConfirm.setEsntlId(one.getEsntlId());
 						BalanceConfirm.setDay(Util.getDay());
-						BalanceConfirm.setBalance0(balanceTable.getBalance0());
+						BalanceConfirm.setBalance0(b0);
 						BalanceConfirm.setBalance1(balanceTable.getBalance1());
-						BalanceConfirm.setAbleBalance0(new BigDecimal(balanceAble.get(0).getDayAblePrice()) );
-						BalanceConfirm.setAbleBalance1(new BigDecimal(balanceAble.get(0).getWeekAblePrice()) );
+						BalanceConfirm.setAbleBalance0( new BigDecimal(balanceAble.getDayAblePrice()) );
+						BalanceConfirm.setAbleBalance1( new BigDecimal(balanceAble.getWeekAblePrice()) );
 						payDAO.insertBalanceConfirm(BalanceConfirm);
 					}
 				}

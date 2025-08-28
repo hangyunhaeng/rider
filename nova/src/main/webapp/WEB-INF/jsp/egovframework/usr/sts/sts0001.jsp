@@ -12,23 +12,24 @@
 	<script type="text/javaScript">
 
 
-	var pageInit = true;
-	var pagePerCnt = 15;
 	let gridOptions="";
 	var grid="";
 	let data;
 	var columnDefs= [
-		{ headerName: "NO", field: "rn", minWidth: 70 },
+		{ headerName: "NO", field: "rn", minWidth: 70, valueGetter:(params) => { return params.node.rowIndex + 1} },
 		{ headerName: "기준일자", field: "day", minWidth: 120},
 		{ headerName: "협력사ID", field: "cooperatorId", minWidth: 120},
 		{ headerName: "협력사명", field: "cooperatorNm", minWidth: 120},
 		{ headerName: "라이더ID", field: "mberId", minWidth: 120},
 		{ headerName: "라이더명", field: "mberNm", minWidth: 120},
-		{ headerName: "BALANCE0", field: "balance0", minWidth: 120},
-		{ headerName: "BALANCE1", field: "balance1", minWidth: 120},
-		{ headerName: "ABLE_BALANCE0", field: "ableBalance0", minWidth: 120},
-		{ headerName: "ABLE_BALANCE1", field: "ableBalance1", minWidth: 120}
-
+		{ headerName: "관리용DB_선지급", field: "balance0", minWidth: 120, cellClass: 'ag-cell-right', valueGetter:(params) => { return currencyFormatter(params.data.balance0)}},
+		{ headerName: "관리용DB_확정금", field: "balance1", minWidth: 120, cellClass: 'ag-cell-right', valueGetter:(params) => { return currencyFormatter(params.data.balance1)}},
+		{ headerName: "실시간잔액_선지급", field: "ableBalance0", minWidth: 120, cellClass: 'ag-cell-right', valueGetter:(params) => { return currencyFormatter(params.data.ableBalance0)}},
+		{ headerName: "실시간잔액_확정금", field: "ableBalance1", minWidth: 120, cellClass: 'ag-cell-right', valueGetter:(params) => { return currencyFormatter(params.data.ableBalance1)}},
+		{ headerName: "접속", field: "con", minWidth: 90
+			, cellRenderer:(params) => {return params.data.gubunNm== '라이더' ? '<div class="btn btn-primary mb-2 mb-sm-0 mx-1 fs-9" type="submit" onclick="clickCon(\''+params.data.mberId+'\')">접속</div>' : '';}
+		},
+		{ headerName: "gubunNm", field: "gubunNm", minWidth: 120, hide: true}
 	];
 
 
@@ -44,8 +45,6 @@
 
 		//업로드일 세팅
 		var today = new Date();
-		var now = new Date();
-		var towWeekAgo = new Date(now.setDate(now.getDate()-14));
 		var searchFromDate = flatpickr("#searchFromDate", {
 			locale: "ko",
 			allowInput: false,
@@ -69,30 +68,25 @@
 			doSearch(1, paging.objectCnt);
 		});
 
-		searchFromDate.setDate(towWeekAgo.getFullYear()+"-"+(towWeekAgo.getMonth()+1)+"-"+towWeekAgo.getDate());
+		searchFromDate.setDate(today.getFullYear()+"-"+(today.getMonth()+1)+"-"+today.getDate());
 		searchToDate.setDate(today.getFullYear()+"-"+(today.getMonth()+1)+"-"+today.getDate());
-
-		//페이징설정
-		paging.createPaging('#paging', 1, pagePerCnt, doSearch);
 
 		//그리드 설정
 		setGrid();
 
 
-		doSearch((${balanceVO.schIdx}==0)?1: ${balanceVO.schIdx}, paging.objectCnt);
+		doSearch();
 	});
 
 
 
 	//내역 조회
-	function doSearch(schIdx, schPagePerCnt){
+	function doSearch(){
 
 		const params = new URLSearchParams();
 		params.append('searchFromDate', getOnlyNumber($('#searchFromDate').val()));
 		params.append('searchToDate', getOnlyNumber($('#searchToDate').val()));
 		params.append('searchGubun', $('#searchGubun').val());
-		params.append("schIdx", schIdx);
-		params.append("schPagePerCnt", schPagePerCnt);
 
 	    if(!limit2Week($('#searchFromDate').val(), $('#searchToDate').val())){
 	    	return;
@@ -129,7 +123,6 @@
         	// 로딩 종료
             $('.loading-wrap--js').hide();
         });
-        pageInit = false;
 	}
 
 	function setGrid(){
@@ -149,7 +142,7 @@
                     //loadData(params.api); // 그리드가 준비된 후 데이터 로드
                     params.api.sizeColumnsToFit();
                 },
-                rowClassRules: {'ag-cell-err ': (params) => { return params.data.err === true; }},
+                rowClassRules: {'ag-cell-err ': (params) => { debugger; return (params.data.balance0 !=  params.data.ableBalance0 || params.data.balance1 !=  params.data.ableBalance1) == true}},
 				overlayLoadingTemplate: '<span class="ag-overlay-loading-center">로딩 중</span>',
 				overlayNoRowsTemplate: '<span class="ag-overlay-loading-center">데이터가 없습니다</span>'
             };
@@ -160,6 +153,41 @@
 
 	}
 
+
+	function clickCon(mberId){
+
+		const params = new URLSearchParams();
+		params.append("mberId", mberId);
+		// 로딩 시작
+        $('.loading-wrap--js').show();
+        axios.post('${pageContext.request.contextPath}/usr/mem0002_0008.do',params).then(function(response) {
+
+            if(chkLogOut(response.data)){
+            	return;
+            }
+
+        	// 로딩 종료
+            $('.loading-wrap--js').hide();
+        	if(response.data.resultCode == "success"){
+        		window.open("${riderUrl}/com/com0004.do", "myForm");
+        		$('#myForm').empty();
+				$('#myForm').attr("action","${riderUrl}/com/com0004.do");
+	            $('#myForm').attr("target", "myForm");
+	            $('#myForm').append($("<input/>", {type:"hidden", name:"id", value:mberId}));
+	            $('#myForm').append($("<input/>", {type:"hidden", name:"emplyrId", value:"${loginVO.id}"}));
+	            $('#myForm').append($("<input/>", {type:"hidden", name:"gubun", value:"admin"}));
+	            $('#myForm').append($("<input/>", {type:"hidden", name:"userSe", value:"GNR"}));
+	            $('#myForm').append($("<input/>", {type:"hidden", name:"key", value:response.data.key}));
+				$('#myForm').submit();
+        	}
+        })
+        .catch(function(error) {
+            console.error('There was an error fetching the data:', error);
+        }).finally(function() {
+        	// 로딩 종료
+            $('.loading-wrap--js').hide();
+        });
+	}
 
 
 	</script>

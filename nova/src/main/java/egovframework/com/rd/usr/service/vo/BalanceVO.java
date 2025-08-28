@@ -20,6 +20,7 @@ import lombok.Setter;
 public class BalanceVO extends Sch implements Serializable {
 
 	private String cooperatorId;
+	private String esntlId;
 	private String mberId;
 	private BigDecimal balance0;
 	private BigDecimal balance1;
@@ -36,5 +37,6 @@ public class BalanceVO extends Sch implements Serializable {
 	private String gubunNm;
 	private String cooperatorNm;
 	private String mberNm;
+	private float feeAdminstrator;
 
 }

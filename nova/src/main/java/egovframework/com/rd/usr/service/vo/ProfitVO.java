@@ -61,7 +61,7 @@ public class ProfitVO extends Sch implements Serializable {
 	private String mberNm;
 	private String cooperatorNm;
 	private String gubunNm;
-
+	private String esntlId;
 
 
 }

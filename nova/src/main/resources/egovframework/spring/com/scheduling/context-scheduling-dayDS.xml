@@ -3,22 +3,22 @@
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.0.xsd">
 
 	<!-- 이체 실패 재처리 -->
-	<bean id="dayDSBean" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
-		<property name="targetObject" ref="dayDS" />
+	<bean id="dayDSSchedulBean" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+		<property name="targetObject" ref="dayDSSchedul" />
 		<property name="targetMethod" value="execute" />
 		<property name="concurrent" value="false" />
 	</bean>
 
-	<bean id="dayDSTrigger" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
-		<property name="jobDetail" ref="dayDSBean" />
+	<bean id="dayDSSchedulTrigger" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+		<property name="jobDetail" ref="dayDSSchedulBean" />
 		<property name="cronExpression" value="0 0 01 * * ?" />
 	</bean>
 
 
-	<bean id="dayDSScheduler" class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
+	<bean id="dayDSSchedulScheduler" class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
 		<property name="triggers">
 			<list>
-				<ref bean="dayDSTrigger" />
+				<ref bean="dayDSSchedulTrigger" />
 			</list>
 		</property>
 	</bean>

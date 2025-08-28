@@ -8,18 +8,23 @@
 			SELECT ROWNUM() RN,m.*
 			FROM (
 		</if>
-				SELECT a.COOPERATOR_ID, a.MBER_ID, a.DAY, a.BALANCE0, a.BALANCE1, a.ABLE_BALANCE0, a.ABLE_BALANCE1
+				SELECT a.COOPERATOR_ID, a.ESNTL_ID, b.mber_id, a.DAY
+				<![CDATA[
+					, if(a.BALANCE1 <0 , BALANCE0+BALANCE1, BALANCE0) AS BALANCE0 , if(a.BALANCE1 <0 , 0, BALANCE1) AS BALANCE1
+					, if(a.ABLE_BALANCE1 <0 , ABLE_BALANCE0+ABLE_BALANCE1, ABLE_BALANCE0) AS ABLE_BALANCE0 , if(a.ABLE_BALANCE1 <0 , 0, ABLE_BALANCE1) AS ABLE_BALANCE1
+				]]>
 					, b.MBER_NM, c.COOPERATOR_NM
-					, if(a.mber_id = #{cooperatorMberId}, '협력사', '라이더') AS GUBUN_NM
+					, if(a.ESNTL_ID = #{cooperatorMberId}, '협력사', '라이더') AS GUBUN_NM
 				FROM RD_BALANCE_CONFIRM a
-				LEFT JOIN COMTNGNRLMBER b ON a.mber_id = b.MBER_ID
+				LEFT JOIN COMTNGNRLMBER b ON a.ESNTL_ID = b.ESNTL_ID
 				LEFT JOIN RD_COOPERATOR c ON a.COOPERATOR_ID = c.COOPERATOR_ID
+				LEFT JOIN COMTNEMPLYRINFO d ON a.ESNTL_ID = d.ESNTL_ID
 				WHERE DAY BETWEEN #{searchFromDate} AND #{searchToDate}
 				<if test='searchCooperatorId != "all" and searchGubun == "R"'>
-				AND a.mber_id != #{cooperatorMberId}
+				AND a.ESNTL_ID != #{cooperatorMberId}
 				</if>
 				<if test='searchCooperatorId != "all" and searchGubun == "C"'>
-				AND a.mber_id = #{cooperatorMberId}
+				AND a.ESNTL_ID = #{cooperatorMberId}
 				</if>
 
 		<if test="schIdx !=0 and schPagePerCnt != 0">

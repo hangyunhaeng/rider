@@ -3,14 +3,14 @@
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.0.xsd">
 
 	<!-- 이체 실패 재처리 -->
-	<bean id="transferBean" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
-		<property name="targetObject" ref="transfer" />
+	<bean id="transferSchedulBean" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+		<property name="targetObject" ref="transferSchedul" />
 		<property name="targetMethod" value="execute" />
 		<property name="concurrent" value="false" />
 	</bean>
 
-	<bean id="transferTrigger" class="org.springframework.scheduling.quartz.SimpleTriggerFactoryBean">
-		<property name="jobDetail" ref="transferBean" />
+	<bean id="transferSchedulTrigger" class="org.springframework.scheduling.quartz.SimpleTriggerFactoryBean">
+		<property name="jobDetail" ref="transferSchedulBean" />
 		<!-- 시작하고 1분후에 실행한다. (milisecond) -->
 		<property name="startDelay" value="300000" />
 		<!-- 매 360(6분)초마다 실행한다. (milisecond) 데몬 형식으로 계속 기동 중 -->
@@ -18,10 +18,10 @@
 	</bean>
 
 
-	<bean id="transferScheduler" class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
+	<bean id="transferSchedulScheduler" class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
 		<property name="triggers">
 			<list>
-				<ref bean="transferTrigger" />
+				<ref bean="transferSchedulTrigger" />
 			</list>
 		</property>
 	</bean>

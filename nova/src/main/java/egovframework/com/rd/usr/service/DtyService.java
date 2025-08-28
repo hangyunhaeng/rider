@@ -1,5 +1,6 @@
 package egovframework.com.rd.usr.service;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
@@ -286,6 +287,17 @@ public interface DtyService {
 	 * @throws Exception
 	 */
 	public void fixWeek(WeekInfoVO weekInfoVO) throws Exception ;
+	/**
+	 * 잔액 조정
+	 * @param CoopId
+	 * @param mberId
+	 * @param esntlId
+	 * @param mdfId
+	 * @param balance0
+	 * @param balance1
+	 * @throws Exception
+	 */
+	public void setBalance(String CoopId, String mberId, String esntlId, String mdfId, BigDecimal balance0, BigDecimal balance1) throws Exception ;
 
 	/**
 	 * 주정산 파일 삭제

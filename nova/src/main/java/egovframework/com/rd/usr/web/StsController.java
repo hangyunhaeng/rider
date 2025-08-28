@@ -18,6 +18,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import egovframework.com.cmm.LoginVO;
+import egovframework.com.cmm.service.EgovProperties;
 import egovframework.com.cmm.util.EgovUserDetailsHelper;
 import egovframework.com.rd.Util;
 import egovframework.com.rd.usr.service.NotService;
@@ -69,6 +70,10 @@ public class StsController {
         	return "egovframework/com/cmm/error/accessDenied";
         }
         model.addAttribute("balanceVO", balanceVO);
+        if(Util.isReal())
+        	model.addAttribute("riderUrl", "https://"+EgovProperties.getProperty("Globals.gnrDomain"));
+        else
+        	model.addAttribute("riderUrl", "http://"+EgovProperties.getProperty("Globals.gnrDevDomain"));
         return "egovframework/usr/sts/sts0001";
 	}
 

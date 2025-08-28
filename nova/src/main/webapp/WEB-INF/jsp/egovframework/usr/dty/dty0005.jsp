@@ -605,7 +605,6 @@
 
 	function doFixWeek(){
 
-		debugger;
 // 	    if(!limit2Week($('#searchFromDate1').val(), $('#searchToDate1').val())){
 // 	    	return;
 // 	    }

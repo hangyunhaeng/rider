@@ -45,15 +45,15 @@ import org.json.simple.parser.JSONParser;
  *  -------    --------    ---------------------------
  * </pre>
  */
-@Service("transfer")
-public class Transfer extends EgovAbstractServiceImpl {
+@Service("transferSchedul")
+public class TransferSchedul extends EgovAbstractServiceImpl {
 
 	@Resource(name = "PayDAO")
 	private PayDAO payDAO;
 	@Resource(name = "DtyDAO")
 	private DtyDAO dtyDAO;
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(Transfer.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(TransferSchedul.class);
 
 
 	/**
@@ -162,6 +162,7 @@ public class Transfer extends EgovAbstractServiceImpl {
 
 		            		// 협력사 잔액 조정
 		            		// 거래내역 삭제(협력사)
+		            		tranResult.setCooperatorMberId(EgovProperties.getProperty("Globals.cooperatorId"));
 		            		payDAO.updateBalanceCooperatorPayByTransfer(tranResult);
 		            		payDAO.updateCooperatorPayByTransfer(tranResult);
 		            		dtyDAO.deleteSalesProfitByCoop(tranResult);
