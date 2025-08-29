@@ -40,10 +40,10 @@
 		FROM RD_BALANCE_CONFIRM
 		WHERE DAY BETWEEN #{searchFromDate} AND #{searchToDate}
 			<if test='searchCooperatorId != "all" and searchGubun == "R"'>
-			AND mber_id != #{cooperatorMberId}
+			AND ESNTL_ID != #{cooperatorMberId}
 			</if>
 			<if test='searchCooperatorId != "all" and searchGubun == "C"'>
-			AND mber_id = #{cooperatorMberId}
+			AND ESNTL_ID = #{cooperatorMberId}
 			</if>
 	</select>
 </mapper>
