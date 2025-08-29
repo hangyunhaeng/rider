@@ -47,7 +47,7 @@
 		{ headerName: "금액", field: "cost", minWidth: 80
 			, cellClass: (params) => {return agGridUnderBarClass(params, 'ag-cell-right')}
 			, valueGetter:(params) => { return currencyFormatter(params.data.cost)}
-			, cellRenderer:(params) => { return '<div data-bs-toggle="modal" data-bs-target="#exampleModal" onclick="clickFee(\''+params.data.coofitId+'\')">'+currencyFormatter(params.data.cost)+'</div>';}
+			, cellRenderer:(params) => { return (params.data.gubun== 'C' || params.data.gubun == 'D')?'<div data-bs-toggle="modal" data-bs-target="#exampleModal" onclick="clickFee(\''+params.data.coofitId+'\')">'+currencyFormatter(params.data.cost)+'</div>':currencyFormatter(params.data.cost) ;}
 		},
 		{ headerName: "등록일", field: "creatDt", minWidth: 140, valueGetter:(params) => { return getStringDate(params.data.creatDt)}}
 	];
@@ -76,37 +76,45 @@
 		{ headerName: "소속<br/>라이더", field: "rdcnt", minWidth: 80, cellClass: 'ag-cell-right', hide:true},
 		{ headerName: "출금가능금액", field: "xxx", minWidth: 90, cellClass: 'ag-cell-right', hide:true},
 		{ headerName: "feeId", field: "feeId", minWidth: 90, hide:true},
-		{ headerName: "선지급수수료(%)", field: "feeAdminstrator", minWidth: 90, maxWidth: 95
+		{ headerName: "선지급수수료(%)", field: "feeAdminstrator", minWidth: 105, maxWidth: 105
 			, valueGetter:(params) => { return currencyFormatter(params.data.feeAdminstrator);}
 		},
-		{ headerName: "협력사<br/>선지급수수료(%)", field: "feeCooperator", minWidth: 90, maxWidth: 95
+		{ headerName: "협력사<br/>선지급수수료(%)", field: "feeCooperator", minWidth: 105, maxWidth: 105
 			, valueGetter:(params) => { return currencyFormatter(params.data.feeCooperator);}
 		},
-		{ headerName: "영업사원<br/>선지급수수료(%)", field: "feeSalesman", minWidth: 87, maxWidth: 87
+		{ headerName: "영업사원<br/>선지급수수료(%)", field: "feeSalesman", minWidth: 105, maxWidth: 105
 			, valueGetter:(params) => { return currencyFormatter(params.data.feeSalesman);}
 		},
-		{ headerName: "고용보험(%)", field: "feeEmploymentInsurance", minWidth: 90, maxWidth: 95
+		{ headerName: "고용보험(%)", field: "feeEmploymentInsurance", minWidth: 90, maxWidth: 95, hide:true
 			, valueGetter:(params) => { return currencyFormatter(params.data.feeEmploymentInsurance);}
 		},
-		{ headerName: "산재보험(%)", field: "feeIndustrialInsurance", minWidth: 90, maxWidth: 95
+		{ headerName: "산재보험(%)", field: "feeIndustrialInsurance", minWidth: 90, maxWidth: 95, hide:true
 			, valueGetter:(params) => { return currencyFormatter(params.data.feeIndustrialInsurance);}
 		},
-		{ headerName: "원천세(%)", field: "feeWithholdingTax", minWidth: 90, maxWidth: 94
+		{ headerName: "원천세(%)", field: "feeWithholdingTax", minWidth: 90, maxWidth: 94, hide:true
 			, valueGetter:(params) => { return currencyFormatter(params.data.feeWithholdingTax);}
 		},
-		{ headerName: "시간제보험(원)", field: "feeTimeInsurance", minWidth: 90, maxWidth: 93
+		{ headerName: "시간제보험(원)", field: "feeTimeInsurance", minWidth: 90, maxWidth: 93, hide:true
 			, valueGetter:(params) => { return currencyFormatter(params.data.feeTimeInsurance);}
 		},
-		{ headerName: "콜수수료(원)", field: "feeCall", minWidth: 90, maxWidth: 93
+		{ headerName: "콜수수료(원)", field: "feeCall", minWidth: 105, maxWidth: 105
 			, valueGetter:(params) => { return currencyFormatter(params.data.feeCall);}
 		},
-		{ headerName: "협력사<br/>콜수수료(%)", field: "feeCooperatorCall", minWidth: 90, maxWidth: 95
+		{ headerName: "협력사<br/>콜수수료(%)", field: "feeCooperatorCall", minWidth: 105, maxWidth: 105
 			, valueGetter:(params) => { return currencyFormatter(params.data.feeCooperatorCall);}
+		},
+		{ headerName: "프로그램료(원)", field: "feeProgram", minWidth: 105, maxWidth: 105
+			, cellClass: (params) => {return agGrideditClass(params, "ag-cell-right");}
+				, valueGetter:(params) => { return currencyFormatter(params.data.feeProgram);}
+		},
+		{ headerName: "영업사원<br/>프로그램료(원)", field: "feeProgramSalesman", minWidth: 105, maxWidth: 105
+			, cellClass: (params) => {return agGrideditClass(params, "ag-cell-right");}
+				, valueGetter:(params) => { return currencyFormatter(params.data.feeProgramSalesman);}
 		},
 		{ headerName: "사용여부", field: "useAt", minWidth: 90, hide:true
 			, valueGetter:(params) => { return (params.node.data.useAt=='Y')?"사용": "미사용"}
 		},
-		{ headerName: "등록일", field: "creatDt", minWidth: 100, maxWidth: 100
+		{ headerName: "등록일", field: "creatDt", minWidth: 105, maxWidth: 105
 	        , valueGetter:(params) => { return getStringDate(params.data.creatDt)}
 	    },
 		{ headerName: "생성자", field: "creatId", minWidth: 90, hide:true},

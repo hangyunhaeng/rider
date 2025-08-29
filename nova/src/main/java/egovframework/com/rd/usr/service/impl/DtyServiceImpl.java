@@ -2572,13 +2572,13 @@ public class DtyServiceImpl extends EgovAbstractServiceImpl implements DtyServic
     		}
 
     		//수익 등록(프로그램료)
-    		ProfitVO fitVo1 = new ProfitVO();
-    		if(one.getFeeProgramCost() > 0) {
+			ProfitVO fitVo1 = new ProfitVO();
+    		if(one.getFeeProgramCost()-one.getFeeProgramSalesmanCost() > 0) {
     			fitVo1.setProfitId(egovFitIdGnrService.getNextStringId());
     			fitVo1.setCooperatorId(one.getCooperatorId());//협력사
     			fitVo1.setMberId(one.getMberId());			//라이더ID
     			fitVo1.setGubun("P");						//프로그램료
-    			fitVo1.setCost(one.getFeeProgramCost()); 		//금액
+    			fitVo1.setCost(one.getFeeProgramCost()-one.getFeeProgramSalesmanCost()); 		//금액
     			fitVo1.setDeliveryCost(one.getDeliveryPrice());	//배달비
     			fitVo1.setDeliveryCnt(one.getDeliveryCnt());	//배달건수
     			fitVo1.setDeliveryDay(one.getDay());			//배달일
@@ -2587,6 +2587,29 @@ public class DtyServiceImpl extends EgovAbstractServiceImpl implements DtyServic
     			fitVo1.setRiderFeeId(one.getRiderFeeId());	//RIDER_FEE_ID
     			fitVo1.setCreatId(user.getId());
 	    		dtyDAO.insertProfit(fitVo1);
+    		}
+
+    		//수익 등록(영업사원 프로그램료)
+    		if(one.getFeeProgramSalesmanCost() > 0) {
+    			if(Util.isEmpty(one.getEmplyrId())) {
+    				throw new IllegalArgumentException("영업사원이 등록되어 있지 않아 확정할 수 없습니다.\n"+one.getCooperatorNm()+"의 영업사원을 지정하세요\n확정을 취소합니다") ;
+    			}
+
+    			ProfitVO salVo1 = new ProfitVO();
+    			salVo1.setSalfitId(egovSitIdGnrService.getNextStringId());
+    			salVo1.setProfitId(fitVo.getProfitId());
+    			salVo1.setEmplyrId(one.getEmplyrId());			//영업사원ID
+    			salVo1.setCooperatorId(one.getCooperatorId());//협력사
+    			salVo1.setMberId(one.getMberId());			//라이더ID
+    			salVo1.setGubun("P");						//프로그램료
+    			salVo1.setCost(one.getFeeProgramSalesmanCost()); 		//금액
+    			salVo1.setDeliveryCnt(one.getDeliveryCnt());	//배달건수
+    			salVo1.setDeliveryDay(one.getDay());			//배달일
+    			salVo1.setDypId(one.getDypId());				//DYP_ID
+    			salVo1.setFeeId(one.getFeeId());				//FEE_ID
+    			salVo1.setRiderFeeId(one.getRiderFeeId());	//RIDER_FEE_ID
+    			salVo1.setCreatId(user.getId());
+	    		dtyDAO.insertSalesProfit(salVo1);
     		}
 
     	}

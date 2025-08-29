@@ -22,6 +22,7 @@ public class DayPayVO extends Sch implements Serializable {
 	private String dypId;
 
 	private String cooperatorId;
+	private String cooperatorNm;
 	//회원ID
 	private String mberId;
 	//ESNTL_ID
@@ -81,8 +82,10 @@ public class DayPayVO extends Sch implements Serializable {
 	private String riderFeeId;
 	//협력사 콜수수료
 	private int feeCooperatorCallCost;
-	//운영사 프로그램료
+	//전체 프로그램료
 	private int feeProgramCost;
+	//영업사원 프로그램료
+	private int feeProgramSalesmanCost;
 
 	//협력사 선지급 수수료
 	private int feeCooperatorCost;

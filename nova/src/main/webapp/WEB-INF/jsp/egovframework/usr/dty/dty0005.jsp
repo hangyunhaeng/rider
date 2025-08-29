@@ -431,6 +431,12 @@
 					grid.setGridOption('pinnedBottomRowData', sum);	//합계데이터는 정상데이터만 포함한다
 					grid.setGridOption("rowData", data);
 	            }
+        	} else {
+        		if(response.data.resultMsg != null && response.data.resultMsg != ''){
+        			alert(response.data.resultMsg);
+        		} else {
+        			alert("확정 실패하였습니다");
+        		}
         	}
 
         })

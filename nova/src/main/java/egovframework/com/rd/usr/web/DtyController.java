@@ -1102,19 +1102,26 @@ public class DtyController {
         if(!Util.isUsr()) {
         	return ResponseEntity.status(401).body("Unauthorized");
         }
+        //return value
+        Map<String, Object> map =  new HashMap<String, Object>();
 
         //총판 or 협력사
         deliveryInfoVO.setSchAuthorCode(user.getAuthorCode());
         deliveryInfoVO.setSchIhidNum(user.getIhidNum());
 
-        dtyService.fixDay(deliveryInfoVO);
+	    try {
+	        dtyService.fixDay(deliveryInfoVO);
 
-        List<DeliveryInfoVO> list = dtyService.selectDeliveryInfoByParam(deliveryInfoVO);
-        //return value
-        Map<String, Object> map =  new HashMap<String, Object>();
+	        List<DeliveryInfoVO> list = dtyService.selectDeliveryInfoByParam(deliveryInfoVO);
 
-        map.put("list", list);
-        map.put("resultCode", "success");
+	        map.put("list", list);
+	        map.put("resultCode", "success");
+	    }catch(Exception e) {
+			e.printStackTrace();
+			LOGGER.error(e.toString());
+			map.put("resultCode", "fail");
+			map.put("resultMsg", e.getMessage());
+	    }
         return ResponseEntity.ok(map);
 	}
 

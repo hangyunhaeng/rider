@@ -105,10 +105,20 @@
 			]
 		},
 
-		{ headerName: "프로그램료(원)", field: "feeProgram", minWidth: 90, editable: (params) => {return ('${loginVO.authorCode}' =='ROLE_ADMIN')? true: false}
-			, cellClass: (params) => {return agGrideditClass(params, "ag-cell-right");}
-			, valueGetter:(params) => { return currencyFormatter(params.data.feeProgram);}
-            , valueParser: (params) => { return gridWan(params);}
+		{ headerName: "프로그램료(원)",
+		    children: [
+		    	{ headerName: "전체(원)", field: "feeProgram", minWidth: 90, editable: (params) => {return ('${loginVO.authorCode}' =='ROLE_ADMIN')? true: false}
+					, cellClass: (params) => {return agGrideditClass(params, "ag-cell-right");}
+					, valueGetter:(params) => { return currencyFormatter(params.data.feeProgram);}
+		            , valueParser: (params) => { return gridWan(params);
+		            }
+		         },
+				{ headerName: "영업사원(원)", field: "feeProgramSalesman", minWidth: 90, editable: (params) => {return ('${loginVO.authorCode}' =='ROLE_ADMIN')? true: false}
+					, cellClass: (params) => {return agGrideditClass(params, "ag-cell-right");}
+					, valueGetter:(params) => { return currencyFormatter(params.data.feeProgramSalesman);}
+		            , valueParser: (params) => { return gridPercent(params);}
+				}
+			]
 		},
 
 		{ headerName: "사용여부", field: "useAt", minWidth: 90, editable: (params) => {return ('${loginVO.authorCode}' == 'ROLE_ADMIN')? true: false}
@@ -260,7 +270,8 @@
 	    var newData = {
     		cooperatorId: null,
     		useAt: 'Y',
-    		crud: "c"
+    		crud: "c",
+    		feeCooperatorAt : false
 	    };
 	    return newData;
 	}

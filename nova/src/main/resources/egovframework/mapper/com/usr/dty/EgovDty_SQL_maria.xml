@@ -621,9 +621,10 @@
 			, DELIVERY_PRICE - INSURANCE - FEE_CALL_COST - FEE_PROGRAM_COST AS 산정대상
 			, CEILING((DELIVERY_PRICE - INSURANCE - FEE_CALL_COST - FEE_PROGRAM_COST) * FEE_ADMINSTRATOR) + FEE_CALL_COST + FEE_PROGRAM_COST AS DAY_FEE
 			, INSURANCE
-			, 'N' AS WEEK_YN, 'Y' AS USE_AT, ATCH_FILE_ID AS DAY_ATCH_FILE_ID, FEE_CALL_COST, FEE_PROGRAM_COST,DELIVERY_CNT, FEE_ID, RIDER_FEE_ID
+			, 'N' AS WEEK_YN, 'Y' AS USE_AT, ATCH_FILE_ID AS DAY_ATCH_FILE_ID, FEE_CALL_COST, FEE_PROGRAM_COST, FEE_PROGRAM_SALESMAN_COST, DELIVERY_CNT, FEE_ID, RIDER_FEE_ID
 			/*협력사 수익: 콜수수료*/
 			, FLOOR(FEE_CALL_COST*FEE_COOPERATOR_CALL) AS FEE_COOPERATOR_CALL_COST
+			, COOPERATOR_NM, EMPLYR_ID
 			FROM
 			(
 				SELECT fee_tab.*
@@ -634,8 +635,10 @@
 					, CEILING(DELIVERY_PRICE*(FEE_EMPLOYMENT_INSURANCE+FEE_INDUSTRIAL_INSURANCE+FEE_WITHHOLDING_TAX)) + if(DELIVERY_CNT*FEE_TIME_INSURANCE > #{timeInsuranceMaxFee}, #{timeInsuranceMaxFee}, DELIVERY_CNT*FEE_TIME_INSURANCE) AS INSURANCE
 					/* 콜수수료 */
 					, DELIVERY_CNT*FEE_CALL AS FEE_CALL_COST
-					/* 프로그램료 */
+					/* 전체 프로그램료 */
 					, DELIVERY_CNT*FEE_PROGRAM AS FEE_PROGRAM_COST
+					/* 영업사원 프로그램료 */
+					, DELIVERY_CNT*FEE_PROGRAM_SALESMAN AS FEE_PROGRAM_SALESMAN_COST
 				FROM (
 					SELECT nvl(b.FEE_ADMINSTRATOR*0.01, 0) AS FEE_ADMINSTRATOR /* 선지급수수료(%) */
 					, nvl(nvl(c.FEE_EMPLOYMENT_INSURANCE, b.FEE_EMPLOYMENT_INSURANCE)*0.01, 0) AS FEE_EMPLOYMENT_INSURANCE/* 고용보험(%) */
@@ -643,15 +646,18 @@
 					, nvl(nvl(c.FEE_WITHHOLDING_TAX, b.FEE_WITHHOLDING_TAX)*0.01, 0) AS FEE_WITHHOLDING_TAX/* 원천세(%) */
 					, nvl(nvl(c.FEE_TIME_INSURANCE, b.FEE_TIME_INSURANCE), 0) AS FEE_TIME_INSURANCE/* 시간제보험(원 최대7,000) */
 					, nvl(nvl(c.FEE_CALL, b.FEE_CALL), 0) AS FEE_CALL/* 건당 콜수수료(원) */
-					, nvl(b.FEE_PROGRAM, 0) AS FEE_PROGRAM /* 프로그램료(원) */
+					, nvl(b.FEE_PROGRAM, 0) AS FEE_PROGRAM /* 전체 프로그램료(원) */
+					, nvl(b.FEE_PROGRAM_SALESMAN, 0) AS FEE_PROGRAM_SALESMAN /* 영업사원 프로그램료(원) */
 					, a.COOPERATOR_ID, a.MBER_ID,a.RUN_DE AS DAY, SUM(a.DELIVERY_PRICE) AS DELIVERY_PRICE, SUM(if(a.DELIVERY_STATE = TRIM('전달완료'), 1, 0)) DELIVERY_CNT
 					, b.FEE_ID, c.RIDER_FEE_ID, b.FEE_COOPERATOR_CALL*0.01 AS FEE_COOPERATOR_CALL
-					, a.ATCH_FILE_ID, d.ESNTL_ID
+					, a.ATCH_FILE_ID, d.ESNTL_ID, f.COOPERATOR_NM, g.EMPLYR_ID
 					FROM RD_DELIVERY_INFO a
 					LEFT JOIN RD_COOPERATOR_FEE b ON a.COOPERATOR_ID = b.COOPERATOR_ID AND b.use_at ='Y'
 					LEFT JOIN RD_RIDER_FEE c ON a.COOPERATOR_ID = c.COOPERATOR_ID  AND a.MBER_ID = c.MBER_ID AND  c.use_at ='Y'
 					LEFT JOIN COMTNGNRLMBER d ON a.mber_id = d.mber_id
 					JOIN COMTNFILE e ON a.ATCH_FILE_ID = e.ATCH_FILE_ID
+					LEFT JOIN RD_COOPERATOR f ON a.COOPERATOR_ID = b.COOPERATOR_ID
+					LEFT JOIN RD_COOPERATOR_SALES g ON a.COOPERATOR_ID = g.COOPERATOR_ID AND g.use_AT ='Y'
 					WHERE 1 = 1
 						AND e.USE_AT ='Y'
 						AND a.RUN_DE BETWEEN #{searchFromDate} AND #{searchToDate}
@@ -697,6 +703,9 @@
 				LEFT JOIN COMTNGNRLMBER B ON A.MBER_ID = B.MBER_ID
 				WHERE A.MBER_ID = #{mberId} AND A.IO_GUBUN ='1' AND A.USE_AT ='Y'
 				AND A.DAY BETWEEN #{searchFromDate} AND #{searchToDate}
+			<if test='searchCooperatorId != null and searchCooperatorId != "all"'>
+				AND A.COOPERATOR_ID = #{searchCooperatorId}
+			</if>
 
 				UNION all
 
@@ -709,7 +718,9 @@
 				WHERE A.MBER_ID = #{mberId} AND A.IO_GUBUN ='2' AND etc_id is NOT NULL AND A.USE_AT ='Y'
 				AND WEEK_YN ='N'
 				AND A.DAY BETWEEN #{searchFromDate} AND #{searchToDate}
-
+			<if test='searchCooperatorId != null and searchCooperatorId != "all"'>
+				AND A.COOPERATOR_ID = #{searchCooperatorId}
+			</if>
 				UNION ALL
 
 				/* 대여금 */
@@ -720,6 +731,9 @@
 				LEFT JOIN COMTNGNRLMBER B ON A.MBER_ID = B.MBER_ID
 				WHERE A.MBER_ID = #{mberId} AND A.IO_GUBUN ='2' AND etc_id is NOT NULL AND A.USE_AT ='Y'
 				AND A.TRAN_DAY BETWEEN #{searchFromDate} AND #{searchToDate}
+			<if test='searchCooperatorId != null and searchCooperatorId != "all"'>
+				AND A.COOPERATOR_ID = #{searchCooperatorId}
+			</if>
 			) tab
 			ORDER BY DAY DESC, CREAT_DT DESC
 		/*) tab

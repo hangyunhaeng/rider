@@ -144,14 +144,14 @@ public class EgovPayController {
 
 
 	/**
-	 * 출금 대상 조회
+	 * 배달 정보 조회
 	 * @param request
 	 * @param sessionVO
 	 * @param model
 	 * @return
 	 */
 	@RequestMapping("/gnr/pay0002_001.do")
-	public ResponseEntity<?> pay0002_001(@ModelAttribute("DayPayVO") DayPayVO dayPayVO, SessionVO sessionVO, ModelMap model) throws Exception{
+	public ResponseEntity<?> pay0002_001(@ModelAttribute("DayPayVO") DayPayVO dayPayVO, SessionVO sessionVO, ModelMap model, HttpServletRequest request) throws Exception{
 
     	//로그인 체크
         LoginVO user = (LoginVO)EgovUserDetailsHelper.getAuthenticatedUser();
@@ -165,6 +165,7 @@ public class EgovPayController {
         Map<String, Object> map =  new HashMap<String, Object>();
 
         dayPayVO.setMberId(user.getId());
+        dayPayVO.setSearchCooperatorId((String)request.getSession().getAttribute("cooperatorId"));
 
         map.put("list", dtyService.selectRiderDayPayList(dayPayVO));
         map.put("resultCode", "success");
