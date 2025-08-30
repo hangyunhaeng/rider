@@ -38,22 +38,22 @@
 	  	$('.pay').addClass('active');
 	  	$('.pay0009').addClass('active');
   	} else if(filename.indexOf('pay0005.do') == 0) {
-	  	$('.pay').addClass('active');
+	  	$('.search').addClass('active');
 	  	$('.pay0005').addClass('active');
   	} else if(filename.indexOf('pay0001.do') == 0) {
-	  	$('.pay').addClass('active');
+	  	$('.withdraw').addClass('active');
 	  	$('.pay0001').addClass('active');
   	} else if(filename.indexOf('pay0006.do') == 0) {
-	  	$('.pay').addClass('active');
+	  	$('.withdraw').addClass('active');
 	  	$('.pay0006').addClass('active');
   	} else if(filename.indexOf('pay0008.do') == 0) {
-	  	$('.pay').addClass('active');
+	  	$('.withdraw').addClass('active');
 	  	$('.pay0008').addClass('active');
   	} else if(filename.indexOf('dty0006.do') == 0) {
 	  	$('.pay').addClass('active');
 	  	$('.dty0006').addClass('active');
   	} else if(filename.indexOf('dty0004.do') == 0) {
-	  	$('.dty').addClass('active');
+	  	$('.search').addClass('active');
 	  	$('.dty0004').addClass('active');
   	} else if(filename.indexOf('pay0002.do') == 0) {
 	  	$('.dty').addClass('active');
@@ -127,23 +127,31 @@ System.out.println("==================================");
 			              <li class="administrator" style="display:none;"><a href="${pageContext.request.contextPath}/usr/pay0003.do" class="pay0003">운영사수익현황(세금)</a></li>
 						  <li class="administrator cooperator" style="display:none;"><a href="${pageContext.request.contextPath}/usr/pay0004.do" class="pay0004">협력사수익현황(세금)</a></li>
 						  <li class="administrator salesman" style="display:none;"><a href="${pageContext.request.contextPath}/usr/pay0009.do" class="pay0009">영업사원수익현황</a></li>
-						  <li class="administrator cooperator" style="display:none;"><a href="${pageContext.request.contextPath}/usr/pay0005.do" class="pay0005">협력사 기타(대여, 리스) 현황</a></li>
-						  <li class="administrator cooperator" style="display:none;"><a href="${pageContext.request.contextPath}/usr/pay0001.do" class="pay0001">라이더 출금내역<br></a></li>
-						  <li class="administrator cooperator" style="display:none;"><a href="${pageContext.request.contextPath}/usr/pay0006.do" class="pay0006">협력사 출금내역<br></a></li>
-						  <li class="administrator salesman" style="display:none;"><a href="${pageContext.request.contextPath}/usr/pay0008.do" class="pay0008">영업사원 출금내역<br></a></li>
 						  <li class="administrator cooperator" style="display:none;"><a href="${pageContext.request.contextPath}/usr/dty0006.do" class="dty0006">협력사 주정산 조회<br></a></li>
 			            </ul>
 		            </li>
-		            <li class="dropdown administrator" style="display:none;"><a href="" onclick="javascript:return false;" class="dty"><span>관리</span> <i class="bi bi-chevron-down toggle-dropdown"></i></a>
+		            <li class="dropdown administrator salesman cooperator" style="display:none;"><a href="" onclick="javascript:return false;" class="withdraw"><span>출금내역</span> <i class="bi bi-chevron-down toggle-dropdown"></i></a>
 			          	<ul>
-						  <li><a href="${pageContext.request.contextPath}/usr/dty0004.do" class="dty0004">배달정보 조회</a></li>
+						  <li class="administrator cooperator" style="display:none;"><a href="${pageContext.request.contextPath}/usr/pay0001.do" class="pay0001">라이더 출금내역<br></a></li>
+						  <li class="administrator cooperator" style="display:none;"><a href="${pageContext.request.contextPath}/usr/pay0006.do" class="pay0006">협력사 출금내역<br></a></li>
+						  <li class="administrator salesman" style="display:none;"><a href="${pageContext.request.contextPath}/usr/pay0008.do" class="pay0008">영업사원 출금내역<br></a></li>
+			            </ul>
+		            </li>
+		            <li class="dropdown administrator cooperator" style="display:none;"><a href="" onclick="javascript:return false;" class="search"><span>정보조회</span> <i class="bi bi-chevron-down toggle-dropdown"></i></a>
+			          	<ul>
+
+						  <li class="administrator cooperator" style="display:none;"><a href="${pageContext.request.contextPath}/usr/dty0004.do" class="dty0004">배달정보 조회</a></li>
+						  <li class="administrator cooperator" style="display:none;"><a href="${pageContext.request.contextPath}/usr/pay0005.do" class="pay0005">협력사 기타(대여, 리스) 현황</a></li>
+
+			            </ul>
+		            </li>
+					<li class="dropdown administrator" style="display:none;"><a href="" onclick="javascript:return false;" class="dty"><span>관리</span> <i class="bi bi-chevron-down toggle-dropdown"></i></a>
+			          	<ul>
 						  <li class="administrator" style="display:none;"><a href="${pageContext.request.contextPath}/usr/pay0002.do" class="pay0002">입출금 대사<br></a></li>
 						  <li class="administrator" style="display:none;"><a href="${pageContext.request.contextPath}/usr/pay0007.do" class="pay0007">알림톡 발송 조회<br></a></li>
 						  <li class="administrator" style="display:none;"><a href="${pageContext.request.contextPath}/usr/sts0001.do" class="sts0001">잔액 조회<br></a></li>
 			            </ul>
 		            </li>
-
-					<li class="cooperator" style="display:none;"><a href="${pageContext.request.contextPath}/usr/dty0004.do">배달정보 조회</a></li>
 
 					<li class="dropdown administrator cooperator" style="display:none;"><a href="" onclick="javascript:return false;" class="mem"><span>협력사/라이더 현황</span><i class="bi bi-chevron-down toggle-dropdown"></i></a>
 						<ul>
