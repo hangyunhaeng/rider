@@ -857,19 +857,65 @@
 		VALUES(#{cooperatorId}, #{esntlId}, #{day}, #{balance0}, #{balance1}, #{ableBalance0}, #{ableBalance1})
 	</insert>
 	<select id="selectWeekPayByMberId" parameterType="egovframework.com.rd.usr.service.vo.WeekPayVO" resultType="egovframework.com.rd.usr.service.vo.WeekPayVO">
-		SELECT tab.ACCOUNTS_ST_DT, tab.ACCOUNTS_ED_DT, tab.SUM_COST, tab.SEND_PRICE, tab.ABLE_PRICE
-		<![CDATA[, if(tab.ABLE_PRICE - tab.SEND_PRICE >= 0, tab.ABLE_PRICE - tab.SEND_PRICE, 0 ) TMP_ABLE_PRICE]]>
+		SELECT tab.ACCOUNTS_ST_DT, tab.ACCOUNTS_ED_DT, tab.SUM_COST, tab.CNT
+		, DAY_FEE_COST,SEND_FEE_COST,SEND_PRICE_COST,ETC_PRICE_COST
+		, CALL_FEE_COST, PROGRAM_FEE_COST
+		, GIVE_PAY
+		, tab.ABLE_PRICE
+		<![CDATA[
+		, if(tab.ABLE_PRICE - tab.SEND_PRICE >= 0, tab.ABLE_PRICE - tab.SEND_PRICE, 0 ) TMP_ABLE_PRICE
+		]]>
 		, DATE_FORMAT(tab.CREAT_DT, '%Y%m%d') AS CREAT_DT
 		from(
-			SELECT b.ACCOUNTS_ST_DT, b.ACCOUNTS_ED_DT, c.SUM_COST, SUM(NVL(d.DAY_FEE, 0)+NVL(d.SEND_FEE,0)+NVL(d.SEND_PRICE,0)) SEND_PRICE, a.ABLE_PRICE, a.CREAT_DT
+			SELECT b.ACCOUNTS_ST_DT, b.ACCOUNTS_ED_DT, c.SUM_COST, c.CNT
+
+			, SUM(if( d.ETC_ID IS NULL, NVL(d.DAY_FEE, 0), 0)) AS DAY_FEE_COST
+			, SUM(if( d.ETC_ID IS NULL, NVL(d.SEND_FEE, 0), 0)) AS SEND_FEE_COST
+			, SUM(if( d.ETC_ID IS NULL, NVL(d.SEND_PRICE, 0), 0)) AS SEND_PRICE_COST
+
+			, SUM(if( d.ETC_ID IS NOT NULL, NVL(d.SEND_PRICE, 0), 0)) AS ETC_PRICE_COST
+
+			, SUM(NVL(d.DAY_FEE, 0)+NVL(d.SEND_FEE,0)+NVL(d.SEND_PRICE,0)) SEND_PRICE
+
+
+			, c.GIVE_PAY /*확정금액*/
+			, CALL_FEE_COST
+			, PROGRAM_FEE_COST
+
+			, a.ABLE_PRICE, a.CREAT_DT
 			FROM RD_WEEK_PAY a
 			LEFT JOIN RD_DAY_PAY d ON a.WEEK_ID = d.WEEK_ID AND d.IO_GUBUN = '2' AND a.MBER_ID = d.MBER_ID
-			, RD_WEEK_INFO b, RD_WEEK_RIDER_INFO c
+			JOIN RD_WEEK_INFO b ON a.WEEK_ID = b.WEEK_ID AND b.FIX_DAY IS NOT NULL
+			JOIN RD_WEEK_RIDER_INFO c ON b.WEEK_ID = c.WEEK_ID AND a.MBER_ID = c.MBER_ID
+			LEFT JOIN (
+				SELECT wi.COOPERATOR_ID, wr.mber_id, d.ESNTL_ID, wi.WEEK_ID
+					<![CDATA[
+					, SUM(nvl(if(wi.accounts_st_dt <= a.DAY AND wi.accounts_ed_dt >= a.DAY, b.COST, 0), 0))
+						+ SUM(nvl(if(wi.accounts_st_dt <= a.DAY AND wi.accounts_ed_dt >= a.DAY, c.COST, 0), 0)) CALL_FEE_COST
+					, SUM(nvl(if(wi.accounts_st_dt <= a.DAY AND wi.accounts_ed_dt >= a.DAY, e.COST, 0), 0))
+						+ SUM(nvl(if(wi.accounts_st_dt <= a.DAY AND wi.accounts_ed_dt >= a.DAY, g.COST, 0), 0))PROGRAM_FEE_COST
+					]]>
+					, wi.accounts_st_dt, wi.accounts_ed_dt
+					, d.MBER_NM
+					, wr.cnt
+					FROM RD_WEEK_INFO wi
+					LEFT JOIN RD_WEEK_RIDER_INFO wr ON wi.WEEK_ID = wr.week_id
+					LEFT JOIN RD_DAY_PAY a ON wi.COOPERATOR_ID = a.COOPERATOR_ID AND wr.MBER_ID = a.mber_id AND a.use_at = 'Y' AND IO_GUBUN= '1' AND a.WEEK_YN = 'Y'
+					LEFT JOIN RD_PROFIT b ON a.COOPERATOR_ID = b.COOPERATOR_ID AND a.mber_id = b.MBER_ID AND b.gubun ='C' AND a.DYP_ID = b.DYP_ID
+					LEFT JOIN RD_COOPERATOR_PROFIT c ON a.COOPERATOR_ID = c.COOPERATOR_ID AND a.mber_id = c.MBER_ID AND c.gubun ='C' AND a.DYP_ID = c.DYP_ID
+					LEFT JOIN RD_PROFIT e ON a.COOPERATOR_ID = e.COOPERATOR_ID AND a.mber_id = e.MBER_ID AND e.gubun ='P' AND a.DYP_ID = e.DYP_ID
+					LEFT JOIN RD_SALES_PROFIT g ON a.COOPERATOR_ID = g.COOPERATOR_ID AND a.mber_id = g.MBER_ID AND g.gubun ='P' AND a.DYP_ID = g.DYP_ID
+					LEFT JOIN COMTNGNRLMBER d ON wr.mber_id = d.mber_id
+					JOIN COMTNFILE f ON wi.ATCH_FILE_ID = f.ATCH_FILE_ID
+						WHERE 1=1
+							AND f.USE_AT ='Y'
+							AND wi.COOPERATOR_ID = #{cooperatorId} AND wr.mber_id = #{mberId}
+				GROUP BY wi.COOPERATOR_ID, wr.mber_id
+			) e ON b.WEEK_ID = e.WEEK_ID
 			WHERE a.COOPERATOR_ID = #{cooperatorId} AND a.mber_id = #{mberId} AND a.IO_GUBUN ='1'
 			AND a.WEEK_ID IS NOT NULL
-			AND a.WEEK_ID = b.WEEK_ID AND b.FIX_DAY IS NOT NULL
-			AND b.WEEK_ID = c.WEEK_ID AND a.MBER_ID = c.MBER_ID
 			AND (a.ACCOUNTS_ST_DT BETWEEN #{searchFromDate} AND #{searchToDate} or a.ACCOUNTS_ED_DT BETWEEN #{searchFromDate} AND #{searchToDate})
+
 			GROUP BY WKP_ID
 		)tab
 	</select>

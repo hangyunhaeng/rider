@@ -70,7 +70,7 @@
 					//$('#customer-order-table-body').find('tr:hidden')
 					//보이는 tr 모두 삭제
 					$('#customer-order-table-body').find('tr:visible').remove();
-					$('#총금액').html(0+"원");
+// 					$('#총금액').html(0+"원");
 
 
 					if(response.data.list == null || response.data.list.length == 0){
@@ -86,17 +86,29 @@
 							내역.find('.accountsStDt').html(getStringDate(dataInfo.accountsStDt));
 							내역.find('.accountsEdDt').html(getStringDate(dataInfo.accountsEdDt));
 							내역.find('.sumCost').html(currencyFormatter(dataInfo.sumCost));
-							내역.find('.sendPrice').html(currencyFormatter(dataInfo.sendPrice));
-							내역.find('.ablePrice').html(currencyFormatter(dataInfo.ablePrice));
+
+
+							내역.find('.sendPriceCost').html(currencyFormatter(dataInfo.sendPriceCost));
+							내역.find('.dayFeeCost').html(currencyFormatter(dataInfo.dayFeeCost));
+							내역.find('.sendFeeCost').html(currencyFormatter(dataInfo.sendFeeCost));
+							내역.find('.etcPriceCost').html(currencyFormatter(dataInfo.etcPriceCost));
+							내역.find('.subsum0').html(currencyFormatter(dataInfo.sendPriceCost+dataInfo.dayFeeCost+dataInfo.sendFeeCost+dataInfo.etcPriceCost));
+
+
+							내역.find('.givePay').html(currencyFormatter(dataInfo.givePay));
+							내역.find('.callFeeCost').html(currencyFormatter(dataInfo.callFeeCost));
+							내역.find('.programFeeCost').html(currencyFormatter(dataInfo.programFeeCost));
+							내역.find('.subsum1').html(currencyFormatter(dataInfo.givePay-dataInfo.callFeeCost-dataInfo.programFeeCost));
+
 							내역.find('.tmpAblePrice').html(currencyFormatter(dataInfo.tmpAblePrice));
 							내역.find('.creatDt').html(getStringDate(dataInfo.creatDt));
 							내역.show();
-							총배달비 += Number(dataInfo.ablePrice, 10);
-							총배달비 -= Number(dataInfo.sendPrice, 10);
+// 							총배달비 += Number(dataInfo.ablePrice, 10);
+// 							총배달비 -= Number(dataInfo.sendPrice, 10);
 						});
 
-						if(총배달비 < 0)총배달비 = 0;
-						$('#총금액').html(currencyFormatter(총배달비)+"원");
+// 						if(총배달비 < 0)총배달비 = 0;
+// 						$('#총금액').html(currencyFormatter(총배달비)+"원");
 					}
 
 				}
@@ -183,14 +195,26 @@
                   <div class="table-responsive scrollbar">
                     <table class="table table-sm fs-9 mb-0">
                       <thead>
+
                         <tr>
-                          <th class="white-space-nowrap align-middle ps-0 pe-0 py-3"" scope="col" data-sort="order" style="text-align:center;background-color:#0f1d33;color:white;" _msttexthash="9666644" _msthash="429">시작일</th>
-                          <th class="white-space-nowrap align-middle text-center pe-0 py-3"" scope="col" data-sort="total" style="text-align:center;background-color:#0f1d33;color:white;" _msttexthash="9571315" _msthash="430">종료일</th>
-                          <th class="white-space-nowrap align-middle white-space-nowrap pe-0 py-3"" scope="col" data-sort="payment_status" style="text-align:center;background-color:#0f1d33;color:white;" _msttexthash="22057685" _msthash="431">배달비</th>
-                          <th class="white-space-nowrap align-middle white-space-nowrap pe-0 py-3"" scope="col" data-sort="payment_status" style="text-align:center;background-color:#0f1d33;color:white;" _msttexthash="22057685" _msthash="431">출금금액</th>
-                          <th class="white-space-nowrap align-middle white-space-nowrap pe-0 py-3" scope="col" data-sort="payment_status" style="text-align:center;background-color:#0f1d33;color:white;" _msttexthash="37371139" _msthash="432">확정금액</th>
-                          <th class="white-space-nowrap align-middle white-space-nowrap pe-0 py-3" scope="col" data-sort="payment_status" style="text-align:center;background-color:#0f1d33;color:white;" _msttexthash="37371139" _msthash="432">출금가능금액</th>
-                          <th class="white-space-nowrap align-middle white-space-nowrap pe-0 py-3" scope="col" data-sort="fulfilment_status" style="text-align:center;background-color:#0f1d33;color:white;" _msttexthash="37371139" _msthash="432">등록일</th>
+                          <th rowspan='2' class="white-space-nowrap align-middle ps-0 pe-0 py-3"" scope="col" data-sort="order" style="text-align:center;background-color:#0f1d33;color:white;" _msttexthash="9666644" _msthash="429">시작일</th>
+                          <th rowspan='2' class="white-space-nowrap align-middle text-center pe-0 py-3"" scope="col" data-sort="total" style="text-align:center;background-color:#0f1d33;color:white;" _msttexthash="9571315" _msthash="430">종료일</th>
+                          <th rowspan='2' class="white-space-nowrap align-middle white-space-nowrap pe-0 py-3"" scope="col" data-sort="payment_status" style="text-align:center;background-color:#0f1d33;color:white;border-right-width:1px;" _msttexthash="22057685" _msthash="431">배달비</th>
+                          <th colspan='5' class="white-space-nowrap align-middle white-space-nowrap pe-0 py-3"" scope="col" data-sort="payment_status" style="text-align:center;background-color:#0f1d33;color:white;border-right-width:1px;" _msttexthash="22057685" _msthash="431" >출금금액</th>
+                          <th colspan='4' class="white-space-nowrap align-middle white-space-nowrap pe-0 py-3" scope="col" data-sort="payment_status" style="text-align:center;background-color:#0f1d33;color:white;border-right-width:1px;" _msttexthash="37371139" _msthash="432" >확정금액</th>
+                          <th rowspan='2' class="white-space-nowrap align-middle white-space-nowrap pe-0 py-3" scope="col" data-sort="payment_status" style="text-align:center;background-color:#0f1d33;color:white;" _msttexthash="37371139" _msthash="432">출금가능금액<br/>(B-A)</th>
+                          <th rowspan='2' class="white-space-nowrap align-middle white-space-nowrap pe-0 py-3" scope="col" data-sort="fulfilment_status" style="text-align:center;background-color:#0f1d33;color:white;" _msttexthash="37371139" _msthash="432">등록일</th>
+                        </tr>
+                        <tr>
+                          <th class="white-space-nowrap align-middle white-space-nowrap pe-0 py-3"" scope="col" data-sort="payment_status" style="text-align:center;background-color:#0f1d33;color:white;" _msttexthash="22057685" _msthash="431">선지급금<br/>(a)</th>
+                          <th class="white-space-nowrap align-middle white-space-nowrap pe-0 py-3"" scope="col" data-sort="payment_status" style="text-align:center;background-color:#0f1d33;color:white;" _msttexthash="22057685" _msthash="431">선지급수수료<br/>(b)</th>
+                          <th class="white-space-nowrap align-middle white-space-nowrap pe-0 py-3"" scope="col" data-sort="payment_status" style="text-align:center;background-color:#0f1d33;color:white;" _msttexthash="22057685" _msthash="431">이체수수료<br/>(c)</th>
+                          <th class="white-space-nowrap align-middle white-space-nowrap pe-0 py-3"" scope="col" data-sort="payment_status" style="text-align:center;background-color:#0f1d33;color:white;" _msttexthash="22057685" _msthash="431">기타수수료<br/>(d)</th>
+                          <th class="white-space-nowrap align-middle white-space-nowrap pe-0 py-3"" scope="col" data-sort="payment_status" style="text-align:center;background-color:#0f1d33;color:white; border-right-width:1px;" _msttexthash="22057685" _msthash="431">소계(A)<br/>(a+b+c+e)</th>
+                          <th class="white-space-nowrap align-middle white-space-nowrap pe-0 py-3" scope="col" data-sort="payment_status" style="text-align:center;background-color:#0f1d33;color:white;" _msttexthash="37371139" _msthash="432">확정금액<br/>(e)</th>
+                          <th class="white-space-nowrap align-middle white-space-nowrap pe-0 py-3" scope="col" data-sort="payment_status" style="text-align:center;background-color:#0f1d33;color:white;" _msttexthash="37371139" _msthash="432">콜수수료<br/>(f)</th>
+                          <th class="white-space-nowrap align-middle white-space-nowrap pe-0 py-3" scope="col" data-sort="payment_status" style="text-align:center;background-color:#0f1d33;color:white;" _msttexthash="37371139" _msthash="432">프로그램료<br/>(g)</th>
+                          <th class="white-space-nowrap align-middle white-space-nowrap pe-0 py-3" scope="col" data-sort="payment_status" style="text-align:center;background-color:#0f1d33;color:white; border-right-width:1px;" _msttexthash="37371139" _msthash="432">소계(B)<br/>(e-f-g)</th>
 
                         </tr>
                       </thead>
@@ -200,14 +224,27 @@
                           <td class="white-space-nowrap order align-middle pe-3 ps-3 py-3 accountsStDt">2025-05-05</td>
                           <td class="white-space-nowrap total align-middle text-center pe-3 text-body-highlight py-3 accountsEdDt" _msttexthash="11490804" _msthash="436">완료</td>
                           <td class="white-space-nowrap total align-middle fw-bold pe-3 text-body-highlight text-end py-3 sumCost">0</td>
-                          <td class="white-space-nowrap total align-middle fw-bold pe-3 text-body-highlight text-end py-3 sendPrice">1,522,555</td>
-                          <td class="white-space-nowrap total align-middle fw-bold pe-3 text-body-highlight text-end py-3 ablePrice">1,522,555</td>
+
+                          <td class="white-space-nowrap total align-middle pe-3 text-body-highlight text-end py-3 sendPriceCost">0</td>
+                          <td class="white-space-nowrap total align-middle pe-3 text-body-highlight text-end py-3 dayFeeCost">0</td>
+                          <td class="white-space-nowrap total align-middle pe-3 text-body-highlight text-end py-3 sendFeeCost">0</td>
+                          <td class="white-space-nowrap total align-middle pe-3 text-body-highlight text-end py-3 etcPriceCost">0</td>
+                          <td class="white-space-nowrap total align-middle fw-bold pe-3 text-body-highlight text-end py-3 subsum0">0</td>
+
+
+                          <td class="white-space-nowrap total align-middle pe-3 text-body-highlight text-end py-3 givePay">0</td>
+                          <td class="white-space-nowrap total align-middle pe-3 text-body-highlight text-end py-3 callFeeCost">0</td>
+                          <td class="white-space-nowrap total align-middle pe-3 text-body-highlight text-end py-3 programFeeCost">0</td>
+                          <td class="white-space-nowrap total align-middle fw-bold pe-3 text-body-highlight text-end py-3 subsum1">0</td>
+
+
+<!--                           <td class="white-space-nowrap total align-middle fw-bold pe-3 text-body-highlight text-end py-3 ablePrice">1,522,555</td> -->
                           <td class="white-space-nowrap total align-middle fw-bold pe-3 text-body-highlight text-end py-3 tmpAblePrice">1,522,555</td>
                           <td class="white-space-nowrap total align-middle pe-3 text-end py-3 creatDt">1,522,555</td>
                         </tr>
 
                         <tr repeatObj="no" class="hover-actions-trigger btn-reveal-trigger position-static" style="display:none;">
-                          <td class="order align-middle white-space-nowrap ps-0 py-3 text-center" colspan="6">조회된 내역이 없습니다</td>
+                          <td class="order align-middle white-space-nowrap ps-0 py-3 text-center" colspan="14">조회된 내역이 없습니다</td>
                         </tr>
 
                         </tbody>
