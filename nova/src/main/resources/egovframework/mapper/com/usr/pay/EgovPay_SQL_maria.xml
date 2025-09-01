@@ -910,7 +910,7 @@
 						WHERE 1=1
 							AND f.USE_AT ='Y'
 							AND wi.COOPERATOR_ID = #{cooperatorId} AND wr.mber_id = #{mberId}
-				GROUP BY wi.COOPERATOR_ID, wr.mber_id
+				GROUP BY wi.WEEK_ID, wi.COOPERATOR_ID, wr.mber_id
 			) e ON b.WEEK_ID = e.WEEK_ID
 			WHERE a.COOPERATOR_ID = #{cooperatorId} AND a.mber_id = #{mberId} AND a.IO_GUBUN ='1'
 			AND a.WEEK_ID IS NOT NULL
