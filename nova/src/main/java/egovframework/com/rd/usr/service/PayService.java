@@ -11,6 +11,7 @@ import egovframework.com.rd.usr.service.vo.KkoVO;
 import egovframework.com.rd.usr.service.vo.MyInfoVO;
 import egovframework.com.rd.usr.service.vo.ProfitVO;
 import egovframework.com.rd.usr.service.vo.WeekPayVO;
+import egovframework.com.rd.usr.service.vo.WeekRiderInfoVO;
 
 public interface PayService {
 
@@ -213,5 +214,5 @@ public interface PayService {
 	 * @return
 	 * @throws Exception
 	 */
-	public List<WeekPayVO> selectWeekPayByMberId(WeekPayVO vo) throws Exception ;
+	public List<WeekRiderInfoVO> selectWeekPayByMberId(WeekPayVO vo) throws Exception ;
 }

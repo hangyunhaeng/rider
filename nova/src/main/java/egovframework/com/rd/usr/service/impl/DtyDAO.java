@@ -124,9 +124,15 @@ public class DtyDAO extends EgovComAbstractDAO {
 	public int insertWeekRiderInfoOut(WeekRiderInfoVO vo) throws Exception {
 		return insert("dtyDAO.insertWeekRiderInfoOut", vo);
 	}
+	public int insertWeekRiderInfoOutRider(WeekRiderInfoVO vo) throws Exception {
+		return insert("dtyDAO.insertWeekRiderInfoOutRider", vo);
+	}
 
 	public int insertWeekInfoOut(WeekInfoVO vo) throws Exception {
 		return insert("dtyDAO.insertWeekInfoOut", vo);
+	}
+	public int insertWeekInfoOutRider(WeekInfoVO vo) throws Exception {
+		return insert("dtyDAO.insertWeekInfoOutRider", vo);
 	}
 
 	public int insertWeekRiderInfo(WeekRiderInfoVO vo) throws Exception {
@@ -202,6 +208,16 @@ public class DtyDAO extends EgovComAbstractDAO {
 	 */
 	public WeekInfoVO selectCalBase(WeekInfoVO vo) throws Exception {
 		return selectOne("dtyDAO.selectCalBase", vo);
+	}
+
+	/**
+	 * 주정산 정산서의 라이더 세금계산 근거 조회
+	 * @param vo
+	 * @return
+	 * @throws Exception
+	 */
+	public List<WeekRiderInfoVO> selectCalRiderBase(WeekInfoVO vo) throws Exception {
+		return selectList("dtyDAO.selectCalRiderBase", vo);
 	}
 
 	/**

@@ -20,6 +20,7 @@ import egovframework.com.rd.usr.service.vo.MyInfoVO;
 import egovframework.com.rd.usr.service.vo.ProfitVO;
 import egovframework.com.rd.usr.service.vo.Sch;
 import egovframework.com.rd.usr.service.vo.WeekPayVO;
+import egovframework.com.rd.usr.service.vo.WeekRiderInfoVO;
 import egovframework.com.uat.uia.web.EgoRDLoginController;
 
 
@@ -432,7 +433,7 @@ public class PayDAO extends EgovComAbstractDAO {
 	 * @return
 	 * @throws Exception
 	 */
-	public List<WeekPayVO> selectWeekPayByMberId(WeekPayVO vo) throws Exception {
+	public List<WeekRiderInfoVO> selectWeekPayByMberId(WeekPayVO vo) throws Exception {
 		return selectList("payDAO.selectWeekPayByMberId", vo);
 	}
 }

@@ -100,4 +100,23 @@ public class WeekRiderInfoVO extends Sch implements Serializable {
 	private String creatDt;
 	/** 생성자 ID */
 	private String creatId;
+
+
+	// 라이더 배포용 정산서 생성 변수
+	private String deliveryCnt;
+	private boolean feeCooperatorAt;
+	private int feeProgram;
+	private String feeId;
+	private String riderFeeId;
+	private String accountsStDt;
+	private String accountsEdDt;
+	private String esntlId;
+	private int feeCall;
+
+	// 라이더 확정정보조회
+	private int dayFeeCost;
+	private int sendFeeCost;
+	private int sendPriceCost;
+	private int etcPriceCost;
+	private int subsum0;
 }

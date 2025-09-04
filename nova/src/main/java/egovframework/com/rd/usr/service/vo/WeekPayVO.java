@@ -72,7 +72,6 @@ public class WeekPayVO extends Sch implements Serializable {
 	private int inputPrice;
 	// 총배달배
 	private BigDecimal sumCost;
-	private int cnt;
 	// 선지급수수료
 	private BigDecimal dayFeeCost;
 	// 이체수수료
@@ -87,4 +86,16 @@ public class WeekPayVO extends Sch implements Serializable {
 	private BigDecimal programFeeCost;
 	//확정금액
 	private BigDecimal givePay;
+
+
+	//주정산확정시 변동된 배달건수의 수수료 책정을 위한 변수
+	private int cnt;	//주정산 배달건수
+	private int deliveryCnt;	//일정산 배달건수
+	private String feeId;
+	private String riderFeeId;
+	private int feeCallCost;	/* 전체 콜수수료 */
+	private int feeCooperatorCallCost; /*협력사  콜수수료*/
+	private int feeProgramCost; /* 전체 프로그램료 */
+	private int feeProgramSalesmanCost; /* 영업사원 프로그램료 */
+	private String emplyrId;
 }

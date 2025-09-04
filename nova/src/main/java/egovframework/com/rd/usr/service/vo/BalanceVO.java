@@ -23,6 +23,7 @@ public class BalanceVO extends Sch implements Serializable {
 	private String esntlId;
 	private String mberId;
 	private BigDecimal balance0;
+	private BigDecimal balance0Cal;
 	private BigDecimal balance1;
 	private int cost;
 	private String lastUpdtPnttm;

@@ -85,7 +85,38 @@
 
 							내역.find('.accountsStDt').html(getStringDate(dataInfo.accountsStDt));
 							내역.find('.accountsEdDt').html(getStringDate(dataInfo.accountsEdDt));
+							내역.find('.cnt').html(dataInfo.cnt);
+							내역.find('.deliveryCost').html(currencyFormatter(dataInfo.deliveryCost));
+							내역.find('.addCost').html(currencyFormatter(dataInfo.addCost));
 							내역.find('.sumCost').html(currencyFormatter(dataInfo.sumCost));
+
+							내역.find('.timeInsurance').html(currencyFormatter(dataInfo.timeInsurance));
+							내역.find('.necessaryExpenses').html(currencyFormatter(dataInfo.necessaryExpenses));
+							내역.find('.pay').html(currencyFormatter(dataInfo.pay));
+
+							내역.find('.ownerEmploymentInsurance').html(currencyFormatter(dataInfo.ownerEmploymentInsurance));
+							내역.find('.riderEmploymentInsurance').html(currencyFormatter(dataInfo.riderEmploymentInsurance));
+							내역.find('.ownerIndustrialInsurance').html(currencyFormatter(dataInfo.ownerIndustrialInsurance));
+							내역.find('.riderIndustrialInsurance').html(currencyFormatter(dataInfo.riderIndustrialInsurance));
+							내역.find('.withholdingTaxInsuranceSum').html(currencyFormatter(dataInfo.riderIndustrialInsurance));
+
+							내역.find('.ownerEmploymentInsuranceAccounts').html(currencyFormatter(dataInfo.ownerEmploymentInsuranceAccounts));
+							내역.find('.riderEmploymentInsuranceAccounts').html(currencyFormatter(dataInfo.riderEmploymentInsuranceAccounts));
+							내역.find('.sumEmploymentInsuranceAccounts').html(currencyFormatter(dataInfo.sumEmploymentInsuranceAccounts));
+							내역.find('.ownerIndustrialInsuranceAccounts').html(currencyFormatter(dataInfo.ownerIndustrialInsuranceAccounts));
+							내역.find('.riderIndustrialInsuranceAccounts').html(currencyFormatter(dataInfo.riderIndustrialInsuranceAccounts));
+							내역.find('.sumIndustrialInsuranceAccounts').html(currencyFormatter(dataInfo.sumIndustrialInsuranceAccounts));
+
+							내역.find('.operatingCostAdd').html(currencyFormatter(dataInfo.operatingCostAdd));
+
+							//라이더별 정산금액
+							내역.find('.accountsCost').html(currencyFormatter(dataInfo.accountsCost));
+
+
+							내역.find('.incomeTax').html(currencyFormatter(dataInfo.incomeTax));
+							내역.find('.residenceTax').html(currencyFormatter(dataInfo.residenceTax));
+							내역.find('.withholdingTax').html(currencyFormatter(dataInfo.withholdingTax));
+							내역.find('.givePay').html(currencyFormatter(dataInfo.givePay));
 
 
 							내역.find('.sendPriceCost').html(currencyFormatter(dataInfo.sendPriceCost));
@@ -95,12 +126,12 @@
 							내역.find('.subsum0').html(currencyFormatter(dataInfo.sendPriceCost+dataInfo.dayFeeCost+dataInfo.sendFeeCost+dataInfo.etcPriceCost));
 
 
-							내역.find('.givePay').html(currencyFormatter(dataInfo.givePay));
-							내역.find('.callFeeCost').html(currencyFormatter(dataInfo.callFeeCost));
-							내역.find('.programFeeCost').html(currencyFormatter(dataInfo.programFeeCost));
-							내역.find('.subsum1').html(currencyFormatter(dataInfo.givePay-dataInfo.callFeeCost-dataInfo.programFeeCost));
+// 							내역.find('.givePay').html(currencyFormatter(dataInfo.givePay));
+// 							내역.find('.callFeeCost').html(currencyFormatter(dataInfo.callFeeCost));
+// 							내역.find('.programFeeCost').html(currencyFormatter(dataInfo.programFeeCost));
+// 							내역.find('.subsum1').html(currencyFormatter(dataInfo.givePay-dataInfo.callFeeCost-dataInfo.programFeeCost));
 
-							내역.find('.tmpAblePrice').html(currencyFormatter(dataInfo.tmpAblePrice));
+// 							내역.find('.tmpAblePrice').html(currencyFormatter(dataInfo.tmpAblePrice));
 							내역.find('.creatDt').html(getStringDate(dataInfo.creatDt));
 							내역.show();
 // 							총배달비 += Number(dataInfo.ablePrice, 10);
@@ -198,49 +229,109 @@
 
                         <tr>
                           <th rowspan='2' class="white-space-nowrap align-middle ps-0 pe-0 py-3"" scope="col" data-sort="order" style="text-align:center;background-color:#0f1d33;color:white;" _msttexthash="9666644" _msthash="429">시작일</th>
-                          <th rowspan='2' class="white-space-nowrap align-middle text-center pe-0 py-3"" scope="col" data-sort="total" style="text-align:center;background-color:#0f1d33;color:white;" _msttexthash="9571315" _msthash="430">종료일</th>
-                          <th rowspan='2' class="white-space-nowrap align-middle white-space-nowrap pe-0 py-3"" scope="col" data-sort="payment_status" style="text-align:center;background-color:#0f1d33;color:white;border-right-width:1px;" _msttexthash="22057685" _msthash="431">배달비</th>
+                          <th rowspan='2' class="white-space-nowrap align-middle text-center pe-0 py-3"" scope="col" data-sort="total" style="text-align:center;background-color:#0f1d33;color:white;border-right-width:1px;" _msttexthash="9571315" _msthash="430">종료일</th>
+                          <th rowspan='2' class="white-space-nowrap align-middle white-space-nowrap pe-0 py-3"" scope="col" data-sort="payment_status" style="text-align:center;background-color:#0f1d33;color:white;border-right-width:1px;" _msttexthash="22057685" _msthash="431">처리건</th>
+                          <th colspan='3' class="white-space-nowrap align-middle white-space-nowrap pe-0 py-3"" scope="col" data-sort="payment_status" style="text-align:center;background-color:#0f1d33;color:white;border-right-width:1px;" _msttexthash="22057685" _msthash="431">배달료</th>
+                          <th rowspan='2' class="white-space-nowrap align-middle white-space-nowrap pe-0 py-3"" scope="col" data-sort="payment_status" style="text-align:center;background-color:#0f1d33;color:white;border-right-width:1px;" _msttexthash="22057685" _msthash="431">시간제보험료<br/>(D)</th>
+                          <th rowspan='2' class="white-space-nowrap align-middle white-space-nowrap pe-0 py-3"" scope="col" data-sort="payment_status" style="text-align:center;background-color:#0f1d33;color:white;border-right-width:1px;" _msttexthash="22057685" _msthash="431">필요경비</th>
+                          <th rowspan='2' class="white-space-nowrap align-middle white-space-nowrap pe-0 py-3"" scope="col" data-sort="payment_status" style="text-align:center;background-color:#0f1d33;color:white;border-right-width:1px;" _msttexthash="22057685" _msthash="431">보수액</th>
+                          <th colspan='2' class="white-space-nowrap align-middle white-space-nowrap pe-0 py-3"" scope="col" data-sort="payment_status" style="text-align:center;background-color:#0f1d33;color:white;border-right-width:1px;" _msttexthash="22057685" _msthash="431">고용보험료</th>
+                          <th colspan='2' class="white-space-nowrap align-middle white-space-nowrap pe-0 py-3"" scope="col" data-sort="payment_status" style="text-align:center;background-color:#0f1d33;color:white;border-right-width:1px;" _msttexthash="22057685" _msthash="431">산재보험료</th>
+                          <th rowspan='2' class="white-space-nowrap align-middle white-space-nowrap pe-0 py-3"" scope="col" data-sort="payment_status" style="text-align:center;background-color:#0f1d33;color:white;border-right-width:1px;" _msttexthash="22057685" _msthash="431">보험료합계<br/>(E)<br/>(①+②+③+④)</th>
+                          <th colspan='3' class="white-space-nowrap align-middle white-space-nowrap pe-0 py-3"" scope="col" data-sort="payment_status" style="text-align:center;background-color:#0f1d33;color:white;border-right-width:1px;" _msttexthash="22057685" _msthash="431">고용보험<br/>소급정산</th>
+                          <th colspan='3' class="white-space-nowrap align-middle white-space-nowrap pe-0 py-3"" scope="col" data-sort="payment_status" style="text-align:center;background-color:#0f1d33;color:white;border-right-width:1px;" _msttexthash="22057685" _msthash="431">산재보험<br/>소급정산</th>
+                          <th rowspan='2' class="white-space-nowrap align-middle white-space-nowrap pe-0 py-3"" scope="col" data-sort="payment_status" style="text-align:center;background-color:#0f1d33;color:white;border-right-width:1px;" _msttexthash="22057685" _msthash="431">운영비<br/>⑨</th>
+                          <th rowspan='2' class="white-space-nowrap align-middle white-space-nowrap pe-0 py-3"" scope="col" data-sort="payment_status" style="text-align:center;background-color:#0f1d33;color:white;border-right-width:1px;" _msttexthash="22057685" _msthash="431">라이더별정산금액<br/>(H)<br/>C-D-(②+④+⑥+⑧)</th>
+                          <th rowspan='2' class="white-space-nowrap align-middle white-space-nowrap pe-0 py-3"" scope="col" data-sort="payment_status" style="text-align:center;background-color:#0f1d33;color:white;border-right-width:1px;" _msttexthash="22057685" _msthash="431">소득세<br/>(I)<br/>(C×3%)</th>
+                          <th rowspan='2' class="white-space-nowrap align-middle white-space-nowrap pe-0 py-3"" scope="col" data-sort="payment_status" style="text-align:center;background-color:#0f1d33;color:white;border-right-width:1px;" _msttexthash="22057685" _msthash="431">주민세<br/>(J)<br/>(H×10%)</th>
+                          <th rowspan='2' class="white-space-nowrap align-middle white-space-nowrap pe-0 py-3"" scope="col" data-sort="payment_status" style="text-align:center;background-color:#0f1d33;color:white;border-right-width:1px;" _msttexthash="22057685" _msthash="431">원천징수세액<br/>(K)<br/>(H+I)</th>
+                          <th rowspan='2' class="white-space-nowrap align-middle white-space-nowrap pe-0 py-3"" scope="col" data-sort="payment_status" style="text-align:center;background-color:#0f1d33;color:white;border-right-width:1px;" _msttexthash="22057685" _msthash="431">라이더별<br/>지급금액<br/>(L) (H-K)</th>
                           <th colspan='5' class="white-space-nowrap align-middle white-space-nowrap pe-0 py-3"" scope="col" data-sort="payment_status" style="text-align:center;background-color:#0f1d33;color:white;border-right-width:1px;" _msttexthash="22057685" _msthash="431" >출금금액</th>
-                          <th colspan='4' class="white-space-nowrap align-middle white-space-nowrap pe-0 py-3" scope="col" data-sort="payment_status" style="text-align:center;background-color:#0f1d33;color:white;border-right-width:1px;" _msttexthash="37371139" _msthash="432" >확정금액</th>
-                          <th rowspan='2' class="white-space-nowrap align-middle white-space-nowrap pe-0 py-3" scope="col" data-sort="payment_status" style="text-align:center;background-color:#0f1d33;color:white;" _msttexthash="37371139" _msthash="432">출금가능금액<br/>(B-A)</th>
+<!--                           <th colspan='4' class="white-space-nowrap align-middle white-space-nowrap pe-0 py-3" scope="col" data-sort="payment_status" style="text-align:center;background-color:#0f1d33;color:white;border-right-width:1px;" _msttexthash="37371139" _msthash="432" >확정금액</th> -->
+<!--                           <th rowspan='2' class="white-space-nowrap align-middle white-space-nowrap pe-0 py-3" scope="col" data-sort="payment_status" style="text-align:center;background-color:#0f1d33;color:white;" _msttexthash="37371139" _msthash="432">출금가능금액<br/>(B-A)</th> -->
                           <th rowspan='2' class="white-space-nowrap align-middle white-space-nowrap pe-0 py-3" scope="col" data-sort="fulfilment_status" style="text-align:center;background-color:#0f1d33;color:white;" _msttexthash="37371139" _msthash="432">등록일</th>
                         </tr>
                         <tr>
+                          <th class="white-space-nowrap align-middle white-space-nowrap pe-0 py-3"" scope="col" data-sort="payment_status" style="text-align:center;background-color:#0f1d33;color:white;" _msttexthash="22057685" _msthash="431">배달료<br/>A</th>
+                          <th class="white-space-nowrap align-middle white-space-nowrap pe-0 py-3"" scope="col" data-sort="payment_status" style="text-align:center;background-color:#0f1d33;color:white;" _msttexthash="22057685" _msthash="431">추가지급<br/>B</th>
+                          <th class="white-space-nowrap align-middle white-space-nowrap pe-0 py-3"" scope="col" data-sort="payment_status" style="text-align:center;background-color:#0f1d33;color:white; border-right-width:1px;" _msttexthash="22057685" _msthash="431">총배달료<br/>C(A+B)</th>
+                          <th class="white-space-nowrap align-middle white-space-nowrap pe-0 py-3"" scope="col" data-sort="payment_status" style="text-align:center;background-color:#0f1d33;color:white;" _msttexthash="22057685" _msthash="431">사업주부담<br/>①</th>
+                          <th class="white-space-nowrap align-middle white-space-nowrap pe-0 py-3"" scope="col" data-sort="payment_status" style="text-align:center;background-color:#0f1d33;color:white; border-right-width:1px;" _msttexthash="22057685" _msthash="431">라이더부담<br/>②</th>
+                          <th class="white-space-nowrap align-middle white-space-nowrap pe-0 py-3"" scope="col" data-sort="payment_status" style="text-align:center;background-color:#0f1d33;color:white;" _msttexthash="22057685" _msthash="431">사업주부담<br/>③</th>
+                          <th class="white-space-nowrap align-middle white-space-nowrap pe-0 py-3"" scope="col" data-sort="payment_status" style="text-align:center;background-color:#0f1d33;color:white; border-right-width:1px;" _msttexthash="22057685" _msthash="431">라이더부담<br/>④</th>
+                          <th class="white-space-nowrap align-middle white-space-nowrap pe-0 py-3"" scope="col" data-sort="payment_status" style="text-align:center;background-color:#0f1d33;color:white;" _msttexthash="22057685" _msthash="431">사업주<br/>⑤</th>
+                          <th class="white-space-nowrap align-middle white-space-nowrap pe-0 py-3"" scope="col" data-sort="payment_status" style="text-align:center;background-color:#0f1d33;color:white;" _msttexthash="22057685" _msthash="431">라이더<br/>⑥</th>
+                          <th class="white-space-nowrap align-middle white-space-nowrap pe-0 py-3"" scope="col" data-sort="payment_status" style="text-align:center;background-color:#0f1d33;color:white; border-right-width:1px;" _msttexthash="22057685" _msthash="431">합계<br/>(F)</th>
+                          <th class="white-space-nowrap align-middle white-space-nowrap pe-0 py-3"" scope="col" data-sort="payment_status" style="text-align:center;background-color:#0f1d33;color:white;" _msttexthash="22057685" _msthash="431">사업주<br/>⑦</th>
+                          <th class="white-space-nowrap align-middle white-space-nowrap pe-0 py-3"" scope="col" data-sort="payment_status" style="text-align:center;background-color:#0f1d33;color:white;" _msttexthash="22057685" _msthash="431">라이더<br/>⑧</th>
+                          <th class="white-space-nowrap align-middle white-space-nowrap pe-0 py-3"" scope="col" data-sort="payment_status" style="text-align:center;background-color:#0f1d33;color:white; border-right-width:1px;" _msttexthash="22057685" _msthash="431">합계<br/>(G)</th>
                           <th class="white-space-nowrap align-middle white-space-nowrap pe-0 py-3"" scope="col" data-sort="payment_status" style="text-align:center;background-color:#0f1d33;color:white;" _msttexthash="22057685" _msthash="431">선지급금<br/>(a)</th>
                           <th class="white-space-nowrap align-middle white-space-nowrap pe-0 py-3"" scope="col" data-sort="payment_status" style="text-align:center;background-color:#0f1d33;color:white;" _msttexthash="22057685" _msthash="431">선지급수수료<br/>(b)</th>
                           <th class="white-space-nowrap align-middle white-space-nowrap pe-0 py-3"" scope="col" data-sort="payment_status" style="text-align:center;background-color:#0f1d33;color:white;" _msttexthash="22057685" _msthash="431">이체수수료<br/>(c)</th>
                           <th class="white-space-nowrap align-middle white-space-nowrap pe-0 py-3"" scope="col" data-sort="payment_status" style="text-align:center;background-color:#0f1d33;color:white;" _msttexthash="22057685" _msthash="431">기타수수료<br/>(d)</th>
                           <th class="white-space-nowrap align-middle white-space-nowrap pe-0 py-3"" scope="col" data-sort="payment_status" style="text-align:center;background-color:#0f1d33;color:white; border-right-width:1px;" _msttexthash="22057685" _msthash="431">소계(A)<br/>(a+b+c+e)</th>
-                          <th class="white-space-nowrap align-middle white-space-nowrap pe-0 py-3" scope="col" data-sort="payment_status" style="text-align:center;background-color:#0f1d33;color:white;" _msttexthash="37371139" _msthash="432">확정금액<br/>(e)</th>
-                          <th class="white-space-nowrap align-middle white-space-nowrap pe-0 py-3" scope="col" data-sort="payment_status" style="text-align:center;background-color:#0f1d33;color:white;" _msttexthash="37371139" _msthash="432">콜수수료<br/>(f)</th>
-                          <th class="white-space-nowrap align-middle white-space-nowrap pe-0 py-3" scope="col" data-sort="payment_status" style="text-align:center;background-color:#0f1d33;color:white;" _msttexthash="37371139" _msthash="432">프로그램료<br/>(g)</th>
-                          <th class="white-space-nowrap align-middle white-space-nowrap pe-0 py-3" scope="col" data-sort="payment_status" style="text-align:center;background-color:#0f1d33;color:white; border-right-width:1px;" _msttexthash="37371139" _msthash="432">소계(B)<br/>(e-f-g)</th>
+<!--                           <th class="white-space-nowrap align-middle white-space-nowrap pe-0 py-3" scope="col" data-sort="payment_status" style="text-align:center;background-color:#0f1d33;color:white;" _msttexthash="37371139" _msthash="432">확정금액<br/>(e)</th> -->
+<!--                           <th class="white-space-nowrap align-middle white-space-nowrap pe-0 py-3" scope="col" data-sort="payment_status" style="text-align:center;background-color:#0f1d33;color:white;" _msttexthash="37371139" _msthash="432">콜수수료<br/>(f)</th> -->
+<!--                           <th class="white-space-nowrap align-middle white-space-nowrap pe-0 py-3" scope="col" data-sort="payment_status" style="text-align:center;background-color:#0f1d33;color:white;" _msttexthash="37371139" _msthash="432">프로그램료<br/>(g)</th> -->
+<!--                           <th class="white-space-nowrap align-middle white-space-nowrap pe-0 py-3" scope="col" data-sort="payment_status" style="text-align:center;background-color:#0f1d33;color:white; border-right-width:1px;" _msttexthash="37371139" _msthash="432">소계(B)<br/>(e-f-g)</th> -->
 
                         </tr>
                       </thead>
                       <tbody class="list" id="customer-order-table-body">
 
                         <tr repeatObj="true" class="hover-actions-trigger btn-reveal-trigger position-static" style="display:none;">
-                          <td class="white-space-nowrap order align-middle pe-3 ps-3 py-3 accountsStDt">2025-05-05</td>
-                          <td class="white-space-nowrap total align-middle text-center pe-3 text-body-highlight py-3 accountsEdDt" _msttexthash="11490804" _msthash="436">완료</td>
-                          <td class="white-space-nowrap total align-middle fw-bold pe-3 text-body-highlight text-end py-3 sumCost">0</td>
+                          <td class="white-space-nowrap order align-middle pe-1 ps-3 py-3 accountsStDt">2025-05-05</td>
+                          <td class="white-space-nowrap total align-middle text-center pe-1 text-body-highlight py-3 accountsEdDt">2025-05-05</td>
+                          <td class="white-space-nowrap total align-middle text-center pe-1 text-body-highlight py-3 cnt">2025-05-05</td>
+                          <td class="white-space-nowrap total align-middle fw-bold pe-1 text-body-highlight text-end py-3 deliveryCost">0</td>
+                          <td class="white-space-nowrap total align-middle fw-bold pe-1 text-body-highlight text-end py-3 addCost">0</td>
+                          <td class="white-space-nowrap total align-middle fw-bold pe-1 text-body-highlight text-end py-3 sumCost">0</td>
 
-                          <td class="white-space-nowrap total align-middle pe-3 text-body-highlight text-end py-3 sendPriceCost">0</td>
-                          <td class="white-space-nowrap total align-middle pe-3 text-body-highlight text-end py-3 dayFeeCost">0</td>
-                          <td class="white-space-nowrap total align-middle pe-3 text-body-highlight text-end py-3 sendFeeCost">0</td>
-                          <td class="white-space-nowrap total align-middle pe-3 text-body-highlight text-end py-3 etcPriceCost">0</td>
-                          <td class="white-space-nowrap total align-middle fw-bold pe-3 text-body-highlight text-end py-3 subsum0">0</td>
-
-
-                          <td class="white-space-nowrap total align-middle pe-3 text-body-highlight text-end py-3 givePay">0</td>
-                          <td class="white-space-nowrap total align-middle pe-3 text-body-highlight text-end py-3 callFeeCost">0</td>
-                          <td class="white-space-nowrap total align-middle pe-3 text-body-highlight text-end py-3 programFeeCost">0</td>
-                          <td class="white-space-nowrap total align-middle fw-bold pe-3 text-body-highlight text-end py-3 subsum1">0</td>
+                          <td class="white-space-nowrap total align-middle fw-bold pe-1 text-body-highlight text-end py-3 timeInsurance">0</td>
+                          <td class="white-space-nowrap total align-middle fw-bold pe-1 text-body-highlight text-end py-3 necessaryExpenses">0</td>
+                          <td class="white-space-nowrap total align-middle fw-bold pe-1 text-body-highlight text-end py-3 pay">0</td>
 
 
-<!--                           <td class="white-space-nowrap total align-middle fw-bold pe-3 text-body-highlight text-end py-3 ablePrice">1,522,555</td> -->
-                          <td class="white-space-nowrap total align-middle fw-bold pe-3 text-body-highlight text-end py-3 tmpAblePrice">1,522,555</td>
-                          <td class="white-space-nowrap total align-middle pe-3 text-end py-3 creatDt">1,522,555</td>
+                          <td class="white-space-nowrap total align-middle fw-bold pe-1 text-body-highlight text-end py-3 ownerEmploymentInsurance">0</td>
+                          <td class="white-space-nowrap total align-middle fw-bold pe-1 text-body-highlight text-end py-3 riderEmploymentInsurance">0</td>
+                          <td class="white-space-nowrap total align-middle fw-bold pe-1 text-body-highlight text-end py-3 ownerIndustrialInsurance">0</td>
+                          <td class="white-space-nowrap total align-middle fw-bold pe-1 text-body-highlight text-end py-3 riderIndustrialInsurance">0</td>
+                          <td class="white-space-nowrap total align-middle fw-bold pe-1 text-body-highlight text-end py-3 withholdingTaxInsuranceSum">0</td>
+
+
+                          <td class="white-space-nowrap total align-middle fw-bold pe-1 text-body-highlight text-end py-3 ownerEmploymentInsuranceAccounts">0</td>
+                          <td class="white-space-nowrap total align-middle fw-bold pe-1 text-body-highlight text-end py-3 riderEmploymentInsuranceAccounts">0</td>
+                          <td class="white-space-nowrap total align-middle fw-bold pe-1 text-body-highlight text-end py-3 sumEmploymentInsuranceAccounts">0</td>
+                          <td class="white-space-nowrap total align-middle fw-bold pe-1 text-body-highlight text-end py-3 ownerIndustrialInsuranceAccounts">0</td>
+                          <td class="white-space-nowrap total align-middle fw-bold pe-1 text-body-highlight text-end py-3 riderIndustrialInsuranceAccounts">0</td>
+                          <td class="white-space-nowrap total align-middle fw-bold pe-1 text-body-highlight text-end py-3 sumIndustrialInsuranceAccounts">0</td>
+
+
+                          <td class="white-space-nowrap total align-middle fw-bold pe-1 text-body-highlight text-end py-3 operatingCostAdd">0</td>
+                          <td class="white-space-nowrap total align-middle fw-bold pe-1 text-body-highlight text-end py-3 accountsCost">0</td>
+
+                          <td class="white-space-nowrap total align-middle fw-bold pe-1 text-body-highlight text-end py-3 incomeTax">0</td>
+                          <td class="white-space-nowrap total align-middle fw-bold pe-1 text-body-highlight text-end py-3 residenceTax">0</td>
+                          <td class="white-space-nowrap total align-middle fw-bold pe-1 text-body-highlight text-end py-3 withholdingTax">0</td>
+                          <td class="white-space-nowrap total align-middle fw-bold pe-1 text-body-highlight text-end py-3 givePay">0</td>
+
+
+                          <td class="white-space-nowrap total align-middle pe-1 text-body-highlight text-end py-3 sendPriceCost">0</td>
+                          <td class="white-space-nowrap total align-middle pe-1 text-body-highlight text-end py-3 dayFeeCost">0</td>
+                          <td class="white-space-nowrap total align-middle pe-1 text-body-highlight text-end py-3 sendFeeCost">0</td>
+                          <td class="white-space-nowrap total align-middle pe-1 text-body-highlight text-end py-3 etcPriceCost">0</td>
+                          <td class="white-space-nowrap total align-middle fw-bold pe-1 text-body-highlight text-end py-3 subsum0">0</td>
+
+
+<!--                           <td class="white-space-nowrap total align-middle pe-1 text-body-highlight text-end py-3 givePay">0</td> -->
+<!--                           <td class="white-space-nowrap total align-middle pe-1 text-body-highlight text-end py-3 callFeeCost">0</td> -->
+<!--                           <td class="white-space-nowrap total align-middle pe-1 text-body-highlight text-end py-3 programFeeCost">0</td> -->
+<!--                           <td class="white-space-nowrap total align-middle fw-bold pe-1 text-body-highlight text-end py-3 subsum1">0</td> -->
+
+
+<!--                           <td class="white-space-nowrap total align-middle fw-bold pe-1 text-body-highlight text-end py-3 ablePrice">1,522,555</td> -->
+<!--                           <td class="white-space-nowrap total align-middle fw-bold pe-1 text-body-highlight text-end py-3 tmpAblePrice">1,522,555</td> -->
+                          <td class="white-space-nowrap total align-middle pe-1 text-end py-3 creatDt">1,522,555</td>
                         </tr>
 
                         <tr repeatObj="no" class="hover-actions-trigger btn-reveal-trigger position-static" style="display:none;">

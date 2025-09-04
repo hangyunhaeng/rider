@@ -2525,6 +2525,7 @@ public class DtyServiceImpl extends EgovAbstractServiceImpl implements DtyServic
     		one.setCreatId(user.getId());
     		dtyDAO.insertDayPay(one);
 
+
     		//라이더 잔액 조정
     		setBalance(one.getCooperatorId(), one.getEsntlId(), one.getMberId(), user.getId(), new BigDecimal(one.getAblePrice()), new BigDecimal(0));
 
@@ -2761,9 +2762,6 @@ public class DtyServiceImpl extends EgovAbstractServiceImpl implements DtyServic
         //0. 확정대상 사용자를 모두 select for update 로 rock
         BalanceVO balanceVO = new BalanceVO();
 
-//        balanceVO.setSearchFromDate(weekInfoVO.getSearchFromDate());
-//        balanceVO.setSearchToDate(weekInfoVO.getSearchToDate());
-//        balanceVO.setSearchNm(weekInfoVO.getSearchNm());
         balanceVO.setSearchAtchFileId(weekInfoVO.getSearchAtchFileId());
         List<BalanceVO> balanceList = dtyDAO.selectForUPdateBalanceWeekByParam(balanceVO);
 
@@ -2771,12 +2769,103 @@ public class DtyServiceImpl extends EgovAbstractServiceImpl implements DtyServic
 		//주정산 입금 이력 데이터를 DB에 isnert
 		for(int i = 0 ; i < weekPayList.size() ; i++) {
 			WeekPayVO one = weekPayList.get(i);
-			one.setWkpId(egovWkpIdGnrService.getNextStringId());
-			one.setCreatId(user.getId());
-			dtyDAO.insertWeekPay(one);
+//			one.setWkpId(egovWkpIdGnrService.getNextStringId());
+//			one.setCreatId(user.getId());
+//			dtyDAO.insertWeekPay(one);
+//
+//    		//라이더 잔액 조정(주금액 +)
+//    		setBalance(one.getCooperatorId(), one.getEsntlId(), one.getMberId(), user.getId(), new BigDecimal(0), one.getAblePrice());
 
-    		//라이더 잔액 조정(주금액 +)
-    		setBalance(one.getCooperatorId(), one.getEsntlId(), one.getMberId(), user.getId(), new BigDecimal(0), one.getAblePrice());
+    		// ※※ 콜수수료, 프로그램료 보정
+    		//주정산배달건수와 일정산 배달건수가 다를 시 프로그램료와 콜수수료를 보정한다
+    		if(one.getCnt() != one.getDeliveryCnt()) {
+
+        		//수익 등록(콜수수료)
+        		ProfitVO fitVo = new ProfitVO();
+        		if(one.getFeeCallCost()-one.getFeeCooperatorCallCost() != 0) {
+    	    		fitVo.setProfitId(egovFitIdGnrService.getNextStringId());
+    	    		fitVo.setCooperatorId(one.getCooperatorId());//협력사
+    	    		fitVo.setMberId(one.getMberId());			//라이더ID
+    	    		fitVo.setGubun("C");						//콜수수료
+    	    		fitVo.setCost(one.getFeeCallCost()-one.getFeeCooperatorCallCost()); 		//금액
+//    	    		fitVo.setDeliveryCost(one.getDeliveryPrice());	//배달비
+    	    		fitVo.setDeliveryCnt(one.getCnt()-one.getDeliveryCnt());	//배달건수
+    	    		fitVo.setDeliveryDay(one.getAccountsEdDt());			//배달일
+//    	    		fitVo.setDypId(one.getDypId());				//DYP_ID
+    	    		fitVo.setFeeId(one.getFeeId());				//FEE_ID
+    	    		fitVo.setRiderFeeId(one.getRiderFeeId());	//RIDER_FEE_ID
+    	    		fitVo.setCreatId(user.getId());
+    	    		dtyDAO.insertProfit(fitVo);
+        		}
+
+        		//협력사 수익등록(콜수수료)
+        		if(one.getFeeCooperatorCallCost() != 0) {
+    	    		ProfitVO citVo = new ProfitVO();
+
+    	    		citVo.setCoofitId(egovCitIdGnrService.getNextStringId());
+    	    		citVo.setProfitId(fitVo.getProfitId());
+    	    		citVo.setCooperatorId(one.getCooperatorId());//협력사
+    	    		citVo.setMberId(one.getMberId());			//라이더ID
+    	    		citVo.setGubun("C");						//콜수수료
+    	    		citVo.setCost(one.getFeeCooperatorCallCost());//금액
+//    	    		citVo.setDeliveryCost(one.getDeliveryPrice());	//배달비
+    	    		citVo.setDeliveryCnt(one.getCnt()-one.getDeliveryCnt());	//배달건수
+    	    		citVo.setDeliveryDay(one.getAccountsEdDt());			//배달일
+//    	    		citVo.setDypId(one.getDypId());				//DYP_ID
+    	    		citVo.setFeeId(one.getFeeId());				//FEE_ID
+    	    		citVo.setRiderFeeId(one.getRiderFeeId());	//RIDER_FEE_ID
+    	    		citVo.setWeekYn("Y");
+    	    		citVo.setCreatId(user.getId());
+    	    		dtyDAO.insertCooperatorProfit(citVo);
+
+
+    	    		//협력사 잔액 조정
+    	    		setBalance(one.getCooperatorId(), EgovProperties.getProperty("Globals.cooperatorId"), EgovProperties.getProperty("Globals.cooperatorId"), user.getId(), new BigDecimal(0), new BigDecimal(one.getFeeCooperatorCallCost()));
+        		}
+
+
+        		//수익 등록(프로그램료)
+    			ProfitVO fitVo1 = new ProfitVO();
+        		if(one.getFeeProgramCost()-one.getFeeProgramSalesmanCost() != 0) {
+        			fitVo1.setProfitId(egovFitIdGnrService.getNextStringId());
+        			fitVo1.setCooperatorId(one.getCooperatorId());//협력사
+        			fitVo1.setMberId(one.getMberId());			//라이더ID
+        			fitVo1.setGubun("P");						//프로그램료
+        			fitVo1.setCost(one.getFeeProgramCost()-one.getFeeProgramSalesmanCost()); 		//금액
+//        			fitVo1.setDeliveryCost(one.getDeliveryPrice());	//배달비
+        			fitVo1.setDeliveryCnt(one.getCnt()-one.getDeliveryCnt());	//배달건수
+        			fitVo1.setDeliveryDay(one.getAccountsEdDt());			//배달일
+//        			fitVo1.setDypId(one.getDypId());				//DYP_ID
+        			fitVo1.setFeeId(one.getFeeId());				//FEE_ID
+        			fitVo1.setRiderFeeId(one.getRiderFeeId());	//RIDER_FEE_ID
+        			fitVo1.setCreatId(user.getId());
+    	    		dtyDAO.insertProfit(fitVo1);
+        		}
+
+        		//수익 등록(영업사원 프로그램료)
+        		if(one.getFeeProgramSalesmanCost() != 0) {
+        			if(Util.isEmpty(one.getEmplyrId())) {
+        				throw new IllegalArgumentException("영업사원이 등록되어 있지 않아 확정할 수 없습니다.\n 영업사원을 지정하세요\n확정을 취소합니다") ;
+        			}
+
+        			ProfitVO salVo1 = new ProfitVO();
+        			salVo1.setSalfitId(egovSitIdGnrService.getNextStringId());
+        			salVo1.setProfitId(fitVo.getProfitId());
+        			salVo1.setEmplyrId(one.getEmplyrId());			//영업사원ID
+        			salVo1.setCooperatorId(one.getCooperatorId());//협력사
+        			salVo1.setMberId(one.getMberId());			//라이더ID
+        			salVo1.setGubun("P");						//프로그램료
+        			salVo1.setCost(one.getFeeProgramSalesmanCost()); 		//금액
+        			salVo1.setDeliveryCnt(one.getCnt()-one.getDeliveryCnt());	//배달건수
+        			salVo1.setDeliveryDay(one.getAccountsEdDt());			//배달일
+//        			salVo1.setDypId(one.getDypId());				//DYP_ID
+        			salVo1.setFeeId(one.getFeeId());				//FEE_ID
+        			salVo1.setRiderFeeId(one.getRiderFeeId());	//RIDER_FEE_ID
+        			salVo1.setCreatId(user.getId());
+    	    		dtyDAO.insertSalesProfit(salVo1);
+        		}
+
+    		}
 		}
 
 		weekInfoVO.setLastUpdusrId(user.getId());
@@ -2818,21 +2907,167 @@ public class DtyServiceImpl extends EgovAbstractServiceImpl implements DtyServic
 
 
 
-        // 협력사 배포용 데이터 생성
-        // 1. 배포용 만들지 조회
-        WeekInfoVO baseVo = dtyDAO.selectCalBase(weekInfoVO);
-        if(baseVo.isFeeCooperatorAt()) {
+        List<WeekRiderInfoVO> baseList = dtyDAO.selectCalRiderBase(weekInfoVO);
+        if(baseList.size() > 0) {
+        	WeekRiderInfoVO baseVo = baseList.get(0);
 
-            //협력사 입금금액 부가세, 원천세
-            BigDecimal addTax = new BigDecimal(0);
-            BigDecimal withholdingTax = new BigDecimal(0);
+            // 협력사 배포용 데이터 생성
+            // 1. 배포용 만들지 조회
+	        if(baseVo.isFeeCooperatorAt()) {
 
+	            //협력사 입금금액 부가세, 원천세
+	            BigDecimal addTax = new BigDecimal(0);
+	            BigDecimal withholdingTax = new BigDecimal(0);
+
+	        	// 2. RD_WEEK_INFO_OUT
+	        	List<WeekInfoVO> weekInfoList = dtyDAO.selectWeekInfoByAtchFileId(weekInfoVO);
+	        	for(int i = 0 ; i < weekInfoList.size() ; i++) {
+	        		WeekInfoVO oneVo = weekInfoList.get(i);
+	        		//운영비 =을지총배달건수*프로그램료
+	        		BigDecimal operatingCostAdd = new BigDecimal(baseVo.getDeliveryCnt()).multiply(new BigDecimal(baseVo.getFeeProgram())) ;
+	        		//운영비 G25
+	        		oneVo.setOperatingCostAdd(operatingCostAdd);	//운영비
+	        		//부가세액 =(D25+E25+F25-G25)*0.1
+	        		oneVo.setEtcCost( oneVo.getDeliveryCost().add(oneVo.getAddAccounts()).add(oneVo.getManagementCost()).subtract(operatingCostAdd).divide(new BigDecimal(10), 0, RoundingMode.HALF_EVEN));
+	        		//정산예정금액 =D25+E25+F25-G25
+	        		//			+H25-I25-N25
+	        		//			-O25-P25
+	        		oneVo.setAccountsScheduleCost( oneVo.getDeliveryCost().add(oneVo.getAddAccounts()).add(oneVo.getManagementCost()).subtract(operatingCostAdd)
+	        				.add(oneVo.getEtcCost()).subtract(oneVo.getTimeInsurance()).subtract(oneVo.getWithholdingTaxInsuranceSum())
+	        				.subtract(oneVo.getEmploymentInsuranceAccounts()).subtract(oneVo.getIndustrialInsuranceAccounts()));
+
+	        		//공급가액 =D25+E25+F25-G25
+	        		oneVo.setTaxBillSupply(oneVo.getDeliveryCost().add(oneVo.getAddAccounts()).add(oneVo.getManagementCost()).subtract(operatingCostAdd));
+	        		//부가세액 =B31*0.1
+	        		oneVo.setTaxBillAdd(oneVo.getEtcCost());
+	        		//공급대가 =B31+C31
+	        		oneVo.setTaxBillSum(oneVo.getTaxBillSupply().add(oneVo.getTaxBillAdd()));
+	        		oneVo.setFeeId(baseVo.getFeeId());
+	        		dtyDAO.insertWeekInfoOut(oneVo);
+
+	        		addTax = addTax.add(oneVo.getEtcCost());
+	        	}
+
+
+	        	// 3. RD_WEEK_RIDER_INFO_OUT
+	        	List<WeekRiderInfoVO> weekRiderInfoList = dtyDAO.selectWeekRiderInfoByAtchFileId(weekInfoVO);
+	        	for(int i = 0 ; i < weekRiderInfoList.size() ; i++) {
+	        		WeekRiderInfoVO oneVo = weekRiderInfoList.get(i);
+	        		//운영비 =D20*프로그램료
+	        		BigDecimal operatingCostAdd = new BigDecimal(oneVo.getCnt()).multiply(new BigDecimal(baseVo.getFeeProgram())) ;
+	        		oneVo.setOperatingCostAdd(operatingCostAdd);	//운영비
+	        		//라이더별 정산금액 =G20-H20-L20
+	        		//			-N20-V20-Q20-T20
+	        		oneVo.setAccountsCost(oneVo.getSumCost().subtract(oneVo.getTimeInsurance()).subtract(oneVo.getRiderEmploymentInsurance())
+	        				.subtract(oneVo.getRiderIndustrialInsurance()).subtract(operatingCostAdd).subtract(oneVo.getRiderEmploymentInsuranceAccounts()).subtract(oneVo.getRiderIndustrialInsuranceAccounts()));
+	        		//소득세 =ROUNDDOWN((G20-V20)*0.03,-1)
+	        		oneVo.setIncomeTax(oneVo.getSumCost().subtract(operatingCostAdd).multiply(new BigDecimal(3)).divide(new BigDecimal(100), -1, RoundingMode.DOWN));
+	        		//주민세 =ROUNDDOWN(X20*0.1,-1)
+	        		oneVo.setResidenceTax(oneVo.getIncomeTax().divide(new BigDecimal(10), -1, RoundingMode.DOWN));
+	        		//원천징수세액 =X20+Y20
+	        		oneVo.setWithholdingTax(oneVo.getIncomeTax().add(oneVo.getResidenceTax()));
+	        		//라이덥별 지급금액 =W20-Z20
+	        		oneVo.setGivePay(oneVo.getAccountsCost().subtract(oneVo.getWithholdingTax()));
+	        		dtyDAO.insertWeekRiderInfoOut(oneVo);
+
+	        		withholdingTax = withholdingTax.add(oneVo.getWithholdingTax());
+	        	}
+
+	        	//4. 협력사 입금 (부가세)
+	        	if(addTax.compareTo(new BigDecimal(0)) > 0) {
+		    		ProfitVO citVo = new ProfitVO();
+		    		citVo.setCoofitId(egovCitIdGnrService.getNextStringId());
+		    		citVo.setCooperatorId(baseVo.getCooperatorId());	//협력사
+		    		citVo.setMberId(EgovProperties.getProperty("Globals.cooperatorId"));//라이더ID
+		    		citVo.setGubun("B");								//부가세
+		    		citVo.setCost(addTax.intValue());					//금액
+		    		citVo.setDeliveryCost(0);							//배달비
+		    		citVo.setDeliveryCnt(0);							//배달건수
+		    		citVo.setDeliveryDay(baseVo.getAccountsEdDt());		//배달일
+		    		citVo.setFeeId(baseVo.getFeeId());					//FEE_ID
+		    		citVo.setWeekYn("Y");								//정산완료
+		    		citVo.setCreatId(user.getId());
+		    		dtyDAO.insertCooperatorProfit(citVo);
+	        	}
+	        	//협력사 잔액 조정
+	    		setBalance(baseVo.getCooperatorId(), EgovProperties.getProperty("Globals.cooperatorId"), EgovProperties.getProperty("Globals.cooperatorId"), user.getId(), new BigDecimal(0), addTax);
+
+	    		//5. 협력사 입금 (원천세)
+	        	if(withholdingTax.compareTo(new BigDecimal(0)) > 0) {
+		    		ProfitVO citVo = new ProfitVO();
+		    		citVo.setCoofitId(egovCitIdGnrService.getNextStringId());
+		    		citVo.setCooperatorId(baseVo.getCooperatorId());	//협력사
+		    		citVo.setMberId(EgovProperties.getProperty("Globals.cooperatorId"));//라이더ID
+		    		citVo.setGubun("O");								//원천세
+		    		citVo.setCost(withholdingTax.intValue());			//금액
+		    		citVo.setDeliveryCost(0);							//배달비
+		    		citVo.setDeliveryCnt(0);							//배달건수
+		    		citVo.setDeliveryDay(baseVo.getAccountsEdDt());		//배달일
+		    		citVo.setFeeId(baseVo.getFeeId());					//FEE_ID
+		    		citVo.setWeekYn("Y");								//정산완료
+		    		citVo.setCreatId(user.getId());
+		    		dtyDAO.insertCooperatorProfit(citVo);
+	        	}
+	        	//협력사 잔액 조정
+	    		setBalance(baseVo.getCooperatorId(), EgovProperties.getProperty("Globals.cooperatorId"), EgovProperties.getProperty("Globals.cooperatorId"), user.getId(), new BigDecimal(0), withholdingTax);
+
+	        }
+
+
+	        //라이더용 주정산 파일 생성
+        	// 1. RD_WEEK_RIDER_INFO_OUT
+//        	List<WeekRiderInfoVO> weekRiderInfoList = dtyDAO.selectWeekRiderInfoByAtchFileId(weekInfoVO);
+	        BigDecimal operatingCostAll = new BigDecimal(0);
+        	for(int i = 0 ; i < baseList.size() ; i++) {
+        		WeekRiderInfoVO oneVo = baseList.get(i);
+        		//운영비 =D20*(프로그램료+콜수수료)
+        		BigDecimal operatingCostAdd = new BigDecimal(oneVo.getCnt()).multiply( new BigDecimal(oneVo.getFeeProgram()+oneVo.getFeeCall()) ) ;
+        		oneVo.setOperatingCostAdd(operatingCostAdd);	//운영비
+        		//라이더별 정산금액 =G20-H20-L20
+        		//			-N20-V20-Q20-T20
+        		oneVo.setAccountsCost(oneVo.getSumCost().subtract(oneVo.getTimeInsurance()).subtract(oneVo.getRiderEmploymentInsurance())
+        				.subtract(oneVo.getRiderIndustrialInsurance()).subtract(operatingCostAdd).subtract(oneVo.getRiderEmploymentInsuranceAccounts()).subtract(oneVo.getRiderIndustrialInsuranceAccounts()));
+        		//소득세 =ROUNDDOWN((G20-V20)*0.03,-1)
+        		oneVo.setIncomeTax(oneVo.getSumCost().subtract(operatingCostAdd).multiply(new BigDecimal(3)).divide(new BigDecimal(100), -1, RoundingMode.DOWN));
+        		//주민세 =ROUNDDOWN(X20*0.1,-1)
+        		oneVo.setResidenceTax(oneVo.getIncomeTax().divide(new BigDecimal(10), -1, RoundingMode.DOWN));
+        		//원천징수세액 =X20+Y20
+        		oneVo.setWithholdingTax(oneVo.getIncomeTax().add(oneVo.getResidenceTax()));
+        		//라이덥별 지급금액 =W20-Z20
+        		oneVo.setGivePay(oneVo.getAccountsCost().subtract(oneVo.getWithholdingTax()));
+        		dtyDAO.insertWeekRiderInfoOutRider(oneVo);
+
+        		operatingCostAll = operatingCostAll.add(operatingCostAdd);
+
+
+        		//주정산 입금 이력 데이터를 DB에 isnert
+    			WeekPayVO weekPay = new WeekPayVO();
+        		weekPay.setWkpId(egovWkpIdGnrService.getNextStringId());
+        		weekPay.setCooperatorId(oneVo.getCooperatorId());
+        		weekPay.setMberId(oneVo.getMberId());
+        		weekPay.setDwGubun("WEK");
+        		weekPay.setIoGubun("1");
+        		weekPay.setAblePrice(oneVo.getGivePay());
+        		weekPay.setFee(0);
+        		weekPay.setAccountsStDt(oneVo.getAccountsStDt());
+        		weekPay.setAccountsEdDt(oneVo.getAccountsEdDt());
+        		weekPay.setAtchFileId(weekInfoVO.getSearchAtchFileId());
+        		weekPay.setWeekId(oneVo.getWeekId());
+        		weekPay.setUseAt("Y");
+        		weekPay.setCreatId(user.getId());
+        		weekPay.setEsntlId(oneVo.getEsntlId());
+    			dtyDAO.insertWeekPay(weekPay);
+
+        		//라이더 잔액 조정(주금액 +)
+        		setBalance(weekPay.getCooperatorId(), weekPay.getEsntlId(), weekPay.getMberId(), user.getId(), new BigDecimal(0), weekPay.getAblePrice());
+
+        	}
         	// 2. RD_WEEK_INFO_OUT
         	List<WeekInfoVO> weekInfoList = dtyDAO.selectWeekInfoByAtchFileId(weekInfoVO);
         	for(int i = 0 ; i < weekInfoList.size() ; i++) {
         		WeekInfoVO oneVo = weekInfoList.get(i);
-        		//운영비 =을지총배달건수*프로그램료
-        		BigDecimal operatingCostAdd = new BigDecimal(baseVo.getDeliveryCnt()).multiply(new BigDecimal(baseVo.getFeeProgram())) ;
+        		//운영비 =을지총배달건수*프로그램료 = 을지 라이더 운영비 합계
+        		BigDecimal operatingCostAdd = operatingCostAll;
         		//운영비 G25
         		oneVo.setOperatingCostAdd(operatingCostAdd);	//운영비
         		//부가세액 =(D25+E25+F25-G25)*0.1
@@ -2850,76 +3085,10 @@ public class DtyServiceImpl extends EgovAbstractServiceImpl implements DtyServic
         		oneVo.setTaxBillAdd(oneVo.getEtcCost());
         		//공급대가 =B31+C31
         		oneVo.setTaxBillSum(oneVo.getTaxBillSupply().add(oneVo.getTaxBillAdd()));
-        		dtyDAO.insertWeekInfoOut(oneVo);
-
-        		addTax = addTax.add(oneVo.getEtcCost());
+        		oneVo.setFeeId(baseVo.getFeeId());
+        		dtyDAO.insertWeekInfoOutRider(oneVo);
         	}
-
-
-        	// 3. RD_WEEK_RIDER_INFO_OUT
-        	List<WeekRiderInfoVO> weekRiderInfoList = dtyDAO.selectWeekRiderInfoByAtchFileId(weekInfoVO);
-        	for(int i = 0 ; i < weekRiderInfoList.size() ; i++) {
-        		WeekRiderInfoVO oneVo = weekRiderInfoList.get(i);
-        		//운영비 =D20*프로그램료
-        		BigDecimal operatingCostAdd = new BigDecimal(oneVo.getCnt()).multiply(new BigDecimal(baseVo.getFeeProgram())) ;
-        		oneVo.setOperatingCostAdd(operatingCostAdd);	//운영비
-        		//라이더별 정산금액 =G20-H20-L20
-        		//			-N20-V20-Q20-T20
-        		oneVo.setAccountsCost(oneVo.getSumCost().subtract(oneVo.getTimeInsurance()).subtract(oneVo.getRiderEmploymentInsurance())
-        				.subtract(oneVo.getRiderIndustrialInsurance()).subtract(operatingCostAdd).subtract(oneVo.getRiderEmploymentInsuranceAccounts()).subtract(oneVo.getRiderIndustrialInsuranceAccounts()));
-        		//소득세 =ROUNDDOWN((G20-V20)*0.03,-1)
-        		oneVo.setIncomeTax(oneVo.getSumCost().subtract(operatingCostAdd).multiply(new BigDecimal(3)).divide(new BigDecimal(100), -1, RoundingMode.DOWN));
-        		//주민세 =ROUNDDOWN(X20*0.1,-1)
-        		oneVo.setResidenceTax(oneVo.getIncomeTax().divide(new BigDecimal(10), -1, RoundingMode.DOWN));
-        		//원천징수세액 =X20+Y20
-        		oneVo.setWithholdingTax(oneVo.getIncomeTax().add(oneVo.getResidenceTax()));
-        		//라이덥별 지급금액 =W20-Z20
-        		oneVo.setGivePay(oneVo.getAccountsCost().subtract(oneVo.getWithholdingTax()));
-        		dtyDAO.insertWeekRiderInfoOut(oneVo);
-
-        		withholdingTax = withholdingTax.add(oneVo.getWithholdingTax());
-        	}
-
-        	//4. 협력사 입금 (부가세)
-        	if(addTax.compareTo(new BigDecimal(0)) > 0) {
-	    		ProfitVO citVo = new ProfitVO();
-	    		citVo.setCoofitId(egovCitIdGnrService.getNextStringId());
-	    		citVo.setCooperatorId(baseVo.getCooperatorId());	//협력사
-	    		citVo.setMberId(EgovProperties.getProperty("Globals.cooperatorId"));//라이더ID
-	    		citVo.setGubun("B");								//부가세
-	    		citVo.setCost(addTax.intValue());					//금액
-	    		citVo.setDeliveryCost(0);							//배달비
-	    		citVo.setDeliveryCnt(0);							//배달건수
-	    		citVo.setDeliveryDay(baseVo.getAccountsEdDt());		//배달일
-	    		citVo.setFeeId(baseVo.getFeeId());					//FEE_ID
-	    		citVo.setWeekYn("Y");								//정산완료
-	    		citVo.setCreatId(user.getId());
-	    		dtyDAO.insertCooperatorProfit(citVo);
-        	}
-        	//협력사 잔액 조정
-    		setBalance(baseVo.getCooperatorId(), EgovProperties.getProperty("Globals.cooperatorId"), EgovProperties.getProperty("Globals.cooperatorId"), user.getId(), new BigDecimal(0), addTax);
-
-    		//5. 협력사 입금 (원천세)
-        	if(withholdingTax.compareTo(new BigDecimal(0)) > 0) {
-	    		ProfitVO citVo = new ProfitVO();
-	    		citVo.setCoofitId(egovCitIdGnrService.getNextStringId());
-	    		citVo.setCooperatorId(baseVo.getCooperatorId());	//협력사
-	    		citVo.setMberId(EgovProperties.getProperty("Globals.cooperatorId"));//라이더ID
-	    		citVo.setGubun("O");								//원천세
-	    		citVo.setCost(withholdingTax.intValue());			//금액
-	    		citVo.setDeliveryCost(0);							//배달비
-	    		citVo.setDeliveryCnt(0);							//배달건수
-	    		citVo.setDeliveryDay(baseVo.getAccountsEdDt());		//배달일
-	    		citVo.setFeeId(baseVo.getFeeId());					//FEE_ID
-	    		citVo.setWeekYn("Y");								//정산완료
-	    		citVo.setCreatId(user.getId());
-	    		dtyDAO.insertCooperatorProfit(citVo);
-        	}
-        	//협력사 잔액 조정
-    		setBalance(baseVo.getCooperatorId(), EgovProperties.getProperty("Globals.cooperatorId"), EgovProperties.getProperty("Globals.cooperatorId"), user.getId(), new BigDecimal(0), withholdingTax);
-
         }
-
 
 
 

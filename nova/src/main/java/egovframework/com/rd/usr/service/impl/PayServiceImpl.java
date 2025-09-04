@@ -30,6 +30,7 @@ import egovframework.com.rd.usr.service.vo.KkoVO;
 import egovframework.com.rd.usr.service.vo.MyInfoVO;
 import egovframework.com.rd.usr.service.vo.ProfitVO;
 import egovframework.com.rd.usr.service.vo.WeekPayVO;
+import egovframework.com.rd.usr.service.vo.WeekRiderInfoVO;
 
 /**
  * @Class Name : DtyServiceImpl.java
@@ -526,7 +527,7 @@ public class PayServiceImpl extends EgovAbstractServiceImpl implements PayServic
 	 * @return
 	 * @throws Exception
 	 */
-	public List<WeekPayVO> selectWeekPayByMberId(WeekPayVO vo) throws Exception {
+	public List<WeekRiderInfoVO> selectWeekPayByMberId(WeekPayVO vo) throws Exception {
 		return payDAO.selectWeekPayByMberId(vo);
 	}
 }

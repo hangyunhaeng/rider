@@ -119,15 +119,15 @@ public class BalanceConfirmSchedul extends EgovAbstractServiceImpl {
 
 					//협력사 잔액 검증 테이블 insert
 					if(balanceTable != null) {
-						BigDecimal b0 = balanceTable.getBalance0().subtract(new BigDecimal(balanceCoopr.getCost())).subtract(
-								balanceTable.getBalance0().multiply(new BigDecimal(balanceCoopr.getFeeAdminstrator())).divide(new BigDecimal(100), 0, RoundingMode.UP)
-						);
+//						BigDecimal b0 = balanceTable.getBalance0().subtract(new BigDecimal(balanceCoopr.getCost())).subtract( //rd_balance - 미확정 출금금액
+//								balanceTable.getBalance0().multiply(new BigDecimal(balanceCoopr.getFeeAdminstrator())).divide(new BigDecimal(100), 0, RoundingMode.UP)
+//						);
 						BalanceVO BalanceConfirm = new BalanceVO();
 						BalanceConfirm.setCooperatorId(one.getCooperatorId());
 //						BalanceConfirm.setMberId(one.getMberId());
 						BalanceConfirm.setEsntlId(one.getEsntlId());
 						BalanceConfirm.setDay(Util.getDay());
-						BalanceConfirm.setBalance0(b0);
+						BalanceConfirm.setBalance0(balanceCoopr.getBalance0Cal());
 						BalanceConfirm.setBalance1(balanceTable.getBalance1());
 						BalanceConfirm.setAbleBalance0( new BigDecimal(balanceAble.getDayAblePrice()) );
 						BalanceConfirm.setAbleBalance1( new BigDecimal(balanceAble.getWeekAblePrice()) );

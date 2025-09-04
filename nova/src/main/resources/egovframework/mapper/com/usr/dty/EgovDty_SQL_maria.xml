@@ -242,12 +242,12 @@
 
 	<insert id="insertWeekInfoOut" parameterType="egovframework.com.rd.usr.service.vo.WeekInfoVO">
 			INSERT INTO RD_WEEK_INFO_OUT
-			(WEEK_ID,COOPERATOR_ID,ACCOUNTS_ST_DT,ACCOUNTS_ED_DT ,DELIVERY_COST ,ADD_ACCOUNTS ,OPERATING_COST,MANAGEMENT_COST
+			(WEEK_ID,FEE_ID,COOPERATOR_ID,ACCOUNTS_ST_DT,ACCOUNTS_ED_DT ,DELIVERY_COST ,ADD_ACCOUNTS ,OPERATING_COST,MANAGEMENT_COST
 			,OPERATING_FEE,ETC_COST,TIME_INSURANCE,OWNER_EMPLOYMENT_INSURANCE,RIDER_EMPLOYMENT_INSURANCE,OWNER_INDUSTRIAL_INSURANCE
 			,RIDER_INDUSTRIAL_INSURANCE,WITHHOLDING_TAX_INSURANCE_SUM,EMPLOYMENT_INSURANCE_ACCOUNTS,INDUSTRIAL_INSURANCE_ACCOUNTS
 			,G,ACCOUNTS_SCHEDULE_COST,TAX_BILL_SUPPLY,TAX_BILL_ADD ,TAX_BILL_SUM ,NOTE,ATCH_FILE_ID,OPERATING_COST_ADD,CREAT_DT,CREAT_ID)
 			VALUES
-			(#{weekId},#{cooperatorId},#{accountsStDt},#{accountsEdDt},#{deliveryCost},#{addAccounts},#{operatingCost},#{managementCost}
+			(#{weekId},#{feeId},#{cooperatorId},#{accountsStDt},#{accountsEdDt},#{deliveryCost},#{addAccounts},#{operatingCost},#{managementCost}
 			,#{operatingFee},#{etcCost},#{timeInsurance},#{ownerEmploymentInsurance},#{riderEmploymentInsurance},#{ownerIndustrialInsurance}
 			,#{riderIndustrialInsurance},#{withholdingTaxInsuranceSum},#{employmentInsuranceAccounts},#{industrialInsuranceAccounts}
 			,#{g},#{accountsScheduleCost},#{taxBillSupply},#{taxBillAdd},#{taxBillSum},#{note},#{atchFileId},#{operatingCostAdd},SYSDATE(),#{creatId})
@@ -262,6 +262,34 @@
 			,OPERATING_COST,ACCOUNTS_COST,INCOME_TAX,RESIDENCE_TAX,WITHHOLDING_TAX,GIVE_PAY,OPERATING_COST_ADD,CREAT_DT,CREAT_ID)
 			VALUES
 			(#{weekId},#{no},#{mberId},#{mberNm},#{cnt},#{deliveryCost},#{addCost},#{sumCost},#{timeInsurance},#{necessaryExpenses},#{pay},#{ownerEmploymentInsurance}
+			,#{riderEmploymentInsurance},#{ownerIndustrialInsurance},#{riderIndustrialInsurance},#{withholdingTaxInsuranceSum}
+			,#{ownerEmploymentInsuranceAccounts},#{riderEmploymentInsuranceAccounts},#{sumEmploymentInsuranceAccounts}
+			,#{ownerIndustrialInsuranceAccounts},#{riderIndustrialInsuranceAccounts},#{sumIndustrialInsuranceAccounts}
+			,#{operatingCost},#{accountsCost},#{incomeTax},#{residenceTax},#{withholdingTax},#{givePay},#{operatingCostAdd},SYSDATE(),#{creatId})
+	</insert>
+
+	<insert id="insertWeekInfoOutRider" parameterType="egovframework.com.rd.usr.service.vo.WeekInfoVO">
+			INSERT INTO RD_WEEK_INFO_OUT_RIDER
+			(WEEK_ID,FEE_ID,COOPERATOR_ID,ACCOUNTS_ST_DT,ACCOUNTS_ED_DT ,DELIVERY_COST ,ADD_ACCOUNTS ,OPERATING_COST,MANAGEMENT_COST
+			,OPERATING_FEE,ETC_COST,TIME_INSURANCE,OWNER_EMPLOYMENT_INSURANCE,RIDER_EMPLOYMENT_INSURANCE,OWNER_INDUSTRIAL_INSURANCE
+			,RIDER_INDUSTRIAL_INSURANCE,WITHHOLDING_TAX_INSURANCE_SUM,EMPLOYMENT_INSURANCE_ACCOUNTS,INDUSTRIAL_INSURANCE_ACCOUNTS
+			,G,ACCOUNTS_SCHEDULE_COST,TAX_BILL_SUPPLY,TAX_BILL_ADD ,TAX_BILL_SUM ,NOTE,ATCH_FILE_ID,OPERATING_COST_ADD,CREAT_DT,CREAT_ID)
+			VALUES
+			(#{weekId},#{feeId},#{cooperatorId},#{accountsStDt},#{accountsEdDt},#{deliveryCost},#{addAccounts},#{operatingCost},#{managementCost}
+			,#{operatingFee},#{etcCost},#{timeInsurance},#{ownerEmploymentInsurance},#{riderEmploymentInsurance},#{ownerIndustrialInsurance}
+			,#{riderIndustrialInsurance},#{withholdingTaxInsuranceSum},#{employmentInsuranceAccounts},#{industrialInsuranceAccounts}
+			,#{g},#{accountsScheduleCost},#{taxBillSupply},#{taxBillAdd},#{taxBillSum},#{note},#{atchFileId},#{operatingCostAdd},SYSDATE(),#{creatId})
+	</insert>
+
+	<insert id="insertWeekRiderInfoOutRider" parameterType="egovframework.com.rd.usr.service.vo.WeekRiderInfoVO">
+			INSERT INTO RD_WEEK_RIDER_INFO_OUT_RIDER
+			(WEEK_ID,FEE_ID, RIDER_FEE_ID, NO,MBER_ID,MBER_NM,CNT,DELIVERY_COST,ADD_COST,SUM_COST,TIME_INSURANCE,NECESSARY_EXPENSES,PAY,OWNER_EMPLOYMENT_INSURANCE
+			,RIDER_EMPLOYMENT_INSURANCE,OWNER_INDUSTRIAL_INSURANCE,RIDER_INDUSTRIAL_INSURANCE,WITHHOLDING_TAX_INSURANCE_SUM
+			,OWNER_EMPLOYMENT_INSURANCE_ACCOUNTS,RIDER_EMPLOYMENT_INSURANCE_ACCOUNTS,SUM_EMPLOYMENT_INSURANCE_ACCOUNTS
+			,OWNER_INDUSTRIAL_INSURANCE_ACCOUNTS,RIDER_INDUSTRIAL_INSURANCE_ACCOUNTS,SUM_INDUSTRIAL_INSURANCE_ACCOUNTS
+			,OPERATING_COST,ACCOUNTS_COST,INCOME_TAX,RESIDENCE_TAX,WITHHOLDING_TAX,GIVE_PAY,OPERATING_COST_ADD,CREAT_DT,CREAT_ID)
+			VALUES
+			(#{weekId},#{feeId},#{riderFeeId},#{no},#{mberId},#{mberNm},#{cnt},#{deliveryCost},#{addCost},#{sumCost},#{timeInsurance},#{necessaryExpenses},#{pay},#{ownerEmploymentInsurance}
 			,#{riderEmploymentInsurance},#{ownerIndustrialInsurance},#{riderIndustrialInsurance},#{withholdingTaxInsuranceSum}
 			,#{ownerEmploymentInsuranceAccounts},#{riderEmploymentInsuranceAccounts},#{sumEmploymentInsuranceAccounts}
 			,#{ownerIndustrialInsuranceAccounts},#{riderIndustrialInsuranceAccounts},#{sumIndustrialInsuranceAccounts}
@@ -477,50 +505,68 @@
 	</select>
 
 	<select id="selectPixWeek" parameterType="egovframework.com.rd.usr.service.vo.WeekInfoVO" resultType="egovframework.com.rd.usr.service.vo.WeekPayVO">
-		SELECT a.WEEK_ID, a.COOPERATOR_ID, b.MBER_ID, 'WEK' AS DW_GUBUN, '1' AS IO_GUBUN, b.GIVE_PAY
-		, b.GIVE_PAY - nvl(d.CALL_FEE_COST, 0) - nvl(d.PROGRAM_FEE_COST, 0) AS ABLE_PRICE, d.CALL_FEE_COST, d.PROGRAM_FEE_COST
-		, 0 AS FEE, a.ACCOUNTS_ST_DT, a.ACCOUNTS_ED_DT, a.ATCH_FILE_ID, 'Y' AS USE_AT, d.ESNTL_ID
-		FROM RD_WEEK_INFO a
-			LEFT JOIN RD_WEEK_RIDER_INFO b on a.WEEK_ID = b.week_id
-			LEFT JOIN COMTNGNRLMBER c ON b.mber_id = c.mber_id
-			JOIN COMTNFILE d ON a.ATCH_FILE_ID = d.ATCH_FILE_ID
-			LEFT JOIN (
-				SELECT wi.COOPERATOR_ID, wr.mber_id, d.ESNTL_ID
-				<![CDATA[
-				, SUM(nvl(if(wi.accounts_st_dt <= a.DAY AND wi.accounts_ed_dt >= a.DAY, b.COST, 0), 0))
-					+ SUM(nvl(if(wi.accounts_st_dt <= a.DAY AND wi.accounts_ed_dt >= a.DAY, c.COST, 0), 0)) CALL_FEE_COST
-				, SUM(nvl(if(wi.accounts_st_dt <= a.DAY AND wi.accounts_ed_dt >= a.DAY, e.COST, 0), 0))
-					+ SUM(nvl(if(wi.accounts_st_dt <= a.DAY AND wi.accounts_ed_dt >= a.DAY, g.COST, 0), 0))PROGRAM_FEE_COST
-				]]>
-				, a.DAY, wi.accounts_st_dt, wi.accounts_ed_dt
-					, d.MBER_NM
-					FROM RD_WEEK_INFO wi
-					LEFT JOIN RD_WEEK_RIDER_INFO wr ON wi.WEEK_ID = wr.week_id
-					LEFT JOIN RD_DAY_PAY a ON wi.COOPERATOR_ID = a.COOPERATOR_ID AND wr.MBER_ID = a.mber_id AND a.use_at = 'Y' AND IO_GUBUN= '1' AND a.WEEK_YN = 'N'
-					LEFT JOIN RD_PROFIT b ON a.COOPERATOR_ID = b.COOPERATOR_ID AND a.mber_id = b.MBER_ID AND b.gubun ='C' AND a.DYP_ID = b.DYP_ID
-					LEFT JOIN RD_COOPERATOR_PROFIT c ON a.COOPERATOR_ID = c.COOPERATOR_ID AND a.mber_id = c.MBER_ID AND c.gubun ='C' AND a.DYP_ID = c.DYP_ID
-					LEFT JOIN RD_PROFIT e ON a.COOPERATOR_ID = e.COOPERATOR_ID AND a.mber_id = e.MBER_ID AND e.gubun ='P' AND a.DYP_ID = e.DYP_ID
-					LEFT JOIN RD_SALES_PROFIT g ON a.COOPERATOR_ID = g.COOPERATOR_ID AND a.mber_id = g.MBER_ID AND g.gubun ='P' AND a.DYP_ID = g.DYP_ID
-					LEFT JOIN COMTNGNRLMBER d ON wr.mber_id = d.mber_id
-					JOIN COMTNFILE f ON wi.ATCH_FILE_ID = f.ATCH_FILE_ID
-						WHERE 1=1
-							AND wr.FIX_DAY is null
-							AND f.USE_AT ='Y'
-							AND wi.ATCH_FILE_ID = #{searchAtchFileId}
-<!-- 							AND (wi.ACCOUNTS_ST_DT BETWEEN #{searchFromDate} AND #{searchToDate} or wi.ACCOUNTS_ED_DT BETWEEN #{searchFromDate} AND #{searchToDate}) -->
-<!-- 							<if test="searchNm != null and searchNm != ''"> -->
-<!-- 							AND d.MBER_NM LIKE '%' #{searchNm} '%' -->
-<!-- 							</if> -->
-				GROUP BY wi.COOPERATOR_ID, wr.mber_id
-			) d ON a.COOPERATOR_ID = d.COOPERATOR_ID AND b.MBER_ID = d.MBER_ID
-		WHERE 1=1
-			AND b.FIX_DAY is null
-			AND d.USE_AT ='Y'
-			AND a.ATCH_FILE_ID = #{searchAtchFileId}
-<!-- 			AND (a.ACCOUNTS_ST_DT BETWEEN #{searchFromDate} AND #{searchToDate} or a.ACCOUNTS_ED_DT BETWEEN #{searchFromDate} AND #{searchToDate}) -->
-<!-- 			<if test="searchNm != null and searchNm != ''"> -->
-<!-- 			AND c.MBER_NM LIKE '%' #{searchNm} '%' -->
-<!-- 			</if> -->
+	SELECT tab.WEEK_ID, tab.COOPERATOR_ID, tab.MBER_ID, tab.cnt, tab.delivery_cnt
+	, tab.fee_id, tab.RIDER_FEE_ID, tab.fee_program, tab.fee_program_salesman
+	, tab.fee_call
+	, tab.fee_cooperator_call
+	, tab.DW_GUBUN, tab.IO_GUBUN, tab.GIVE_PAY
+	, tab.ABLE_PRICE - (cnt -delivery_cnt) *FEE_CALL - (cnt -delivery_cnt)*FEE_PROGRAM AS ABLE_PRICE, tab.CALL_FEE_COST, tab.PROGRAM_FEE_COST
+	, tab.FEE, tab.ACCOUNTS_ST_DT, tab.ACCOUNTS_ED_DT, tab.ATCH_FILE_ID, tab.USE_AT, tab.ESNTL_ID, tab.EMPLYR_ID
+	, (cnt -delivery_cnt) *FEE_CALL AS FEE_CALL_COST	/* 전체 콜수수료 */
+	, FLOOR(((cnt -delivery_cnt) *FEE_CALL)*FEE_COOPERATOR_CALL*0.01) AS FEE_COOPERATOR_CALL_COST /*협력사  콜수수료*/
+	, (cnt -delivery_cnt)*FEE_PROGRAM AS FEE_PROGRAM_COST /* 전체 프로그램료 */
+	, (cnt -delivery_cnt)*FEE_PROGRAM_SALESMAN AS FEE_PROGRAM_SALESMAN_COST /* 영업사원 프로그램료 */
+	FROM (
+			SELECT a.WEEK_ID, a.COOPERATOR_ID, b.MBER_ID, b.cnt, d.delivery_cnt
+			, nvl(d.fee_id, g.fee_id) AS fee_id, nvl(d.RIDER_FEE_ID, h.RIDER_FEE_ID) AS RIDER_FEE_ID
+			, nvl(e.fee_program, g.fee_program) AS fee_program, nvl(e.fee_program_salesman, g.fee_program_salesman) AS fee_program_salesman
+			, nvl(nvl(f.fee_call,e.fee_call), nvl(h.fee_call, g.fee_call)) AS fee_call
+			, nvl(e.fee_cooperator_call , g.fee_cooperator_call) AS fee_cooperator_call
+			,'WEK' AS DW_GUBUN, '1' AS IO_GUBUN, b.GIVE_PAY
+			, b.GIVE_PAY - nvl(d.CALL_FEE_COST, 0) - nvl(d.PROGRAM_FEE_COST, 0) AS ABLE_PRICE, d.CALL_FEE_COST, d.PROGRAM_FEE_COST
+			, 0 AS FEE, a.ACCOUNTS_ST_DT, a.ACCOUNTS_ED_DT, a.ATCH_FILE_ID, 'Y' AS USE_AT, d.ESNTL_ID, i.EMPLYR_ID
+			FROM RD_WEEK_INFO a
+				LEFT JOIN RD_WEEK_RIDER_INFO b on a.WEEK_ID = b.week_id
+				LEFT JOIN COMTNGNRLMBER c ON b.mber_id = c.mber_id
+				JOIN COMTNFILE d ON a.ATCH_FILE_ID = d.ATCH_FILE_ID
+				LEFT JOIN (
+					SELECT wi.COOPERATOR_ID, wr.mber_id, d.ESNTL_ID
+					<![CDATA[
+						, SUM(nvl(if(wi.accounts_st_dt <= a.DAY AND wi.accounts_ed_dt >= a.DAY, b.COST, 0), 0))
+							+ SUM(nvl(if(wi.accounts_st_dt <= a.DAY AND wi.accounts_ed_dt >= a.DAY, c.COST, 0), 0)) CALL_FEE_COST
+						, SUM(nvl(if(wi.accounts_st_dt <= a.DAY AND wi.accounts_ed_dt >= a.DAY, e.COST, 0), 0))
+						+ SUM(nvl(if(wi.accounts_st_dt <= a.DAY AND wi.accounts_ed_dt >= a.DAY, g.COST, 0), 0))PROGRAM_FEE_COST
+						, a.DAY, wi.accounts_st_dt, wi.accounts_ed_dt
+						, SUM(nvl(if(wi.accounts_st_dt <= a.DAY AND wi.accounts_ed_dt >= a.DAY, a.delivery_cnt, 0), 0)) AS delivery_cnt
+						, MAX(if(wi.accounts_st_dt <= a.DAY AND wi.accounts_ed_dt >= a.DAY, a.fee_id, null)) AS fee_id
+						, MAX(if(wi.accounts_st_dt <= a.DAY AND wi.accounts_ed_dt >= a.DAY, a.RIDER_FEE_ID, null)) AS RIDER_FEE_ID
+					]]>
+						, d.MBER_NM
+						FROM RD_WEEK_INFO wi
+						LEFT JOIN RD_WEEK_RIDER_INFO wr ON wi.WEEK_ID = wr.week_id
+						LEFT JOIN RD_DAY_PAY a ON wi.COOPERATOR_ID = a.COOPERATOR_ID AND wr.MBER_ID = a.mber_id AND a.use_at = 'Y' AND IO_GUBUN= '1' AND a.WEEK_YN = 'N'
+						LEFT JOIN RD_PROFIT b ON a.COOPERATOR_ID = b.COOPERATOR_ID AND a.mber_id = b.MBER_ID AND b.gubun ='C' AND a.DYP_ID = b.DYP_ID
+						LEFT JOIN RD_COOPERATOR_PROFIT c ON a.COOPERATOR_ID = c.COOPERATOR_ID AND a.mber_id = c.MBER_ID AND c.gubun ='C' AND a.DYP_ID = c.DYP_ID
+						LEFT JOIN RD_PROFIT e ON a.COOPERATOR_ID = e.COOPERATOR_ID AND a.mber_id = e.MBER_ID AND e.gubun ='P' AND a.DYP_ID = e.DYP_ID
+						LEFT JOIN RD_SALES_PROFIT g ON a.COOPERATOR_ID = g.COOPERATOR_ID AND a.mber_id = g.MBER_ID AND g.gubun ='P' AND a.DYP_ID = g.DYP_ID
+						LEFT JOIN COMTNGNRLMBER d ON wr.mber_id = d.mber_id
+						JOIN COMTNFILE f ON wi.ATCH_FILE_ID = f.ATCH_FILE_ID
+							WHERE 1=1
+								AND wr.FIX_DAY is null
+								AND f.USE_AT ='Y'
+								AND wi.ATCH_FILE_ID = #{searchAtchFileId}
+					GROUP BY wi.COOPERATOR_ID, wr.mber_id
+				) d ON a.COOPERATOR_ID = d.COOPERATOR_ID AND b.MBER_ID = d.MBER_ID
+				LEFT JOIN RD_COOPERATOR_FEE e ON d.fee_id = e.fee_id	-- 일정산했던 수수료 기준으로 누락된 배달건수에 대한 콜,운영수수료를 책정한다
+				LEFT JOIN RD_RIDER_FEE f ON d.RIDER_FEE_ID = f.RIDER_FEE_ID
+				LEFT JOIN RD_COOPERATOR_FEE g ON a.COOPERATOR_ID = g.COOPERATOR_ID AND g.use_at ='Y' -- 일정산 수수료 이력이 없을 시 최근 수수료 기준으로 책정
+				LEFT JOIN RD_RIDER_FEE h ON a.COOPERATOR_ID = h.COOPERATOR_ID  AND b.MBER_ID = h.MBER_ID AND  h.use_at ='Y'
+				LEFT JOIN RD_COOPERATOR_SALES i ON a.COOPERATOR_ID = i.COOPERATOR_ID AND i.use_AT ='Y'
+			WHERE 1=1
+				AND b.FIX_DAY is null
+				AND d.USE_AT ='Y'
+				AND a.ATCH_FILE_ID = #{searchAtchFileId}
+	) tab
 	</select>
 
 	<select id="selectCalBase" parameterType="egovframework.com.rd.usr.service.vo.WeekInfoVO" resultType="egovframework.com.rd.usr.service.vo.WeekInfoVO">
@@ -531,6 +577,35 @@
 		JOIN COMTNFILE f ON wi.ATCH_FILE_ID = f.ATCH_FILE_ID
 			WHERE 1=1
 				AND wr.FIX_DAY is null
+				AND f.USE_AT ='Y'
+				AND wi.ATCH_FILE_ID = #{searchAtchFileId}
+	</select>
+	<select id="selectCalRiderBase" parameterType="egovframework.com.rd.usr.service.vo.WeekInfoVO" resultType="egovframework.com.rd.usr.service.vo.WeekRiderInfoVO">
+		SELECT wi.COOPERATOR_ID, wr.MBER_ID, wr.CNT AS DELIVERY_CNT, a.FEE_COOPERATOR_AT, a.FEE_PROGRAM
+		, nvl(b.FEE_ID,a.FEE_ID) AS FEE_ID, nvl(b.RIDER_FEE_ID,c.RIDER_FEE_ID) AS RIDER_FEE_ID, wi.ACCOUNTS_ST_DT, wi.ACCOUNTS_ED_DT, g.ESNTL_ID
+		, nvl(e.FEE_CALL, d.FEE_CALL) AS FEE_CALL
+		,wr.WEEK_ID,wr.NO,wr.MBER_ID,wr.MBER_NM,wr.CNT,wr.DELIVERY_COST,wr.ADD_COST,wr.SUM_COST,wr.TIME_INSURANCE,wr.NECESSARY_EXPENSES,wr.PAY,wr.OWNER_EMPLOYMENT_INSURANCE
+		,wr.RIDER_EMPLOYMENT_INSURANCE,wr.OWNER_INDUSTRIAL_INSURANCE,wr.RIDER_INDUSTRIAL_INSURANCE,wr.WITHHOLDING_TAX_INSURANCE_SUM
+		,wr.OWNER_EMPLOYMENT_INSURANCE_ACCOUNTS,wr.RIDER_EMPLOYMENT_INSURANCE_ACCOUNTS,wr.SUM_EMPLOYMENT_INSURANCE_ACCOUNTS
+		,wr.OWNER_INDUSTRIAL_INSURANCE_ACCOUNTS,wr.RIDER_INDUSTRIAL_INSURANCE_ACCOUNTS,wr.SUM_INDUSTRIAL_INSURANCE_ACCOUNTS
+		,wr.OPERATING_COST,wr.ACCOUNTS_COST,wr.INCOME_TAX,wr.RESIDENCE_TAX,wr.WITHHOLDING_TAX,wr.GIVE_PAY,wr.CREAT_DT,wr.CREAT_ID
+		FROM RD_WEEK_INFO wi
+		JOIN RD_WEEK_RIDER_INFO wr ON wi.WEEK_ID = wr.WEEK_ID
+		JOIN COMTNFILE f ON wi.ATCH_FILE_ID = f.ATCH_FILE_ID
+		LEFT JOIN (
+			SELECT b.WEEK_ID, b.MBER_ID, MAX(c.FEE_ID) AS FEE_ID, MAX(c.RIDER_FEE_ID) AS RIDER_FEE_ID
+			FROM RD_WEEK_INFO a
+			JOIN RD_WEEK_RIDER_INFO b ON a.WEEK_ID = b.WEEK_ID
+			LEFT JOIN RD_DAY_PAY c ON b.MBER_ID = c.MBER_ID and c.DAY BETWEEN a.ACCOUNTS_ST_DT AND a.ACCOUNTS_ED_DT AND c.IO_GUBUN = '1' AND c.USE_AT ='Y'
+			WHERE a.ATCH_FILE_ID = #{searchAtchFileId}
+			GROUP BY b.WEEK_ID, b.mber_id
+		) b ON wr.WEEK_ID = b.WEEK_ID AND wr.MBER_ID = b.MBER_ID -- 일정산 기준 수수료을 1차로 가져옴
+		JOIN RD_COOPERATOR_FEE a ON wi.COOPERATOR_ID = a.COOPERATOR_ID AND a.use_at ='Y'	-- 일정산 수수료 기준이 없을때 가져옴
+		LEFT JOIN RD_RIDER_FEE c ON wi.COOPERATOR_ID = c.COOPERATOR_ID  AND b.MBER_ID = c.MBER_ID AND  c.use_at ='Y'-- 일정산 수수료 기준이 없을때 가져옴
+		JOIN RD_COOPERATOR_FEE d ON nvl(b.FEE_ID,a.FEE_ID) = d.fee_id  	-- 기준이 된 최종 수수료
+		LEFT JOIN RD_RIDER_FEE e ON nvl(b.RIDER_FEE_ID,c.RIDER_FEE_ID) = e.RIDER_FEE_ID -- 기준이 된 최종 수수료
+		JOIN COMTNGNRLMBER g ON wr.MBER_ID = g.MBER_ID
+			WHERE 1=1
 				AND f.USE_AT ='Y'
 				AND wi.ATCH_FILE_ID = #{searchAtchFileId}
 	</select>
@@ -677,9 +752,9 @@
 	<insert id="insertDayPay" parameterType="egovframework.com.rd.usr.service.vo.DayPayVO">
 		INSERT INTO RD_DAY_PAY
 		(DYP_ID, COOPERATOR_ID,MBER_ID, DAY, IO_GUBUN, DELIVERY_PRICE, DELIVERY_CNT, DAY_FEE, INSURANCE, SEND_FEE, ABLE_PRICE, SEND_PRICE, WEEK_YN
-		, DAY_ATCH_FILE_ID, WEK_ATCH_FILE_ID, WEEK_ID, TRAN_DAY, TELEGRAM_NO, USE_AT, CREAT_DT, CREAT_ID, ETC_ID)
+		, DAY_ATCH_FILE_ID, WEK_ATCH_FILE_ID, WEEK_ID, FEE_ID, RIDER_FEE_ID, TRAN_DAY, TELEGRAM_NO, USE_AT, CREAT_DT, CREAT_ID, ETC_ID)
 		VALUES(#{dypId}, #{cooperatorId}, #{mberId}, #{day}, #{ioGubun}, #{deliveryPrice}, #{deliveryCnt}, #{dayFee}, #{insurance}, #{sendFee}, #{ablePrice}, #{sendPrice}, #{weekYn}
-		, #{dayAtchFileId}, #{wekAtchFileId}, #{weekId}, #{tranDay}, #{telegramNo}, #{useAt}, SYSDATE(), #{creatId}, #{etcId})
+		, #{dayAtchFileId}, #{wekAtchFileId}, #{weekId}, #{feeId}, #{riderFeeId}, #{tranDay}, #{telegramNo}, #{useAt}, SYSDATE(), #{creatId}, #{etcId})
 	</insert>
 
 	<select id="getAbleDateWeek" parameterType="egovframework.com.rd.usr.service.vo.WeekInfoVO" resultType="boolean">
@@ -1417,6 +1492,12 @@
 	</select>
 	<select id="selectBalanceByCooprator" parameterType="egovframework.com.rd.usr.service.vo.BalanceVO" resultType="egovframework.com.rd.usr.service.vo.BalanceVO">
 		SELECT a.COOPERATOR_ID, a.ESNTL_ID, a.BALANCE0, a.BALANCE1, SUM(SEND_PRICE+SEND_FEE) AS cost, c.FEE_ADMINSTRATOR
+		<![CDATA[
+		, if(a.BALANCE1 < 0
+			, (a.BALANCE0 - nvl(SUM(SEND_PRICE+SEND_FEE), 0) - CEILING(a.BALANCE0*nvl(c.FEE_ADMINSTRATOR*0.01, 0))) + a.BALANCE1
+			, a.BALANCE0 - nvl(SUM(SEND_PRICE+SEND_FEE), 0) - CEILING(a.BALANCE0*nvl(c.FEE_ADMINSTRATOR*0.01, 0))
+		) AS BALANCE0_CAL
+		]]>
 		from RD_BALANCE a
 		LEFT JOIN RD_COOPERATOR_PAY b ON a.COOPERATOR_ID = b.COOPERATOR_ID AND b.USE_AT ='Y' AND WEEK_YN ='N'
 		LEFT JOIN RD_COOPERATOR_FEE c ON a.COOPERATOR_ID = c.COOPERATOR_ID AND c.USE_AT ='Y'
