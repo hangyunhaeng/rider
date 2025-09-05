@@ -876,8 +876,8 @@
 			, SUM(NVL(d.DAY_FEE, 0)+NVL(d.SEND_FEE,0)+NVL(d.SEND_PRICE,0)) SEND_PRICE
 
 
-			FROM rd_week_info_out_rider b
-			JOIN rd_week_rider_info_out_rider c ON b.WEEK_ID = c.WEEK_ID
+			FROM RD_WEEK_INFO_OUT_RIDER b
+			JOIN RD_WEEK_RIDER_INFO_OUT_RIDER c ON b.WEEK_ID = c.WEEK_ID
 			LEFT JOIN RD_DAY_PAY d ON b.WEEK_ID = d.WEEK_ID AND d.IO_GUBUN = '2' AND c.MBER_ID = d.MBER_ID AND d.week_YN ='Y'
 			WHERE b.COOPERATOR_ID = #{cooperatorId} AND c.mber_id = #{mberId}
 			AND (b.ACCOUNTS_ST_DT BETWEEN #{searchFromDate} AND #{searchToDate} or b.ACCOUNTS_ED_DT BETWEEN #{searchFromDate} AND #{searchToDate})
