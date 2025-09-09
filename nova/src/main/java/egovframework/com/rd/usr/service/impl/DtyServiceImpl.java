@@ -2353,6 +2353,11 @@ public class DtyServiceImpl extends EgovAbstractServiceImpl implements DtyServic
     		            payDAO.updateKkoUsr(kkoVo);
     		        }
 
+		        } else {
+		        	kkoVo.setUpKkoId(kkoId);
+		        	kkoVo.setCode((String)jsonObj.get("code"));
+		        	kkoVo.setBigo((String)jsonObj.get("message"));
+		        	payDAO.updateKko(kkoVo);
 		        }
 	        }
 

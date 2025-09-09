@@ -366,6 +366,15 @@ public class PayDAO extends EgovComAbstractDAO {
 		return update("payDAO.updateKko", vo);
 	}
 
+	/**
+	 * 카톡 수신 이력 실패 udpate
+	 * @param vo
+	 * @return
+	 * @throws Exception
+	 */
+	public int updateFailKko(KkoVO vo) throws Exception {
+		return update("payDAO.updateFailKko", vo);
+	}
 
 	/**
 	 * 카톡 수신 사용자별 이력 udpate

@@ -752,6 +752,12 @@
 			</if>
 		where KKO_ID = #{kkoId}
 	</update>
+	<update id="updateFailKko" parameterType="egovframework.com.rd.usr.service.vo.KkoVO">
+		UPDATE RD_KKO
+		SET CODE = #{code}
+			, BIGO = #{bigo}
+		where UP_KKO_ID = #{upKkoId}
+	</update>
 	<update id="updateKkoUsr" parameterType="egovframework.com.rd.usr.service.vo.KkoVO">
 		UPDATE RD_KKO
 		SET BIGO = #{bigo}

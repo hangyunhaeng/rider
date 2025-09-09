@@ -10,7 +10,7 @@ import org.springframework.stereotype.Repository;
 
 import egovframework.com.cmm.service.impl.EgovComAbstractDAO;
 import egovframework.com.rd.usr.service.vo.InquiryVO;
-import egovframework.com.rd.usr.service.vo.NoticeVO;
+import egovframework.com.rd.usr.service.vo.KkoVO;
 import egovframework.com.uat.uia.web.EgoRDLoginController;
 
 
@@ -119,6 +119,16 @@ public class InqDAO extends EgovComAbstractDAO {
 	 */
 	public int deleteInquiryByInqId(InquiryVO vo) throws Exception {
 		return update("inqDAO.deleteInquiryByInqId", vo);
+	}
+
+	/**
+	 * 1:1 문의 답변 등룍 요청 알림
+	 * @param vo
+	 * @return
+	 * @throws Exception
+	 */
+	public List<KkoVO> selectReqUserList(InquiryVO vo) throws Exception {
+		return selectList("inqDAO.selectReqUserList", vo);
 	}
 }
 

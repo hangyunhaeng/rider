@@ -171,5 +171,35 @@
 		, LAST_UPDT_PNTTM = SYSDATE(), LAST_UPDUSR_ID = #{lastUpdusrId}
 		WHERE INQ_ID = #{inqId}
 	</update>
+	<select id="selectReqUserList" parameterType="egovframework.com.rd.usr.service.vo.InquiryVO" resultType="egovframework.com.rd.usr.service.vo.KkoVO">
+			SELECT EMPLYR_ID AS MBER_ID, a.MBTLNUM, c.MBER_NM AS PARAM0, b.TITLE AS PARAM1, b.LONGTXT AS PARAM2
+			FROM (
+				-- 운영사
+				SELECT EMPLYR_ID, MBTLNUM
+				FROM COMTNEMPLYRINFO a
+				JOIN COMTNEMPLYRSCRTYESTBS b ON a.ESNTL_ID = b.SCRTY_DTRMN_TRGET_ID AND author_code ='ROLE_ADMIN'
+				LEFT JOIN RD_CD c ON a.EMPLYR_ID = c.CD AND c.CD_GROUP ='NO_KKO'
+				WHERE c.CD IS null
+
+				UNION
+
+				-- 협력사
+				SELECT EMPLYR_ID, MBTLNUM
+				FROM COMTNEMPLYRINFO a
+				JOIN COMTNEMPLYRSCRTYESTBS b ON a.ESNTL_ID = b.SCRTY_DTRMN_TRGET_ID AND author_code ='ROLE_USER'
+				LEFT JOIN RD_CD c ON a.EMPLYR_ID = c.CD AND c.CD_GROUP ='NO_KKO'
+				WHERE c.CD IS null
+				and IHIDNUM IN (
+					SELECT b.REGISTRATION_SN
+					FROM RD_COOPERATOR_RIDER_CONNECT a
+					JOIN RD_COOPERATOR b ON a.COOPERATOR_ID = b.COOPERATOR_ID
+					WHERE a.MBER_ID = #{creatId} AND a.USE_AT ='Y'
+				)
+			) a
+			JOIN RD_INQUIRY b
+			JOIN COMTNGNRLMBER c ON  b.creat_id = c.mber_id
+			WHERE b.inq_id = #{inqId}
+			AND NVL(a.MBTLNUM , '') != ''
+	</select>
 
 </mapper>

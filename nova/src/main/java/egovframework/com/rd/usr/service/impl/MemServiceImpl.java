@@ -236,13 +236,58 @@ public class MemServiceImpl extends EgovAbstractServiceImpl implements MemServic
         		if(!Util.isEmpty(vo.getPassword())) {
         			userOne.setPassword(vo.getPassword());
         			userManageService.updatePasswordInit(userOne);
+
+    		        //알림톡 발송
+        			if(!Util.isEmpty(Util.getOnlyNumber(vo.getMbtlnum())) ) {
+
+        				List<KkoVO> kkoList = new ArrayList<KkoVO>();
+        				KkoVO kkoOne = new KkoVO();
+        				kkoOne.setMberId(vo.getMberId());
+        				kkoOne.setMbtlnum(Util.getOnlyNumber(vo.getMbtlnum()));
+        				kkoOne.setParam0(vo.getUserNm());
+        				kkoOne.setParam1(vo.getPassword());
+        				kkoOne.setTemplateCode(EgovProperties.getProperty("Globals.passUserInitAlert"));
+        				kkoList.add(kkoOne);
+
+        		        //2. 알림톡 토큰 가져오기
+        	        	DoznTokenVO responseData = dtyService.getMsgTocken();
+
+        	        	//3. 메세지 발송
+        		        if(!Util.isEmpty(responseData.getSendAccessToken()) && !Util.isEmpty(responseData.getSendRefreshToken())) {
+
+        		        	JSONObject jsonMain = Util.makeKko(kkoList);
+
+        			        LOGGER.debug("json : "+jsonMain.toString());
+        	    	        //3. 성공시 메세지 발송
+        	    		    dtyService.doznHttpRequestMsg(jsonMain, responseData.getKkoId(), responseData.getSendAccessToken(), responseData.getSendRefreshToken());
+
+
+        		        } else {	//토큰을 못받아서 발송 못했을 경우에도 사용자 정보를 이력에 쌓아줘야 나중에 찾음
+        			        for(int j = 0; j < kkoList.size() ; j++) {
+        			        	KkoVO kkoVo = kkoList.get(j);
+        			            //거래이력 누적
+        			        	kkoVo.setKkoId(egovKkoIdGnrService.getNextStringId());
+        			        	kkoVo.setUpKkoId(responseData.getKkoId());
+        			        	kkoVo.setGubun("2");	//메세지
+        			        	kkoVo.setUrl("/api/v1/send");
+        			        	kkoVo.setCreatId(user.getId());
+        			        	kkoVo.setBigo("알림 미발송");
+        			        	kkoVo.setSendDt(Util.getDay());
+        			            payDAO.insertKko(kkoVo);
+        			        }
+        		        }
+
+        			}
+
+
         		}
 
         	} else {
+        		String pass = Util.isEmpty(vo.getPassword())? "Daon2025!" : vo.getPassword();
                 UserManageVO voMem = new UserManageVO();
                 voMem.setEmplyrId(vo.getMberId());
                 voMem.setEmplyrNm(vo.getUserNm());
-                voMem.setPassword(Util.isEmpty(vo.getPassword())? "Daon2025!" : vo.getPassword());
+                voMem.setPassword(pass);
                 voMem.setMoblphonNo(vo.getMbtlnum());
                 // 협력사는 자신의 관련 사업자 사용자만 등록한다.
                 if("ROLE_USER".equals(user.getAuthorCode())) {
@@ -260,6 +305,49 @@ public class MemServiceImpl extends EgovAbstractServiceImpl implements MemServic
         		authorGroup.setAuthorCode("ROLE_USER");
         		authorGroup.setMberTyCode("USR01");
         		egovAuthorGroupService.insertAuthorGroup(authorGroup);
+
+
+		        //알림톡 발송
+    			if(!Util.isEmpty(Util.getOnlyNumber(vo.getMbtlnum())) ) {
+
+    				List<KkoVO> kkoList = new ArrayList<KkoVO>();
+    				KkoVO kkoOne = new KkoVO();
+    				kkoOne.setMberId(vo.getMberId());
+    				kkoOne.setMbtlnum(Util.getOnlyNumber(vo.getMbtlnum()));
+    				kkoOne.setParam0(vo.getUserNm());
+    				kkoOne.setParam1(pass);
+    				kkoOne.setTemplateCode(EgovProperties.getProperty("Globals.enterUserAlert"));
+    				kkoList.add(kkoOne);
+
+    		        //2. 알림톡 토큰 가져오기
+    	        	DoznTokenVO responseData = dtyService.getMsgTocken();
+
+    	        	//3. 메세지 발송
+    		        if(!Util.isEmpty(responseData.getSendAccessToken()) && !Util.isEmpty(responseData.getSendRefreshToken())) {
+
+    		        	JSONObject jsonMain = Util.makeKko(kkoList);
+
+    			        LOGGER.debug("json : "+jsonMain.toString());
+    	    	        //3. 성공시 메세지 발송
+    	    		    dtyService.doznHttpRequestMsg(jsonMain, responseData.getKkoId(), responseData.getSendAccessToken(), responseData.getSendRefreshToken());
+
+
+    		        } else {	//토큰을 못받아서 발송 못했을 경우에도 사용자 정보를 이력에 쌓아줘야 나중에 찾음
+    			        for(int j = 0; j < kkoList.size() ; j++) {
+    			        	KkoVO kkoVo = kkoList.get(j);
+    			            //거래이력 누적
+    			        	kkoVo.setKkoId(egovKkoIdGnrService.getNextStringId());
+    			        	kkoVo.setUpKkoId(responseData.getKkoId());
+    			        	kkoVo.setGubun("2");	//메세지
+    			        	kkoVo.setUrl("/api/v1/send");
+    			        	kkoVo.setCreatId(user.getId());
+    			        	kkoVo.setBigo("알림 미발송");
+    			        	kkoVo.setSendDt(Util.getDay());
+    			            payDAO.insertKko(kkoVo);
+    			        }
+    		        }
+
+    			}
 
         	}
         	returnVo = vo;
@@ -892,13 +980,58 @@ public class MemServiceImpl extends EgovAbstractServiceImpl implements MemServic
         		if(!Util.isEmpty(vo.getPassword())) {
         			userOne.setPassword(vo.getPassword());
         			userManageService.updatePasswordInit(userOne);
+
+
+    		        //알림톡 발송
+        			if(!Util.isEmpty(Util.getOnlyNumber(vo.getMbtlnum())) ) {
+
+        				List<KkoVO> kkoList = new ArrayList<KkoVO>();
+        				KkoVO kkoOne = new KkoVO();
+        				kkoOne.setMberId(vo.getMberId());
+        				kkoOne.setMbtlnum(Util.getOnlyNumber(vo.getMbtlnum()));
+        				kkoOne.setParam0(vo.getUserNm());
+        				kkoOne.setParam1(vo.getPassword());
+        				kkoOne.setTemplateCode(EgovProperties.getProperty("Globals.passUserInitAlert"));
+        				kkoList.add(kkoOne);
+
+        		        //2. 알림톡 토큰 가져오기
+        	        	DoznTokenVO responseData = dtyService.getMsgTocken();
+
+        	        	//3. 메세지 발송
+        		        if(!Util.isEmpty(responseData.getSendAccessToken()) && !Util.isEmpty(responseData.getSendRefreshToken())) {
+
+        		        	JSONObject jsonMain = Util.makeKko(kkoList);
+
+        			        LOGGER.debug("json : "+jsonMain.toString());
+        	    	        //3. 성공시 메세지 발송
+        	    		    dtyService.doznHttpRequestMsg(jsonMain, responseData.getKkoId(), responseData.getSendAccessToken(), responseData.getSendRefreshToken());
+
+
+        		        } else {	//토큰을 못받아서 발송 못했을 경우에도 사용자 정보를 이력에 쌓아줘야 나중에 찾음
+        			        for(int j = 0; j < kkoList.size() ; j++) {
+        			        	KkoVO kkoVo = kkoList.get(j);
+        			            //거래이력 누적
+        			        	kkoVo.setKkoId(egovKkoIdGnrService.getNextStringId());
+        			        	kkoVo.setUpKkoId(responseData.getKkoId());
+        			        	kkoVo.setGubun("2");	//메세지
+        			        	kkoVo.setUrl("/api/v1/send");
+        			        	kkoVo.setCreatId(user.getId());
+        			        	kkoVo.setBigo("알림 미발송");
+        			        	kkoVo.setSendDt(Util.getDay());
+        			            payDAO.insertKko(kkoVo);
+        			        }
+        		        }
+
+        			}
+
         		}
 
         	} else {
+        		String pass = Util.isEmpty(vo.getPassword())? "Daon2025!" : vo.getPassword();
                 UserManageVO voMem = new UserManageVO();
                 voMem.setEmplyrId(vo.getMberId());
                 voMem.setEmplyrNm(vo.getUserNm());
-                voMem.setPassword(Util.isEmpty(vo.getPassword())? "Daon2025!" : vo.getPassword());
+                voMem.setPassword(pass);
                 voMem.setMoblphonNo(vo.getMbtlnum());
                 voMem.setEmplyrSttusCode("P");
         		String uniqId = userManageService.insertUser(voMem);
@@ -910,6 +1043,49 @@ public class MemServiceImpl extends EgovAbstractServiceImpl implements MemServic
         		authorGroup.setAuthorCode("ROLE_SALES");
         		authorGroup.setMberTyCode("USR02");
         		egovAuthorGroupService.insertAuthorGroup(authorGroup);
+
+
+		        //알림톡 발송
+    			if(!Util.isEmpty(Util.getOnlyNumber(vo.getMbtlnum())) ) {
+
+    				List<KkoVO> kkoList = new ArrayList<KkoVO>();
+    				KkoVO kkoOne = new KkoVO();
+    				kkoOne.setMberId(vo.getMberId());
+    				kkoOne.setMbtlnum(Util.getOnlyNumber(vo.getMbtlnum()));
+    				kkoOne.setParam0(vo.getUserNm());
+    				kkoOne.setParam1(pass);
+    				kkoOne.setTemplateCode(EgovProperties.getProperty("Globals.enterSaleAlert"));
+    				kkoList.add(kkoOne);
+
+    		        //2. 알림톡 토큰 가져오기
+    	        	DoznTokenVO responseData = dtyService.getMsgTocken();
+
+    	        	//3. 메세지 발송
+    		        if(!Util.isEmpty(responseData.getSendAccessToken()) && !Util.isEmpty(responseData.getSendRefreshToken())) {
+
+    		        	JSONObject jsonMain = Util.makeKko(kkoList);
+
+    			        LOGGER.debug("json : "+jsonMain.toString());
+    	    	        //3. 성공시 메세지 발송
+    	    		    dtyService.doznHttpRequestMsg(jsonMain, responseData.getKkoId(), responseData.getSendAccessToken(), responseData.getSendRefreshToken());
+
+
+    		        } else {	//토큰을 못받아서 발송 못했을 경우에도 사용자 정보를 이력에 쌓아줘야 나중에 찾음
+    			        for(int j = 0; j < kkoList.size() ; j++) {
+    			        	KkoVO kkoVo = kkoList.get(j);
+    			            //거래이력 누적
+    			        	kkoVo.setKkoId(egovKkoIdGnrService.getNextStringId());
+    			        	kkoVo.setUpKkoId(responseData.getKkoId());
+    			        	kkoVo.setGubun("2");	//메세지
+    			        	kkoVo.setUrl("/api/v1/send");
+    			        	kkoVo.setCreatId(user.getId());
+    			        	kkoVo.setBigo("알림 미발송");
+    			        	kkoVo.setSendDt(Util.getDay());
+    			            payDAO.insertKko(kkoVo);
+    			        }
+    		        }
+
+    			}
 
         	}
         	returnVo = vo;

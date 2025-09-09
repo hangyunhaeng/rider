@@ -99,12 +99,51 @@ public class InqServiceImpl extends EgovAbstractServiceImpl implements InqServic
         	String inqId = egovInqIdGnrService.getNextStringId();
         	vo.setInqId(inqId);
         	inqDAO.insertInquiry(vo);
+
+        	//라이더가 1:1문의 등록시 답변달 대상자에게 알림톡 발송
+        	if(Util.isGnr()) {
+        		List<KkoVO> ingReq = inqDAO.selectReqUserList(vo);
+        		for(int i = 0; i < ingReq.size() ; i++) {
+        			KkoVO kkoOne = ingReq.get(i);
+        			kkoOne.setTemplateCode(EgovProperties.getProperty("Globals.inqReqAlert"));
+        		}
+		        //알림톡 발송
+        		if(ingReq.size() > 0) {
+			        //2. 알림톡 토큰 가져오기
+		        	DoznTokenVO responseData = dtyService.getMsgTocken();
+
+		        	//3. 메세지 발송
+			        if(!Util.isEmpty(responseData.getSendAccessToken()) && !Util.isEmpty(responseData.getSendRefreshToken())) {
+
+			        	JSONObject jsonMain = Util.makeKko(ingReq);
+
+				        LOGGER.debug("json : "+jsonMain.toString());
+		    	        //3. 성공시 메세지 발송
+		    		    dtyService.doznHttpRequestMsg(jsonMain, responseData.getKkoId(), responseData.getSendAccessToken(), responseData.getSendRefreshToken());
+
+
+			        } else {	//토큰을 못받아서 발송 못했을 경우에도 사용자 정보를 이력에 쌓아줘야 나중에 찾음
+				        for(int i = 0; i < ingReq.size() ; i++) {
+				        	KkoVO kkoVo = ingReq.get(i);
+				            //거래이력 누적
+				        	kkoVo.setKkoId(egovKkoIdGnrService.getNextStringId());
+				        	kkoVo.setUpKkoId(responseData.getKkoId());
+				        	kkoVo.setGubun("2");	//메세지
+				        	kkoVo.setUrl("/api/v1/send");
+				        	kkoVo.setCreatId(user.getId());
+				        	kkoVo.setBigo("알림 미발송");
+				        	kkoVo.setSendDt(Util.getDay());
+				            payDAO.insertKko(kkoVo);
+				        }
+			        }
+        		}
+        	}
         } else {
         	inqDAO.updateInquiry(vo);
         }
 		if(vo.getUpInqId() != null) {
 
-			//알림톡 발송 대상 조회
+			//알림톡 발송 대상 조회 (1:1문의 답변 등록 알림)
 			InquiryVO upVo = inqDAO.selectInquiryByUpInqId(vo);
 			if(!Util.isEmpty(Util.getOnlyNumber(upVo.getMbtlnum())) ) {
 				List<KkoVO> kkoList = new ArrayList<KkoVO>();

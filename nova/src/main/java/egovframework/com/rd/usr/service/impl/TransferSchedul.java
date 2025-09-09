@@ -3,8 +3,12 @@ package egovframework.com.rd.usr.service.impl;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.TransactionDefinition;
+import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.DefaultTransactionDefinition;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -53,6 +57,9 @@ public class TransferSchedul extends EgovAbstractServiceImpl {
 	@Resource(name = "DtyDAO")
 	private DtyDAO dtyDAO;
 
+	@Resource(name = "transactionManager")
+    private DataSourceTransactionManager transactionManager;
+
 	private static final Logger LOGGER = LoggerFactory.getLogger(TransferSchedul.class);
 
 
@@ -63,6 +70,10 @@ public class TransferSchedul extends EgovAbstractServiceImpl {
 	 */
 	@Transactional
 	public void execute() {
+
+		DefaultTransactionDefinition transaction = new DefaultTransactionDefinition();
+		transaction.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRED);
+		TransactionStatus transactionStatus = transactionManager.getTransaction(transaction);
 
 		try {
 			LOGGER.debug("Transfer ..........start");
@@ -178,9 +189,12 @@ public class TransferSchedul extends EgovAbstractServiceImpl {
 
 			}
 			LOGGER.debug("Transfer ..........end");
+
+			transactionManager.commit(transactionStatus);
 		}catch (Exception e) {
 			e.printStackTrace();
 			LOGGER.error(e.toString());
+			transactionManager.rollback(transactionStatus);
 		}
 	}
 
