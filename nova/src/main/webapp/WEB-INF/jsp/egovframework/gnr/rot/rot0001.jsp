@@ -175,8 +175,8 @@
 		                </div>
 		                <div class="col col-md-auto">
 		                  <nav class="nav justify-content-end doc-tab-nav align-items-center" role="tablist">
-		                  <a class="btn btn-sm btn-phoenix-primary code-btn ms-2 collapsed" role="button" href="${pageContext.request.contextPath}/gnr/not0001.do">
-		                  <font _mstmutation="1" _msttexthash="21101600" _msthash="402">공지사항</font></a>
+		                  <button class="btn btn-phoenix-primary me-2 mb-2 mb-sm-0" role="button" >
+		                  	<a href="${pageContext.request.contextPath}/gnr/not0001.do"><font _mstmutation="1" _msttexthash="21101600" _msthash="402">공지사항</font></a></button>
 		                  </nav>
 		                </div>
 		              </div>
@@ -236,8 +236,10 @@
 		                </div>
 		                <div class="col col-md-auto">
 		                  <nav class="nav justify-content-end doc-tab-nav align-items-center" role="tablist">
-		                  <a class="btn btn-sm btn-phoenix-primary code-btn ms-2 collapsed" role="button" href="${pageContext.request.contextPath}/gnr/pay0004.do">
-		                  <font _mstmutation="1" _msttexthash="21101600" _msthash="402">대여,리스</font></a>
+		                  <button class="btn btn-phoenix-primary me-2 mb-2 mb-sm-0" role="button" >
+			                  <a href="${pageContext.request.contextPath}/gnr/pay0004.do">
+			                  <font _mstmutation="1" _msttexthash="21101600" _msthash="402">대여,리스</font></a>
+			              </button>
 		                  </nav>
 		                </div>
 		              </div>
