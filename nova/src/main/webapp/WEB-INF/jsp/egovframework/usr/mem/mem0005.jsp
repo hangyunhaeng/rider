@@ -286,11 +286,15 @@
 
 	// 영업사원 협력사 연결 저장
 	function saveCooperatorSales(){
-		grid.stopEditing();
+		grid1.stopEditing();
 
 		setTimeout(function(){
 			var updateItem = getEditRows(grid1);
 
+			if(getEditRows(grid).length > 0){
+				alert("좌측 계정 저장후에 협력사 연결정보를 저장하시기 바랍니다.\n저장을 취소합니다.");
+				return;
+			}
 			if(updateItem.length <=0 ){
 				alert("저장할 항목이 없습니다");
 				return;
