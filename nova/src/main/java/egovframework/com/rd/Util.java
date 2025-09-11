@@ -302,18 +302,18 @@ public class Util {
         			+ "RADER BANK에 접속하여 임시패스워드로 로그인 후 임시패스워드를 다시 설정해 주시기 바랍니다.\r\n\n"
         			+ "- 임시패스워드 : #{임시패스워드}");
         } else if(EgovProperties.getProperty("Globals.enterUserAlert").equals(templateCode)) {
-        	jsonKakaoMessage.put("body", "[라이더뱅크 패스워드 초기화]\r\n\n\n"
-        			+ "#{성명}님 패스워드가 초기화 되었습니다\r\n"
+        	jsonKakaoMessage.put("body", "[라이더뱅크 가입안내]\r\n\n\n"
+        			+ "#{성명}님 라이더뱅크에 협력사로 등록되셨습니다.\r\n"
         			+ "RADER BANK에 접속하여 임시패스워드로 로그인 후 임시패스워드를 다시 설정해 주시기 바랍니다.\r\n\n"
         			+ "- 임시패스워드 : #{임시패스워드}");
         } else if(EgovProperties.getProperty("Globals.enterSaleAlert").equals(templateCode)) {
-        	jsonKakaoMessage.put("body", "[라이더뱅크 패스워드 초기화]\r\n\n\n"
-        			+ "#{성명}님 패스워드가 초기화 되었습니다\r\n"
+        	jsonKakaoMessage.put("body", "[라이더뱅크 가입안내]\r\n\n\n"
+        			+ "#{성명}님 라이더뱅크에 영업사로 등록되셨습니다.\r\n"
         			+ "RADER BANK에 접속하여 임시패스워드로 로그인 후 임시패스워드를 다시 설정해 주시기 바랍니다.\r\n\n"
         			+ "- 임시패스워드 : #{임시패스워드}");
-        } else if(EgovProperties.getProperty("Globals.enterAdminAlertk").equals(templateCode)) {
-        	jsonKakaoMessage.put("body", "[라이더뱅크 패스워드 초기화]\r\n\n\n"
-        			+ "#{성명}님 패스워드가 초기화 되었습니다\r\n"
+        } else if(EgovProperties.getProperty("Globals.enterAdminAlert").equals(templateCode)) {
+        	jsonKakaoMessage.put("body", "[라이더뱅크 가입안내]\r\n\n\n"
+        			+ "#{성명}님 라이더뱅크에 운영사로 등록되셨습니다.\r\n"
         			+ "RADER BANK에 접속하여 임시패스워드로 로그인 후 임시패스워드를 다시 설정해 주시기 바랍니다.\r\n\n"
         			+ "- 임시패스워드 : #{임시패스워드}");
         }

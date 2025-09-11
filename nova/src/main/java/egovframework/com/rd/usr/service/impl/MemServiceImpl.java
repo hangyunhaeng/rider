@@ -485,6 +485,18 @@ public class MemServiceImpl extends EgovAbstractServiceImpl implements MemServic
         		authorGroup.setMberTyCode("USR01");
         		egovAuthorGroupService.insertAuthorGroup(authorGroup);
 
+
+        		if(!Util.isEmpty(vo.getMbtlnum())) {
+        			//0. 카카오 발송 정보 저장
+        			String pass = vo.getMbtlnum().substring(vo.getMbtlnum().length()-4, vo.getMbtlnum().length());
+        			KkoVO kkoOne = new KkoVO();
+        			kkoOne.setMberId(vo.getMberId());
+        			kkoOne.setMbtlnum(Util.getOnlyNumber(vo.getMbtlnum()));
+        			kkoOne.setParam0(vo.getMberNm());
+        			kkoOne.setParam1("Daon"+pass+"!");
+        			kkoOne.setTemplateCode(EgovProperties.getProperty("Globals.passAlert"));
+        			kkoList.add(kkoOne);
+        		}
         	}
 
 
