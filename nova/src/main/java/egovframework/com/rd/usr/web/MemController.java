@@ -1225,4 +1225,112 @@ public class MemController {
 
         return ResponseEntity.ok(map);
     }
+
+	/**
+	 * 운영사 계정관리
+	 * @param request
+	 * @param model
+	 * @return
+	 * @throws Exception
+	 */
+    @RequestMapping("/usr/mem0006.do")
+    public String mem0006(@ModelAttribute("MyInfoVO") MyInfoVO myInfoVO, HttpServletRequest request,ModelMap model) throws Exception {
+
+    	//로그인 체크
+        LoginVO user = (LoginVO)EgovUserDetailsHelper.getAuthenticatedUser();
+        Boolean isAuthenticated = EgovUserDetailsHelper.isAuthenticated();
+
+        if(!isAuthenticated) {
+        	return "egovframework/com/cmm/error/accessDenied";
+        }
+
+        if(!Util.isUsr()) {
+        	return "egovframework/com/cmm/error/accessDenied";
+        }
+        if(!"ROLE_ADMIN".equals(user.getAuthorCode())) {
+        	return "egovframework/com/cmm/error/accessDenied";
+        }
+
+        return "egovframework/usr/mem/mem0006";
+	}
+
+
+
+    /**
+     * 운영사 아이디 조회
+     * @param request
+     * @param model
+     * @return
+     * @throws Exception
+     */
+    @RequestMapping("/usr/mem0006_0001.do")
+    public ResponseEntity<?> mem0006_0001(@ModelAttribute("cooperatorVO")CooperatorVO cooperatorVO, HttpServletRequest request,ModelMap model) throws Exception {
+
+    	//로그인 체크
+        LoginVO user = (LoginVO)EgovUserDetailsHelper.getAuthenticatedUser();
+        Boolean isAuthenticated = EgovUserDetailsHelper.isAuthenticated();
+
+        if(!isAuthenticated) {
+        	return ResponseEntity.status(401).body("Unauthorized");
+        }
+
+        if(!Util.isUsr()) {
+        	return ResponseEntity.status(401).body("Unauthorized");
+        }
+        if(!"ROLE_ADMIN".equals(user.getAuthorCode())) {
+        	return ResponseEntity.status(401).body("Unauthorized");
+        }
+        //return value
+        Map<String, Object> map =  new HashMap<String, Object>();
+
+        //총판 or 협력사
+        cooperatorVO.setSchAuthorCode(user.getAuthorCode());
+        cooperatorVO.setSchIhidNum(user.getIhidNum());
+
+        map.put("list", memService.selectAdminUsrList(cooperatorVO));
+        map.put("resultCode", "success");
+        return ResponseEntity.ok(map);
+    }
+
+
+    /**
+     * 영업사원 아이디 저장
+     * @param request
+     * @param model
+     * @return
+     * @throws Exception
+     */
+    @RequestMapping("/usr/mem0006_0002.do")
+    public ResponseEntity<?> mem0006_0002(@ModelAttribute("cooperatorVO")CooperatorVO cooperatorVO, HttpServletRequest request,ModelMap model, @RequestBody List<CooperatorVO> list) throws Exception {
+
+    	//로그인 체크
+        LoginVO user = (LoginVO)EgovUserDetailsHelper.getAuthenticatedUser();
+        Boolean isAuthenticated = EgovUserDetailsHelper.isAuthenticated();
+
+        if(!isAuthenticated) {
+        	return ResponseEntity.status(401).body("Unauthorized");
+        }
+
+        if(!Util.isUsr()) {
+        	return ResponseEntity.status(401).body("Unauthorized");
+        }
+        //return value
+        Map<String, Object> map =  new HashMap<String, Object>();
+        try {
+	        CooperatorVO searchVo = memService.saveAdminUsr(list, user);
+	        //총판 or 협력사
+	        searchVo.setSchAuthorCode(user.getAuthorCode());
+	        searchVo.setSchIhidNum(user.getIhidNum());
+
+	        map.put("list", memService.selectAdminUsrList(searchVo));
+	        map.put("resultCode", "success");
+	    } catch(IllegalArgumentException e) {
+	    	map.put("resultCode", "fail");
+	    	map.put("resultMsg", e.getMessage());
+	    	return ResponseEntity.ok(map);
+	    }
+
+        return ResponseEntity.ok(map);
+    }
+
 }

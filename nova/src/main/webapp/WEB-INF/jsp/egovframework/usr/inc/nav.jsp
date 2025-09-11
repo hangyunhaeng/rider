@@ -73,6 +73,9 @@
   	} else if(filename.indexOf('mem0005.do') == 0) {
 	  	$('.mem').addClass('active');
 	  	$('.mem0005').addClass('active');
+  	} else if(filename.indexOf('mem0006.do') == 0) {
+	  	$('.mem').addClass('active');
+	  	$('.mem0006').addClass('active');
   	} else if(filename.indexOf('mem0002.do') == 0) {
 	  	$('.mem').addClass('active');
 	  	$('.mem0002').addClass('active');
@@ -158,6 +161,7 @@ System.out.println("==================================");
 							<li><a href="${pageContext.request.contextPath}/usr/mem0001.do" class="mem0001">협력사 관리</a></li>
               				<li class="administrator" style="display:none;"><a href="${pageContext.request.contextPath}/usr/mem0003.do" class="mem0003">협력사계정 관리</a></li>
               				<li class="administrator" style="display:none;"><a href="${pageContext.request.contextPath}/usr/mem0005.do" class="mem0005">영업사원계정 관리</a></li>
+              				<li class="administrator" style="display:none;"><a href="${pageContext.request.contextPath}/usr/mem0006.do" class="mem0006">운영사계정 관리</a></li>
 							<li><a href="${pageContext.request.contextPath}/usr/mem0002.do" class="mem0002">라이더관리</a></li>
 						</ul>
 					</li>

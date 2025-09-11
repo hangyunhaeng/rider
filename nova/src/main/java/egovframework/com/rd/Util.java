@@ -242,6 +242,9 @@ public class Util {
 	        } else if(EgovProperties.getProperty("Globals.enterSaleAlert").equals(templateCode)) {
 	        	variablesObject.put("성명", kkoVo.getParam0());
 	        	variablesObject.put("임시패스워드", kkoVo.getParam1());
+	        } else if(EgovProperties.getProperty("Globals.enterAdminAlert").equals(templateCode)) {
+	        	variablesObject.put("성명", kkoVo.getParam0());
+	        	variablesObject.put("임시패스워드", kkoVo.getParam1());
 	        }
 	        jsonObject.put("variables", variablesObject);
 	        jsonObject.put("phone", kkoVo.getMbtlnum());
@@ -254,7 +257,8 @@ public class Util {
         if(!EgovProperties.getProperty("Globals.inqReqAlert").equals(templateCode)
         		&& !EgovProperties.getProperty("Globals.passUserInitAlert").equals(templateCode)
         		&& !EgovProperties.getProperty("Globals.enterUserAlert").equals(templateCode)
-        		&& !EgovProperties.getProperty("Globals.enterSaleAlert").equals(templateCode)) {
+        		&& !EgovProperties.getProperty("Globals.enterSaleAlert").equals(templateCode)
+        		&& !EgovProperties.getProperty("Globals.enterAdminAlert").equals(templateCode)) {
 	        jsonbutton1.put("name", "접속");
 	        jsonbutton1.put("type", "WL");
 	        jsonbutton1.put("urlMobile", "https://riderbank.co.kr");
@@ -269,7 +273,8 @@ public class Util {
         if(!EgovProperties.getProperty("Globals.inqReqAlert").equals(templateCode)
         		&& !EgovProperties.getProperty("Globals.passUserInitAlert").equals(templateCode)
         		&& !EgovProperties.getProperty("Globals.enterUserAlert").equals(templateCode)
-        		&& !EgovProperties.getProperty("Globals.enterSaleAlert").equals(templateCode)) {
+        		&& !EgovProperties.getProperty("Globals.enterSaleAlert").equals(templateCode)
+        		&& !EgovProperties.getProperty("Globals.enterAdminAlert").equals(templateCode)) {
         	jsonKakaoMessage.put("button1", jsonbutton1);
         }
         if(EgovProperties.getProperty("Globals.passAlert").equals(templateCode)) {
@@ -302,6 +307,11 @@ public class Util {
         			+ "RADER BANK에 접속하여 임시패스워드로 로그인 후 임시패스워드를 다시 설정해 주시기 바랍니다.\r\n\n"
         			+ "- 임시패스워드 : #{임시패스워드}");
         } else if(EgovProperties.getProperty("Globals.enterSaleAlert").equals(templateCode)) {
+        	jsonKakaoMessage.put("body", "[라이더뱅크 패스워드 초기화]\r\n\n\n"
+        			+ "#{성명}님 패스워드가 초기화 되었습니다\r\n"
+        			+ "RADER BANK에 접속하여 임시패스워드로 로그인 후 임시패스워드를 다시 설정해 주시기 바랍니다.\r\n\n"
+        			+ "- 임시패스워드 : #{임시패스워드}");
+        } else if(EgovProperties.getProperty("Globals.enterAdminAlertk").equals(templateCode)) {
         	jsonKakaoMessage.put("body", "[라이더뱅크 패스워드 초기화]\r\n\n\n"
         			+ "#{성명}님 패스워드가 초기화 되었습니다\r\n"
         			+ "RADER BANK에 접속하여 임시패스워드로 로그인 후 임시패스워드를 다시 설정해 주시기 바랍니다.\r\n\n"

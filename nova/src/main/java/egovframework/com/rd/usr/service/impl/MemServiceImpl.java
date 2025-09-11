@@ -229,6 +229,7 @@ public class MemServiceImpl extends EgovAbstractServiceImpl implements MemServic
         		} else {
         			userOne.setIhidnum(vo.getIhidnum());
         		}
+        		userOne.setEmplyrSttusCode(vo.getEmplyrSttusCode());
         		userManageService.updateUser(userOne);
 
 
@@ -1147,5 +1148,167 @@ public class MemServiceImpl extends EgovAbstractServiceImpl implements MemServic
         }
 
 		return returnVo;
+	}
+
+
+
+	/**
+	 * 운영사 ID 리스트 조회
+	 * @param vo
+	 * @return
+	 * @throws Exception
+	 */
+	public List<CooperatorVO> selectAdminUsrList(CooperatorVO vo) throws Exception {
+		return memDAO.selectAdminUsrList(vo);
+	}
+
+
+	/**
+	 * 운영사 ID 저장
+	 * @param vo
+	 * @return
+	 * @throws Exception
+	 */
+	public CooperatorVO saveAdminUsr(List<CooperatorVO> list, LoginVO user) throws Exception {
+		CooperatorVO returnVo = new CooperatorVO();
+
+		if(!"ROLE_ADMIN".equals(user.getAuthorCode())) {
+			throw new IllegalArgumentException("운영사만 등록 할 수 있습니다.") ;
+		}
+
+        for(int i = 0 ; i< list.size() ;i++) {
+
+        	CooperatorVO vo = list.get(i);
+        	vo.setMberId(vo.getMberId());
+        	vo.setCreatId(user.getId());
+        	vo.setLastUpdusrId(user.getId());
+
+
+        	//comtnemplyrinfo 등록
+            UserDefaultVO searchVO = new UserDefaultVO();
+            searchVO.setSearchCondition("0");
+            searchVO.setSearchKeyword(vo.getMberId());
+            UserManageVO userOne = userManageDAO.selectUserListRider(searchVO);
+        	if( userOne != null ) {
+        		userOne.setEmplyrNm(vo.getUserNm());
+        		userOne.setMoblphonNo(vo.getMbtlnum());
+        		userManageService.updateUser(userOne);
+
+
+        		//기존 사용자의 패스워드 변경
+        		if(!Util.isEmpty(vo.getPassword())) {
+        			userOne.setPassword(vo.getPassword());
+        			userManageService.updatePasswordInit(userOne);
+
+
+    		        //알림톡 발송
+        			if(!Util.isEmpty(Util.getOnlyNumber(vo.getMbtlnum())) ) {
+
+        				List<KkoVO> kkoList = new ArrayList<KkoVO>();
+        				KkoVO kkoOne = new KkoVO();
+        				kkoOne.setMberId(vo.getMberId());
+        				kkoOne.setMbtlnum(Util.getOnlyNumber(vo.getMbtlnum()));
+        				kkoOne.setParam0(vo.getUserNm());
+        				kkoOne.setParam1(vo.getPassword());
+        				kkoOne.setTemplateCode(EgovProperties.getProperty("Globals.passUserInitAlert"));
+        				kkoList.add(kkoOne);
+
+        		        //2. 알림톡 토큰 가져오기
+        	        	DoznTokenVO responseData = dtyService.getMsgTocken();
+
+        	        	//3. 메세지 발송
+        		        if(!Util.isEmpty(responseData.getSendAccessToken()) && !Util.isEmpty(responseData.getSendRefreshToken())) {
+
+        		        	JSONObject jsonMain = Util.makeKko(kkoList);
+
+        			        LOGGER.debug("json : "+jsonMain.toString());
+        	    	        //3. 성공시 메세지 발송
+        	    		    dtyService.doznHttpRequestMsg(jsonMain, responseData.getKkoId(), responseData.getSendAccessToken(), responseData.getSendRefreshToken());
+
+
+        		        } else {	//토큰을 못받아서 발송 못했을 경우에도 사용자 정보를 이력에 쌓아줘야 나중에 찾음
+        			        for(int j = 0; j < kkoList.size() ; j++) {
+        			        	KkoVO kkoVo = kkoList.get(j);
+        			            //거래이력 누적
+        			        	kkoVo.setKkoId(egovKkoIdGnrService.getNextStringId());
+        			        	kkoVo.setUpKkoId(responseData.getKkoId());
+        			        	kkoVo.setGubun("2");	//메세지
+        			        	kkoVo.setUrl("/api/v1/send");
+        			        	kkoVo.setCreatId(user.getId());
+        			        	kkoVo.setBigo("알림 미발송");
+        			        	kkoVo.setSendDt(Util.getDay());
+        			            payDAO.insertKko(kkoVo);
+        			        }
+        		        }
+
+        			}
+
+        		}
+
+        	} else {
+        		String pass = Util.isEmpty(vo.getPassword())? "Daon2025!" : vo.getPassword();
+                UserManageVO voMem = new UserManageVO();
+                voMem.setEmplyrId(vo.getMberId());
+                voMem.setEmplyrNm(vo.getUserNm());
+                voMem.setPassword(pass);
+                voMem.setMoblphonNo(vo.getMbtlnum());
+                voMem.setEmplyrSttusCode("P");
+        		String uniqId = userManageService.insertUser(voMem);
+
+
+            	//COMTNEMPLYRSCRTYESTBS 등록
+                AuthorGroup authorGroup = new AuthorGroup();
+                authorGroup.setUniqId(uniqId);
+        		authorGroup.setAuthorCode("ROLE_ADMIN");
+        		authorGroup.setMberTyCode("USR03");
+        		egovAuthorGroupService.insertAuthorGroup(authorGroup);
+
+
+		        //알림톡 발송
+    			if(!Util.isEmpty(Util.getOnlyNumber(vo.getMbtlnum())) ) {
+
+    				List<KkoVO> kkoList = new ArrayList<KkoVO>();
+    				KkoVO kkoOne = new KkoVO();
+    				kkoOne.setMberId(vo.getMberId());
+    				kkoOne.setMbtlnum(Util.getOnlyNumber(vo.getMbtlnum()));
+    				kkoOne.setParam0(vo.getUserNm());
+    				kkoOne.setParam1(pass);
+    				kkoOne.setTemplateCode(EgovProperties.getProperty("Globals.enterAdminAlert"));
+    				kkoList.add(kkoOne);
+
+    		        //2. 알림톡 토큰 가져오기
+    	        	DoznTokenVO responseData = dtyService.getMsgTocken();
+
+    	        	//3. 메세지 발송
+    		        if(!Util.isEmpty(responseData.getSendAccessToken()) && !Util.isEmpty(responseData.getSendRefreshToken())) {
+
+    		        	JSONObject jsonMain = Util.makeKko(kkoList);
+
+    			        LOGGER.debug("json : "+jsonMain.toString());
+    	    	        //3. 성공시 메세지 발송
+    	    		    dtyService.doznHttpRequestMsg(jsonMain, responseData.getKkoId(), responseData.getSendAccessToken(), responseData.getSendRefreshToken());
+
+
+    		        } else {	//토큰을 못받아서 발송 못했을 경우에도 사용자 정보를 이력에 쌓아줘야 나중에 찾음
+    			        for(int j = 0; j < kkoList.size() ; j++) {
+    			        	KkoVO kkoVo = kkoList.get(j);
+    			            //거래이력 누적
+    			        	kkoVo.setKkoId(egovKkoIdGnrService.getNextStringId());
+    			        	kkoVo.setUpKkoId(responseData.getKkoId());
+    			        	kkoVo.setGubun("2");	//메세지
+    			        	kkoVo.setUrl("/api/v1/send");
+    			        	kkoVo.setCreatId(user.getId());
+    			        	kkoVo.setBigo("알림 미발송");
+    			        	kkoVo.setSendDt(Util.getDay());
+    			            payDAO.insertKko(kkoVo);
+    			        }
+    		        }
+
+    			}
+
+        	}
+        	returnVo = vo;
+        }
+        return returnVo;
 	}
 }

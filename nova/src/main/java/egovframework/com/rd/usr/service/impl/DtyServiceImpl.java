@@ -2911,6 +2911,7 @@ public class DtyServiceImpl extends EgovAbstractServiceImpl implements DtyServic
 
 
 
+		WeekInfoVO baseVoOne = dtyDAO.selectCalBase(weekInfoVO);
 
         List<WeekRiderInfoVO> baseList = dtyDAO.selectCalRiderBase(weekInfoVO);
         if(baseList.size() > 0) {
@@ -2918,7 +2919,7 @@ public class DtyServiceImpl extends EgovAbstractServiceImpl implements DtyServic
 
             // 협력사 배포용 데이터 생성
             // 1. 배포용 만들지 조회
-	        if(baseVo.isFeeCooperatorAt()) {
+	        if(baseVoOne.isFeeCooperatorAt()) {
 
 	            //협력사 입금금액 부가세, 원천세
 	            BigDecimal addTax = new BigDecimal(0);
@@ -2929,7 +2930,7 @@ public class DtyServiceImpl extends EgovAbstractServiceImpl implements DtyServic
 	        	for(int i = 0 ; i < weekInfoList.size() ; i++) {
 	        		WeekInfoVO oneVo = weekInfoList.get(i);
 	        		//운영비 =을지총배달건수*프로그램료
-	        		BigDecimal operatingCostAdd = new BigDecimal(baseVo.getDeliveryCnt()).multiply(new BigDecimal(baseVo.getFeeProgram())) ;
+	        		BigDecimal operatingCostAdd = new BigDecimal(baseVoOne.getDeliveryCnt()).multiply(new BigDecimal(baseVo.getFeeProgram())) ;
 	        		//운영비 G25
 	        		oneVo.setOperatingCostAdd(operatingCostAdd);	//운영비
 	        		//부가세액 =(D25+E25+F25-G25)*0.1

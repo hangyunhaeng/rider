@@ -12,7 +12,6 @@ import egovframework.com.rd.usr.service.vo.CooperatorVO;
 import egovframework.com.rd.usr.service.vo.DayPayVO;
 import egovframework.com.rd.usr.service.vo.DeliveryInfoVO;
 import egovframework.com.rd.usr.service.vo.EtcVO;
-import egovframework.com.rd.usr.service.vo.InquiryVO;
 import egovframework.com.rd.usr.service.vo.Sch;
 import egovframework.com.uat.uia.web.EgoRDLoginController;
 import egovframework.com.uss.umt.service.MberManageVO;
@@ -498,6 +497,16 @@ public class MemDAO extends EgovComAbstractDAO {
 	 */
 	public int insertCooperatorSales(CooperatorVO vo ) throws Exception {
 		return insert("memDAO.insertCooperatorSales", vo);
+	}
+
+	/**
+	 * 운영사 ID 리스트 조회
+	 * @param vo
+	 * @return
+	 * @throws Exception
+	 */
+	public List<CooperatorVO> selectAdminUsrList(CooperatorVO vo) throws Exception {
+		return selectList("memDAO.selectAdminUsrList", vo);
 	}
 }
 

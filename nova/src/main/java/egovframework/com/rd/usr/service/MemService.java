@@ -213,4 +213,20 @@ public interface MemService {
 	 * @throws Exception
 	 */
 	public CooperatorVO saveCooperatorSalesUsr(List<CooperatorVO> list) throws Exception ;
+
+	/**
+	 * 운영사 ID 리스트 조회
+	 * @param vo
+	 * @return
+	 * @throws Exception
+	 */
+	public List<CooperatorVO> selectAdminUsrList(CooperatorVO vo) throws Exception ;
+
+	/**
+	 * 운영사 ID 저장
+	 * @param vo
+	 * @return
+	 * @throws Exception
+	 */
+	public CooperatorVO saveAdminUsr(List<CooperatorVO> list, LoginVO user) throws Exception ;
 }

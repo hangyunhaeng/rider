@@ -696,4 +696,13 @@
 		WHERE a.COOPERATOR_ID = #{cooperatorId} AND a.USE_AT = 'Y'
 			AND a.COOPERATOR_ID = b.COOPERATOR_ID
 	</select>
+
+	<select id="selectAdminUsrList" parameterType="egovframework.com.rd.usr.service.vo.CooperatorVO" resultType="egovframework.com.rd.usr.service.vo.CooperatorVO">
+		SELECT a.EMPLYR_ID as mber_id, a.USER_NM, a.mbtlnum, a.EMPLYR_STTUS_CODE
+		from COMTNEMPLYRINFO a
+			LEFT JOIN COMTNEMPLYRSCRTYESTBS b ON a.ESNTL_ID = b.SCRTY_DTRMN_TRGET_ID
+		WHERE 1=1
+		/* AND a.EMPLYR_STTUS_CODE = 'P' /*P:사용 D:미사용*/
+		AND b.AUTHOR_CODE ='ROLE_ADMIN'
+	</select>
 </mapper>
