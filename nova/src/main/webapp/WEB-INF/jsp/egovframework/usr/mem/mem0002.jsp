@@ -42,7 +42,8 @@
 		{ headerName: "시간제보험(원)", field: "feeTimeInsurance", minWidth: 90},
 		{ headerName: "콜수수료(원)", field: "feeCall", minWidth: 90},
 
-		{ headerName: "구분", field: "gubun", minWidth: 90, hide:true}
+		{ headerName: "구분", field: "gubun", minWidth: 90, hide:true},
+		{ headerName: "modifyAt", field: "modifyAt", minWidth: 90, hide:true}
 	];
 
 	var columnDefs1= [
@@ -74,27 +75,32 @@
 	        , valueGetter:(params) => { return getStringDate(params.data.endDt)}
 		},
 
-		{ headerName: "고용보험(%)", field: "feeEmploymentInsurance", minWidth: 90, editable: true
+		{ headerName: "고용보험(%)", field: "feeEmploymentInsurance", minWidth: 90
+			, editable: (params) => {return (params.data.modifyAt== true)? true: false}
 			, cellClass: (params) => {return agGrideditClass(params, "ag-cell-right");}
 // 			, valueGetter:(params) => { return currencyFormatter(params.data.feeEmploymentInsurance);}
             , valueParser: (params) => { return gridPercent(params);}
 		},
-		{ headerName: "산재보험(%)", field: "feeIndustrialInsurance", minWidth: 90, editable: true
+		{ headerName: "산재보험(%)", field: "feeIndustrialInsurance", minWidth: 90
+			, editable: (params) => {return (params.data.modifyAt== true)? true: false}
 			, cellClass: (params) => {return agGrideditClass(params, "ag-cell-right");}
 // 			, valueGetter:(params) => { return currencyFormatter(params.data.feeIndustrialInsurance);}
             , valueParser: (params) => { return gridPercent(params);}
 		},
-		{ headerName: "원천세(%)", field: "feeWithholdingTax", minWidth: 90, editable: true
+		{ headerName: "원천세(%)", field: "feeWithholdingTax", minWidth: 90
+			, editable: (params) => {return (params.data.modifyAt== true)? true: false}
 			, cellClass: (params) => {return agGrideditClass(params, "ag-cell-right");}
 // 			, valueGetter:(params) => { return currencyFormatter(params.data.feeWithholdingTax);}
             , valueParser: (params) => { return gridPercent(params);}
 		},
-		{ headerName: "시간제보험(원)", field: "feeTimeInsurance", minWidth: 90, editable: true
+		{ headerName: "시간제보험(원)", field: "feeTimeInsurance", minWidth: 90
+			, editable: (params) => {return (params.data.modifyAt== true)? true: false}
 			, cellClass: (params) => {return agGrideditClass(params, "ag-cell-right");}
 			, valueGetter:(params) => { return currencyFormatter(params.data.feeTimeInsurance);}
             , valueParser: (params) => { return gridWan(params);}
 		},
-		{ headerName: "콜수수료(원)", field: "feeCall", minWidth: 90, editable: true
+		{ headerName: "콜수수료(원)", field: "feeCall", minWidth: 90
+			, editable: (params) => {return (params.data.modifyAt== true)? true: false}
 			, cellClass: (params) => {return agGrideditClass(params, "ag-cell-right");}
 			, valueGetter:(params) => { return currencyFormatter(params.data.feeCall);}
             , valueParser: (params) => { return gridWan(params);}
@@ -111,7 +117,8 @@
 		{ headerName: "접속", field: "con", minWidth: 90, hide: true
 			, cellRenderer:(params) => {return '<div class="btn btn-primary mb-2 mb-sm-0 mx-1 fs-9" type="submit" onclick="clickCon(\''+params.data.mberId+'\')">접속</div>';}
 		},
-		{ headerName: "생성자", field: "creatId", minWidth: 90, hide:true}
+		{ headerName: "생성자", field: "creatId", minWidth: 90, hide:true},
+		{ headerName: "modifyAt", field: "modifyAt", minWidth: 90, hide:true}
 	];
 
 	var columnDefs2= [
@@ -305,6 +312,7 @@
     		feeWithholdingTax: grid.getRowNode(grid.getFocusedCell().rowIndex).data.feeWithholdingTax,		//원천세
     		feeTimeInsurance: grid.getRowNode(grid.getFocusedCell().rowIndex).data.feeTimeInsurance,		//시간제보험
     		feeCall: grid.getRowNode(grid.getFocusedCell().rowIndex).data.feeCall,							//콜수수료
+    		modifyAt: grid.getRowNode(grid.getFocusedCell().rowIndex).data.modifyAt,						//수정여부
 
     		useAt: 'Y',
     		crud: "c"

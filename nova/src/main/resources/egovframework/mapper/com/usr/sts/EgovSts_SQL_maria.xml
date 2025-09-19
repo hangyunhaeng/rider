@@ -46,4 +46,196 @@
 			AND ESNTL_ID = #{cooperatorMberId}
 			</if>
 	</select>
+
+	<select id="selectSts0002" parameterType="egovframework.com.rd.usr.service.vo.StsVO" resultType="egovframework.com.rd.usr.service.vo.StsVO">
+		SELECT
+			tab.COOPERATOR_ID, a.COOPERATOR_NM, tab.DAY, SUM(tab.DELIVERY_CNT) DELIVERY_CNT, SUM(tab.DELIVERY_PRICE) AS DELIVERY_PRICE
+			, SUM(tab.COST_C_OPER) AS COST_C_OPER, SUM(tab.COST_C_COOP) AS COST_C_COOP, SUM(tab.COST_P_OPER) AS COST_P_OPER, SUM(tab.COST_P_SALE) AS COST_P_SALE
+		FROM
+		(
+			SELECT a.COOPERATOR_ID, a.DAY
+			-- 배달건수 : 주정산때의 보정된 건수는 어떻게 할까?
+			, SUM(a.DELIVERY_CNT) AS DELIVERY_CNT
+			, SUM(a.DELIVERY_PRICE) AS DELIVERY_PRICE
+			-- 콜수수료 : 운영사, 협력사
+			, nvl(SUM( if(c.GUBUN = 'C', c.COST, 0)), 0) AS COST_C_OPER
+			, nvl(SUM( if(d.GUBUN = 'C', d.COST, 0)), 0) AS COST_C_COOP
+			-- 운영비 : 운영사, 영업사원
+			, nvl(SUM( if(c.GUBUN = 'P', c.COST, 0)), 0) AS COST_P_OPER
+			, nvl(SUM( if(c.GUBUN = 'P', e.COST, 0)), 0) AS COST_P_SALE
+			FROM RD_DAY_PAY a
+			LEFT JOIN RD_PROFIT c ON a.DYP_ID = c.DYP_ID AND c.USE_AT ='Y' -- 운영사
+			LEFT JOIN RD_COOPERATOR_PROFIT d ON a.DYP_ID = d.DYP_ID AND d.USE_AT ='Y' -- 협력사
+			LEFT JOIN RD_SALES_PROFIT e ON a.DYP_ID = e.DYP_ID AND e.USE_AT ='Y' -- 영업사원
+			WHERE DAY BETWEEN #{searchFromDate} AND #{searchToDate}
+			AND a.IO_GUBUN ='1'
+			AND a.USE_AT ='Y'
+			GROUP BY a.COOPERATOR_ID, a.DAY
+
+			UNION all
+
+			SELECT
+			COOPERATOR_ID, DELIVERY_DAY AS DAY, MAX(DELIVERY_CNT) AS DELIVERY_CNT, SUM(DELIVERY_PRICE) AS DELIVERY_PRICE
+			, SUM(COST_C_OPER) AS COST_C_OPER, SUM(COST_C_COOP) AS COST_C_COOP, SUM(COST_P_OPER) AS COST_P_OPER, SUM(COST_P_SALE) AS COST_P_SALE
+			FROM (
+				SELECT a.COOPERATOR_ID, a.DELIVERY_DAY, a.DELIVERY_CNT, a.DELIVERY_COST AS DELIVERY_PRICE
+				-- 콜수수료 : 운영사, 협력사
+				, nvl(SUM(if(a.GUBUN = 'C', a.COST, 0)), 0) AS COST_C_OPER
+				, 0 AS COST_C_COOP
+				-- 운영비 : 운영사, 영업사원
+				, nvl(SUM(if(a.GUBUN = 'P', a.COST, 0)), 0) AS COST_P_OPER
+				, 0 AS COST_P_SALE
+				, 'O' AS gubun
+				FROM RD_PROFIT a
+				WHERE a.DYP_ID IS NULL
+				AND a.DELIVERY_DAY BETWEEN #{searchFromDate} AND #{searchToDate}
+				AND a.GUBUN IN ('C', 'P')
+				AND a.USE_AT ='Y'
+				GROUP BY a.COOPERATOR_ID, a.DELIVERY_DAY, a.GUBUN
+
+				UNION ALL
+
+				SELECT a.COOPERATOR_ID, a.DELIVERY_DAY, a.DELIVERY_CNT, a.DELIVERY_COST AS DELIVERY_PRICE
+				-- 콜수수료 : 운영사, 협력사
+				, 0 AS COST_C_OPER
+				, nvl(SUM(if(a.GUBUN = 'C', a.COST, 0)), 0) AS COST_C_COOP
+				-- 운영비 : 운영사, 영업사원
+				, 0 AS COST_P_OPER
+				, 0 AS COST_P_SALE
+				, 'C' AS GUBUN
+				FROM RD_COOPERATOR_PROFIT a
+				WHERE a.DYP_ID IS NULL
+				AND a.DELIVERY_DAY BETWEEN #{searchFromDate} AND #{searchToDate}
+				AND a.GUBUN IN ('C', 'P')
+				AND a.USE_AT ='Y'
+				GROUP BY a.COOPERATOR_ID, a.DELIVERY_DAY, a.GUBUN
+
+				UNION ALL
+
+				SELECT a.COOPERATOR_ID, a.DELIVERY_DAY, a.DELIVERY_CNT, 0 AS DELIVERY_PRICE
+				-- 콜수수료 : 운영사, 협력사
+				, 0 AS COST_C_OPER
+				, 0 AS COST_C_COOP
+				-- 운영비 : 운영사, 영업사원
+				, 0 AS COST_P_OPER
+				, nvl(SUM(if(a.GUBUN = 'P', a.COST, 0)), 0) AS COST_P_SALE
+				, 'S' AS GUBUN
+				FROM RD_SALES_PROFIT a
+				WHERE a.DYP_ID IS NULL
+				AND a.DELIVERY_DAY BETWEEN #{searchFromDate} AND #{searchToDate}
+				AND a.GUBUN IN ('C', 'P')
+				AND a.USE_AT ='Y'
+				GROUP BY a.COOPERATOR_ID, a.DELIVERY_DAY, a.GUBUN
+			) tab
+			GROUP BY tab.COOPERATOR_ID, tab.DELIVERY_DAY
+		) tab
+		LEFT JOIN RD_COOPERATOR a ON tab.COOPERATOR_ID = a.COOPERATOR_ID
+		WHERE 1 = 1
+			<if test="schAuthorCode == 'ROLE_USER'">
+			/* 협력사 조건 */
+			AND a.REGISTRATION_SN = #{schIhidNum} AND a.use_at ='Y'
+			</if>
+			<if test='searchCooperatorId != null and searchCooperatorId != "all"'>
+			AND a.cooperator_id = #{searchCooperatorId}
+			</if>
+		GROUP BY tab.COOPERATOR_ID, tab.DAY
+	</select>
+
+	<select id="selectSts0003" parameterType="egovframework.com.rd.usr.service.vo.StsVO" resultType="egovframework.com.rd.usr.service.vo.StsVO">
+		SELECT
+			tab.COOPERATOR_ID, a.COOPERATOR_NM, tab.DAY, tab.MBER_ID, b.MBER_NM, SUM(tab.DELIVERY_CNT) DELIVERY_CNT, SUM(tab.DELIVERY_PRICE) AS DELIVERY_PRICE
+			, SUM(tab.COST_C_OPER) AS COST_C_OPER, SUM(tab.COST_C_COOP) AS COST_C_COOP, SUM(tab.COST_P_OPER) AS COST_P_OPER, SUM(tab.COST_P_SALE) AS COST_P_SALE
+		FROM
+		(
+			SELECT a.COOPERATOR_ID, a.DAY, a.MBER_ID
+			-- 배달건수 : 주정산때의 보정된 건수는 어떻게 할까?
+			, SUM(a.DELIVERY_CNT) AS DELIVERY_CNT
+			, SUM(a.DELIVERY_PRICE) AS DELIVERY_PRICE
+			-- 콜수수료 : 운영사, 협력사
+			, nvl(SUM( if(c.GUBUN = 'C', c.COST, 0)), 0) AS COST_C_OPER
+			, nvl(SUM( if(d.GUBUN = 'C', d.COST, 0)), 0) AS COST_C_COOP
+			-- 운영비 : 운영사, 영업사원
+			, nvl(SUM( if(c.GUBUN = 'P', c.COST, 0)), 0) AS COST_P_OPER
+			, nvl(SUM( if(c.GUBUN = 'P', e.COST, 0)), 0) AS COST_P_SALE
+			FROM RD_DAY_PAY a
+			LEFT JOIN RD_PROFIT c ON a.DYP_ID = c.DYP_ID AND c.USE_AT ='Y' -- 운영사
+			LEFT JOIN RD_COOPERATOR_PROFIT d ON a.DYP_ID = d.DYP_ID AND d.USE_AT ='Y' -- 협력사
+			LEFT JOIN RD_SALES_PROFIT e ON a.DYP_ID = e.DYP_ID AND e.USE_AT ='Y' -- 영업사원
+			WHERE DAY BETWEEN #{searchFromDate} AND #{searchToDate}
+			AND a.IO_GUBUN ='1'
+			AND a.USE_AT ='Y'
+			GROUP BY a.COOPERATOR_ID, a.DAY, a.MBER_ID
+
+			UNION all
+
+			SELECT
+			COOPERATOR_ID, DELIVERY_DAY AS DAY, MBER_ID, MAX(DELIVERY_CNT) AS DELIVERY_CNT, SUM(DELIVERY_PRICE) AS DELIVERY_PRICE
+			, SUM(COST_C_OPER) AS COST_C_OPER, SUM(COST_C_COOP) AS COST_C_COOP, SUM(COST_P_OPER) AS COST_P_OPER, SUM(COST_P_SALE) AS COST_P_SALE
+			FROM (
+				SELECT a.COOPERATOR_ID, a.DELIVERY_DAY, a.MBER_ID, a.DELIVERY_CNT, a.DELIVERY_COST AS DELIVERY_PRICE
+				-- 콜수수료 : 운영사, 협력사
+				, nvl(SUM(if(a.GUBUN = 'C', a.COST, 0)), 0) AS COST_C_OPER
+				, 0 AS COST_C_COOP
+				-- 운영비 : 운영사, 영업사원
+				, nvl(SUM(if(a.GUBUN = 'P', a.COST, 0)), 0) AS COST_P_OPER
+				, 0 AS COST_P_SALE
+				, 'O' AS gubun
+				FROM RD_PROFIT a
+				WHERE a.DYP_ID IS NULL
+				AND a.DELIVERY_DAY BETWEEN #{searchFromDate} AND #{searchToDate}
+				AND a.GUBUN IN ('C', 'P')
+				AND a.USE_AT ='Y'
+				GROUP BY a.COOPERATOR_ID, a.DELIVERY_DAY, a.GUBUN, a.MBER_ID
+
+				UNION ALL
+
+				SELECT a.COOPERATOR_ID, a.DELIVERY_DAY, a.MBER_ID, a.DELIVERY_CNT, a.DELIVERY_COST AS DELIVERY_PRICE
+				-- 콜수수료 : 운영사, 협력사
+				, 0 AS COST_C_OPER
+				, nvl(SUM(if(a.GUBUN = 'C', a.COST, 0)), 0) AS COST_C_COOP
+				-- 운영비 : 운영사, 영업사원
+				, 0 AS COST_P_OPER
+				, 0 AS COST_P_SALE
+				, 'C' AS GUBUN
+				FROM RD_COOPERATOR_PROFIT a
+				WHERE a.DYP_ID IS NULL
+				AND a.DELIVERY_DAY BETWEEN #{searchFromDate} AND #{searchToDate}
+				AND a.GUBUN IN ('C', 'P')
+				AND a.USE_AT ='Y'
+				GROUP BY a.COOPERATOR_ID, a.DELIVERY_DAY, a.GUBUN, a.MBER_ID
+
+				UNION ALL
+
+				SELECT a.COOPERATOR_ID, a.DELIVERY_DAY, a.MBER_ID, a.DELIVERY_CNT, 0 AS DELIVERY_PRICE
+				-- 콜수수료 : 운영사, 협력사
+				, 0 AS COST_C_OPER
+				, 0 AS COST_C_COOP
+				-- 운영비 : 운영사, 영업사원
+				, 0 AS COST_P_OPER
+				, nvl(SUM(if(a.GUBUN = 'P', a.COST, 0)), 0) AS COST_P_SALE
+				, 'S' AS GUBUN
+				FROM RD_SALES_PROFIT a
+				WHERE a.DYP_ID IS NULL
+				AND a.DELIVERY_DAY BETWEEN #{searchFromDate} AND #{searchToDate}
+				AND a.GUBUN IN ('C', 'P')
+				AND a.USE_AT ='Y'
+				GROUP BY a.COOPERATOR_ID, a.DELIVERY_DAY, a.GUBUN, a.MBER_ID
+			) tab
+			GROUP BY tab.COOPERATOR_ID, tab.DELIVERY_DAY
+		) tab
+		LEFT JOIN RD_COOPERATOR a ON tab.COOPERATOR_ID = a.COOPERATOR_ID
+		LEFT JOIN COMTNGNRLMBER b ON tab.MBER_ID = b.MBER_ID
+		WHERE 1 = 1
+			<if test="schAuthorCode == 'ROLE_USER'">
+			/* 협력사 조건 */
+			AND a.REGISTRATION_SN = #{schIhidNum} AND a.use_at ='Y'
+			</if>
+			<if test='searchCooperatorId != null and searchCooperatorId != "all"'>
+			AND a.COOPERATOR_ID = #{searchCooperatorId}
+			</if>
+			<if test='searchNm != null and searchNm != ""'>
+			 AND tab.MBER_ID LIKE '%' #{searchNm} '%' OR b.MBER_NM LIKE '%' #{searchNm} '%'
+			</if>
+		GROUP BY tab.COOPERATOR_ID, tab.DAY, tab.mber_id
+	</select>
 </mapper>

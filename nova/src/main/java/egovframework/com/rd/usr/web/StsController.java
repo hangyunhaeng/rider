@@ -25,6 +25,7 @@ import egovframework.com.rd.usr.service.NotService;
 import egovframework.com.rd.usr.service.StsService;
 import egovframework.com.rd.usr.service.vo.BalanceVO;
 import egovframework.com.rd.usr.service.vo.NoticeVO;
+import egovframework.com.rd.usr.service.vo.StsVO;
 
 /**
  * 게시판
@@ -56,7 +57,7 @@ public class StsController {
 	 * @throws Exception
 	 */
     @RequestMapping("/usr/sts0001.do")
-    public String pay0001(@ModelAttribute("BalanceVO") BalanceVO balanceVO, HttpServletRequest request,ModelMap model) throws Exception {
+    public String sts0001(@ModelAttribute("BalanceVO") BalanceVO balanceVO, HttpServletRequest request,ModelMap model) throws Exception {
 
     	//로그인 체크
         LoginVO user = (LoginVO)EgovUserDetailsHelper.getAuthenticatedUser();
@@ -112,5 +113,124 @@ public class StsController {
         return ResponseEntity.ok(map);
 	}
 
+	/**
+	 * 협력사 일별 배달현황 페이지
+	 * @param request
+	 * @param model
+	 * @return
+	 * @throws Exception
+	 */
+    @RequestMapping("/usr/sts0002.do")
+    public String sts0002(@ModelAttribute("StsVO") StsVO stsVO, HttpServletRequest request,ModelMap model) throws Exception {
 
+    	//로그인 체크
+        LoginVO user = (LoginVO)EgovUserDetailsHelper.getAuthenticatedUser();
+        Boolean isAuthenticated = EgovUserDetailsHelper.isAuthenticated();
+
+        if(!isAuthenticated) {
+        	return "egovframework/com/cmm/error/accessDenied";
+        }
+
+        if(!Util.isUsr()) {
+        	return "egovframework/com/cmm/error/accessDenied";
+        }
+        model.addAttribute("stsVO", stsVO);
+        return "egovframework/usr/sts/sts0002";
+	}
+
+
+	/**
+	 * 협력사 일별 배달현황 리스트
+	 * @param noticeVO
+	 * @param request
+	 * @return
+	 * @throws Exception
+	 */
+	@RequestMapping("/usr/sts0002_0001.do")
+	public ResponseEntity<?> sts0002_0001(@ModelAttribute("StsVO") StsVO stsVO, HttpServletRequest request) throws Exception{
+
+    	//로그인 체크
+        LoginVO user = (LoginVO)EgovUserDetailsHelper.getAuthenticatedUser();
+        Boolean isAuthenticated = EgovUserDetailsHelper.isAuthenticated();
+
+        if(!isAuthenticated) {
+        	return ResponseEntity.status(401).body("Unauthorized");
+        }
+
+        if(!Util.isUsr()) {
+        	return ResponseEntity.status(401).body("Unauthorized");
+        }
+        //return value
+        Map<String, Object> map =  new HashMap<String, Object>();
+
+        //총판 or 협력사
+        stsVO.setSchUserSe(user.getUserSe());
+        stsVO.setSchAuthorCode(user.getAuthorCode());
+        stsVO.setSchIhidNum(user.getIhidNum());
+        stsVO.setSchId(user.getId());
+
+        map.put("list", stsService.selectSts0002(stsVO));
+        map.put("resultCode", "success");
+        return ResponseEntity.ok(map);
+	}
+
+	/**
+	 * 라이더 일별 배달현황 페이지
+	 * @param request
+	 * @param model
+	 * @return
+	 * @throws Exception
+	 */
+    @RequestMapping("/usr/sts0003.do")
+    public String sts0003(@ModelAttribute("StsVO") StsVO stsVO, HttpServletRequest request,ModelMap model) throws Exception {
+
+    	//로그인 체크
+        LoginVO user = (LoginVO)EgovUserDetailsHelper.getAuthenticatedUser();
+        Boolean isAuthenticated = EgovUserDetailsHelper.isAuthenticated();
+
+        if(!isAuthenticated) {
+        	return "egovframework/com/cmm/error/accessDenied";
+        }
+
+        if(!Util.isUsr()) {
+        	return "egovframework/com/cmm/error/accessDenied";
+        }
+        model.addAttribute("stsVO", stsVO);
+        return "egovframework/usr/sts/sts0003";
+	}
+
+	/**
+	 * 라이더 일별 배달현황 리스트
+	 * @param noticeVO
+	 * @param request
+	 * @return
+	 * @throws Exception
+	 */
+	@RequestMapping("/usr/sts0003_0001.do")
+	public ResponseEntity<?> sts0003_0001(@ModelAttribute("StsVO") StsVO stsVO, HttpServletRequest request) throws Exception{
+
+    	//로그인 체크
+        LoginVO user = (LoginVO)EgovUserDetailsHelper.getAuthenticatedUser();
+        Boolean isAuthenticated = EgovUserDetailsHelper.isAuthenticated();
+
+        if(!isAuthenticated) {
+        	return ResponseEntity.status(401).body("Unauthorized");
+        }
+
+        if(!Util.isUsr()) {
+        	return ResponseEntity.status(401).body("Unauthorized");
+        }
+        //return value
+        Map<String, Object> map =  new HashMap<String, Object>();
+
+        //총판 or 협력사
+        stsVO.setSchUserSe(user.getUserSe());
+        stsVO.setSchAuthorCode(user.getAuthorCode());
+        stsVO.setSchIhidNum(user.getIhidNum());
+        stsVO.setSchId(user.getId());
+
+        map.put("list", stsService.selectSts0003(stsVO));
+        map.put("resultCode", "success");
+        return ResponseEntity.ok(map);
+	}
 }

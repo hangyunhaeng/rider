@@ -62,7 +62,6 @@ import egovframework.com.rd.usr.service.DtyService;
 import egovframework.com.rd.usr.service.ExcelSheetHandler;
 import egovframework.com.rd.usr.service.RotService;
 import egovframework.com.rd.usr.service.vo.BalanceVO;
-import egovframework.com.rd.usr.service.vo.CooperatorFeeVO;
 import egovframework.com.rd.usr.service.vo.CooperatorVO;
 import egovframework.com.rd.usr.service.vo.DayPayVO;
 import egovframework.com.rd.usr.service.vo.DeliveryErrorVO;
@@ -91,7 +90,6 @@ import egovframework.com.uss.umt.service.UserDefaultVO;
 import egovframework.com.uss.umt.service.impl.MberManageDAO;
 import egovframework.com.utl.fcc.service.EgovStringUtil;
 import kr.co.dozn.secure.base.CryptoUtil;
-import lombok.Synchronized;
 import twitter4j.JSONArray;
 
 /**
@@ -3223,5 +3221,15 @@ public class DtyServiceImpl extends EgovAbstractServiceImpl implements DtyServic
 	 */
 	public List<WeekRiderInfoVO> selectWeekRiderInfoOutByParam(WeekInfoVO vo) throws Exception {
 		return dtyDAO.selectWeekRiderInfoOutByParam(vo);
+	}
+
+	/**
+	 * 출금시 오류 처리
+	 * @param vo
+	 * @return
+	 * @throws Exception
+	 */
+	public int errorTransfer(DoszTransferVO vo) throws Exception {
+		return dtyDAO.errorTransfer(vo);
 	}
 }

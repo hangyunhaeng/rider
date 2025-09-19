@@ -19,6 +19,7 @@ import egovframework.com.rd.usr.service.StsService;
 import egovframework.com.rd.usr.service.vo.BalanceVO;
 import egovframework.com.rd.usr.service.vo.DayPayVO;
 import egovframework.com.rd.usr.service.vo.MyInfoVO;
+import egovframework.com.rd.usr.service.vo.StsVO;
 import egovframework.com.uat.uia.service.EgovLoginService;
 import egovframework.com.uss.umt.service.EgovUserManageService;
 import egovframework.com.uss.umt.service.UserManageVO;
@@ -65,5 +66,23 @@ public class StsServiceImpl extends EgovAbstractServiceImpl implements StsServic
 	public int selectBalanceConfirmListCnt(BalanceVO vo) throws Exception {
 		vo.setCooperatorMberId(EgovProperties.getProperty("Globals.cooperatorId"));
 		return stsDAO.selectBalanceConfirmListCnt(vo);
+	}
+	/**
+	 * 협력사 일별 배달현황 조회
+	 * @param vo
+	 * @return
+	 * @throws Exception
+	 */
+	public List<StsVO> selectSts0002(StsVO vo) throws Exception {
+		return stsDAO.selectSts0002(vo);
+	}
+	/**
+	 * 라이더 일별 배달현황 조회
+	 * @param vo
+	 * @return
+	 * @throws Exception
+	 */
+	public List<StsVO> selectSts0003(StsVO vo) throws Exception {
+		return stsDAO.selectSts0003(vo);
 	}
 }

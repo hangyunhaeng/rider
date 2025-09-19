@@ -52,6 +52,12 @@
   	} else if(filename.indexOf('dty0006.do') == 0) {
 	  	$('.pay').addClass('active');
 	  	$('.dty0006').addClass('active');
+  	} else if(filename.indexOf('sts0002.do') == 0) {
+	  	$('.search').addClass('active');
+	  	$('.sts0002').addClass('active');
+  	} else if(filename.indexOf('sts0003.do') == 0) {
+	  	$('.search').addClass('active');
+	  	$('.sts0003').addClass('active');
   	} else if(filename.indexOf('dty0004.do') == 0) {
 	  	$('.search').addClass('active');
 	  	$('.dty0004').addClass('active');
@@ -142,7 +148,8 @@ System.out.println("==================================");
 		            </li>
 		            <li class="dropdown administrator cooperator" style="display:none;"><a href="" onclick="javascript:return false;" class="search"><span>정보조회</span> <i class="bi bi-chevron-down toggle-dropdown"></i></a>
 			          	<ul>
-
+						  <li class="administrator cooperator" style="display:none;"><a href="${pageContext.request.contextPath}/usr/sts0002.do" class="sts0002">협력사 일별 배달현황</a></li>
+						  <li class="administrator cooperator" style="display:none;"><a href="${pageContext.request.contextPath}/usr/sts0003.do" class="sts0003">라이더 일별 배달현황</a></li>
 						  <li class="administrator cooperator" style="display:none;"><a href="${pageContext.request.contextPath}/usr/dty0004.do" class="dty0004">배달정보 조회</a></li>
 						  <li class="administrator cooperator" style="display:none;"><a href="${pageContext.request.contextPath}/usr/pay0005.do" class="pay0005">협력사 기타(대여, 리스) 현황</a></li>
 

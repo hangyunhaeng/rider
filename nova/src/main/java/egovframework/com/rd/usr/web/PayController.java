@@ -613,9 +613,10 @@ public class PayController {
         cooperatorPayVO.setSchAuthorCode(user.getAuthorCode());
         cooperatorPayVO.setSchIhidNum(user.getIhidNum());
 
+        DoszTransferVO tran = null;
         try {
 
-            DoszTransferVO tran = payService.cooperatorPay(cooperatorPayVO);
+            tran = payService.cooperatorPay(cooperatorPayVO);
 
             // 이체 실행
             DoszTransferVO tranResult = dtyService.transfer(tran);
@@ -649,9 +650,17 @@ public class PayController {
     		map.put("ablePrice", payService.cooperatorAblePriceByCoopId(myInfoVO));
         	map.put("resultCode", "success");
         }catch(IllegalArgumentException e) {
+        	if(tran != null) {
+        		tran.setStatus("999");
+        		dtyService.errorTransfer(tran);
+        	}
 			map.put("resultMsg", e.getMessage());
         	map.put("resultCode", "fail");
         }catch(Exception e) {
+        	if(tran != null) {
+        		tran.setStatus("999");
+        		dtyService.errorTransfer(tran);
+        	}
 			map.put("resultMsg", e.toString());
         	map.put("resultCode", "fail");
         }
@@ -842,9 +851,10 @@ public class PayController {
         cooperatorPayVO.setSchAuthorCode(user.getAuthorCode());
         cooperatorPayVO.setSchIhidNum(user.getIhidNum());
 
+        DoszTransferVO tran = null;
         try {
 
-            DoszTransferVO tran = payService.salesPay(cooperatorPayVO);
+            tran = payService.salesPay(cooperatorPayVO);
 
             // 이체 실행
             DoszTransferVO tranResult = dtyService.transfer(tran);
@@ -875,9 +885,17 @@ public class PayController {
     		map.put("ablePrice", payService.salesAblePriceOne(myInfoVO));
         	map.put("resultCode", "success");
         }catch(IllegalArgumentException e) {
+        	if(tran != null) {
+        		tran.setStatus("999");
+        		dtyService.errorTransfer(tran);
+        	}
 			map.put("resultMsg", e.getMessage());
         	map.put("resultCode", "fail");
         }catch(Exception e) {
+        	if(tran != null) {
+        		tran.setStatus("999");
+        		dtyService.errorTransfer(tran);
+        	}
 			map.put("resultMsg", e.toString());
         	map.put("resultCode", "fail");
         }

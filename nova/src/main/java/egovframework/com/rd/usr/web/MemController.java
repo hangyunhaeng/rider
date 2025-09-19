@@ -1078,6 +1078,11 @@ public class MemController {
         	return "egovframework/com/cmm/error/accessDenied";
         }
 
+        if(Util.isReal())
+        	model.addAttribute("adminUrl", "https://"+EgovProperties.getProperty("Globals.usrDomain"));
+        else
+        	model.addAttribute("adminUrl", "http://"+EgovProperties.getProperty("Globals.usrDevDomain"));
+
         return "egovframework/usr/mem/mem0005";
 	}
 

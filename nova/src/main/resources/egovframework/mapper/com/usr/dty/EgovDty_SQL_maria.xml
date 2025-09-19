@@ -1111,6 +1111,12 @@
 			</if>
 		WHERE TRAN_DAY = #{tranDay} AND TELEGRAM_NO = #{telegram_no}
 	</update>
+
+	<update id="errorTransfer" parameterType="egovframework.com.rd.usr.service.vo.DoszTransferVO">
+		UPDATE RD_TRANSFER
+		SET STATUS = #{status}
+		WHERE TRAN_DAY = #{tranDay} AND TELEGRAM_NO = #{telegram_no}
+	</update>
 	<select id="selectForUpdateBalanceDayTran" parameterType="egovframework.com.rd.usr.service.vo.DoszTransferVO" resultType="egovframework.com.rd.usr.service.vo.BalanceVO">
 		SELECT *
 		FROM RD_BALANCE

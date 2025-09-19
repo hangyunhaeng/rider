@@ -19,7 +19,6 @@ import egovframework.com.rd.usr.service.vo.DoszSchAccoutVO;
 import egovframework.com.rd.usr.service.vo.DoszTransferVO;
 import egovframework.com.rd.usr.service.vo.DoznTokenVO;
 import egovframework.com.rd.usr.service.vo.HistoryVO;
-import egovframework.com.rd.usr.service.vo.KkoVO;
 import egovframework.com.rd.usr.service.vo.MyInfoVO;
 import egovframework.com.rd.usr.service.vo.NiceVO;
 import egovframework.com.rd.usr.service.vo.SearchKeyVO;
@@ -331,4 +330,11 @@ public interface DtyService {
 	 * @throws Exception
 	 */
 	public List<WeekRiderInfoVO> selectWeekRiderInfoOutByParam(WeekInfoVO vo) throws Exception ;
+	/**
+	 * 출금시 오류 처리
+	 * @param vo
+	 * @return
+	 * @throws Exception
+	 */
+	public int errorTransfer(DoszTransferVO vo) throws Exception ;
 }

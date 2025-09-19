@@ -795,5 +795,14 @@ public class DtyDAO extends EgovComAbstractDAO {
 	public int updateFixCooperatorPayConfirm(WeekInfoVO weekInfoVO) throws Exception {
 		return update("dtyDAO.updateFixCooperatorPayConfirm", weekInfoVO);
 	}
+	/**
+	 * 출금시 오류 처리
+	 * @param vo
+	 * @return
+	 * @throws Exception
+	 */
+	public int errorTransfer(DoszTransferVO vo) throws Exception {
+		return update("dtyDAO.errorTransfer", vo);
+	}
 }
 

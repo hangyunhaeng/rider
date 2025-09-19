@@ -35,7 +35,10 @@
 			}
 		},
 		{ headerName: "사용여부", field: "emplyrSttusCode", minWidth: 90, editable: true, valueGetter:(params) => { return (params.node.data.emplyrSttusCode=='P')?"사용": "미사용"} ,cellEditor: 'agSelectCellEditor', cellEditorParams: params => { return {values: ['P', 'D']}; }, cellClass: (params) => {return agGrideditClass(params)} },
-		{ headerName: "생성자", field: "creatId", minWidth: 90, hide:true}
+		{ headerName: "생성자", field: "creatId", minWidth: 90, hide:true},
+		{ headerName: "접속", field: "con", minWidth: 90
+			, cellRenderer:(params) => {return '<div class="btn btn-primary mb-2 mb-sm-0 mx-1 fs-9" type="submit" onclick="clickCon(\''+params.data.mberId+'\')">접속</div>';}
+		}
 	];
 
 	var columnDefs1= [
@@ -422,6 +425,51 @@
 
 	}
 
+	function clickCon(mberId){
+
+		alert('접속 시 운영사 로그인 정보가 끊기고 영업사원 로그인으로 전환 됩니다');
+
+		const params = new URLSearchParams();
+		params.append("mberId", mberId);
+		// 로딩 시작
+        $('.loading-wrap--js').show();
+        axios.post('${pageContext.request.contextPath}/usr/mem0002_0008.do',params).then(function(response) {
+
+            if(chkLogOut(response.data)){
+            	return;
+            }
+
+        	// 로딩 종료
+            $('.loading-wrap--js').hide();
+            if(response.data.resultCode != "success"){
+				if(response.data.resultMsg != '' && response.data.resultMsg != null)
+					alert(response.data.resultMsg);
+				else alert("접속에 오류가 발생하였습니다.");
+				return ;
+			}
+
+       		window.open("${adminUrl}/com/com0004.do", "myForm");
+       		$('#myForm').empty();
+			$('#myForm').attr("action","${adminUrl}/com/com0004.do");
+            $('#myForm').attr("target", "myForm");
+            $('#myForm').append($("<input/>", {type:"hidden", name:"id", value:mberId}));
+            $('#myForm').append($("<input/>", {type:"hidden", name:"emplyrId", value:"${loginVO.id}"}));
+            $('#myForm').append($("<input/>", {type:"hidden", name:"gubun", value:"admin"}));
+            $('#myForm').append($("<input/>", {type:"hidden", name:"userSe", value:"USR"}));
+            $('#myForm').append($("<input/>", {type:"hidden", name:"key", value:response.data.key}));
+			$('#myForm').submit();
+
+			setTimeout(function(){
+				location.replace("${pageContext.request.contextPath}/com/com0002.do");
+			}, 2000);
+        })
+        .catch(function(error) {
+            console.error('There was an error fetching the data:', error);
+        }).finally(function() {
+        	// 로딩 종료
+            $('.loading-wrap--js').hide();
+        });
+	}
 	</script>
 <body class="index-page">
 

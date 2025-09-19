@@ -7,12 +7,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Repository;
 
-import egovframework.com.cmm.service.EgovProperties;
 import egovframework.com.cmm.service.impl.EgovComAbstractDAO;
 import egovframework.com.rd.usr.service.vo.BalanceVO;
-import egovframework.com.rd.usr.service.vo.DayPayVO;
-import egovframework.com.rd.usr.service.vo.MyInfoVO;
-import egovframework.com.rd.usr.service.vo.NoticeVO;
+import egovframework.com.rd.usr.service.vo.StsVO;
 import egovframework.com.uat.uia.web.EgoRDLoginController;
 
 
@@ -56,6 +53,24 @@ public class StsDAO extends EgovComAbstractDAO {
 	public int selectBalanceConfirmListCnt(BalanceVO vo) throws Exception {
 		BalanceVO reVo = selectOne("stsDAO.selectBalanceConfirmListCnt", vo);
 		return reVo.getTotalCnt();
+	}
+	/**
+	 * 협력사 일별 배달현황 조회
+	 * @param vo
+	 * @return
+	 * @throws Exception
+	 */
+	public List<StsVO> selectSts0002(StsVO vo) throws Exception {
+		return selectList("stsDAO.selectSts0002", vo);
+	}
+	/**
+	 * 라이더 일별 배달현황 조회
+	 * @param vo
+	 * @return
+	 * @throws Exception
+	 */
+	public List<StsVO> selectSts0003(StsVO vo) throws Exception {
+		return selectList("stsDAO.selectSts0003", vo);
 	}
 }
 
