@@ -18,7 +18,9 @@ import org.slf4j.Logger;
 import egovframework.com.cmm.LoginVO;
 import egovframework.com.cmm.util.EgovUserDetailsHelper;
 import egovframework.com.rd.Util;
+import egovframework.com.rd.usr.service.InqService;
 import egovframework.com.rd.usr.service.NotService;
+import egovframework.com.rd.usr.service.vo.InquiryVO;
 import egovframework.com.rd.usr.service.vo.NoticeVO;
 
 /**
@@ -40,6 +42,8 @@ public class RotController {
 
     @Resource(name = "NotService")
     private NotService notService;
+    @Resource(name = "InqService")
+    private InqService inqService;
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(RotController.class);
 
@@ -96,8 +100,16 @@ public class RotController {
         noticeVO.setSchUserSe(user.getUserSe());
         noticeVO.setSchAuthorCode(user.getAuthorCode());
         noticeVO.setSchId(user.getId());
+        noticeVO.setSearchGubun("MAIN");
+
+        InquiryVO inquiryVO = new InquiryVO();
+        inquiryVO.setSchUserSe(user.getUserSe());
+        inquiryVO.setSchAuthorCode(user.getAuthorCode());
+        inquiryVO.setSchId(user.getId());
+        inquiryVO.setSearchGubun("MAIN");
 
         map.put("list", notService.selectNoticeViewList(noticeVO));
+        map.put("inqList", inqService.selectInquiryList(inquiryVO));
         map.put("resultCode", "success");
         return ResponseEntity.ok(map);
 	}

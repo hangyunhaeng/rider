@@ -57,6 +57,10 @@
 					)
 				</if>
 				ORDER BY a.CREAT_DT DESC
+				<if test="searchGubun == 'MAIN'">
+				-- 운영사 메인 화면
+				LIMIT 5
+				</if>
 		<if test="schIdx !=0 and schPagePerCnt != 0">
 			) m
 		) m

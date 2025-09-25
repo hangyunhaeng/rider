@@ -252,6 +252,10 @@ public class DtyServiceImpl extends EgovAbstractServiceImpl implements DtyServic
 		            	deliveryInfoVO.setCreatId(user.getId());
 
 
+
+		            	if(deliveryInfoVO.getDeliveryPrice() <= 0) {
+		            		throw new IllegalArgumentException("배달처리비가 0원입니다.") ;
+		            	}
 		            	//권한
 		            	deliveryInfoVO.setSchAuthorCode(user.getAuthorCode());
 		            	deliveryInfoVO.setSchIhidNum(user.getIhidNum());
