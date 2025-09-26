@@ -219,7 +219,7 @@ public class DtyServiceImpl extends EgovAbstractServiceImpl implements DtyServic
 		            	deliveryInfoVO.setRegistrationNm(row.get(3));
 		            	deliveryInfoVO.setRunDe(row.get(4));
 		            	deliveryInfoVO.setDeliverySn(row.get(5));
-		            	deliveryInfoVO.setDeliveryState(row.get(6));
+		            	deliveryInfoVO.setDeliveryState(row.get(6).trim());
 		            	deliveryInfoVO.setServiceType(row.get(7));
 		            	deliveryInfoVO.setDeliveryType(row.get(8));
 		            	deliveryInfoVO.setRiderId(row.get(9));
@@ -252,8 +252,11 @@ public class DtyServiceImpl extends EgovAbstractServiceImpl implements DtyServic
 		            	deliveryInfoVO.setCreatId(user.getId());
 
 
+		            	if(!"전달완료".equals(deliveryInfoVO.getDeliveryState()) &&!"배달취소".equals(deliveryInfoVO.getDeliveryState())) {
+		            		throw new IllegalArgumentException("배달상태가 전달완료나 배달취소가 아닌 건이 있습니다.") ;
+		            	}
 
-		            	if(deliveryInfoVO.getDeliveryPrice() <= 0) {
+		            	if("전달완료".equals(deliveryInfoVO.getDeliveryState()) && deliveryInfoVO.getDeliveryPrice() <= 0) {
 		            		throw new IllegalArgumentException("배달처리비가 0원입니다.") ;
 		            	}
 		            	//권한
@@ -939,8 +942,16 @@ public class DtyServiceImpl extends EgovAbstractServiceImpl implements DtyServic
 					WeekInfoVO weekInfoVO = new WeekInfoVO();
 					weekInfoVO.setWeekId(egovWeekIdGnrService.getNextStringId());
 					weekInfoVO.setCooperatorId(cooperatorId);
-					weekInfoVO.setAccountsStDt( simpleDateFormat.format(rowObj.getCell(1).getDateCellValue()) );
-					weekInfoVO.setAccountsEdDt( simpleDateFormat.format(rowObj.getCell(2).getDateCellValue()) );
+					try {
+						weekInfoVO.setAccountsStDt( simpleDateFormat.format(rowObj.getCell(1).getDateCellValue()) );
+					}catch(Exception e){
+						weekInfoVO.setAccountsStDt( Util.getOnlyNumber(rowObj.getCell(1).toString()) );
+					}
+					try {
+						weekInfoVO.setAccountsEdDt( simpleDateFormat.format(rowObj.getCell(2).getDateCellValue()) );
+					}catch(Exception e){
+						weekInfoVO.setAccountsEdDt( Util.getOnlyNumber(rowObj.getCell(2).toString()) );
+					}
 					weekInfoVO.setDeliveryCost(new BigDecimal( Util.getOnlyNumber(getValue(rowObj.getCell(3)))));
 					weekInfoVO.setAddAccounts(new BigDecimal( Util.getOnlyNumber(getValue(rowObj.getCell(4)))));
 					weekInfoVO.setOperatingCost(new BigDecimal( 0 ));
