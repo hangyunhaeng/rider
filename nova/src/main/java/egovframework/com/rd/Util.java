@@ -22,6 +22,7 @@ import egovframework.com.rd.usr.service.vo.KkoVO;
 public class Util {
 
 	private static final Pattern GET_NUMBER = Pattern.compile("[0-9]+");
+	private static final Pattern GET_MINUS_NUMBER = Pattern.compile("[0-9-]+");
     private static final Pattern IS_ONLY_NUMBER = Pattern.compile("^[0-9]*?");
 	/**
 	 * 사용자가 일반 유저일때 true
@@ -108,6 +109,23 @@ public class Util {
     public static String getOnlyNumber(final String str) {
         StringBuilder sb = new StringBuilder();
         Matcher matcher = GET_NUMBER.matcher((str == null ? "": str));
+
+        while (matcher.find()) {
+            sb.append(matcher.group());
+        }
+
+        if("".equals(sb.toString()))sb.append("0");
+        return sb.toString();
+    }
+
+    /**
+     * 숫자만 추출한다
+     * @param str
+     * @return
+     */
+    public static String getOnlyNumberM(final String str) {
+        StringBuilder sb = new StringBuilder();
+        Matcher matcher = GET_MINUS_NUMBER.matcher((str == null ? "": str));
 
         while (matcher.find()) {
             sb.append(matcher.group());
