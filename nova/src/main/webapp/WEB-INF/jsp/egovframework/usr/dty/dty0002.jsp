@@ -261,7 +261,6 @@
 			formData.append("fileName", files[i]);
 		}
 
-		debugger;
 		// 로딩 시작
         $('.loading-wrap--js').show();
 
