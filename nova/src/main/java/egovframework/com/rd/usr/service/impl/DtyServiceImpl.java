@@ -905,24 +905,24 @@ public class DtyServiceImpl extends EgovAbstractServiceImpl implements DtyServic
 
 
 
-					weekInfoVO.setAccountsStDt( rowObj.getCell(1).getCellTypeEnum() == CellType.NUMERIC  ? simpleDateFormat.format(rowObj.getCell(1).getDateCellValue()) : Util.getOnlyNumber(getValue(rowObj.getCell(1)))  );
-					weekInfoVO.setAccountsEdDt( rowObj.getCell(1).getCellTypeEnum() == CellType.NUMERIC  ? simpleDateFormat.format(rowObj.getCell(2).getDateCellValue()) : Util.getOnlyNumber(getValue(rowObj.getCell(2))) );
-					weekInfoVO.setDeliveryCost(new BigDecimal( Util.getOnlyNumber(getValue(rowObj.getCell(3)))));
-					weekInfoVO.setAddAccounts(new BigDecimal( Util.getOnlyNumber(getValue(rowObj.getCell(4)))));
-					weekInfoVO.setOperatingCost(new BigDecimal( Util.getOnlyNumber(getValue(rowObj.getCell(5)))));
-					weekInfoVO.setManagementCost(new BigDecimal( Util.getOnlyNumber(getValue(rowObj.getCell(6)))));
-					weekInfoVO.setOperatingFee(new BigDecimal( Util.getOnlyNumber(getValue(rowObj.getCell(7)))));
-					weekInfoVO.setEtcCost(new BigDecimal( Util.getOnlyNumber(getValue(rowObj.getCell(8)))));
-					weekInfoVO.setTimeInsurance(new BigDecimal( Util.getOnlyNumber(getValue(rowObj.getCell(9)))));
-					weekInfoVO.setOwnerEmploymentInsurance(new BigDecimal( Util.getOnlyNumber(getValue(rowObj.getCell(10)))));
-					weekInfoVO.setRiderEmploymentInsurance(new BigDecimal( Util.getOnlyNumber(getValue(rowObj.getCell(11)))));
-					weekInfoVO.setOwnerIndustrialInsurance(new BigDecimal( Util.getOnlyNumber(getValue(rowObj.getCell(12)))));
-					weekInfoVO.setRiderIndustrialInsurance(new BigDecimal( Util.getOnlyNumber(getValue(rowObj.getCell(13)))));
-					weekInfoVO.setWithholdingTaxInsuranceSum(new BigDecimal( Util.getOnlyNumber(getValue(rowObj.getCell(14)))));
-					weekInfoVO.setEmploymentInsuranceAccounts(new BigDecimal( Util.getOnlyNumber(getValue(rowObj.getCell(15)))));
-					weekInfoVO.setIndustrialInsuranceAccounts(new BigDecimal( Util.getOnlyNumber(getValue(rowObj.getCell(16)))));
-					weekInfoVO.setG(new BigDecimal( Util.getOnlyNumber(getValue(rowObj.getCell(17)))));
-					weekInfoVO.setAccountsScheduleCost(new BigDecimal( Util.getOnlyNumber(getValue(rowObj.getCell(18)))));
+					weekInfoVO.setAccountsStDt( rowObj.getCell(1).getCellTypeEnum() == CellType.NUMERIC  ? simpleDateFormat.format(rowObj.getCell(1).getDateCellValue()) : Util.getOnlyNumberM(getValue(rowObj.getCell(1)))  );
+					weekInfoVO.setAccountsEdDt( rowObj.getCell(1).getCellTypeEnum() == CellType.NUMERIC  ? simpleDateFormat.format(rowObj.getCell(2).getDateCellValue()) : Util.getOnlyNumberM(getValue(rowObj.getCell(2))) );
+					weekInfoVO.setDeliveryCost(new BigDecimal( Util.getOnlyNumberM(getValue(rowObj.getCell(3)))));
+					weekInfoVO.setAddAccounts(new BigDecimal( Util.getOnlyNumberM(getValue(rowObj.getCell(4)))));
+					weekInfoVO.setOperatingCost(new BigDecimal( Util.getOnlyNumberM(getValue(rowObj.getCell(5)))));
+					weekInfoVO.setManagementCost(new BigDecimal( Util.getOnlyNumberM(getValue(rowObj.getCell(6)))));
+					weekInfoVO.setOperatingFee(new BigDecimal( Util.getOnlyNumberM(getValue(rowObj.getCell(7)))));
+					weekInfoVO.setEtcCost(new BigDecimal( Util.getOnlyNumberM(getValue(rowObj.getCell(8)))));
+					weekInfoVO.setTimeInsurance(new BigDecimal( Util.getOnlyNumberM(getValue(rowObj.getCell(9)))));
+					weekInfoVO.setOwnerEmploymentInsurance(new BigDecimal( Util.getOnlyNumberM(getValue(rowObj.getCell(10)))));
+					weekInfoVO.setRiderEmploymentInsurance(new BigDecimal( Util.getOnlyNumberM(getValue(rowObj.getCell(11)))));
+					weekInfoVO.setOwnerIndustrialInsurance(new BigDecimal( Util.getOnlyNumberM(getValue(rowObj.getCell(12)))));
+					weekInfoVO.setRiderIndustrialInsurance(new BigDecimal( Util.getOnlyNumberM(getValue(rowObj.getCell(13)))));
+					weekInfoVO.setWithholdingTaxInsuranceSum(new BigDecimal( Util.getOnlyNumberM(getValue(rowObj.getCell(14)))));
+					weekInfoVO.setEmploymentInsuranceAccounts(new BigDecimal( Util.getOnlyNumberM(getValue(rowObj.getCell(15)))));
+					weekInfoVO.setIndustrialInsuranceAccounts(new BigDecimal( Util.getOnlyNumberM(getValue(rowObj.getCell(16)))));
+					weekInfoVO.setG(new BigDecimal( Util.getOnlyNumberM(getValue(rowObj.getCell(17)))));
+					weekInfoVO.setAccountsScheduleCost(new BigDecimal( Util.getOnlyNumberM(getValue(rowObj.getCell(18)))));
 
 					weekInfoVO.setAtchFileId(atchFileId);
 					weekInfoVO.setCreatId(loginVO.getId());
@@ -945,29 +945,29 @@ public class DtyServiceImpl extends EgovAbstractServiceImpl implements DtyServic
 					try {
 						weekInfoVO.setAccountsStDt( simpleDateFormat.format(rowObj.getCell(1).getDateCellValue()) );
 					}catch(Exception e){
-						weekInfoVO.setAccountsStDt( Util.getOnlyNumber(rowObj.getCell(1).toString()) );
+						weekInfoVO.setAccountsStDt( Util.getOnlyNumberM(rowObj.getCell(1).toString()) );
 					}
 					try {
 						weekInfoVO.setAccountsEdDt( simpleDateFormat.format(rowObj.getCell(2).getDateCellValue()) );
 					}catch(Exception e){
-						weekInfoVO.setAccountsEdDt( Util.getOnlyNumber(rowObj.getCell(2).toString()) );
+						weekInfoVO.setAccountsEdDt( Util.getOnlyNumberM(rowObj.getCell(2).toString()) );
 					}
-					weekInfoVO.setDeliveryCost(new BigDecimal( Util.getOnlyNumber(getValue(rowObj.getCell(3)))));
-					weekInfoVO.setAddAccounts(new BigDecimal( Util.getOnlyNumber(getValue(rowObj.getCell(4)))));
+					weekInfoVO.setDeliveryCost(new BigDecimal( Util.getOnlyNumberM(getValue(rowObj.getCell(3)))));
+					weekInfoVO.setAddAccounts(new BigDecimal( Util.getOnlyNumberM(getValue(rowObj.getCell(4)))));
 					weekInfoVO.setOperatingCost(new BigDecimal( 0 ));
-					weekInfoVO.setManagementCost(new BigDecimal( Util.getOnlyNumber(getValue(rowObj.getCell(5)))));
+					weekInfoVO.setManagementCost(new BigDecimal( Util.getOnlyNumberM(getValue(rowObj.getCell(5)))));
 					weekInfoVO.setOperatingFee(new BigDecimal( 0 ));
-					weekInfoVO.setEtcCost(new BigDecimal( Util.getOnlyNumber(getValue(rowObj.getCell(6)))));
-					weekInfoVO.setTimeInsurance(new BigDecimal( Util.getOnlyNumber(getValue(rowObj.getCell(7)))));
-					weekInfoVO.setOwnerEmploymentInsurance(new BigDecimal( Util.getOnlyNumber(getValue(rowObj.getCell(8)))));
-					weekInfoVO.setRiderEmploymentInsurance(new BigDecimal( Util.getOnlyNumber(getValue(rowObj.getCell(9)))));
-					weekInfoVO.setOwnerIndustrialInsurance(new BigDecimal( Util.getOnlyNumber(getValue(rowObj.getCell(10)))));
-					weekInfoVO.setRiderIndustrialInsurance(new BigDecimal( Util.getOnlyNumber(getValue(rowObj.getCell(11)))));
-					weekInfoVO.setWithholdingTaxInsuranceSum(new BigDecimal( Util.getOnlyNumber(getValue(rowObj.getCell(12)))));
-					weekInfoVO.setEmploymentInsuranceAccounts(new BigDecimal( Util.getOnlyNumber(getValue(rowObj.getCell(13)))));
-					weekInfoVO.setIndustrialInsuranceAccounts(new BigDecimal( Util.getOnlyNumber(getValue(rowObj.getCell(14)))));
+					weekInfoVO.setEtcCost(new BigDecimal( Util.getOnlyNumberM(getValue(rowObj.getCell(6)))));
+					weekInfoVO.setTimeInsurance(new BigDecimal( Util.getOnlyNumberM(getValue(rowObj.getCell(7)))));
+					weekInfoVO.setOwnerEmploymentInsurance(new BigDecimal( Util.getOnlyNumberM(getValue(rowObj.getCell(8)))));
+					weekInfoVO.setRiderEmploymentInsurance(new BigDecimal( Util.getOnlyNumberM(getValue(rowObj.getCell(9)))));
+					weekInfoVO.setOwnerIndustrialInsurance(new BigDecimal( Util.getOnlyNumberM(getValue(rowObj.getCell(10)))));
+					weekInfoVO.setRiderIndustrialInsurance(new BigDecimal( Util.getOnlyNumberM(getValue(rowObj.getCell(11)))));
+					weekInfoVO.setWithholdingTaxInsuranceSum(new BigDecimal( Util.getOnlyNumberM(getValue(rowObj.getCell(12)))));
+					weekInfoVO.setEmploymentInsuranceAccounts(new BigDecimal( Util.getOnlyNumberM(getValue(rowObj.getCell(13)))));
+					weekInfoVO.setIndustrialInsuranceAccounts(new BigDecimal( Util.getOnlyNumberM(getValue(rowObj.getCell(14)))));
 					weekInfoVO.setG(new BigDecimal( 0 ));
-					weekInfoVO.setAccountsScheduleCost(new BigDecimal( Util.getOnlyNumber(getValue(rowObj.getCell(15)))));
+					weekInfoVO.setAccountsScheduleCost(new BigDecimal( Util.getOnlyNumberM(getValue(rowObj.getCell(15)))));
 					weekInfoVO.setAtchFileId(atchFileId);
 
 					weekInfoVO.setWekAtchFileId(atchFileId);
@@ -989,9 +989,9 @@ public class DtyServiceImpl extends EgovAbstractServiceImpl implements DtyServic
 						continue;
 					}
 					WeekInfoVO addTaxWeekInfoVO = insertData.get(taxIdx);
-					addTaxWeekInfoVO.setTaxBillSupply(new BigDecimal( Util.getOnlyNumber(getValue(rowObj.getCell(1)))));
-					addTaxWeekInfoVO.setTaxBillAdd(new BigDecimal(Util.getOnlyNumber(getValue(rowObj.getCell(2)))));
-					addTaxWeekInfoVO.setTaxBillSum(new BigDecimal(Util.getOnlyNumber(getValue(rowObj.getCell(3)))));
+					addTaxWeekInfoVO.setTaxBillSupply(new BigDecimal( Util.getOnlyNumberM(getValue(rowObj.getCell(1)))));
+					addTaxWeekInfoVO.setTaxBillAdd(new BigDecimal(Util.getOnlyNumberM(getValue(rowObj.getCell(2)))));
+					addTaxWeekInfoVO.setTaxBillSum(new BigDecimal(Util.getOnlyNumberM(getValue(rowObj.getCell(3)))));
 					insertData.set(taxIdx, addTaxWeekInfoVO);
 					taxIdx++;
 				}
@@ -2812,6 +2812,7 @@ public class DtyServiceImpl extends EgovAbstractServiceImpl implements DtyServic
 //    	    		fitVo.setDypId(one.getDypId());				//DYP_ID
     	    		fitVo.setFeeId(one.getFeeId());				//FEE_ID
     	    		fitVo.setRiderFeeId(one.getRiderFeeId());	//RIDER_FEE_ID
+    	    		fitVo.setWeekId(one.getWeekId());
     	    		fitVo.setCreatId(user.getId());
     	    		dtyDAO.insertProfit(fitVo);
         		}
@@ -2832,6 +2833,7 @@ public class DtyServiceImpl extends EgovAbstractServiceImpl implements DtyServic
 //    	    		citVo.setDypId(one.getDypId());				//DYP_ID
     	    		citVo.setFeeId(one.getFeeId());				//FEE_ID
     	    		citVo.setRiderFeeId(one.getRiderFeeId());	//RIDER_FEE_ID
+    	    		citVo.setWeekId(one.getWeekId());
     	    		citVo.setWeekYn("Y");
     	    		citVo.setCreatId(user.getId());
     	    		dtyDAO.insertCooperatorProfit(citVo);
@@ -2856,6 +2858,7 @@ public class DtyServiceImpl extends EgovAbstractServiceImpl implements DtyServic
 //        			fitVo1.setDypId(one.getDypId());				//DYP_ID
         			fitVo1.setFeeId(one.getFeeId());				//FEE_ID
         			fitVo1.setRiderFeeId(one.getRiderFeeId());	//RIDER_FEE_ID
+        			fitVo1.setWeekId(one.getWeekId());
         			fitVo1.setCreatId(user.getId());
     	    		dtyDAO.insertProfit(fitVo1);
         		}
@@ -2879,6 +2882,7 @@ public class DtyServiceImpl extends EgovAbstractServiceImpl implements DtyServic
 //        			salVo1.setDypId(one.getDypId());				//DYP_ID
         			salVo1.setFeeId(one.getFeeId());				//FEE_ID
         			salVo1.setRiderFeeId(one.getRiderFeeId());	//RIDER_FEE_ID
+        			salVo1.setWeekId(one.getWeekId());
         			salVo1.setCreatId(user.getId());
     	    		dtyDAO.insertSalesProfit(salVo1);
         		}
@@ -3005,7 +3009,9 @@ public class DtyServiceImpl extends EgovAbstractServiceImpl implements DtyServic
 		    		citVo.setDeliveryDay(baseVo.getAccountsEdDt());		//배달일
 		    		citVo.setFeeId(baseVo.getFeeId());					//FEE_ID
 		    		citVo.setWeekYn("Y");								//정산완료
+		    		citVo.setWeekId(baseVo.getWeekId());
 		    		citVo.setCreatId(user.getId());
+
 		    		dtyDAO.insertCooperatorProfit(citVo);
 	        	}
 	        	//협력사 잔액 조정
@@ -3024,11 +3030,132 @@ public class DtyServiceImpl extends EgovAbstractServiceImpl implements DtyServic
 		    		citVo.setDeliveryDay(baseVo.getAccountsEdDt());		//배달일
 		    		citVo.setFeeId(baseVo.getFeeId());					//FEE_ID
 		    		citVo.setWeekYn("Y");								//정산완료
+		    		citVo.setWeekId(baseVo.getWeekId());
 		    		citVo.setCreatId(user.getId());
 		    		dtyDAO.insertCooperatorProfit(citVo);
 	        	}
 	        	//협력사 잔액 조정
 	    		setBalance(baseVo.getCooperatorId(), EgovProperties.getProperty("Globals.cooperatorId"), EgovProperties.getProperty("Globals.cooperatorId"), user.getId(), new BigDecimal(0), withholdingTax);
+
+	        } else {
+
+	            //협력사 입금금액 관리비, 사업주부담고용보험, 사업주부담산재보험
+	            BigDecimal managementCost = new BigDecimal(0);
+	            BigDecimal ownerEmploymentInsurance = new BigDecimal(0);
+	            BigDecimal ownerIndustrialInsurance = new BigDecimal(0);
+
+	        	// 2. RD_WEEK_INFO_OUT
+	        	List<WeekInfoVO> weekInfoList = dtyDAO.selectWeekInfoByAtchFileId(weekInfoVO);
+	        	for(int i = 0 ; i < weekInfoList.size() ; i++) {
+	        		WeekInfoVO oneVo = weekInfoList.get(i);
+	        		//운영비 =을지총배달건수*프로그램료
+	        		BigDecimal operatingCostAdd = new BigDecimal(baseVoOne.getDeliveryCnt()).multiply(new BigDecimal(baseVo.getFeeProgram())) ;
+	        		//운영비 G25
+	        		oneVo.setOperatingCostAdd(operatingCostAdd);	//운영비
+	        		//부가세액 = 0
+	        		oneVo.setEtcCost( new BigDecimal(0) );
+	        		//정산예정금액 =D25+E25+F25-G25
+	        		//			+H25-I25-N25
+	        		//			-O25-P25
+	        		oneVo.setAccountsScheduleCost( oneVo.getDeliveryCost().add(oneVo.getAddAccounts()).add(oneVo.getManagementCost()).subtract(operatingCostAdd)
+	        				.add(oneVo.getEtcCost()).subtract(oneVo.getTimeInsurance()).subtract(oneVo.getWithholdingTaxInsuranceSum())
+	        				.subtract(oneVo.getEmploymentInsuranceAccounts()).subtract(oneVo.getIndustrialInsuranceAccounts()));
+
+	        		//공급가액 = 0
+	        		oneVo.setTaxBillSupply(new BigDecimal(0));
+	        		//부가세액 = 0
+	        		oneVo.setTaxBillAdd(new BigDecimal(0));
+	        		//공급대가 = 0
+	        		oneVo.setTaxBillSum(new BigDecimal(0));
+	        		oneVo.setFeeId(baseVo.getFeeId());
+	        		dtyDAO.insertWeekInfoOut(oneVo);
+
+	        		managementCost = managementCost.add(oneVo.getManagementCost());
+	        		ownerEmploymentInsurance = ownerEmploymentInsurance.add(oneVo.getOwnerEmploymentInsurance());
+	        		ownerIndustrialInsurance = ownerIndustrialInsurance.add(oneVo.getOwnerIndustrialInsurance());
+
+	        	}
+
+
+	        	// 3. RD_WEEK_RIDER_INFO_OUT
+	        	List<WeekRiderInfoVO> weekRiderInfoList = dtyDAO.selectWeekRiderInfoByAtchFileId(weekInfoVO);
+	        	for(int i = 0 ; i < weekRiderInfoList.size() ; i++) {
+	        		WeekRiderInfoVO oneVo = weekRiderInfoList.get(i);
+	        		//운영비 =D20*프로그램료
+	        		BigDecimal operatingCostAdd = new BigDecimal(oneVo.getCnt()).multiply(new BigDecimal(baseVo.getFeeProgram())) ;
+	        		oneVo.setOperatingCostAdd(operatingCostAdd);	//운영비
+	        		//라이더별 정산금액 =G20-H20-L20
+	        		//			-N20-V20-Q20-T20
+	        		oneVo.setAccountsCost(oneVo.getSumCost().subtract(oneVo.getTimeInsurance()).subtract(oneVo.getRiderEmploymentInsurance())
+	        				.subtract(oneVo.getRiderIndustrialInsurance()).subtract(operatingCostAdd).subtract(oneVo.getRiderEmploymentInsuranceAccounts()).subtract(oneVo.getRiderIndustrialInsuranceAccounts()));
+	        		//소득세 =ROUNDDOWN((G20-V20)*0.03,-1)
+	        		oneVo.setIncomeTax(oneVo.getSumCost().subtract(operatingCostAdd).multiply(new BigDecimal(3)).divide(new BigDecimal(100), -1, RoundingMode.DOWN));
+	        		//주민세 =ROUNDDOWN(X20*0.1,-1)
+	        		oneVo.setResidenceTax(oneVo.getIncomeTax().divide(new BigDecimal(10), -1, RoundingMode.DOWN));
+	        		//원천징수세액 =X20+Y20
+	        		oneVo.setWithholdingTax(oneVo.getIncomeTax().add(oneVo.getResidenceTax()));
+	        		//라이덥별 지급금액 =W20-Z20
+	        		oneVo.setGivePay(oneVo.getAccountsCost().subtract(oneVo.getWithholdingTax()));
+	        		dtyDAO.insertWeekRiderInfoOut(oneVo);
+
+	        	}
+
+
+	        	//4. 협력사 입금 (관리비)
+	        	if(managementCost.compareTo(new BigDecimal(0)) > 0) {
+		    		ProfitVO citVo = new ProfitVO();
+		    		citVo.setCoofitId(egovCitIdGnrService.getNextStringId());
+		    		citVo.setCooperatorId(baseVo.getCooperatorId());	//협력사
+		    		citVo.setMberId(EgovProperties.getProperty("Globals.cooperatorId"));//라이더ID
+		    		citVo.setGubun("M");								//관리비
+		    		citVo.setCost(managementCost.intValue());			//금액
+		    		citVo.setDeliveryCost(0);							//배달비
+		    		citVo.setDeliveryCnt(0);							//배달건수
+		    		citVo.setDeliveryDay(baseVo.getAccountsEdDt());		//배달일
+		    		citVo.setFeeId(baseVo.getFeeId());					//FEE_ID
+		    		citVo.setWeekYn("Y");								//정산완료
+		    		citVo.setWeekId(baseVo.getWeekId());
+		    		citVo.setCreatId(user.getId());
+		    		dtyDAO.insertCooperatorProfit(citVo);
+	        	}
+
+	        	//5. 협력사 -입금 (사업주부담고용보험료)
+	        	if(ownerEmploymentInsurance.compareTo(new BigDecimal(0)) > 0) {
+		    		ProfitVO citVo = new ProfitVO();
+		    		citVo.setCoofitId(egovCitIdGnrService.getNextStringId());
+		    		citVo.setCooperatorId(baseVo.getCooperatorId());	//협력사
+		    		citVo.setMberId(EgovProperties.getProperty("Globals.cooperatorId"));//라이더ID
+		    		citVo.setGubun("S");								//사업주부담고용보험료
+		    		citVo.setCost(ownerEmploymentInsurance.intValue()*-1);	//금액
+		    		citVo.setDeliveryCost(0);							//배달비
+		    		citVo.setDeliveryCnt(0);							//배달건수
+		    		citVo.setDeliveryDay(baseVo.getAccountsEdDt());		//배달일
+		    		citVo.setFeeId(baseVo.getFeeId());					//FEE_ID
+		    		citVo.setWeekYn("Y");								//정산완료
+		    		citVo.setWeekId(baseVo.getWeekId());
+		    		citVo.setCreatId(user.getId());
+		    		dtyDAO.insertCooperatorProfit(citVo);
+	        	}
+
+	        	//6. 협력사 -입금 (사업주부담산재보험료)
+	        	if(ownerIndustrialInsurance.compareTo(new BigDecimal(0)) > 0) {
+		    		ProfitVO citVo = new ProfitVO();
+		    		citVo.setCoofitId(egovCitIdGnrService.getNextStringId());
+		    		citVo.setCooperatorId(baseVo.getCooperatorId());	//협력사
+		    		citVo.setMberId(EgovProperties.getProperty("Globals.cooperatorId"));//라이더ID
+		    		citVo.setGubun("R");								//사업주부담산재보험료
+		    		citVo.setCost(ownerIndustrialInsurance.intValue()*-1);	//금액
+		    		citVo.setDeliveryCost(0);							//배달비
+		    		citVo.setDeliveryCnt(0);							//배달건수
+		    		citVo.setDeliveryDay(baseVo.getAccountsEdDt());		//배달일
+		    		citVo.setFeeId(baseVo.getFeeId());					//FEE_ID
+		    		citVo.setWeekYn("Y");								//정산완료
+		    		citVo.setWeekId(baseVo.getWeekId());
+		    		citVo.setCreatId(user.getId());
+		    		dtyDAO.insertCooperatorProfit(citVo);
+	        	}
+
+
 
 	        }
 

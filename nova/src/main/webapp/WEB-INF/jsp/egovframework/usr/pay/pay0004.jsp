@@ -26,12 +26,12 @@
 		{ headerName: "coofitId", field: "coofitId", minWidth: 120, hide:true},
 		{ headerName: "profitId", field: "profitId", minWidth: 120, hide:true},
 		{ headerName: "배달건수", field: "deliveryCnt", minWidth: 70
-			, valueGetter:(params) => { return params.data.deliveryCnt > 0 || params.data.deliveryCnt =='합계'? params.data.deliveryCnt: ''}
+			, valueGetter:(params) => { return params.data.deliveryCnt != 0 || params.data.deliveryCnt =='합계'? params.data.deliveryCnt: ''}
 			, cellClass: 'ag-cell-right'
 		},
 		{ headerName: "배달일", field: "deliveryDay", minWidth: 120},
 		{ headerName: "배달비", field: "deliveryCost", minWidth: 120
-			, valueGetter:(params) => { return params.data.deliveryCnt > 0 ? currencyFormatter(params.data.deliveryCost): ''}
+			, valueGetter:(params) => { return params.data.deliveryCnt != 0 ? currencyFormatter(params.data.deliveryCost): ''}
 			, cellClass: 'ag-cell-right'
 		},
 		{ headerName: "dypId", field: "dypId", minWidth: 120, hide:true},
@@ -43,7 +43,7 @@
 		{ headerName: "라이더ID", field: "mberId", minWidth: 140, valueGetter:(params) => { return params.data.mberId == '${notMberId}' ? '' :params.data.mberId; }},
 		{ headerName: "라이더명", field: "mberNm", minWidth: 140},
 		{ headerName: "구분", field: "gubun", minWidth: 140, hide:true},
-		{ headerName: "구분", field: "gubunNm", minWidth: 140},
+		{ headerName: "구분", field: "gubunNm", minWidth: 150},
 		{ headerName: "금액", field: "cost", minWidth: 80
 			, cellClass: (params) => {return agGridUnderBarClass(params, 'ag-cell-right')}
 			, valueGetter:(params) => { return currencyFormatter(params.data.cost)}
@@ -664,6 +664,9 @@
 								<option value="D">선지급수수료</option>
 								<option value="B">부가세</option>
 								<option value="O">원천세</option>
+								<option value="M">관리비</option>
+								<option value="S">사업주부담고용보험료</option>
+								<option value="R">사업주부담산재보험료</option>
 							</select>
 						</td>
 					</tr>

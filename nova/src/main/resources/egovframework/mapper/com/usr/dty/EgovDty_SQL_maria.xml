@@ -868,35 +868,31 @@
 			SELECT tab.COOPERATOR_ID, sum(if(FIX_YN = 1 , able_price, 0)) AS COOP_ABLE_PRICE
 			, sum(if(FIX_YN = 2 , able_price, 0)) AS DAY_MINUS
 			FROM(
-				SELECT a.COOPERATOR_ID, cost as able_price
+				SELECT wi.COOPERATOR_ID, cost as able_price
 				<![CDATA[
 				, case when a.GUBUN IN ('C', 'E') AND wi.accounts_st_dt <= a.DELIVERY_DAY AND wi.accounts_ed_dt >= a.DELIVERY_DAY then 1
 						when a.GUBUN IN ('D', 'B', 'O') then 1
 						ELSE 0 END AS FIX_YN
 				]]>
 					FROM RD_WEEK_INFO wi
-					LEFT JOIN RD_COOPERATOR_PROFIT a ON wi.COOPERATOR_ID = a.COOPERATOR_ID AND a.USE_AT = 'Y'
+					LEFT JOIN RD_COOPERATOR_PROFIT a ON wi.COOPERATOR_ID = a.COOPERATOR_ID AND a.USE_AT = 'Y' AND a.WEEK_YN = 'N'
 					JOIN COMTNFILE b ON wi.ATCH_FILE_ID = b.ATCH_FILE_ID
 						WHERE 1=1
 							AND wi.FIX_DAY is NULL
 							AND b.USE_AT ='Y'
-							AND a.WEEK_YN = 'N'
 							AND wi.ATCH_FILE_ID = #{searchAtchFileId}
-							AND a.USE_AT ='Y'
 
 				UNION all
 
-				SELECT a.COOPERATOR_ID, SEND_PRICE+SEND_FEE+DAY_FEE as able_price
+				SELECT wi.COOPERATOR_ID, SEND_PRICE+SEND_FEE+DAY_FEE as able_price
 				, 2 AS FIX_YN  /*출금 금액은 잔액에 영향을 주지 않는다.*/
 					FROM RD_WEEK_INFO wi
-					LEFT JOIN RD_COOPERATOR_PAY a ON wi.COOPERATOR_ID = a.COOPERATOR_ID AND a.USE_AT = 'Y'
+					LEFT JOIN RD_COOPERATOR_PAY a ON wi.COOPERATOR_ID = a.COOPERATOR_ID AND a.USE_AT = 'Y' AND a.WEEK_YN = 'N'
 					JOIN COMTNFILE b ON wi.ATCH_FILE_ID = b.ATCH_FILE_ID
 						WHERE 1=1
 							AND wi.FIX_DAY is NULL
 							AND b.USE_AT ='Y'
-							AND a.WEEK_YN = 'N'
 							AND wi.ATCH_FILE_ID = #{searchAtchFileId}
-							AND a.USE_AT ='Y'
 
 				) tab
 	</select>
@@ -1389,8 +1385,8 @@
 
 	<insert id="insertCooperatorProfit" parameterType="egovframework.com.rd.usr.service.vo.ProfitVO">
 		INSERT INTO RD_COOPERATOR_PROFIT
-		(COOFIT_ID, PROFIT_ID, COOPERATOR_ID, MBER_ID, GUBUN, COST, DELIVERY_COST, DELIVERY_CNT, DELIVERY_DAY, DYP_ID, FEE_ID, RIDER_FEE_ID, WEEK_YN, CREAT_DT, CREAT_ID)
-		VALUES(#{coofitId}, #{profitId}, #{cooperatorId}, #{mberId}, #{gubun}, #{cost}, #{deliveryCost}, #{deliveryCnt}, #{deliveryDay}, #{dypId}, #{feeId}, #{riderFeeId}, #{weekYn}, SYSDATE(), #{creatId})
+		(COOFIT_ID, PROFIT_ID, COOPERATOR_ID, MBER_ID, GUBUN, COST, DELIVERY_COST, DELIVERY_CNT, DELIVERY_DAY, DYP_ID, FEE_ID, RIDER_FEE_ID, WEEK_YN, WEEK_ID, CREAT_DT, CREAT_ID)
+		VALUES(#{coofitId}, #{profitId}, #{cooperatorId}, #{mberId}, #{gubun}, #{cost}, #{deliveryCost}, #{deliveryCnt}, #{deliveryDay}, #{dypId}, #{feeId}, #{riderFeeId}, #{weekYn}, #{weekId},SYSDATE(), #{creatId})
 	</insert>
 
 	<insert id="insertSalesProfit" parameterType="egovframework.com.rd.usr.service.vo.ProfitVO">

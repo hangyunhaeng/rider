@@ -22,12 +22,12 @@
 		{ headerName: "오류", field: "err", minWidth: 120, hide:true},
 		{ headerName: "profitId", field: "profitId", minWidth: 120, hide:true},
 		{ headerName: "배달건수", field: "deliveryCnt", minWidth: 70
-			, valueGetter:(params) => { return params.data.deliveryCnt > 0 || params.data.deliveryCnt =='합계' ? params.data.deliveryCnt: ''}
+			, valueGetter:(params) => { return params.data.deliveryCnt != 0 || params.data.deliveryCnt =='합계' ? params.data.deliveryCnt: ''}
 			, cellClass: 'ag-cell-right'
 		},
 		{ headerName: "배달일", field: "deliveryDay", minWidth: 120},
 		{ headerName: "배달비", field: "deliveryCost", minWidth: 120
-			, valueGetter:(params) => { return params.data.deliveryCnt > 0 ? currencyFormatter(params.data.deliveryCost): ''}
+			, valueGetter:(params) => { return params.data.deliveryCnt != 0 ? currencyFormatter(params.data.deliveryCost): ''}
 			, cellClass: 'ag-cell-right'
 		},
 		{ headerName: "dypId", field: "dypId", minWidth: 120, hide:true},

@@ -54,6 +54,7 @@ public class ProfitVO extends Sch implements Serializable {
 	private String copId;
 	// 정산완료
 	private String weekYn;
+	private String weekId;
 	//등록일
 	private String creatDt;
 	//생성자 ID
