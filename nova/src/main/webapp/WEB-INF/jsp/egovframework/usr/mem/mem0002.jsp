@@ -705,7 +705,7 @@
         const gridDiv = document.querySelector('#myGrid1');
         grid1 = agGrid.createGrid(gridDiv, gridOptions);
 
-        if('${loginVO.authorCode}' =='ROLE_ADMIN')
+        if('${loginVO.authorCode}' == 'ROLE_ADMIN' || '${loginVO.authorCode}' == 'ROLE_USER')
         	grid1.setColumnVisible('con', true);
         grid1.hideOverlay();
 

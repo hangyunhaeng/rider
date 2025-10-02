@@ -14,6 +14,7 @@ import egovframework.com.rd.usr.service.vo.DeliveryErrorVO;
 import egovframework.com.rd.usr.service.vo.DeliveryInfoVO;
 import egovframework.com.rd.usr.service.vo.DoszSchAccoutVO;
 import egovframework.com.rd.usr.service.vo.DoszTransferVO;
+import egovframework.com.rd.usr.service.vo.EtcNotVO;
 import egovframework.com.rd.usr.service.vo.EtcVO;
 import egovframework.com.rd.usr.service.vo.HistoryVO;
 import egovframework.com.rd.usr.service.vo.MyInfoVO;
@@ -257,6 +258,43 @@ public class DtyDAO extends EgovComAbstractDAO {
 	public List<DayPayVO> selectFixDay(DayPayVO vo)throws Exception {
 		return selectList("dtyDAO.selectFixDay", vo);
 	}
+	/**
+	 * 일정산 확정 대상 기본정보 (협력사, 날짜)
+	 * @param vo
+	 * @return
+	 * @throws Exception
+	 */
+	public List<DayPayVO> selectFixDayBase(DayPayVO vo)throws Exception {
+		return selectList("dtyDAO.selectFixDayBase", vo);
+	}
+	/**
+	 * 리스 미수 리스트 조회 by 협력사, 날짜
+	 * @param vo
+	 * @return
+	 * @throws Exception
+	 */
+	public List<EtcVO> selectNotEtc(DayPayVO vo)throws Exception {
+		return selectList("dtyDAO.selectNotEtc", vo);
+	}
+	/**
+	 * 리스 미수 이력 등록
+	 * @param vo
+	 * @return
+	 * @throws Exception
+	 */
+	public int insertEtcNot(EtcNotVO vo)throws Exception {
+		return insert("dtyDAO.insertEtcNot", vo);
+	}
+	/**
+	 * 리스 미수 이력 삭제
+	 * @param vo
+	 * @return
+	 * @throws Exception
+	 */
+	public int deleteEtcNot(EtcNotVO vo)throws Exception {
+		return update("dtyDAO.deleteEtcNot", vo);
+	}
+
 	/**
 	 * 일정산 입금내역 등록
 	 * @param vo

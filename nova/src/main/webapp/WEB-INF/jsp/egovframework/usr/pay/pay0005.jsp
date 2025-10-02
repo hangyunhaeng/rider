@@ -19,7 +19,7 @@
 	var columnDefs= [
 		{ headerName: "NO", field: "no", minWidth: 70, valueGetter:(params) => { return params.node.rowIndex + 1} },
 		{ headerName: "오류", field: "err", minWidth: 120, hide:true},
-		{ headerName: "etcId", field: "dypId", minWidth: 120, hide:true},
+		{ headerName: "etcId", field: "etcId", minWidth: 120, hide:true},
 		{ headerName: "협력사아이디", field: "cooperatorId", minWidth: 120},
 		{ headerName: "협력사명", field: "cooperatorNm", minWidth: 120},
 		{ headerName: "라이더ID", field: "mberId", minWidth: 90},
@@ -45,14 +45,27 @@
 			, valueGetter:(params) => { return currencyFormatter(params.data.paybackCostAll);}
 		},
 		{ headerName: "상환<br/>완료금액", field: "finishCost", minWidth: 70
-			, cellClass: (params) => {return agGrideditClass(params, "ag-cell-right");}
+			, cellClass: (params) => {return agGridUnderBarClass(params, "ag-cell-right");}
 			, valueGetter:(params) => { return currencyFormatter(params.data.finishCost);}
+			, cellRenderer:(params) => { return '<div data-bs-toggle="modal" data-bs-target="#exampleModal" onclick="clickEtc(\''+params.data.etcId+'\')">'+currencyFormatter(params.data.finishCost)+'</div>';}
 		},
 		{ headerName: "상환<br/>완료여부", field: "finishAt", minWidth: 50},
 		{ headerName: "승인요청일", field: "authRequestDt", minWidth: 100, valueGetter:(params) => { return getStringDate(params.data.authRequestDt)}},
 		{ headerName: "라이더<br/>승인일", field: "authResponsDt", minWidth: 100, valueGetter:(params) => { return getStringDate(params.data.authResponsDt)}},
 		{ headerName: "라이더<br/>승인여부", field: "responsAt", minWidth: 80},
 		{ headerName: "등록일", field: "creatDt", minWidth: 100, valueGetter:(params) => { return getStringDate(params.data.creatDt)}}
+	];
+
+
+	var columnDefs2= [
+		{ headerName: "crud", field: "crud", minWidth: 90, hide:true},
+		{ headerName: "NO", field: "rnum", minWidth: 50, maxWidth: 100 },
+		{ headerName: "날짜", field: "day", minWidth: 250, maxWidth: 250, valueGetter:(params) => { return getStringDate(params.data.day)} },
+		{ headerName: "상환액", field: "sendPrice", minWidth: 200, maxWidth: 200, cellClass:"ag-cell-right", valueGetter:(params) => { return currencyFormatter(params.data.sendPrice);}},
+		{ headerName: "선지급잔액", field: "balance0", minWidth: 100, maxWidth: 150, hide:true, cellClass:"ag-cell-right", valueGetter:(params) => { return nullToString(params.data.msg) == '' ? '-': currencyFormatter(params.data.balance0); }},
+		{ headerName: "확정잔액", field: "balance1", minWidth: 100, maxWidth: 150, hide:true, cellClass:"ag-cell-right", valueGetter:(params) => { return nullToString(params.data.msg) == '' ? '-': currencyFormatter(params.data.balance1); }},
+		{ headerName: "미상환사유", field: "msg", minWidth: 480, maxWidth: 480 }
+
 	];
 
 
@@ -92,6 +105,7 @@
 		loadCooperatorList();
 		//그리드 설정
 		setGrid();
+		setGrid2();
 	});
 
 
@@ -168,6 +182,45 @@
         pageInit = false;
 	}
 
+
+	function clickEtc(etcId){
+
+
+		const params = new URLSearchParams();
+		params.append('etcId', etcId);
+
+		// 로딩 시작
+        $('.loading-wrap--js').show();
+        axios.post('${pageContext.request.contextPath}/usr/pay0005_0002.do',params).then(function(response) {
+        	// 로딩 종료
+            $('.loading-wrap--js').hide();
+
+            if(chkLogOut(response.data)){
+            	return;
+            }
+
+			if(response.data.resultCode == "success"){
+
+	        	if (response.data.list.length == 0) {
+	        		grid2.setGridOption('rowData',[]);  	// 데이터가 없는 경우 빈 배열 설정
+	        		grid2.showNoRowsOverlay();  			// 데이터가 없는 경우
+	            } else {
+
+	            	data = response.data.list;	//정상데이터
+					grid2.setGridOption("rowData", data);
+	            }
+
+			}
+
+        })
+        .catch(function(error) {
+            console.error('There was an error fetching the data:', error);
+        }).finally(function() {
+        	// 로딩 종료
+            $('.loading-wrap--js').hide();
+        });
+	}
+
 	function setGrid(){
 		// 사용자 정의 컴포넌트를 글로벌 네임스페이스에 추가
 		window.CustomHeader = CustomHeader;
@@ -199,9 +252,37 @@
 
 	}
 
+	function setGrid2(){
+		// 사용자 정의 컴포넌트를 글로벌 네임스페이스에 추가
+		window.CustomHeader = CustomHeader;
+    	gridOptions = {
+                columnDefs: columnDefs2,
+                rowData: [], // 초기 행 데이터를 빈 배열로 설정
+                defaultColDef: { headerComponent: 'CustomHeader'}, //
+                components: { CustomHeader: CustomHeader },
+                enableCellTextSelection: true, // 셀 텍스트 선택을 활성화합니다.
+                rowHeight: 35,
+                headerHeight: 35,
+                alwaysShowHorizontalScroll : true,
+                alwaysShowVerticalScroll: true,
+                onGridReady: function(params) {
+                    //loadData(params.api); // 그리드가 준비된 후 데이터 로드
+                    params.api.sizeColumnsToFit();
+                },
+                rowClassRules: {'ag-cell-err ': (params) => { return params.data.err === true; }},
+				overlayLoadingTemplate: '<span class="ag-overlay-loading-center">로딩 중</span>',
+				overlayNoRowsTemplate: '<span class="ag-overlay-loading-center">데이터가 없습니다</span>'
+            };
+        const gridDiv = document.querySelector('#myGrid2');
+        grid2 = agGrid.createGrid(gridDiv, gridOptions);
+
+        grid2.hideOverlay();
+
+	}
+
 	function selcetRow(params){
 		if(params.column.colId == "sendPrice"){
-			debugger;
+
 			if(params.node.data.dwGubun == 'DAY'){
 				if(params.node.data.ioGubun == '1'){
 					$('#myForm').attr("action", "/usr/dty0001.do");
@@ -226,16 +307,9 @@
 		}
 	}
 
-
 	function agGridUnderBarClass(params, addClass){
 		var pAddClass = (addClass =='undefined')? "" : addClass;
-		if(params.node.data.ioGubun == '1' && params.node.data.dwGubun == 'DAY')	//입금 && 일정산
-			return pAddClass+" tdul";
-		if(params.node.data.ioGubun == '1' && params.node.data.dwGubun == 'WEK')	//입금 && 일정산
-			return pAddClass+" tdul";
-
-		else
-			return pAddClass;
+		return pAddClass+" tdul";
 	}
 
 	</script>
@@ -260,6 +334,43 @@
 			<input name="pageSize" type="hidden" value="1000"/>
 			<!--과제관리_목록 -->
 			<div class="search_box ty2">
+
+
+			<div class="card-body py-0 scrollbar to-do-list-body">
+				<!-- 팝업 -->
+                  <div class="modal fade" id="exampleModal" tabindex="-1" style="display: none;" aria-hidden="true">
+                    <div class="modal-dialog modal-xl">
+                      <div class="modal-content bg-body overflow-hidden">
+                        <div class="modal-header justify-content-between px-6 py-5 pe-sm-5 px-md-6 dark__bg-gray-1100">
+                          <h3 class="text-body-highlight fw-bolder mb-0">상환 이력</h3>
+                          <button style="min-width:50px!important; min-height:50px!important;" class="btn btn-phoenix-secondary btn-icon btn-icon-xl flex-shrink-0" type="button" data-bs-dismiss="modal" aria-label="Close"><svg class="svg-inline--fa fa-xmark" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="xmark" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512" data-fa-i2svg=""><path fill="currentColor" d="M342.6 150.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L192 210.7 86.6 105.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L146.7 256 41.4 361.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L192 301.3 297.4 406.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L237.3 256 342.6 150.6z"></path></svg></button>
+                        </div>
+                        <div class="modal-body bg-body-highlight px-6 py-0">
+                          <div class="row gx-14">
+                            <div class="col-12 border-end-lg">
+                              <div class="py-6">
+                                <div class="mb-7">
+
+<!-- 									<div style="height: 0px;"> -->
+<!-- 										<span class="pagetotal" style='margin-right: 20px;'>협력사 수수료</span> -->
+<!-- 									</div> -->
+									<div class="ib_product">
+										<div id="myGrid2" class="ag-theme-alpine" style="height: 500px; width: 100%;"></div>
+									</div>
+
+
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+				<!-- 팝업 end -->
+                </div>
+
+
 				<table>
 					<colgroup>
 						<col style="width: 13%">

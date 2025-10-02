@@ -71,6 +71,7 @@ import egovframework.com.rd.usr.service.vo.DoszSchAccoutVO;
 import egovframework.com.rd.usr.service.vo.DoszTransferVO;
 import egovframework.com.rd.usr.service.vo.DoznHistoryVO;
 import egovframework.com.rd.usr.service.vo.DoznTokenVO;
+import egovframework.com.rd.usr.service.vo.EtcNotVO;
 import egovframework.com.rd.usr.service.vo.EtcVO;
 import egovframework.com.rd.usr.service.vo.HistoryVO;
 import egovframework.com.rd.usr.service.vo.KkoVO;
@@ -160,6 +161,9 @@ public class DtyServiceImpl extends EgovAbstractServiceImpl implements DtyServic
     /** ID Generation */
 	@Resource(name="egovSitIdGnrService")
 	private EgovIdGnrService egovSitIdGnrService;
+    /** ID Generation */
+	@Resource(name="egovEtnIdGnrService")
+	private EgovIdGnrService egovEtnIdGnrService;
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(DtyServiceImpl.class);
 
@@ -2533,6 +2537,7 @@ public class DtyServiceImpl extends EgovAbstractServiceImpl implements DtyServic
 		inVo.setTimeInsuranceMaxFee(Integer.parseInt(EgovProperties.getProperty("Globals.timeInsuranceMaxFee")) );
 
 
+		List<DayPayVO> dayListBase = dtyDAO.selectFixDayBase(inVo);		//확정대상인 협력사와 일자를 조회
 
     	List<DayPayVO> dayList = dtyDAO.selectFixDay(inVo);
     	for(int i = 0 ; i<dayList.size() ; i++) {
@@ -2762,6 +2767,52 @@ public class DtyServiceImpl extends EgovAbstractServiceImpl implements DtyServic
     			}// end if(etcSumCnt.get(one.getEtcId()) < one.getPaybackDay())
     		}// end if("Y".equals(one.getAbleYn())) {
 
+    	}
+
+    	//대출대상인데 미출금된 건 이력 생성
+    	for(int i = 0 ; i < dayListBase.size() ; i++) {
+    		DayPayVO base = dayListBase.get(i);
+    		base.setSearchFromDate(deliveryInfoVO.getSearchFromDate());
+    		base.setSearchToDate(deliveryInfoVO.getSearchToDate());
+    		base.setSearchNm(deliveryInfoVO.getSearchNm());
+    		List<EtcVO> notEtcList = dtyDAO.selectNotEtc(base);
+
+    		for(int j = 0 ; j < notEtcList.size() ; j++ ) {
+    			EtcVO notEtcVO = notEtcList.get(j);
+    			if(Util.isEmpty(notEtcVO.getDypId()) && Util.isEmpty(notEtcVO.getWkpId()) ) {	//출금건이 없으면 미출금 이력생성
+
+//    				if(Util.isEmpty(notEtcVO.getEtcNotId())) {
+			    		//1.출금 가능금액
+			    		MyInfoVO myInfoVO = new MyInfoVO();
+			    		myInfoVO.setMberId(notEtcVO.getMberId());
+			    		myInfoVO.setSearchCooperatorId(notEtcVO.getCooperatorId());
+			    		MyInfoVO ablePrice = rotService.selectAblePrice(myInfoVO);
+
+	    				EtcNotVO etcNotVO = new EtcNotVO();
+	    				etcNotVO.setEtcNotId(egovEtnIdGnrService.getNextStringId());
+	    				etcNotVO.setEtcId(notEtcVO.getEtcId());
+	    				etcNotVO.setCooperatorId(notEtcVO.getCooperatorId());
+	    				etcNotVO.setMberId(notEtcVO.getMberId());
+	    				etcNotVO.setDay(base.getDay());
+	    				etcNotVO.setBalance0(new BigDecimal(ablePrice.getDayAblePrice()) );
+	    				etcNotVO.setBalance1(new BigDecimal(ablePrice.getWeekAblePrice()));
+	    				etcNotVO.setCreatId(user.getId());
+	    				if(notEtcVO.getTotalCnt() <= 0){
+	    					etcNotVO.setMsg("배달건 없음");
+	    				} else {
+	    					etcNotVO.setMsg("잔액 부족");
+	    				}
+	    				dtyDAO.insertEtcNot(etcNotVO);
+//    				}
+    			} else if(!Util.isEmpty(notEtcVO.getDypId()) || !Util.isEmpty(notEtcVO.getWkpId())) {
+    				//리스 입금 이력이 있을때 미수이력은 삭제
+    				if(!Util.isEmpty(notEtcVO.getEtcNotId())) {
+    					EtcNotVO etcNotVO = new EtcNotVO();
+        				etcNotVO.setEtcNotId(notEtcVO.getEtcNotId());
+        				dtyDAO.deleteEtcNot(etcNotVO);
+    				}
+    			}
+    		}
     	}
 
         //확정일자 세팅

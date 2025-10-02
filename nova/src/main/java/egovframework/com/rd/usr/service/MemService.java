@@ -178,6 +178,13 @@ public interface MemService {
 	 */
 	public List<DayPayVO> selectEtcInputList(DayPayVO vo) throws Exception ;
 	/**
+	 * 대출 입금 리스트 조회(운영사용)
+	 * @param vo
+	 * @return
+	 * @throws Exception
+	 */
+	public List<DayPayVO> selectEtcInputListByOperator(EtcVO vo) throws Exception ;
+	/**
 	 * 관리자가 라이더 로그인을 위한 key 생성
 	 * @param vo
 	 * @return

@@ -1,6 +1,7 @@
 package egovframework.com.rd.usr.service.vo;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.List;
 
 import lombok.AllArgsConstructor;
@@ -71,6 +72,14 @@ public class EtcVO extends Sch implements Serializable {
 	private String uniq;
 
 	private String Mbtlnum;
+	private String dypId;
+	private String wkpId;
+	private String etcNotId;
+	private String rnum;
+	private BigDecimal sendPrice;
+	private BigDecimal balance0;
+	private BigDecimal balance1;
+	private String msg;
 
 
 	private List<EtcVO> etcVO;

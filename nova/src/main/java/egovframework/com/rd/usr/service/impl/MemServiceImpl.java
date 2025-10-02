@@ -925,6 +925,15 @@ public class MemServiceImpl extends EgovAbstractServiceImpl implements MemServic
 	public List<DayPayVO> selectEtcInputList(DayPayVO vo) throws Exception {
 		return memDAO.selectEtcInputList(vo);
 	}
+	/**
+	 * 대출 입금 리스트 조회(운영사용)
+	 * @param vo
+	 * @return
+	 * @throws Exception
+	 */
+	public List<DayPayVO> selectEtcInputListByOperator(EtcVO vo) throws Exception {
+		return memDAO.selectEtcInputListByOperator(vo);
+	}
 
 	/**
 	 * 관리자가 라이더 로그인을 위한 key 생성
@@ -934,9 +943,9 @@ public class MemServiceImpl extends EgovAbstractServiceImpl implements MemServic
 	 */
 	public String getRandomKey(CooperatorVO vo) throws Exception {
 		LoginVO user = (LoginVO)EgovUserDetailsHelper.getAuthenticatedUser();
-		if(!"ROLE_ADMIN".equals(user.getAuthorCode())) {
-			throw new IllegalArgumentException("운영사만 접속 할 수 있습니다.") ;
-		}
+//		if(!"ROLE_ADMIN".equals(user.getAuthorCode())) {
+//			throw new IllegalArgumentException("운영사만 접속 할 수 있습니다.") ;
+//		}
 
 		String key = Util.getRandomKey();
 		Sch inVo = new Sch();

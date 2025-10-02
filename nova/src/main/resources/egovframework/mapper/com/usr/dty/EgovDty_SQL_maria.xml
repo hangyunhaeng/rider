@@ -749,6 +749,57 @@
 		) tab
 	</select>
 
+	<select id="selectFixDayBase" parameterType="egovframework.com.rd.usr.service.vo.DayPayVO" resultType="egovframework.com.rd.usr.service.vo.DayPayVO">
+		SELECT a.COOPERATOR_ID, a.RUN_DE AS DAY
+		FROM RD_DELIVERY_INFO a
+		LEFT JOIN COMTNGNRLMBER d ON a.mber_id = d.mber_id
+		JOIN COMTNFILE e ON a.ATCH_FILE_ID = e.ATCH_FILE_ID
+		WHERE 1 = 1
+			AND e.USE_AT ='Y'
+			AND a.RUN_DE BETWEEN #{searchFromDate} AND #{searchToDate}
+			<if test="searchNm != null and searchNm != ''">
+			AND d.MBER_NM like '%' #{searchNm} '%'
+			</if>
+			AND a.FIX_DAY is null	/* 확정은 미확정 데이터를 대상으로만 한다 */
+		GROUP BY a.COOPERATOR_ID, a.RUN_DE
+	</select>
+
+	<select id="selectNotEtc" parameterType="egovframework.com.rd.usr.service.vo.DayPayVO" resultType="egovframework.com.rd.usr.service.vo.EtcVO">
+		SELECT a.ETC_ID, a.COOPERATOR_ID, a.MBER_ID, b.DYP_ID, c.WKP_ID
+		, (SELECT count(sub_a.MBER_ID)
+			FROM RD_DELIVERY_INFO sub_a
+			JOIN COMTNFILE sub_b ON sub_a.ATCH_FILE_ID = sub_b.ATCH_FILE_ID
+			LEFT JOIN COMTNGNRLMBER sub_c ON sub_a.MBER_ID = sub_c.MBER_ID
+			WHERE a.COOPERATOR_ID = sub_a.COOPERATOR_ID AND a.mber_id = sub_a.mber_id
+			AND sub_a.RUN_DE BETWEEN #{searchFromDate} AND #{searchToDate}
+			<if test="searchNm != null and searchNm != ''">
+			AND sub_c.MBER_NM like '%' #{searchNm} '%'
+			</if>
+			) AS TOTAL_CNT
+		, (SELECT MAX(ETC_NOT_ID) from RD_ETC_NOT sub_a where a.ETC_ID = sub_a.ETC_ID AND sub_a.DAY = #{day} AND sub_a.USE_AT = 'Y') AS ETC_NOT_ID
+		FROM RD_ETC a
+		LEFT JOIN RD_DAY_PAY b ON a.COOPERATOR_ID = b.COOPERATOR_ID AND a.ETC_ID = b.ETC_ID AND b.io_gubun ='2' AND b.DAY = #{day} AND b.USE_AT ='Y'-- 리스 출금내역
+		LEFT JOIN RD_WEEK_PAY c ON a.COOPERATOR_ID = c.COOPERATOR_ID AND a.ETC_ID = b.ETC_ID AND c.io_gubun ='2' AND c.TRAN_DAY = #{day} AND c.USE_AT ='Y'-- 리스 출금내역
+		WHERE a.USE_AT ='Y'
+		AND a.RESPONS_AT ='Y'
+		AND a.FINISH_AT = 'N'
+		AND a.COOPERATOR_ID = #{cooperatorId}
+	</select>
+	<insert id="insertEtcNot" parameterType="egovframework.com.rd.usr.service.vo.EtcNotVO">
+		INSERT RD_ETC_NOT
+		(ETC_NOT_ID, ETC_ID, COOPERATOR_ID, MBER_ID, DAY, BALANCE0, BALANCE1, MSG, CREAT_ID, CREAT_DT)
+		VALUES (#{etcNotId}, #{etcId}, #{cooperatorId}, #{mberId}, #{day}, #{balance0}, #{balance1}, #{msg}, #{creatId}, SYSDATE())
+	</insert>
+
+	<update id="deleteEtcNot" parameterType="egovframework.com.rd.usr.service.vo.EtcNotVO">
+		UPDATE RD_ETC_NOT
+		SET USE_AT = 'N'
+		WHERE (ETC_ID, COOPERATOR_ID, MBER_ID, DAY) IN (
+			SELECT ETC_ID, COOPERATOR_ID, MBER_ID, DAY FROM  RD_ETC_NOT
+			WHERE ETC_NOT_ID = #{etcNotId}
+		)
+	</update>
+
 	<insert id="insertDayPay" parameterType="egovframework.com.rd.usr.service.vo.DayPayVO">
 		INSERT INTO RD_DAY_PAY
 		(DYP_ID, COOPERATOR_ID,MBER_ID, DAY, IO_GUBUN, DELIVERY_PRICE, DELIVERY_CNT, DAY_FEE, INSURANCE, SEND_FEE, ABLE_PRICE, SEND_PRICE, WEEK_YN
