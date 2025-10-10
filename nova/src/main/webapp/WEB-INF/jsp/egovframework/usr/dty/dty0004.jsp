@@ -51,6 +51,8 @@
 		{ headerName: "기상할증", field: "weatherPrimage", minWidth: 90},
 		{ headerName: "추가할증", field: "addPrimage", minWidth: 90},
 		{ headerName: "피크할증 등 ", field: "peakPrimageEtc", minWidth: 90},
+		{ headerName: "지역할증", field: "areaPrimage", minWidth: 90},
+		{ headerName: "대량할증 ", field: "amountPrimage", minWidth: 90},
 		{ headerName: "배달처리비", field: "deliveryPrice", minWidth: 90},
 		{ headerName: "라이더귀책여부", field: "riderCauseYn", minWidth: 90},
 		{ headerName: "추가할증사유", field: "addPrimageDesc", minWidth: 90}

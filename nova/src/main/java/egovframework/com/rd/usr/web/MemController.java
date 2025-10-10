@@ -34,7 +34,6 @@ import egovframework.com.rd.usr.service.vo.DoszSchAccoutCostVO;
 import egovframework.com.rd.usr.service.vo.DoszSchAccoutVO;
 import egovframework.com.rd.usr.service.vo.EtcVO;
 import egovframework.com.rd.usr.service.vo.MyInfoVO;
-import egovframework.com.sec.rgm.service.EgovAuthorGroupService;
 import egovframework.com.uss.umt.service.EgovUserManageService;
 import egovframework.com.uss.umt.service.MberManageVO;
 import egovframework.com.uss.umt.service.UserManageVO;
@@ -68,8 +67,6 @@ public class MemController {
 
 	@Resource(name = "userManageService")
 	private EgovUserManageService userManageService;
-    @Resource(name = "egovAuthorGroupService")
-    private EgovAuthorGroupService egovAuthorGroupService;
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(MemController.class);
 

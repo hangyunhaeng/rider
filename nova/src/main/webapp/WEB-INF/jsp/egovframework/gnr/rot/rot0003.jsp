@@ -95,6 +95,28 @@
         document.form_chk.target = "popupChk";
         document.form_chk.submit();
     }
+
+    function preAct(){
+
+	    const params = new URLSearchParams();
+	    axios.post('${pageContext.request.contextPath}/gnr/rot0003_0000.do', params)
+	        .then(response => {
+	            $('.loading-wrap--js').hide();
+				if(response.data.resultCode == "success"){
+					goAct();
+				} else {
+					if(response.data.resultMsg != '' && response.data.resultMsg != null)
+						alert(response.data.resultMsg);
+					else alert("입금 실패하였습니다");
+					return ;
+				}
+	        })
+	        .catch(error => {
+	            $('.loading-wrap--js').hide();
+	            console.error('Error fetching data:', error);
+	        });
+    }
+
 	function goAct(){
 
 		if("${myInfoVO.mbtlnum}" == "null" || "${myInfoVO.mbtlnum}".trim() == '' ){
@@ -422,7 +444,7 @@
 				<div class="row justify-content-between">
 					<div class="col-auto"></div>
                        <div class="col-auto d-flex">
-                       	<button class="btn btn-primary mb-2 mb-sm-0 mx-1 fs-9" type="submit" onclick="goAct();" >입금하기</button>
+                       	<button class="btn btn-primary mb-2 mb-sm-0 mx-1 fs-9" type="submit" onclick="preAct();" >입금하기</button>
                        </div>
                 </div>
 

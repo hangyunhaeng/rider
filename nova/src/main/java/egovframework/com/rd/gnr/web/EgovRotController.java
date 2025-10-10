@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ibm.icu.util.Calendar;
 
 import org.slf4j.Logger;
 
@@ -552,6 +553,44 @@ public class EgovRotController {
 		model.addAttribute("fee", rotService.selectFeeByMberId(myInfoVO));
         return "egovframework/gnr/rot/rot0003";
 	}
+
+	/**
+	 * 이체 가능여부 조회
+	 * @param request
+	 * @param model
+	 * @return
+	 * @throws Exception
+	 */
+    @RequestMapping("/gnr/rot0003_0000.do")
+    public ResponseEntity<?> rot0003_0000(@ModelAttribute("DayPayVO") DayPayVO dayPayVO, HttpServletRequest request,ModelMap model) throws Exception {
+
+    	//로그인 체크
+        LoginVO user = (LoginVO)EgovUserDetailsHelper.getAuthenticatedUser();
+        Boolean isAuthenticated = EgovUserDetailsHelper.isAuthenticated();
+
+        if(!isAuthenticated) {
+        	return ResponseEntity.status(401).body("Unauthorized");
+        }
+
+        if(!Util.isGnr()) {
+        	return ResponseEntity.status(401).body("Unauthorized");
+        }
+        //return value
+        Map<String, Object> map =  new HashMap<String, Object>();
+
+
+        int time = Calendar.getInstance().get(Calendar.HOUR_OF_DAY);
+
+        if(time > 0 && time < 23) {
+	    	map.put("resultCode", "success");
+        }else {
+			map.put("resultMsg", "이체 시간은 01:00 ~ 23:00 까지입니다.");
+	    	map.put("resultCode", "fail");
+        }
+
+        return ResponseEntity.ok(map);
+	}
+
 	/**
 	 * 선출금 실행
 	 * @param request

@@ -208,8 +208,8 @@ public class DtyServiceImpl extends EgovAbstractServiceImpl implements DtyServic
 				if(!"라이더명".equals(headerList.get(11).trim())) {
 					throw new IllegalArgumentException("엑셀 서식이 다릅니다 [라이더명 : L열]") ;
 				}
-				if(!"배달처리비".equals(headerList.get(31).trim())) {
-					throw new IllegalArgumentException("엑셀 서식이 다릅니다 [배달처리비 : AF열]") ;
+				if(!"배달처리비".equals(headerList.get(33).trim())) {
+					throw new IllegalArgumentException("엑셀 서식이 다릅니다 [배달처리비 : AH열]") ;
 				}
 
 
@@ -248,9 +248,11 @@ public class DtyServiceImpl extends EgovAbstractServiceImpl implements DtyServic
 		            	deliveryInfoVO.setWeatherPrimage(Integer.parseInt(row.get(28)) );
 		            	deliveryInfoVO.setAddPrimage(Integer.parseInt(row.get(29)) );
 		            	deliveryInfoVO.setPeakPrimageEtc(Integer.parseInt(row.get(30)) );
-		            	deliveryInfoVO.setDeliveryPrice(Integer.parseInt(row.get(31)) );
-		            	deliveryInfoVO.setRiderCauseYn(row.get(32));
-		            	deliveryInfoVO.setAddPrimageDesc(row.get(33));
+		            	deliveryInfoVO.setAreaPrimage(Integer.parseInt(row.get(31)));
+		            	deliveryInfoVO.setAmountPrimage(Integer.parseInt(row.get(32)));
+		            	deliveryInfoVO.setDeliveryPrice(Integer.parseInt(row.get(33)) );
+		            	deliveryInfoVO.setRiderCauseYn(row.get(34));
+		            	deliveryInfoVO.setAddPrimageDesc(row.get(35));
 		            	deliveryInfoVO.setNote("");
 		            	deliveryInfoVO.setAtchFileId(atchFileId);
 		            	deliveryInfoVO.setCreatId(user.getId());
@@ -3168,10 +3170,13 @@ public class DtyServiceImpl extends EgovAbstractServiceImpl implements DtyServic
 		    		citVo.setWeekId(baseVo.getWeekId());
 		    		citVo.setCreatId(user.getId());
 		    		dtyDAO.insertCooperatorProfit(citVo);
+
+    	    		//협력사 잔액 조정
+    	    		setBalance(baseVo.getCooperatorId(), EgovProperties.getProperty("Globals.cooperatorId"), EgovProperties.getProperty("Globals.cooperatorId"), user.getId(), new BigDecimal(0), managementCost);
 	        	}
 
 	        	//5. 협력사 -입금 (사업주부담고용보험료)
-	        	if(ownerEmploymentInsurance.compareTo(new BigDecimal(0)) > 0) {
+	        	if(ownerEmploymentInsurance.compareTo(new BigDecimal(0)) != 0) {
 		    		ProfitVO citVo = new ProfitVO();
 		    		citVo.setCoofitId(egovCitIdGnrService.getNextStringId());
 		    		citVo.setCooperatorId(baseVo.getCooperatorId());	//협력사
@@ -3186,10 +3191,13 @@ public class DtyServiceImpl extends EgovAbstractServiceImpl implements DtyServic
 		    		citVo.setWeekId(baseVo.getWeekId());
 		    		citVo.setCreatId(user.getId());
 		    		dtyDAO.insertCooperatorProfit(citVo);
+
+    	    		//협력사 잔액 조정
+    	    		setBalance(baseVo.getCooperatorId(), EgovProperties.getProperty("Globals.cooperatorId"), EgovProperties.getProperty("Globals.cooperatorId"), user.getId(), new BigDecimal(0), new BigDecimal(ownerEmploymentInsurance.intValue()*-1));
 	        	}
 
 	        	//6. 협력사 -입금 (사업주부담산재보험료)
-	        	if(ownerIndustrialInsurance.compareTo(new BigDecimal(0)) > 0) {
+	        	if(ownerIndustrialInsurance.compareTo(new BigDecimal(0)) != 0) {
 		    		ProfitVO citVo = new ProfitVO();
 		    		citVo.setCoofitId(egovCitIdGnrService.getNextStringId());
 		    		citVo.setCooperatorId(baseVo.getCooperatorId());	//협력사
@@ -3204,9 +3212,10 @@ public class DtyServiceImpl extends EgovAbstractServiceImpl implements DtyServic
 		    		citVo.setWeekId(baseVo.getWeekId());
 		    		citVo.setCreatId(user.getId());
 		    		dtyDAO.insertCooperatorProfit(citVo);
+
+    	    		//협력사 잔액 조정
+    	    		setBalance(baseVo.getCooperatorId(), EgovProperties.getProperty("Globals.cooperatorId"), EgovProperties.getProperty("Globals.cooperatorId"), user.getId(), new BigDecimal(0), new BigDecimal(ownerIndustrialInsurance.intValue()*-1));
 	        	}
-
-
 
 	        }
 

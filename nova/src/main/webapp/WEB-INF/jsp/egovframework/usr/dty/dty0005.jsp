@@ -52,6 +52,8 @@
 		{ headerName: "기상할증", field: "weatherPrimage", minWidth: 90, cellClass: 'ag-cell-right', valueGetter:(params) => { return currencyFormatter(params.data.weatherPrimage)}},
 		{ headerName: "추가할증", field: "addPrimage", minWidth: 90, cellClass: 'ag-cell-right', valueGetter:(params) => { return currencyFormatter(params.data.addPrimage)}},
 		{ headerName: "피크할증 등 ", field: "peakPrimageEtc", minWidth: 90, cellClass: 'ag-cell-right', valueGetter:(params) => { return currencyFormatter(params.data.peakPrimageEtc)}},
+		{ headerName: "지역할증", field: "areaPrimage", minWidth: 90, cellClass: 'ag-cell-right', valueGetter:(params) => { return currencyFormatter(params.data.areaPrimage)}},
+		{ headerName: "대량할증 ", field: "amountPrimage", minWidth: 90, cellClass: 'ag-cell-right', valueGetter:(params) => { return currencyFormatter(params.data.amountPrimage)}},
 		{ headerName: "배달처리비", field: "deliveryPrice", minWidth: 90, cellClass: 'ag-cell-right', valueGetter:(params) => { return currencyFormatter(params.data.deliveryPrice)}},
 		{ headerName: "라이더귀책여부", field: "riderCauseYn", minWidth: 90},
 		{ headerName: "추가할증사유", field: "addPrimageDesc", minWidth: 90}
@@ -339,6 +341,8 @@
 						, weatherPrimage: 0
 						, addPrimage: 0
 						, peakPrimageEtc: 0
+						, areaPrimage: 0
+						, amountPrimage: 0
 						, deliveryPrice: 0
 						}
 					];
@@ -354,6 +358,8 @@
 						, weatherPrimage: response.data.list.reduce((acc, num) => Number(acc, 10) + Number(num.weatherPrimage, 10), 0)
 						, addPrimage: response.data.list.reduce((acc, num) => Number(acc, 10) + Number(num.addPrimage, 10), 0)
 						, peakPrimageEtc: response.data.list.reduce((acc, num) => Number(acc, 10) + Number(num.peakPrimageEtc, 10), 0)
+						, areaPrimage: response.data.list.reduce((acc, num) => Number(acc, 10) + Number(num.areaPrimage, 10), 0)
+						, amountPrimage: response.data.list.reduce((acc, num) => Number(acc, 10) + Number(num.amountPrimage, 10), 0)
 						, deliveryPrice: response.data.list.reduce((acc, num) => Number(acc, 10) + Number(num.deliveryPrice, 10), 0)
 						}
 					];
@@ -410,6 +416,8 @@
 						, weatherPrimage: 0
 						, addPrimage: 0
 						, peakPrimageEtc: 0
+						, areaPrimage: 0
+						, amountPrimage: 0
 						, deliveryPrice: 0
 						}
 					];
@@ -425,6 +433,8 @@
 						, weatherPrimage: response.data.list.reduce((acc, num) => Number(acc, 10) + Number(num.weatherPrimage, 10), 0)
 						, addPrimage: response.data.list.reduce((acc, num) => Number(acc, 10) + Number(num.addPrimage, 10), 0)
 						, peakPrimageEtc: response.data.list.reduce((acc, num) => Number(acc, 10) + Number(num.peakPrimageEtc, 10), 0)
+						, areaPrimage: response.data.list.reduce((acc, num) => Number(acc, 10) + Number(num.areaPrimage, 10), 0)
+						, amountPrimage: response.data.list.reduce((acc, num) => Number(acc, 10) + Number(num.amountPrimage, 10), 0)
 						, deliveryPrice: response.data.list.reduce((acc, num) => Number(acc, 10) + Number(num.deliveryPrice, 10), 0)
 						}
 					];

@@ -96,6 +96,10 @@ public class DeliveryInfoVO extends Sch implements Serializable {
 	private int addPrimage = 0;
 	/* 피크할증 등 */
 	private int peakPrimageEtc = 0;
+	/* 지역할증 */
+	private int areaPrimage = 0;
+	/* 대량할증 */
+	private int amountPrimage = 0;
 	/* 배달처리비 */
 	private int deliveryPrice = 0;
 	/* 라이더귀책여부 */
