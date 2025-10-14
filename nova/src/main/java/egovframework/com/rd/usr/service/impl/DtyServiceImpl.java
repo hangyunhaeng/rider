@@ -951,12 +951,12 @@ public class DtyServiceImpl extends EgovAbstractServiceImpl implements DtyServic
 					try {
 						weekInfoVO.setAccountsStDt( simpleDateFormat.format(rowObj.getCell(1).getDateCellValue()) );
 					}catch(Exception e){
-						weekInfoVO.setAccountsStDt( Util.getOnlyNumberM(rowObj.getCell(1).toString()) );
+						weekInfoVO.setAccountsStDt( Util.getOnlyNumber(rowObj.getCell(1).toString()) );
 					}
 					try {
 						weekInfoVO.setAccountsEdDt( simpleDateFormat.format(rowObj.getCell(2).getDateCellValue()) );
 					}catch(Exception e){
-						weekInfoVO.setAccountsEdDt( Util.getOnlyNumberM(rowObj.getCell(2).toString()) );
+						weekInfoVO.setAccountsEdDt( Util.getOnlyNumber(rowObj.getCell(2).toString()) );
 					}
 					weekInfoVO.setDeliveryCost(new BigDecimal( Util.getOnlyNumberM(getValue(rowObj.getCell(3)))));
 					weekInfoVO.setAddAccounts(new BigDecimal( Util.getOnlyNumberM(getValue(rowObj.getCell(4)))));
