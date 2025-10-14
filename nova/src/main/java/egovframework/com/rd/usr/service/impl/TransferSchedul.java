@@ -153,7 +153,8 @@ public class TransferSchedul extends EgovAbstractServiceImpl {
 		    		        //선입금 완료시 협력사 잔액 조정
 		            		tranResult.setCooperatorMberId(EgovProperties.getProperty("Globals.cooperatorId"));
 		    		        dtyDAO.updateBalanceDayTran(tranResult);
-
+		    		        //선입금 완료시 영업사원 잔액 조정
+		    		        dtyDAO.updateBalanceSalesDayTran(tranResult);
 
 
 		            	} else {
@@ -180,6 +181,7 @@ public class TransferSchedul extends EgovAbstractServiceImpl {
 		            		dtyDAO.deleteProfitByCoop(tranResult);
 
 		            		//영업사원
+		            		payDAO.updateBalanceSalesPayByTransfer(tranResult);
 		            		payDAO.updateSalesPayByTransfer(tranResult);
 		            	}
 		            }

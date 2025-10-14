@@ -8,23 +8,28 @@
 			SELECT ROWNUM() RN,m.*
 			FROM (
 		</if>
-				SELECT a.COOPERATOR_ID, a.ESNTL_ID, b.mber_id, a.DAY
+				SELECT a.COOPERATOR_ID, a.ESNTL_ID, a.DAY
 				<![CDATA[
 					, if(a.BALANCE1 <0 , BALANCE0+BALANCE1, BALANCE0) AS BALANCE0 , if(a.BALANCE1 <0 , 0, BALANCE1) AS BALANCE1
 					, if(a.ABLE_BALANCE1 <0 , ABLE_BALANCE0+ABLE_BALANCE1, ABLE_BALANCE0) AS ABLE_BALANCE0 , if(a.ABLE_BALANCE1 <0 , 0, ABLE_BALANCE1) AS ABLE_BALANCE1
 				]]>
-					, b.MBER_NM, c.COOPERATOR_NM
-					, if(a.ESNTL_ID = #{cooperatorMberId}, '협력사', '라이더') AS GUBUN_NM
+					, if(a.COOPERATOR_ID = #{cooperatorMberId}, d.USER_NM,b.MBER_NM) AS MBER_NM, c.COOPERATOR_NM
+					, if(a.COOPERATOR_ID = #{cooperatorMberId}, d.EMPLYR_ID,b.mber_id) AS mber_id
+					, if(a.ESNTL_ID = #{cooperatorMberId}, '협력사', if(a.COOPERATOR_ID = #{cooperatorMberId}, '영업사원','라이더')) AS GUBUN_NM
+
 				FROM RD_BALANCE_CONFIRM a
 				LEFT JOIN COMTNGNRLMBER b ON a.ESNTL_ID = b.ESNTL_ID
 				LEFT JOIN RD_COOPERATOR c ON a.COOPERATOR_ID = c.COOPERATOR_ID
 				LEFT JOIN COMTNEMPLYRINFO d ON a.ESNTL_ID = d.ESNTL_ID
 				WHERE DAY BETWEEN #{searchFromDate} AND #{searchToDate}
 				<if test='searchCooperatorId != "all" and searchGubun == "R"'>
-				AND a.ESNTL_ID != #{cooperatorMberId}
+					AND a.ESNTL_ID != #{cooperatorMberId} AND a.COOPERATOR_ID != #{cooperatorMberId}
+				</if>
+				<if test='searchCooperatorId != "all" and searchGubun == "S"'>
+					AND a.COOPERATOR_ID = #{cooperatorMberId}
 				</if>
 				<if test='searchCooperatorId != "all" and searchGubun == "C"'>
-				AND a.ESNTL_ID = #{cooperatorMberId}
+					AND a.ESNTL_ID = #{cooperatorMberId}
 				</if>
 
 		<if test="schIdx !=0 and schPagePerCnt != 0">
@@ -221,7 +226,7 @@
 				AND a.USE_AT ='Y'
 				GROUP BY a.COOPERATOR_ID, a.DELIVERY_DAY, a.GUBUN, a.MBER_ID
 			) tab
-			GROUP BY tab.COOPERATOR_ID, tab.DELIVERY_DAY
+			GROUP BY tab.COOPERATOR_ID, tab.DELIVERY_DAY, tab.MBER_ID
 		) tab
 		LEFT JOIN RD_COOPERATOR a ON tab.COOPERATOR_ID = a.COOPERATOR_ID
 		LEFT JOIN COMTNGNRLMBER b ON tab.MBER_ID = b.MBER_ID

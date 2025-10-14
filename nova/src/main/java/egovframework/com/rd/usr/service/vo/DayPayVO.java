@@ -93,6 +93,7 @@ public class DayPayVO extends Sch implements Serializable {
 	private int feeSalesmanCost;
 	//영업사원 id
 	private String emplyrId;
+	private String salesEsntlId;
 
 	//라인수
 	private int rnum;

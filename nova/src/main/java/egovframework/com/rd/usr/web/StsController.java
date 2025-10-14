@@ -21,10 +21,8 @@ import egovframework.com.cmm.LoginVO;
 import egovframework.com.cmm.service.EgovProperties;
 import egovframework.com.cmm.util.EgovUserDetailsHelper;
 import egovframework.com.rd.Util;
-import egovframework.com.rd.usr.service.NotService;
 import egovframework.com.rd.usr.service.StsService;
 import egovframework.com.rd.usr.service.vo.BalanceVO;
-import egovframework.com.rd.usr.service.vo.NoticeVO;
 import egovframework.com.rd.usr.service.vo.StsVO;
 
 /**

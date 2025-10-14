@@ -235,6 +235,7 @@
 								<option value="all">전체</option>
 								<option value="R">라이더</option>
 								<option value="C">협력사</option>
+								<option value="S">영업사원</option>
 							</select>
 						</td>
 					</tr>

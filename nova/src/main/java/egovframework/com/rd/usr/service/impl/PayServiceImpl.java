@@ -333,7 +333,7 @@ public class PayServiceImpl extends EgovAbstractServiceImpl implements PayServic
 
 
 		//영업사원 잔액 조정
-//		setBalance(vo.getCooperatorId(), EgovProperties.getProperty("Globals.cooperatorId"), user.getId(), new BigDecimal(0), new BigDecimal((inputPrice+sendFee)*-1));
+		dtyService.setBalance(EgovProperties.getProperty("Globals.cooperatorId"), user.getUniqId(), user.getId(), user.getId(), new BigDecimal(0), new BigDecimal((inputPrice+sendFee)*-1));
 
 		MyInfoVO bankInfo = rotService.selectMyInfo(myInfoVO);
 		DoszTransferVO doszTransferVO = new DoszTransferVO();
@@ -382,7 +382,7 @@ public class PayServiceImpl extends EgovAbstractServiceImpl implements PayServic
 		payDAO.selectForUPdateSalesBalanceByTran(vo);
 
 		// 잔액 조정
-//		payDAO.updateBalanceCooperatorPayByTransfer(vo);
+		payDAO.updateBalanceSalesPayByTransfer(vo);
 
 		payDAO.updateSalesPayByTransfer(vo);
 	}

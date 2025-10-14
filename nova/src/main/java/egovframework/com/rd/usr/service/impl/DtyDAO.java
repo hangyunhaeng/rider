@@ -444,8 +444,8 @@ public class DtyDAO extends EgovComAbstractDAO {
 	 * @return
 	 * @throws Exception
 	 */
-	public BalanceVO selectForUpdateBalanceDayTran(DoszTransferVO vo)throws Exception {
-		return selectOne("dtyDAO.selectForUpdateBalanceDayTran", vo);
+	public List<BalanceVO> selectForUpdateBalanceDayTran(DoszTransferVO vo)throws Exception {
+		return selectList("dtyDAO.selectForUpdateBalanceDayTran", vo);
 	}
 	/**
 	 * 선출금 성공시 협력사 잔액 +
@@ -455,6 +455,16 @@ public class DtyDAO extends EgovComAbstractDAO {
 	 */
 	public int updateBalanceDayTran(DoszTransferVO vo)throws Exception {
 		return update("dtyDAO.updateBalanceDayTran", vo);
+	}
+
+	/**
+	 * 선출금 성공시 영업사원 잔액 +
+	 * @param vo
+	 * @return
+	 * @throws Exception
+	 */
+	public int updateBalanceSalesDayTran(DoszTransferVO vo)throws Exception {
+		return update("dtyDAO.updateBalanceSalesDayTran", vo);
 	}
 	/**
 	 * 선출금 성공시 협력사 선출금 수수료 금액 조회

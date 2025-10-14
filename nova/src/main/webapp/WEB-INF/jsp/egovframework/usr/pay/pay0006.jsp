@@ -240,7 +240,7 @@
 		var feeAdminstrator = $(obj).closest('tr').find('input[name=feeAdminstrator]').val()
 		var cost = $(obj).closest('tr').find('input[name=cost]').val().replace(/[^0-9]/g, '').replace(/(\..*)\./g, '$1');
 
-		$(obj).closest('tr').find('sm[name=dayFee]').html('&nbsp;&nbsp;선지급 - '+currencyFormatter(Math.ceil(cost*feeAdminstrator*0.01))+'원')
+		$(obj).closest('tr').find('sm[name=dayFee]').html('&nbsp;&nbsp;선지급 - '+currencyFormatter(Math.ceil((cost*feeAdminstrator*0.01).toFixed(5)))+'원')
 	}
 
 

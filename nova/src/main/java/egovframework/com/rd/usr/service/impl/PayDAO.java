@@ -244,6 +244,16 @@ public class PayDAO extends EgovComAbstractDAO {
 	public int updateBalanceCooperatorPayByTransfer(DoszTransferVO vo) throws Exception {
 		return update("payDAO.updateBalanceCooperatorPayByTransfer", vo);
 	}
+
+	/**
+	 * 영업사원 잔액 보정
+	 * @param vo
+	 * @return
+	 * @throws Exception
+	 */
+	public int updateBalanceSalesPayByTransfer(DoszTransferVO vo) throws Exception {
+		return update("payDAO.updateBalanceSalesPayByTransfer", vo);
+	}
 	/**
 	 * 협력사 출금 리스트
 	 * @param vo

@@ -97,5 +97,8 @@ public class WeekPayVO extends Sch implements Serializable {
 	private int feeCooperatorCallCost; /*협력사  콜수수료*/
 	private int feeProgramCost; /* 전체 프로그램료 */
 	private int feeProgramSalesmanCost; /* 영업사원 프로그램료 */
+
+	//영업사원 id
 	private String emplyrId;
+	private String salesEsntlId;
 }

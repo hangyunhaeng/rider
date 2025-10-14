@@ -82,28 +82,54 @@ public class BalanceConfirmSchedul extends EgovAbstractServiceImpl {
 			for(int i = 0 ; i < list.size() ; i++) {
 				BalanceVO one = list.get(i);
 				if(!EgovProperties.getProperty("Globals.cooperatorId").equals(one.getEsntlId())) {
+					if(EgovProperties.getProperty("Globals.cooperatorId").equals(one.getCooperatorId())) {
 
-					//라이더 실시간 잔액 조회
-					MyInfoVO myInfoVO = new MyInfoVO();
-					myInfoVO.setSearchCooperatorId(one.getCooperatorId());
-					myInfoVO.setMberId(one.getMberId());
-					MyInfoVO balanceAble = rotDAO.selectAblePrice(myInfoVO);
+						//영업사원 실시간 잔액 조회
+						MyInfoVO myInfoVO = new MyInfoVO();
+						myInfoVO.setEmplyrId(one.getMberId());
+						MyInfoVO balanceAble = payDAO.salesAblePrice(myInfoVO);
 
-					//라이더 잔액 DB조회
-					BalanceVO balanceTable = dtyDAO.selectBalanceById(one);
 
-					if(balanceTable != null) {
-						//라이더 잔액 검증 테이블 insert
-						BalanceVO BalanceConfirm = new BalanceVO();
-						BalanceConfirm.setCooperatorId(one.getCooperatorId());
-//						BalanceConfirm.setMberId(one.getMberId());
-						BalanceConfirm.setEsntlId(one.getEsntlId());
-						BalanceConfirm.setDay(Util.getDay());
-						BalanceConfirm.setBalance0(balanceTable.getBalance0());
-						BalanceConfirm.setBalance1(balanceTable.getBalance1());
-						BalanceConfirm.setAbleBalance0(balanceAble.getBalanceDayAblePrice() );
-						BalanceConfirm.setAbleBalance1(balanceAble.getBalanceWeekAblePrice() );
-						payDAO.insertBalanceConfirm(BalanceConfirm);
+						//영업사원 잔액 DB조회
+						BalanceVO balanceTable = dtyDAO.selectBalanceById(one);
+
+						if(balanceTable != null) {
+							//영업사원 잔액 검증 테이블 insert
+							BalanceVO BalanceConfirm = new BalanceVO();
+							BalanceConfirm.setCooperatorId(one.getCooperatorId());
+							BalanceConfirm.setEsntlId(one.getEsntlId());
+							BalanceConfirm.setDay(Util.getDay());
+							BalanceConfirm.setBalance0(balanceTable.getBalance0());
+							BalanceConfirm.setBalance1(balanceTable.getBalance1());
+							BalanceConfirm.setAbleBalance0(new BigDecimal(0) );
+							BalanceConfirm.setAbleBalance1( new BigDecimal(balanceAble.getSalesAblePrice()) );
+							payDAO.insertBalanceConfirm(BalanceConfirm);
+						}
+
+					} else {
+
+						//라이더 실시간 잔액 조회
+						MyInfoVO myInfoVO = new MyInfoVO();
+						myInfoVO.setSearchCooperatorId(one.getCooperatorId());
+						myInfoVO.setMberId(one.getMberId());
+						MyInfoVO balanceAble = rotDAO.selectAblePrice(myInfoVO);
+
+						//라이더 잔액 DB조회
+						BalanceVO balanceTable = dtyDAO.selectBalanceById(one);
+
+						if(balanceTable != null) {
+							//라이더 잔액 검증 테이블 insert
+							BalanceVO BalanceConfirm = new BalanceVO();
+							BalanceConfirm.setCooperatorId(one.getCooperatorId());
+	//						BalanceConfirm.setMberId(one.getMberId());
+							BalanceConfirm.setEsntlId(one.getEsntlId());
+							BalanceConfirm.setDay(Util.getDay());
+							BalanceConfirm.setBalance0(balanceTable.getBalance0());
+							BalanceConfirm.setBalance1(balanceTable.getBalance1());
+							BalanceConfirm.setAbleBalance0(balanceAble.getBalanceDayAblePrice() );
+							BalanceConfirm.setAbleBalance1(balanceAble.getBalanceWeekAblePrice() );
+							payDAO.insertBalanceConfirm(BalanceConfirm);
+						}
 					}
 
 				} else {

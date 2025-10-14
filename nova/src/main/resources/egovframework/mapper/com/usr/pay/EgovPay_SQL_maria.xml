@@ -207,6 +207,48 @@
 							WHERE STATUS = '400'
 							AND error_code IN ('VTIM', '0011')
 					)
+
+
+					UNION
+
+
+					/*영업사원 선입금 수수료 */
+					SELECT #{cooperatorMberId} AS COOPERATOR_ID, c.ESNTL_ID FROM RD_DAY_PAY a
+					JOIN RD_SALES_PROFIT b ON a.DYP_ID = b.DYP_ID
+					JOIN COMTNEMPLYRINFO c ON b.EMPLYR_ID = c.EMPLYR_ID
+					WHERE (a.TELEGRAM_NO, a.TRAN_DAY) IN (
+
+							SELECT TELEGRAM_NO, TRAN_DAY FROM RD_TRANSFER
+							WHERE STATUS = '999'
+
+							UNION ALL
+
+							SELECT TELEGRAM_NO, TRAN_DAY FROM RD_TRANSFER
+							WHERE STATUS = '400'
+							AND error_code IN ('VTIM', '0011')
+					)
+					GROUP BY a.COOPERATOR_ID, c.ESNTL_ID
+
+
+					UNION
+
+
+					/*영업사원 선입금 수수료 */
+					SELECT #{cooperatorMberId} AS COOPERATOR_ID, c.ESNTL_ID FROM RD_COOPERATOR_PAY a
+					JOIN RD_SALES_PROFIT b ON a.COP_ID = b.COP_ID
+					JOIN COMTNEMPLYRINFO c ON b.EMPLYR_ID = c.EMPLYR_ID
+					WHERE (a.TELEGRAM_NO, a.TRAN_DAY) IN (
+
+							SELECT TELEGRAM_NO, TRAN_DAY FROM RD_TRANSFER
+							WHERE STATUS = '999'
+
+							UNION ALL
+
+							SELECT TELEGRAM_NO, TRAN_DAY FROM RD_TRANSFER
+							WHERE STATUS = '400'
+							AND error_code IN ('VTIM', '0011')
+					)
+					GROUP BY a.COOPERATOR_ID
 				)
 		FOR UPDATE
 	</select>
@@ -444,10 +486,10 @@
 
 		SELECT SUM(day_plus) - SUM(day_minus) AS SALES_ABLE_PRICE
 		FROM (
-			SELECT NVL(sum(if(a.gubun = 'C' OR a.gubun = 'E' OR a.gubun = 'B' OR a.gubun = 'O' OR a.gubun = 'P' OR (a.gubun = 'D' AND c.status_cd = '0000' AND c.STATUS = '200'), cost, 0)), 0) DAY_PLUS	/*선지급금은 이체완료건만 산정*/
+			SELECT NVL(sum(if(a.gubun = 'C' OR a.gubun = 'P' OR (a.gubun = 'D' AND c.status_cd = '0000' AND c.STATUS = '200'), cost, 0)), 0) DAY_PLUS	/*선지급금은 이체완료건만 산정*/
 			, 0 DAY_MINUS
 			FROM RD_SALES_PROFIT a
-			JOIN RD_DAY_PAY b  ON a.DYP_ID = b.DYP_ID AND b.USE_AT ='Y'
+			LEFT JOIN RD_DAY_PAY b  ON a.DYP_ID = b.DYP_ID AND b.USE_AT ='Y'
 			LEFT JOIN RD_TRANSFER c ON b.TRAN_DAY = c.TRAN_DAY AND b.TELEGRAM_NO = c.TELEGRAM_NO
 			JOIN COMTNEMPLYRINFO d ON a.EMPLYR_ID = d.EMPLYR_ID
 			JOIN COMTNEMPLYRSCRTYESTBS e ON d.ESNTL_ID = e.SCRTY_DTRMN_TRGET_ID
@@ -458,7 +500,7 @@
 
 			UNION all
 
-			SELECT NVL(sum(if(a.gubun = 'C' OR a.gubun = 'E' OR a.gubun = 'B' OR a.gubun = 'O' OR a.gubun = 'P' OR (a.gubun = 'D' AND c.status_cd = '0000' AND c.STATUS = '200'), cost, 0)), 0) DAY_PLUS	/*선지급금은 이체완료건만 산정*/
+			SELECT NVL(sum(if(a.gubun = 'C' OR a.gubun = 'P' OR (a.gubun = 'D' AND c.status_cd = '0000' AND c.STATUS = '200'), cost, 0)), 0) DAY_PLUS	/*선지급금은 이체완료건만 산정*/
 			, 0 DAY_MINUS
 			FROM RD_SALES_PROFIT a
 			JOIN RD_COOPERATOR_PAY b  ON a.COP_ID = b.COP_ID AND b.USE_AT ='Y'
@@ -532,6 +574,18 @@
 				WHERE TRAN_DAY = #{tranDay} AND  TELEGRAM_NO = #{telegram_no} AND USE_AT ='Y'
 		)b
 		SET BALANCE1 = BALANCE1 + if(week_yn =  'Y', SUM_COST, 0 )
+		WHERE a.COOPERATOR_ID = b.COOPERATOR_ID
+		AND a.ESNTL_ID = b.ESNTL_ID
+	</update>
+
+	<update id="updateBalanceSalesPayByTransfer" parameterType="egovframework.com.rd.usr.service.vo.DoszTransferVO">
+		UPDATE RD_BALANCE a, (
+				SELECT #{cooperatorMberId} AS COOPERATOR_ID, b.ESNTL_ID , SEND_FEE+SEND_PRICE AS SUM_COST
+				FROM RD_SALES_PAY a
+				JOIN COMTNEMPLYRINFO b ON a.EMPLYR_ID = b.EMPLYR_ID
+				WHERE TRAN_DAY = #{tranDay} AND  TELEGRAM_NO = #{telegram_no} AND USE_AT ='Y'
+		)b
+		SET BALANCE1 = BALANCE1 + SUM_COST
 		WHERE a.COOPERATOR_ID = b.COOPERATOR_ID
 		AND a.ESNTL_ID = b.ESNTL_ID
 	</update>
@@ -844,7 +898,7 @@
 	</select>
 
 	<select id="selectBalanceConfirmTarget" parameterType="egovframework.com.rd.usr.service.vo.Sch" resultType="egovframework.com.rd.usr.service.vo.BalanceVO">
-		SELECT b.COOPERATOR_ID, b.mber_id, c.ESNTL_ID
+		SELECT b.COOPERATOR_ID, b.MBER_ID, c.ESNTL_ID
 		FROM RD_COOPERATOR a
 		LEFT JOIN RD_COOPERATOR_RIDER_CONNECT b ON a.COOPERATOR_ID = b.COOPERATOR_ID
 		JOIN COMTNGNRLMBER c ON b.MBER_ID = c.MBER_ID
@@ -853,9 +907,14 @@
 
 		UNION ALL
 
-		SELECT COOPERATOR_ID, #{cooperatorMberId} AS mber_id, #{cooperatorMberId} AS ESNTL_ID
+		SELECT COOPERATOR_ID, #{cooperatorMberId} AS MBER_ID, #{cooperatorMberId} AS ESNTL_ID
 		FROM RD_COOPERATOR
 		WHERE USE_AT = 'Y'
+		UNION ALL
+
+		SELECT #{cooperatorMberId} AS COOPERATOR_ID, a.EMPLYR_ID AS MBER_ID, a.ESNTL_ID
+		FROM COMTNEMPLYRINFO a
+		JOIN COMTNEMPLYRSCRTYESTBS b ON a.ESNTL_ID = b.SCRTY_DTRMN_TRGET_ID AND b.author_code ='ROLE_SALES'
 	</select>
 	<insert id="insertBalanceConfirm" parameterType="egovframework.com.rd.usr.service.vo.BalanceVO">
 		INSERT INTO RD_BALANCE_CONFIRM

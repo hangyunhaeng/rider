@@ -37,7 +37,6 @@
 			$('.mx-lg-n4').find('input').attr('disabled', true);
 		}
 
-		debugger;
 		$('#dayAblePrice').html(currencyFormatter(minWon0(${ablePrice.dayAblePrice}))+"원");
 		$('#weekAblePrice').html(currencyFormatter(minWon0(${ablePrice.weekAblePrice}))+"원");
 		$('#sendFee').html(currencyFormatter(sendFee));
@@ -83,7 +82,7 @@
 
 		//선지급수수료
 		if("${myInfoVOData.gubun}" == "DAY"){
-			$('#dayFee').html(currencyFormatter(Math.ceil(dayPrice*${fee.feeAdminstrator})));
+			$('#dayFee').html(currencyFormatter(Math.ceil((dayPrice*${fee.feeAdminstrator}).toFixed(5))));
 		}
 	}
 

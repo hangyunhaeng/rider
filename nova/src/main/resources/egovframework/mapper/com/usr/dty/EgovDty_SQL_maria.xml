@@ -515,7 +515,7 @@
 	, tab.fee_cooperator_call
 	, tab.DW_GUBUN, tab.IO_GUBUN, tab.GIVE_PAY
 	, tab.ABLE_PRICE - (cnt -delivery_cnt) *FEE_CALL - (cnt -delivery_cnt)*FEE_PROGRAM AS ABLE_PRICE, tab.CALL_FEE_COST, tab.PROGRAM_FEE_COST
-	, tab.FEE, tab.ACCOUNTS_ST_DT, tab.ACCOUNTS_ED_DT, tab.ATCH_FILE_ID, tab.USE_AT, tab.ESNTL_ID, tab.EMPLYR_ID
+	, tab.FEE, tab.ACCOUNTS_ST_DT, tab.ACCOUNTS_ED_DT, tab.ATCH_FILE_ID, tab.USE_AT, tab.ESNTL_ID, tab.EMPLYR_ID, tab.SALES_ESNTL_ID
 	, (cnt -delivery_cnt) *FEE_CALL AS FEE_CALL_COST	/* 전체 콜수수료 */
 	, FLOOR(((cnt -delivery_cnt) *FEE_CALL)*FEE_COOPERATOR_CALL*0.01) AS FEE_COOPERATOR_CALL_COST /*협력사  콜수수료*/
 	, (cnt -delivery_cnt)*FEE_PROGRAM AS FEE_PROGRAM_COST /* 전체 프로그램료 */
@@ -528,7 +528,7 @@
 			, nvl(e.fee_cooperator_call , g.fee_cooperator_call) AS fee_cooperator_call
 			,'WEK' AS DW_GUBUN, '1' AS IO_GUBUN, b.GIVE_PAY
 			, b.GIVE_PAY - nvl(d.CALL_FEE_COST, 0) - nvl(d.PROGRAM_FEE_COST, 0) AS ABLE_PRICE, d.CALL_FEE_COST, d.PROGRAM_FEE_COST
-			, 0 AS FEE, a.ACCOUNTS_ST_DT, a.ACCOUNTS_ED_DT, a.ATCH_FILE_ID, 'Y' AS USE_AT, d.ESNTL_ID, i.EMPLYR_ID
+			, 0 AS FEE, a.ACCOUNTS_ST_DT, a.ACCOUNTS_ED_DT, a.ATCH_FILE_ID, 'Y' AS USE_AT, d.ESNTL_ID, i.EMPLYR_ID, j.ESNTL_ID AS SALES_ESNTL_ID
 			FROM RD_WEEK_INFO a
 				LEFT JOIN RD_WEEK_RIDER_INFO b on a.WEEK_ID = b.week_id
 				LEFT JOIN COMTNGNRLMBER c ON b.mber_id = c.mber_id
@@ -566,6 +566,7 @@
 				LEFT JOIN RD_COOPERATOR_FEE g ON a.COOPERATOR_ID = g.COOPERATOR_ID AND g.use_at ='Y' -- 일정산 수수료 이력이 없을 시 최근 수수료 기준으로 책정
 				LEFT JOIN RD_RIDER_FEE h ON a.COOPERATOR_ID = h.COOPERATOR_ID  AND b.MBER_ID = h.MBER_ID AND  h.use_at ='Y'
 				LEFT JOIN RD_COOPERATOR_SALES i ON a.COOPERATOR_ID = i.COOPERATOR_ID AND i.use_AT ='Y'
+				LEFT JOIN COMTNEMPLYRINFO j ON i.EMPLYR_ID = j.EMPLYR_ID
 			WHERE 1=1
 				AND b.FIX_DAY is null
 				AND d.USE_AT ='Y'
@@ -705,7 +706,7 @@
 			, 'N' AS WEEK_YN, 'Y' AS USE_AT, ATCH_FILE_ID AS DAY_ATCH_FILE_ID, FEE_CALL_COST, FEE_PROGRAM_COST, FEE_PROGRAM_SALESMAN_COST, DELIVERY_CNT, FEE_ID, RIDER_FEE_ID
 			/*협력사 수익: 콜수수료*/
 			, FLOOR(FEE_CALL_COST*FEE_COOPERATOR_CALL) AS FEE_COOPERATOR_CALL_COST
-			, COOPERATOR_NM, EMPLYR_ID
+			, COOPERATOR_NM, EMPLYR_ID, SALES_ESNTL_ID
 			FROM
 			(
 				SELECT fee_tab.*
@@ -731,7 +732,7 @@
 					, nvl(b.FEE_PROGRAM_SALESMAN, 0) AS FEE_PROGRAM_SALESMAN /* 영업사원 프로그램료(원) */
 					, a.COOPERATOR_ID, a.MBER_ID,a.RUN_DE AS DAY, SUM(a.DELIVERY_PRICE) AS DELIVERY_PRICE, SUM(if(a.DELIVERY_STATE = TRIM('전달완료'), 1, 0)) DELIVERY_CNT
 					, b.FEE_ID, c.RIDER_FEE_ID, b.FEE_COOPERATOR_CALL*0.01 AS FEE_COOPERATOR_CALL
-					, a.ATCH_FILE_ID, d.ESNTL_ID, f.COOPERATOR_NM, g.EMPLYR_ID
+					, a.ATCH_FILE_ID, d.ESNTL_ID, f.COOPERATOR_NM, g.EMPLYR_ID, h.ESNTL_ID AS SALES_ESNTL_ID
 					FROM RD_DELIVERY_INFO a
 					LEFT JOIN RD_COOPERATOR_FEE b ON a.COOPERATOR_ID = b.COOPERATOR_ID AND b.use_at ='Y'
 					LEFT JOIN RD_RIDER_FEE c ON a.COOPERATOR_ID = c.COOPERATOR_ID  AND a.MBER_ID = c.MBER_ID AND  c.use_at ='Y'
@@ -739,6 +740,7 @@
 					JOIN COMTNFILE e ON a.ATCH_FILE_ID = e.ATCH_FILE_ID
 					LEFT JOIN RD_COOPERATOR f ON a.COOPERATOR_ID = f.COOPERATOR_ID
 					LEFT JOIN RD_COOPERATOR_SALES g ON a.COOPERATOR_ID = g.COOPERATOR_ID AND g.use_AT ='Y'
+					LEFT JOIN COMTNEMPLYRINFO h ON g.EMPLYR_ID = h.EMPLYR_ID
 					WHERE 1 = 1
 						AND e.USE_AT ='Y'
 						AND a.RUN_DE BETWEEN #{searchFromDate} AND #{searchToDate}
@@ -1191,6 +1193,17 @@
 			AND a.USE_AT ='Y'
 			AND b.USE_AT ='Y'
 
+			UNION
+
+			SELECT #{cooperatorMberId} AS COOPERATOR_ID, c.ESNTL_ID FROM RD_COOPERATOR_PAY a, RD_SALES_PROFIT b, COMTNEMPLYRINFO c
+			WHERE a.COP_ID = b.COP_ID
+				AND b.EMPLYR_ID = c.EMPLYR_ID
+				AND (a.TRAN_DAY, a.TELEGRAM_NO) IN  (
+				SELECT TRAN_DAY, TELEGRAM_NO FROM RD_TRANSFER
+				WHERE TRAN_DAY = #{tranDay} AND TELEGRAM_NO = #{telegram_no}
+			)
+			AND a.USE_AT ='Y'
+			AND b.USE_AT ='Y'
 		)
 		FOR UPDATE
 	</select>
@@ -1198,7 +1211,7 @@
 		UPDATE RD_BALANCE a, (
 				SELECT a.cooperator_id, #{cooperatorMberId} AS ESNTL_ID, b.cost
 				FROM RD_DAY_PAY a
-				LEFT JOIN RD_COOPERATOR_PROFIT b ON a.DYP_ID = b.DYP_ID
+				JOIN RD_COOPERATOR_PROFIT b ON a.DYP_ID = b.DYP_ID
 				WHERE (tran_day, telegram_no) IN  (
 					SELECT tran_day, telegram_no FROM RD_TRANSFER
 					WHERE TRAN_DAY = #{tranDay} AND TELEGRAM_NO = #{telegram_no}
@@ -1210,7 +1223,25 @@
 			, a.LAST_UPDUSR_ID = #{lastUpdusrId}
 		WHERE a.COOPERATOR_ID = b.COOPERATOR_ID
 		AND a.ESNTL_ID = b.ESNTL_ID
+	</update>
 
+	<update id="updateBalanceSalesDayTran" parameterType="egovframework.com.rd.usr.service.vo.DoszTransferVO">
+		UPDATE RD_BALANCE a, (
+				SELECT #{cooperatorMberId} AS COOPERATOR_ID, c.ESNTL_ID, b.cost
+				FROM RD_DAY_PAY a
+				JOIN RD_SALES_PROFIT b ON a.DYP_ID = b.DYP_ID
+				JOIN COMTNEMPLYRINFO c ON b.EMPLYR_ID = c.EMPLYR_ID
+				WHERE (TRAN_DAY, TELEGRAM_NO) IN  (
+					SELECT tran_day, telegram_no FROM RD_TRANSFER
+					WHERE TRAN_DAY = #{tranDay} AND TELEGRAM_NO = #{telegram_no}
+				)
+				AND a.USE_AT ='Y'
+			)b
+		set a.BALANCE1 = a.BALANCE1 + b.cost
+			, a.LAST_UPDT_PNTTM = SYSDATE()
+			, a.LAST_UPDUSR_ID = #{lastUpdusrId}
+		WHERE a.COOPERATOR_ID = b.COOPERATOR_ID
+		AND a.ESNTL_ID = b.ESNTL_ID
 	</update>
 
 	<select id="selectBalanceDayTran" parameterType="egovframework.com.rd.usr.service.vo.DoszTransferVO" resultType="egovframework.com.rd.usr.service.vo.ProfitVO">
@@ -1227,6 +1258,19 @@
 			SELECT #{cooperatorMberId} AS COOPERATOR_ID, c.ESNTL_ID, b.COST, TRAN_DAY, TELEGRAM_NO, b.EMPLYR_ID
 			FROM RD_DAY_PAY a, RD_SALES_PROFIT b , COMTNEMPLYRINFO c
 			WHERE a.DYP_ID = b.DYP_ID
+				AND b.EMPLYR_ID = c.EMPLYR_ID
+				AND (a.TRAN_DAY, a.TELEGRAM_NO) IN  (
+				SELECT TRAN_DAY, TELEGRAM_NO FROM RD_TRANSFER
+				WHERE TRAN_DAY = #{tranDay} AND TELEGRAM_NO = #{telegram_no}
+			)
+			AND a.USE_AT ='Y'
+			AND b.USE_AT ='Y'
+
+			UNION
+
+			SELECT #{cooperatorMberId} AS COOPERATOR_ID, c.ESNTL_ID, b.COST, TRAN_DAY, TELEGRAM_NO, b.EMPLYR_ID
+			FROM RD_COOPERATOR_PAY a, RD_SALES_PROFIT b , COMTNEMPLYRINFO c
+			WHERE a.COP_ID = b.COP_ID
 				AND b.EMPLYR_ID = c.EMPLYR_ID
 				AND (a.TRAN_DAY, a.TELEGRAM_NO) IN  (
 				SELECT TRAN_DAY, TELEGRAM_NO FROM RD_TRANSFER
