@@ -1594,10 +1594,11 @@
 	<select id="selectBalanceByCooprator" parameterType="egovframework.com.rd.usr.service.vo.BalanceVO" resultType="egovframework.com.rd.usr.service.vo.BalanceVO">
 		SELECT a.COOPERATOR_ID, a.ESNTL_ID, a.BALANCE0, a.BALANCE1, SUM(SEND_PRICE+SEND_FEE) AS cost, c.FEE_ADMINSTRATOR
 		<![CDATA[
-		, if(a.BALANCE1 < 0
+		/*, if(a.BALANCE1 < 0
 			, (a.BALANCE0 - nvl(SUM(SEND_PRICE+SEND_FEE), 0) - CEILING(a.BALANCE0*nvl(c.FEE_ADMINSTRATOR*0.01, 0))) + a.BALANCE1
 			, a.BALANCE0 - nvl(SUM(SEND_PRICE+SEND_FEE), 0) - CEILING(a.BALANCE0*nvl(c.FEE_ADMINSTRATOR*0.01, 0))
-		) AS BALANCE0_CAL
+		) AS BALANCE0_CAL*/
+		, a.BALANCE0 - nvl(SUM(SEND_PRICE+SEND_FEE), 0) - CEILING(a.BALANCE0*nvl(c.FEE_ADMINSTRATOR*0.01, 0)) AS BALANCE0_CAL
 		]]>
 		from RD_BALANCE a
 		LEFT JOIN RD_COOPERATOR_PAY b ON a.COOPERATOR_ID = b.COOPERATOR_ID AND b.USE_AT ='Y' AND WEEK_YN ='N'

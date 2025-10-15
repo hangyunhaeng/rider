@@ -6,33 +6,19 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 import egovframework.com.cmm.service.EgovProperties;
 import egovframework.com.rd.Util;
 import egovframework.com.rd.usr.service.vo.BalanceVO;
-import egovframework.com.rd.usr.service.vo.DoszResultVO;
-import egovframework.com.rd.usr.service.vo.DoszTransferVO;
-import egovframework.com.rd.usr.service.vo.DoznHistoryVO;
 import egovframework.com.rd.usr.service.vo.MyInfoVO;
 import egovframework.com.rd.usr.service.vo.Sch;
-import kr.co.dozn.secure.base.CryptoUtil;
 
-import java.io.BufferedReader;
-import java.io.DataOutputStream;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.math.BigDecimal;
-import java.math.RoundingMode;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.util.List;
 
 import javax.annotation.Resource;
 
 import org.egovframe.rte.fdl.cmmn.EgovAbstractServiceImpl;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
 
 /**
  *
