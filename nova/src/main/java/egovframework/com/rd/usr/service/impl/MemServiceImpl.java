@@ -615,6 +615,81 @@ public class MemServiceImpl extends EgovAbstractServiceImpl implements MemServic
 		return returnVo;
 	}
 	/**
+	 * 라이더 패스워드 초기화
+	 * @param vo
+	 * @return
+	 * @throws Exception
+	 */
+	public int initRiderPass(CooperatorVO vo) throws Exception {
+
+        LoginVO user = (LoginVO)EgovUserDetailsHelper.getAuthenticatedUser();
+		List<KkoVO> kkoList = new ArrayList<KkoVO>();
+
+		//라이더 정보 조회
+        UserDefaultVO searchVO = new UserDefaultVO();
+        searchVO.setSearchCondition("0");
+        searchVO.setSearchKeyword(vo.getMberId());
+        MberManageVO userOne = mberManageDAO.selectUserListRider(searchVO);
+        if(userOne == null) {
+        	throw new IllegalArgumentException("라이더 정보를 찾을 수 없습니다") ;
+        }
+
+        if(Util.isEmpty(userOne.getMbtlnum())){
+        	throw new IllegalArgumentException("라이더의 핸드폰 번호가 누락되어 있습니다") ;
+        }
+
+
+		//0. 카카오 발송 정보 저장
+		String pass = Util.getRandomKey(5);
+		KkoVO kkoOne = new KkoVO();
+		kkoOne.setMberId(userOne.getMberId());
+		kkoOne.setMbtlnum(Util.getOnlyNumber(userOne.getMbtlnum()));
+		kkoOne.setParam0(userOne.getMberNm());
+		kkoOne.setParam1("Daon"+pass);
+		kkoOne.setTemplateCode(EgovProperties.getProperty("Globals.passRiderInitAlert"));
+		kkoList.add(kkoOne);
+
+
+		//1. 임시패스워드와 MBER_CONFIRM_AT를 N로 설정
+		MberManageVO mberManageVO = new MberManageVO();
+
+	    mberManageVO.setUniqId(userOne.getUniqId());
+        mberManageVO.setPassword(EgovFileScrty.encryptPassword("Daon"+pass+"!", EgovStringUtil.isNullToString(userOne.getMberId())));
+        mberManageVO.setMberConfirmAt("N");
+        mberManageService.updatePasswordSelf(mberManageVO);
+
+        //2. 알림톡 토큰 가져오기
+    	DoznTokenVO responseData = dtyService.getMsgTocken();
+
+    	//3. 메세지 발송
+        if(!Util.isEmpty(responseData.getSendAccessToken()) && !Util.isEmpty(responseData.getSendRefreshToken())) {
+
+        	JSONObject jsonMain = Util.makeKko(kkoList);
+
+	        LOGGER.debug("json : "+jsonMain.toString());
+	        //3. 성공시 메세지 발송
+		    dtyService.doznHttpRequestMsg(jsonMain, responseData.getKkoId(), responseData.getSendAccessToken(), responseData.getSendRefreshToken());
+
+
+        } else {	//토큰을 못받아서 발송 못했을 경우에도 사용자 정보를 이력에 쌓아줘야 나중에 찾음
+	        for(int i = 0; i < kkoList.size() ; i++) {
+	        	KkoVO kkoVo = kkoList.get(i);
+	            //거래이력 누적
+	        	kkoVo.setKkoId(egovKkoIdGnrService.getNextStringId());
+	        	kkoVo.setUpKkoId(responseData.getKkoId());
+	        	kkoVo.setGubun("2");	//메세지
+	        	kkoVo.setUrl("/api/v1/send");
+	        	kkoVo.setCreatId(user.getId());
+	        	kkoVo.setBigo("알림 미발송");
+	        	kkoVo.setSendDt(Util.getDay());
+	            payDAO.insertKko(kkoVo);
+	        }
+        }
+
+
+		return 1;
+	}
+	/**
 	 * 협력사 접속 아이디 조회
 	 * @param vo
 	 * @return
@@ -947,7 +1022,7 @@ public class MemServiceImpl extends EgovAbstractServiceImpl implements MemServic
 //			throw new IllegalArgumentException("운영사만 접속 할 수 있습니다.") ;
 //		}
 
-		String key = Util.getRandomKey();
+		String key = Util.getRandomKey(30);
 		Sch inVo = new Sch();
 		inVo.setSearchId(user.getId());
 		inVo.setSearchMberId(vo.getMberId());

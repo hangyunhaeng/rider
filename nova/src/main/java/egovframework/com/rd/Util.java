@@ -263,6 +263,9 @@ public class Util {
 	        } else if(EgovProperties.getProperty("Globals.enterAdminAlert").equals(templateCode)) {
 	        	variablesObject.put("성명", kkoVo.getParam0());
 	        	variablesObject.put("임시패스워드", kkoVo.getParam1());
+	        } else if(EgovProperties.getProperty("Globals.passRiderInitAlert").equals(templateCode)) {
+	        	variablesObject.put("성명", kkoVo.getParam0());
+	        	variablesObject.put("임시패스워드", kkoVo.getParam1());
 	        }
 	        jsonObject.put("variables", variablesObject);
 	        jsonObject.put("phone", kkoVo.getMbtlnum());
@@ -334,6 +337,11 @@ public class Util {
         			+ "#{성명}님 라이더뱅크에 운영사로 등록되셨습니다.\r\n"
         			+ "RADER BANK에 접속하여 임시패스워드로 로그인 후 임시패스워드를 다시 설정해 주시기 바랍니다.\r\n\n"
         			+ "- 임시패스워드 : #{임시패스워드}");
+        } else if(EgovProperties.getProperty("Globals.passRiderInitAlert").equals(templateCode)) {
+        	jsonKakaoMessage.put("body", "[라이더뱅크 패스워드 초기화]\r\n\n\n"
+        			+ "#{성명}님 패스워드가 초기화 되었습니다\r\n"
+        			+ "RADER BANK에 접속하여 임시패스워드로 로그인 후 임시패스워드를 다시 설정해 주시기 바랍니다.\r\n\n"
+        			+ "- 임시패스워드 : #{임시패스워드}");
         }
         jsonKakaoMessage.put("templateCode", templateCode);
         jsonKakaoMessage.put("senderKey", EgovProperties.getProperty("Globals.senderKey"));
@@ -343,11 +351,11 @@ public class Util {
         return jsonMain;
     }
 
-    public static String getRandomKey() {
+    public static String getRandomKey(int len) {
     	SecureRandom random = new SecureRandom();
     	String charar = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+";
-    	StringBuilder sb = new StringBuilder(30);
-    	for (int i = 0; i < 30; i++) {
+    	StringBuilder sb = new StringBuilder(len);
+    	for (int i = 0; i < len; i++) {
     	    int randomIndex = random.nextInt(charar.length());
     	    sb.append(charar.charAt(randomIndex));
     	}

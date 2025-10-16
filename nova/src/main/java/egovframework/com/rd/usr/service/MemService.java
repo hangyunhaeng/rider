@@ -81,6 +81,13 @@ public interface MemService {
 	 */
 	public CooperatorVO saveCooperatoRider(List<CooperatorVO> list, LoginVO user) throws Exception ;
 	/**
+	 * 라이더 패스워드 초기화
+	 * @param vo
+	 * @return
+	 * @throws Exception
+	 */
+	public int initRiderPass(CooperatorVO vo) throws Exception ;
+	/**
 	 * 협력사 접속 아이디 조회 by 사업자번호
 	 * @param vo
 	 * @return

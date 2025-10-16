@@ -609,6 +609,43 @@ public class MemController {
 	    }
         return ResponseEntity.ok(map);
     }
+
+
+    /**
+     * 관리자가 라이더 로그인을 위한 key 생성
+     * @param request
+     * @param model
+     * @return
+     * @throws Exception
+     */
+    @RequestMapping("/usr/mem0002_0009.do")
+    public ResponseEntity<?> mem0002_0009(@ModelAttribute("cooperatorVO")CooperatorVO cooperatorVO, HttpServletRequest request,ModelMap model) throws Exception {
+
+    	//로그인 체크
+        LoginVO user = (LoginVO)EgovUserDetailsHelper.getAuthenticatedUser();
+        Boolean isAuthenticated = EgovUserDetailsHelper.isAuthenticated();
+
+        if(!isAuthenticated) {
+        	return ResponseEntity.status(401).body("Unauthorized");
+        }
+
+        if(!Util.isUsr()) {
+        	return ResponseEntity.status(401).body("Unauthorized");
+        }
+        //return value
+        Map<String, Object> map =  new HashMap<String, Object>();
+
+        try {
+        	memService.initRiderPass(cooperatorVO);
+	        map.put("resultCode", "success");
+	    } catch(IllegalArgumentException e) {
+	    	map.put("resultCode", "fail");
+	    	map.put("resultMsg", e.getMessage());
+	    	return ResponseEntity.ok(map);
+	    }
+        return ResponseEntity.ok(map);
+    }
+
 	/**
 	 * 라이더 관리
 	 * @param request

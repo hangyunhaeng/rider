@@ -106,16 +106,19 @@
             , valueParser: (params) => { return gridWan(params);}
 		},
 		{ headerName: "기타<br/>(대여,리스)", field: "etcCall", minWidth: 90
-			, cellRenderer:(params) => { return '<div class="btn btn-primary mb-2 mb-sm-0 mx-1 fs-9" data-bs-toggle="modal" data-bs-target="#exampleModal" onclick="clickEtc(\''+params.data.cooperatorId+'\', \''+params.data.mberId+'\')">관리</div>';}
-		},
+			, cellRenderer:(params) => { return '<div class="btn btn-primary mb-2 mb-sm-0 mx-1 fs-9" style="padding:0 5px!important" data-bs-toggle="modal" data-bs-target="#exampleModal" onclick="clickEtc(\''+params.data.cooperatorId+'\', \''+params.data.mberId+'\')">관리</div>';}
+		}
 
-		{ headerName: "사용여부", field: "useAt", minWidth: 90, editable: true
-		,valueGetter:(params) => { return (params.node.data.useAt=='Y')?"사용": "미사용"}
-		,cellEditor: 'agSelectCellEditor'
-		,cellEditorParams: params => { return {values: ['Y', 'N']}; }
-		, cellClass: (params) => {return agGrideditClass(params)}},
+		,{ headerName: "사용여부", field: "useAt", minWidth: 90, editable: true
+			,valueGetter:(params) => { return (params.node.data.useAt=='Y')?"사용": "미사용"}
+			,cellEditor: 'agSelectCellEditor'
+			,cellEditorParams: params => { return {values: ['Y', 'N']}; }
+			, cellClass: (params) => {return agGrideditClass(params)}},
+		{ headerName: "패스워드", field: "pass", minWidth: 90
+				, cellRenderer:(params) => {return '<div class="btn btn-primary mb-2 mb-sm-0 mx-1 fs-9" style="padding:0 5px!important" type="submit" onclick="clickPassInit(\''+params.data.mberId+'\', \''+params.data.mberNm+'\')">초기화</div>';}
+		},
 		{ headerName: "접속", field: "con", minWidth: 90, hide: true
-			, cellRenderer:(params) => {return '<div class="btn btn-primary mb-2 mb-sm-0 mx-1 fs-9" type="submit" onclick="clickCon(\''+params.data.mberId+'\')">접속</div>';}
+			, cellRenderer:(params) => {return '<div class="btn btn-primary mb-2 mb-sm-0 mx-1 fs-9" style="padding:0 5px!important" type="submit" onclick="clickCon(\''+params.data.mberId+'\')">접속</div>';}
 		},
 		{ headerName: "생성자", field: "creatId", minWidth: 90, hide:true},
 		{ headerName: "modifyAt", field: "modifyAt", minWidth: 90, hide:true}
@@ -438,6 +441,7 @@
 
 	function saveEtc(){
 		grid2.stopEditing();
+		var bSaveFail = false;
 
 		setTimeout(function(){
 			var updateItem = getEditRows(grid2);
@@ -446,6 +450,24 @@
 				alert("저장할 항목이 없습니다");
 				return;
 			}
+			debugger;
+			for(var i = 0 ; i < updateItem.length ; i++){
+				if(updateItem[i].paybackDay == null || updateItem[i].paybackDay == 0){
+					alert("상황기간을 입력해주세요");
+					bSaveFail= true;
+					return;
+				}
+				if(updateItem[i].paybackCost == null || updateItem[i].paybackCost == 0){
+					alert("일별상환금액을 입력해주세요");
+					bSaveFail= true;
+					return;
+				}
+			}
+
+			if(bSaveFail){
+				return false;
+			}
+
 			// 로딩 시작
 	        $('.loading-wrap--js').show();
 	        axios.post('${pageContext.request.contextPath}/usr/mem0002_0005.do',getEditRows(grid2)).then(function(response) {        	// 로딩 종료
@@ -486,6 +508,7 @@
 
 	function requestEtc(){
 		grid2.stopEditing();
+		var bSaveFail = false;
 
 		setTimeout(function(){
 			var updateItem = getChkRows(grid2);
@@ -494,6 +517,24 @@
 				alert("승인요청할 항목을 체크해주세요");
 				return;
 			}
+
+			for(var i = 0 ; i < updateItem.length ; i++){
+				if(updateItem[i].paybackDay == null || updateItem[i].paybackDay == 0){
+					alert("상황기간을 입력해주세요");
+					bSaveFail= true;
+					return;
+				}
+				if(updateItem[i].paybackCost == null || updateItem[i].paybackCost == 0){
+					alert("일별상환금액을 입력해주세요");
+					bSaveFail= true;
+					return;
+				}
+			}
+
+			if(bSaveFail){
+				return false;
+			}
+
 			// 로딩 시작
 	        $('.loading-wrap--js').show();
 	        axios.post('${pageContext.request.contextPath}/usr/mem0002_0006.do',updateItem).then(function(response) {        	// 로딩 종료
@@ -833,6 +874,42 @@
 	            $('#myForm').append($("<input/>", {type:"hidden", name:"userSe", value:"GNR"}));
 	            $('#myForm').append($("<input/>", {type:"hidden", name:"key", value:response.data.key}));
 				$('#myForm').submit();
+        	}
+        })
+        .catch(function(error) {
+            console.error('There was an error fetching the data:', error);
+        }).finally(function() {
+        	// 로딩 종료
+            $('.loading-wrap--js').hide();
+        });
+	}
+
+	function clickPassInit(mberId, mberNm){
+
+		if(!confirm(mberId+' / '+mberNm+'님의 패스워드를 초기화 하시겠습니까?\n초기화 시 임시패스워드가 라이더에게 알림톡으로 전송됩니다'))
+			return false;
+
+		const params = new URLSearchParams();
+		params.append("mberId", mberId);
+		// 로딩 시작
+        $('.loading-wrap--js').show();
+        axios.post('${pageContext.request.contextPath}/usr/mem0002_0009.do',params).then(function(response) {
+
+            if(chkLogOut(response.data)){
+            	return;
+            }
+
+        	// 로딩 종료
+            $('.loading-wrap--js').hide();
+        	if(response.data.resultCode == "success"){
+        		alert("패스워드 변경 완료 되었습니다.");
+
+        	} else {
+        		if(response.data.resultMsg != null && response.data.resultMsg != ''){
+        			alert(response.data.resultMsg);
+        		} else {
+        			alert("패스워드 초기화 실패하였습니다");
+        		}
         	}
         })
         .catch(function(error) {

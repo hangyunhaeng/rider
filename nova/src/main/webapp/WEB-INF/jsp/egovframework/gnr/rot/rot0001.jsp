@@ -82,6 +82,7 @@
 	function 대출(){
 		if(${requestCnt} > 0){
 			$('#div대출').show();
+			$('#div대출').find('button').attr('disabled', false);
 		}
 	}
 

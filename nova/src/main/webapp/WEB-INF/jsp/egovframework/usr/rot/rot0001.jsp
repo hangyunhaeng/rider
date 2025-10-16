@@ -26,7 +26,7 @@
 <%--     <script type="text/javascript"	src="<c:url value='/js/leaflet.js.다운로드' />"></script> --%>
 <%--     <script type="text/javascript"	src="<c:url value='/js/leaflet.markercluster.js.다운로드' />"></script> --%>
 <%--     <script type="text/javascript"	src="<c:url value='/js/leaflet-tilelayer-colorfilter.min.js.다운로드' />"></script> --%>
-<%--     <script type="text/javascript"	src="<c:url value='/js/ecommerce-dashboard' />"></script> --%>
+<%--     <script type="text/javascript"	src="<c:url value='/js/ecommerce-dashboard.js' />"></script> --%>
 
 </head>
 <script type="text/javaScript">
@@ -36,7 +36,7 @@
 	document.addEventListener('DOMContentLoaded', function() {
 		loadNotice();
 		loadCooperatorList();
-
+		//newCustomersChartsInit();
 
 	});
 	function loadNotice(){
@@ -315,6 +315,150 @@
           })));
       }
   };
+
+
+/*const newCustomersChartsInit = () => {
+      const {getColor: o, getData: t, getDates: e} = window.phoenix.utils
+        , a = document.querySelector(".echarts-new-customers")
+        , i = o => {
+          const t = window.dayjs(o[0].axisValue)
+            , e = window.dayjs(o[0].axisValue).subtract(1, "month")
+            , a = o.map(( (o, a) => ({
+              value: o.value,
+              date: a > 0 ? e : t,
+              color: o.color
+          })));
+          let i = "";
+          return a.forEach(( (o, t) => {
+              i += '<h6 class="fs-9 text-body-tertiary '+(t>0?"mb-0":"")+'"><span class="fas fa-circle me-2" style="color:'+o.color+'"></span>\n      '+o.date.format("MMM DD")+' : '+o.value+'\n    </h6>';
+          }
+          )),
+          '<div class="ms-1">\n              '+i+'\n            </div>'
+      }
+      ;
+      if (a) {
+          const r = t(a, "echarts")
+            , s = window.echarts.init(a);
+          echartSetOption(s, r, ( () => ({
+              tooltip: {
+                  trigger: "axis",
+                  padding: 10,
+                  backgroundColor: o("body-highlight-bg"),
+                  borderColor: o("border-color"),
+                  textStyle: {
+                      color: o("light-text-emphasis")
+                  },
+                  borderWidth: 1,
+                  transitionDuration: 0,
+                  axisPointer: {
+                      type: "none"
+                  },
+                  formatter: i,
+                  extraCssText: "z-index: 1000"
+              },
+              xAxis: [{
+                  type: "category",
+                  data: e(new Date("5/1/2022"), new Date("5/7/2022"), 864e5),
+                  show: !0,
+                  boundaryGap: !1,
+                  axisLine: {
+                      show: !0,
+                      lineStyle: {
+                          color: o("secondary-bg")
+                      }
+                  },
+                  axisTick: {
+                      show: !1
+                  },
+                  axisLabel: {
+                      formatter: o => window.dayjs(o).format("DD MMM"),
+                      showMinLabel: !0,
+                      showMaxLabel: !1,
+                      color: o("secondary-color"),
+                      align: "left",
+                      interval: 5,
+                      fontFamily: "Nunito Sans",
+                      fontWeight: 600,
+                      fontSize: 12.8
+                  }
+              }, {
+                  type: "category",
+                  position: "bottom",
+                  show: !0,
+                  data: e(new Date("5/1/2022"), new Date("5/7/2022"), 864e5),
+                  axisLabel: {
+                      formatter: o => window.dayjs(o).format("DD MMM"),
+                      interval: 130,
+                      showMaxLabel: !0,
+                      showMinLabel: !1,
+                      color: o("secondary-color"),
+                      align: "right",
+                      fontFamily: "Nunito Sans",
+                      fontWeight: 600,
+                      fontSize: 12.8
+                  },
+                  axisLine: {
+                      show: !1
+                  },
+                  axisTick: {
+                      show: !1
+                  },
+                  splitLine: {
+                      show: !1
+                  },
+                  boundaryGap: !1
+              }],
+              yAxis: {
+                  show: !1,
+                  type: "value",
+                  boundaryGap: !1
+              },
+              series: [{
+                  type: "line",
+                  data: [150, 100, 300, 200, 250, 180, 250],
+                  showSymbol: !1,
+                  symbol: "circle",
+                  lineStyle: {
+                      width: 2,
+                      color: o("secondary-bg")
+                  },
+                  emphasis: {
+                      lineStyle: {
+                          color: o("secondary-bg")
+                      }
+                  },
+                  zlevel: 2
+              }, {
+                  type: "line",
+                  data: [200, 150, 250, 100, 500, 400, 600],
+                  lineStyle: {
+                      width: 2,
+                      color: o("primary")
+                  },
+                  showSymbol: !1,
+                  symbol: "circle",
+                  zlevel: 2
+              }, {
+                  type: "line",
+                  data: [100, 100, 400, 300, 100, 100, 500],
+                  lineStyle: {
+                      width: 2,
+                      color: o("info-dark")
+                  },
+                  showSymbol: !1,
+                  symbol: "circle",
+                  zlevel: 2
+              }],
+              grid: {
+                  left: 0,
+                  right: 0,
+                  top: 5,
+                  bottom: 20
+              }
+          })));
+      }
+  }
+  ;*/
 </script>
 <body class="index-page">
 
@@ -370,6 +514,47 @@
                   </div>
                 </div>
 
+
+
+                <div class="col-12 col-md-6">
+                  <div class="card h-100">
+                    <div class="card-body">
+                      <div class="d-flex justify-content-between">
+                        <div>
+                          <h5 class="mb-1">준비중<span class="badge badge-phoenix badge-phoenix-warning rounded-pill fs-9 ms-2"> <span class="badge-label">+26.5%</span></span></h5>
+                          <h6 class="text-body-tertiary">Last 7 days</h6>
+                        </div>
+                        <h4>0</h4>
+                      </div>
+                      <div class="pb-0 pt-4">
+                        <div class="echarts-new-customers" style="height: 180px; width: 100%; user-select: none; -webkit-tap-highlight-color: rgba(0, 0, 0, 0); position: relative;" _echarts_instance_="ec_1758602219820">
+                        	<div style="position: relative; width: 323px; height: 180px; padding: 0px; margin: 0px; border-width: 0px; cursor: default;">
+                        		<canvas data-zr-dom-id="zr_0" width="323" height="180" style="position: absolute; left: 0px; top: 0px; width: 323px; height: 180px; user-select: none; -webkit-tap-highlight-color: rgba(0, 0, 0, 0); padding: 0px; margin: 0px; border-width: 0px;"></canvas>
+                        		<canvas data-zr-dom-id="zr_2" width="323" height="180" style="position: absolute; left: 0px; top: 0px; width: 323px; height: 180px; user-select: none; -webkit-tap-highlight-color: rgba(0, 0, 0, 0); padding: 0px; margin: 0px; border-width: 0px;"></canvas>
+                        	</div>
+                        	<div class="" style="position: absolute; display: block; border-style: solid; white-space: nowrap; box-shadow: rgba(0, 0, 0, 0.2) 1px 2px 10px; background-color: rgb(239, 242, 246); border-width: 1px; border-radius: 4px; color: rgb(20, 24, 36); font: 14px / 21px &quot;Microsoft YaHei&quot;; padding: 10px; top: 0px; left: 0px; transform: translate3d(158px, 70px, 0px); border-color: rgb(203, 208, 221); z-index: 1000; pointer-events: none; visibility: hidden; opacity: 0;">
+	                        	<div class="ms-1">
+		              				<h6 class="fs-9 text-body-tertiary false">
+			              				<svg class="svg-inline--fa fa-circle me-2" style="color: #5470c6;" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="circle" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" data-fa-i2svg="">
+			              					<path fill="currentColor" d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512z"></path>
+			              				</svg><!-- <span class="fas fa-circle me-2" style="color:#5470c6"></span> Font Awesome fontawesome.com -->
+										May 04 : 200
+									</h6>
+									<h6 class="fs-9 text-body-tertiary mb-0">
+										<svg class="svg-inline--fa fa-circle me-2" style="color: #91cc75;" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="circle" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" data-fa-i2svg="">
+											<path fill="currentColor" d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512z"></path>
+										</svg><!-- <span class="fas fa-circle me-2" style="color:#91cc75"></span> Font Awesome fontawesome.com -->
+										Apr 04 : 100
+									</h6>
+	            				</div>
+            				</div>
+            			</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+
                 <div class="col-12 col-md-6">
                   <div class="card h-100">
                     <div class="card-body">
@@ -381,7 +566,12 @@
                         <h4>0</h4>
                       </div>
                       <div class="d-flex justify-content-center px-4 py-6">
-                        <div class="echart-total-orders" style="height: 85px; width: 115px; user-select: none; -webkit-tap-highlight-color: rgba(0, 0, 0, 0); position: relative;" _echarts_instance_="ec_1758602219825"><div style="position: relative; width: 115px; height: 85px; padding: 0px; margin: 0px; border-width: 0px;"><canvas data-zr-dom-id="zr_0" width="115" height="85" style="position: absolute; left: 0px; top: 0px; width: 115px; height: 85px; user-select: none; -webkit-tap-highlight-color: rgba(0, 0, 0, 0); padding: 0px; margin: 0px; border-width: 0px;"></canvas></div><div class=""></div></div>
+                        <div class="echart-total-orders" style="height: 85px; width: 115px; user-select: none; -webkit-tap-highlight-color: rgba(0, 0, 0, 0); position: relative;" _echarts_instance_="ec_1758602219825">
+                        	<div style="position: relative; width: 115px; height: 85px; padding: 0px; margin: 0px; border-width: 0px;">
+                        		<canvas data-zr-dom-id="zr_0" width="115" height="85" style="position: absolute; left: 0px; top: 0px; width: 115px; height: 85px; user-select: none; -webkit-tap-highlight-color: rgba(0, 0, 0, 0); padding: 0px; margin: 0px; border-width: 0px;"></canvas>
+                        	</div>
+                        	<div class=""></div>
+                        </div>
                       </div>
                       <div class="mt-2">
                         <div class="d-flex align-items-center mb-2">
@@ -400,28 +590,8 @@
                 </div>
 
 
-                <div class="col-12 col-md-6">
-                  <div class="card h-100">
-                    <div class="card-body">
-                      <div class="d-flex justify-content-between">
-                        <div>
-                          <h5 class="mb-1">준비중<span class="badge badge-phoenix badge-phoenix-warning rounded-pill fs-9 ms-2"> <span class="badge-label">+26.5%</span></span></h5>
-                          <h6 class="text-body-tertiary">Last 7 days</h6>
-                        </div>
-                        <h4>0</h4>
-                      </div>
-                      <div class="pb-0 pt-4">
-                        <div class="echarts-new-customers" style="height: 180px; width: 100%; user-select: none; -webkit-tap-highlight-color: rgba(0, 0, 0, 0); position: relative;" _echarts_instance_="ec_1758602219820"><div style="position: relative; width: 323px; height: 180px; padding: 0px; margin: 0px; border-width: 0px; cursor: default;"><canvas data-zr-dom-id="zr_0" width="323" height="180" style="position: absolute; left: 0px; top: 0px; width: 323px; height: 180px; user-select: none; -webkit-tap-highlight-color: rgba(0, 0, 0, 0); padding: 0px; margin: 0px; border-width: 0px;"></canvas><canvas data-zr-dom-id="zr_2" width="323" height="180" style="position: absolute; left: 0px; top: 0px; width: 323px; height: 180px; user-select: none; -webkit-tap-highlight-color: rgba(0, 0, 0, 0); padding: 0px; margin: 0px; border-width: 0px;"></canvas></div><div class="" style="position: absolute; display: block; border-style: solid; white-space: nowrap; box-shadow: rgba(0, 0, 0, 0.2) 1px 2px 10px; background-color: rgb(239, 242, 246); border-width: 1px; border-radius: 4px; color: rgb(20, 24, 36); font: 14px / 21px &quot;Microsoft YaHei&quot;; padding: 10px; top: 0px; left: 0px; transform: translate3d(158px, 70px, 0px); border-color: rgb(203, 208, 221); z-index: 1000; pointer-events: none; visibility: hidden; opacity: 0;"><div class="ms-1">
-              <h6 class="fs-9 text-body-tertiary false"><svg class="svg-inline--fa fa-circle me-2" style="color: #5470c6;" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="circle" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" data-fa-i2svg=""><path fill="currentColor" d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512z"></path></svg><!-- <span class="fas fa-circle me-2" style="color:#5470c6"></span> Font Awesome fontawesome.com -->
-      May 04 : 200
-    </h6><h6 class="fs-9 text-body-tertiary mb-0"><svg class="svg-inline--fa fa-circle me-2" style="color: #91cc75;" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="circle" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" data-fa-i2svg=""><path fill="currentColor" d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512z"></path></svg><!-- <span class="fas fa-circle me-2" style="color:#91cc75"></span> Font Awesome fontawesome.com -->
-      Apr 04 : 100
-    </h6>
-            </div></div></div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
+
+
                 <div class="col-12 col-md-6">
                   <div class="card h-100">
                     <div class="card-body d-flex flex-column">
