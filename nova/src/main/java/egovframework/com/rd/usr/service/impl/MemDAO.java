@@ -355,8 +355,7 @@ public class MemDAO extends EgovComAbstractDAO {
 	 * @throws Exception
 	 */
 	public int selectEtcListCnt(EtcVO vo) throws Exception {
-		EtcVO reVo = selectOne("memDAO.selectEtcListCnt", vo);
-		return reVo.getTotalCnt();
+		return selectOne("memDAO.selectEtcListCnt", vo);
 	}
 	/**
 	 * 협력사,라이더별 대출 등록

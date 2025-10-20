@@ -13,6 +13,7 @@
 
 
 	var pageInit = true;
+	var pagePerCnt = 15;
 	let gridOptions="";
 	var grid="";
 	let data;
@@ -76,36 +77,40 @@
 		var today = new Date();
 		var now = new Date();
 		var towWeekAgo = new Date(now.setDate(now.getDate()-14));
-		var searchFromDate = flatpickr("#searchFromDate", {
-			locale: "ko",
-			allowInput: false,
-		    altInput: true,              // 기존 입력을 숨기고 새 입력을 만듦
-		    altFormat: 'Y-m-d',      // 날짜 선택 후 표시 형태
-		    dateFormat: 'Y-m-d',     // date format 형식
-		    disableMobile: true          // 모바일 지원
+// 		var searchFromDate = flatpickr("#searchFromDate", {
+// 			locale: "ko",
+// 			allowInput: false,
+// 		    altInput: true,              // 기존 입력을 숨기고 새 입력을 만듦
+// 		    altFormat: 'Y-m-d',      // 날짜 선택 후 표시 형태
+// 		    dateFormat: 'Y-m-d',     // date format 형식
+// 		    disableMobile: true          // 모바일 지원
 
-		});
-		var searchToDate = flatpickr("#searchToDate", {
-			"locale": "ko",
-			allowInput: false,
-		    altInput: true,              // 기존 입력을 숨기고 새 입력을 만듦
-		    altFormat: 'Y-m-d',      // 날짜 선택 후 표시 형태
-		    dateFormat: 'Y-m-d',     // date format 형식
-		    disableMobile: true          // 모바일 지원
-		});
+// 		});
+// 		var searchToDate = flatpickr("#searchToDate", {
+// 			"locale": "ko",
+// 			allowInput: false,
+// 		    altInput: true,              // 기존 입력을 숨기고 새 입력을 만듦
+// 		    altFormat: 'Y-m-d',      // 날짜 선택 후 표시 형태
+// 		    dateFormat: 'Y-m-d',     // date format 형식
+// 		    disableMobile: true          // 모바일 지원
+// 		});
 
 		// 1. 조회버튼
 		$('#loadDataBtn').on("click", function(){
-			doSearch();
+			doSearch(1, paging.objectCnt);
 		});
 
-		searchFromDate.setDate(towWeekAgo.getFullYear()+"-"+(towWeekAgo.getMonth()+1)+"-"+towWeekAgo.getDate());
-		searchToDate.setDate(today.getFullYear()+"-"+(today.getMonth()+1)+"-"+today.getDate());
+// 		searchFromDate.setDate(towWeekAgo.getFullYear()+"-"+(towWeekAgo.getMonth()+1)+"-"+towWeekAgo.getDate());
+// 		searchToDate.setDate(today.getFullYear()+"-"+(today.getMonth()+1)+"-"+today.getDate());
+
+		//페이징설정
+		paging.createPaging('#paging', 1, pagePerCnt, doSearch);
 
 		loadCooperatorList();
 		//그리드 설정
 		setGrid();
 		setGrid2();
+
 	});
 
 
@@ -130,24 +135,26 @@
 	}
 
 	//내역 조회
-	function doSearch(){
+	function doSearch(schIdx, schPagePerCnt){
 		if($('#searchRegistrationSn').val().trim() != '' && $('#searchRegistrationSn').val().trim().length != 10){
 			alert("식별번호는 10자리입니다");
 			$('#searchRegistrationSn').focus()
 			return ;
 		}
 
-	    if(!limit2Week($('#searchFromDate').val(), $('#searchToDate').val())){
-	    	return;
-	    }
+// 	    if(!limit2Week($('#searchFromDate').val(), $('#searchToDate').val())){
+// 	    	return;
+// 	    }
 
 		const params = new URLSearchParams();
 		params.append('searchCooperatorId', $('#searchCooperatorId').val());
-		params.append('searchFromDate', getOnlyNumber($('#searchFromDate').val()));
-		params.append('searchToDate', getOnlyNumber($('#searchToDate').val()));
+// 		params.append('searchFromDate', getOnlyNumber($('#searchFromDate').val()));
+// 		params.append('searchToDate', getOnlyNumber($('#searchToDate').val()));
 		params.append('searchNm', $('#searchNm').val().trim());
 		params.append('searchRegistrationSn', $('#searchRegistrationSn').val().trim());
 		params.append('searchGubun', $('#searchGubun').val());
+		params.append("schIdx", schIdx);
+		params.append("schPagePerCnt", schPagePerCnt);
 
 		// 로딩 시작
         $('.loading-wrap--js').show();
@@ -161,7 +168,7 @@
 
 			if(response.data.resultCode == "success"){
 
-	            document.getElementById('TT_CNT0').textContent = currencyFormatter(response.data.list.length);
+	            document.getElementById('TT_CNT0').textContent = currencyFormatter(response.data.cnt);
 
 	        	if (response.data.list.length == 0) {
 	        		grid.setGridOption('rowData',[]);  	// 데이터가 없는 경우 빈 배열 설정
@@ -170,6 +177,7 @@
 					var lst = response.data.list;	//정상데이터
 	                grid.setGridOption('rowData', lst);
 	            }
+	        	paging.setPageing(schIdx, response.data.cnt);
 			}
 
         })
@@ -390,23 +398,13 @@
 						</td>
 					</tr>
 					<tr>
-						<th>등록일</th>
-						<td>
-							<div>
-								<input id="searchFromDate" class="form-control search fs-9 float-start w40p"" type="date" placeholder="Search" aria-label="Search" _mstplaceholder="181961" _mstaria-label="74607">
-								<sm class="float-start">&nbsp;~&nbsp;</sm>
-								<input id="searchToDate" class="form-control search fs-9 float-start w40p" type="date" placeholder="Search" aria-label="Search" _mstplaceholder="181961" _mstaria-label="74607">
-							</div>
-						</td>
 						<th>식별번호</th>
 						<td>
 <!-- 							<input id="searchRegistrationSn" type="text" oninput="this.value = this.value.replace(/[^0-9-]/g, '').replace(/(\..*)\./g, '$1');"> -->
 							<input id="searchRegistrationSn" type="text">
 						</td>
-					</tr>
-					<tr>
 						<th>상환완료여부</th>
-						<td colspan="3">
+						<td>
 							<select id="searchGubun" name='searchGubun' style='width: 100%'>
 								<option value="all">전체</option>
 								<option value="END">완료</option>
@@ -431,6 +429,7 @@
 			<div id="loadingOverlay" style="display: none;">Loading...</div>
 			<div  class="ib_product">
 				<div id="myGrid" class="ag-theme-alpine" style="height: 550px; width: 100%;"></div>
+				<div id="paging" class="d-flex align-items-center justify-content-center mt-3"></div>
 			</div>
 			</div>
 

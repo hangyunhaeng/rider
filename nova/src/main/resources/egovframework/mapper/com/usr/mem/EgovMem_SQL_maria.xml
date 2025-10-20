@@ -534,14 +534,67 @@
 		<![CDATA[WHERE RN > #{schIdx}*#{schPagePerCnt} -#{schPagePerCnt} AND RN <= #{schIdx}*#{schPagePerCnt}]]>
 		</if>
 	</select>
-	<select id="selectEtcListCnt" parameterType="egovframework.com.rd.usr.service.vo.EtcVO" resultType = "egovframework.com.rd.usr.service.vo.EtcVO">
-			SELECT
-				COUNT(ETC_ID) TOTAL_CNT
-			FROM RD_ETC
-			WHERE COOPERATOR_ID = #{cooperatorId} AND MBER_ID = #{mberId}
-				<if test="searchGubun == 'RIDER'">
-				AND use_at ='Y' AND auth_request_dt IS NOT NULL AND auth_respons_dt IS NULL	/*요청했으나 승인을 않한건*/
+	<select id="selectEtcListCnt" parameterType="egovframework.com.rd.usr.service.vo.EtcVO" resultType = "java.lang.Integer">
+		SELECT COUNT(ETC_ID)
+		FROM (
+			SELECT a.ETC_ID
+			FROM RD_ETC a
+			LEFT JOIN RD_DAY_PAY b ON a.COOPERATOR_ID = b.COOPERATOR_ID AND a.MBER_ID = b.MBER_ID AND a.ETC_ID = b.ETC_ID and b.USE_AT = 'Y' AND b.WEEK_YN !='Y'
+			LEFT JOIN RD_WEEK_PAY c ON a.COOPERATOR_ID = c.COOPERATOR_ID AND a.MBER_ID = c.MBER_ID AND a.ETC_ID = c.ETC_ID AND c.USE_AT = 'Y'
+			LEFT JOIN COMTNGNRLMBER d ON a.mber_id = d.mber_id
+			LEFT JOIN RD_COOPERATOR e ON a.COOPERATOR_ID = e.COOPERATOR_ID
+			, (SELECT @ROWNUM:=0) AS R
+			WHERE 1=1
+				AND a.use_at ='Y'
+				<if test="cooperatorId != null and cooperatorId != ''">
+				AND a.COOPERATOR_ID = #{cooperatorId}
 				</if>
+				<if test="mberId != null and mberId != ''">
+				AND a.MBER_ID = #{mberId}
+				</if>
+				<if test="searchGubun == 'RIDER_ALERT'">
+				AND a.auth_request_dt IS NOT NULL AND a.auth_respons_dt IS NULL	/*요청했으나 승인을 않한건*/
+				</if>
+				<if test="searchGubun == 'RIDER_LIST'">
+				AND a.auth_request_dt IS NOT NULL
+				</if>
+
+
+				<if test="searchGubun == 'END'">
+				AND a.FINISH_AT = 'Y'
+				</if>
+				<if test="searchGubun == 'ING'">
+				AND a.FINISH_AT = 'N' and a.AUTH_RESPONS_DT is not null
+				</if>
+				<if test="searchGubun == 'NO'">
+				AND a.AUTH_RESPONS_DT is null
+				</if>
+
+				<if test='searchCooperatorId != null and searchCooperatorId != "all"'>
+				AND a.cooperator_id = #{searchCooperatorId}
+				</if>
+				<if test="searchNm != null and searchNm != ''">
+				AND d.mber_nm like '%' #{searchNm} '%'
+				</if>
+				<if test='searchFromDate != null and searchFromDate != "all" and searchFromDate != null and searchFromDate != "all"'>
+				AND DATE_FORMAT(a.CREAT_DT,'%Y%m%d') BETWEEN #{searchFromDate} AND #{searchToDate}
+				</if>
+				<if test="searchRegistrationSn != null and searchRegistrationSn != ''">
+				AND a.COOPERATOR_ID IN (
+					SELECT COOPERATOR_ID from RD_COOPERATOR
+					WHERE REGISTRATION_SN = #{searchRegistrationSn}
+				)
+				</if>
+
+				<if test="schAuthorCode == 'ROLE_USER' and schUserSe == 'USR'">
+				/* 협력사 조건 */
+				AND a.COOPERATOR_ID IN (
+					SELECT COOPERATOR_ID FROM RD_COOPERATOR a
+					WHERE a.REGISTRATION_SN = #{schIhidNum} AND use_at ='Y'
+				)
+				</if>
+			GROUP BY a.etc_id
+		) tab
 	</select>
 	<insert id="insertEtc" parameterType="egovframework.com.rd.usr.service.vo.EtcVO">
 

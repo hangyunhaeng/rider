@@ -36,4 +36,11 @@ public interface StsService {
 	 * @throws Exception
 	 */
 	public List<StsVO> selectSts0003(StsVO vo) throws Exception ;
+	/**
+	 * 주정산별 협력사별 수익현황
+	 * @param vo
+	 * @return
+	 * @throws Exception
+	 */
+	public List<StsVO> selectCooperatorProfitStsList(StsVO vo) throws Exception ;
 }

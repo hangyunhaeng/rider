@@ -243,4 +243,28 @@
 			</if>
 		GROUP BY tab.COOPERATOR_ID, tab.DAY, tab.mber_id
 	</select>
+
+	<select id="selectCooperatorProfitStsList" parameterType="egovframework.com.rd.usr.service.vo.StsVO" resultType="egovframework.com.rd.usr.service.vo.StsVO">
+		-- 콜수수료, 기타수수료, 선지급수수료(부가세, 원천세, 관리비, 사업주부담고용보험료, 사업주부담산재보험료 제외)
+		SELECT NVL(SUM(b.COST), 0) AS COST, fix.ACCOUNTS_ED_DT AS DAY, c.COOPERATOR_NM, fix.COOPERATOR_ID
+		FROM (
+			SELECT sub_tab.ACCOUNTS_ED_DT , b.COOPERATOR_ID
+			FROM (SELECT ACCOUNTS_ED_DT FROM RD_WEEK_INFO
+			WHERE FIX_DAY IS NOT NULL
+			GROUP BY ACCOUNTS_ED_DT desc
+			LIMIT 7) sub_tab -- 최근 7주만 조회
+			LEFT JOIN RD_COOPERATOR b ON b.USE_AT ='Y'
+		) AS fix
+		LEFT JOIN RD_WEEK_INFO a ON fix.COOPERATOR_ID = a.COOPERATOR_ID AND fix.ACCOUNTS_ED_DT = a.ACCOUNTS_ED_DT  AND a.FIX_DAY IS NOT NULL
+		LEFT JOIN RD_COOPERATOR_PROFIT b ON a.WEEK_ID = b.WEEK_ID AND b.USE_AT ='Y' AND b.GUBUN IN ('C','E','D')
+		LEFT JOIN RD_COOPERATOR c ON fix.COOPERATOR_ID = c.COOPERATOR_ID
+		where 1 = 1
+			<if test="schAuthorCode == 'ROLE_USER'">
+			/* 협력사 조건 */
+			AND c.REGISTRATION_SN = #{schIhidNum} AND c.use_at ='Y'
+			</if>
+
+		GROUP BY fix.ACCOUNTS_ED_DT, fix.COOPERATOR_ID
+		ORDER BY fix.ACCOUNTS_ED_DT
+	</select>
 </mapper>

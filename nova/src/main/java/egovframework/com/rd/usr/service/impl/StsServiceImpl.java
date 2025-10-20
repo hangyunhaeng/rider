@@ -71,4 +71,13 @@ public class StsServiceImpl extends EgovAbstractServiceImpl implements StsServic
 	public List<StsVO> selectSts0003(StsVO vo) throws Exception {
 		return stsDAO.selectSts0003(vo);
 	}
+	/**
+	 * 주정산별 협력사별 수익현황
+	 * @param vo
+	 * @return
+	 * @throws Exception
+	 */
+	public List<StsVO> selectCooperatorProfitStsList(StsVO vo) throws Exception {
+		return stsDAO.selectCooperatorProfitStsList(vo);
+	}
 }

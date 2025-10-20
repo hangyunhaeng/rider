@@ -31,12 +31,13 @@
 </head>
 <script type="text/javaScript">
 
-	var colorArray = ["primary", "primary-lighter", "info-dark"];
+	var colorArray = ["primary", "primary-lighter", "purple", "info-dark", "teal", "success-lighte", "danger-text-emphasis"];
 	//onLoad
 	document.addEventListener('DOMContentLoaded', function() {
 		loadNotice();
 		loadCooperatorList();
-		//newCustomersChartsInit();
+		loadCooperatorProfitList();
+// 		newCustomersChartsInit();
 
 	});
 	function loadNotice(){
@@ -221,6 +222,83 @@
 	}
 
 
+	function loadCooperatorProfitList(){
+		const params = new URLSearchParams();
+
+		// 로딩 시작
+        $('.loading-wrap--js').show();
+        axios.post('${pageContext.request.contextPath}/usr/rot0001_0002.do',params).then(function(response) {
+        	// 로딩 종료
+            $('.loading-wrap--js').hide();
+
+            if(chkLogOut(response.data)){
+            	return;
+            }
+
+        	if(response.data.resultCode == "success"){
+
+        		var data = [];
+        		var date = [];
+        		var idxColor = 0;
+        		for(var i = 0 ; i < response.data.profitList.length ; i++){
+        			var oneData = response.data.profitList[i];
+        			//data.push({value: response.data.list[i].rdcnt, name:response.data.list[i].cooperatorNm});
+        			var bFindData = false;
+        			var bFindDate = false;
+        			for (var j = 0 ; j < data.length; j++){
+        				if(data[j].cooperatorId == oneData.cooperatorId){
+        					profitArr = data[j].data;
+        					profitArr.push(oneData.cost);
+        					data[j].data = profitArr;
+        					bFindData = true;
+        				}
+        			}
+        			if(!bFindData){
+    					data.push({cooperatorId: oneData.cooperatorId
+    						, yLabelName: oneData.cooperatorNm
+    						, type:"line"
+    						, data: [oneData.cost]
+	                        , showSymbol: !1
+	                        , symbol: "circle"
+	                        , lineStyle: {
+	                             width: 2,
+	                             color: window.phoenix.utils.getColor(colorArray[(idxColor++)%colorArray.length])
+	                        }
+	                        , emphasis: {
+	                             lineStyle: {
+	                                 color: window.phoenix.utils.getColor(colorArray[(idxColor++)%colorArray.length])
+	                             }
+	                        }
+	                        , zlevel: 2}
+    					);
+        			}
+
+        			for (var j = 0 ; j < date.length; j++){
+        				if(date[j] == oneData.day){
+        					bFindDate = true;
+        				}
+        			}
+
+        			if(!bFindDate){
+        				date.push(oneData.day);
+        			}
+        		}
+
+
+        		newCustomersChartsInit(data, date);
+        	}
+
+
+        })
+        .catch(function(error) {
+            console.error('There was an error fetching the data:', error);
+        }).finally(function() {
+        	// 로딩 종료
+            $('.loading-wrap--js').hide();
+        });
+	}
+
+
 
     const {merge: merge} = window._;
     const echartSetOption = (t, e, s, n) => {
@@ -317,23 +395,23 @@
   };
 
 
-/*const newCustomersChartsInit = () => {
-      const {getColor: o, getData: t, getDates: e} = window.phoenix.utils
+const newCustomersChartsInit = (data, tmpDate) => {
+      const {getColor: o, getData: t} = window.phoenix.utils
         , a = document.querySelector(".echarts-new-customers")
         , i = o => {
-          const t = window.dayjs(o[0].axisValue)
-            , e = window.dayjs(o[0].axisValue).subtract(1, "month")
-            , a = o.map(( (o, a) => ({
+          const  a = o.map(( (o, a) => ({
               value: o.value,
-              date: a > 0 ? e : t,
+              yLabelName:o.yLabelName,
               color: o.color
           })));
           let i = "";
+
+          a.sort((a, b) => -(a.value - b.value));
           return a.forEach(( (o, t) => {
-              i += '<h6 class="fs-9 text-body-tertiary '+(t>0?"mb-0":"")+'"><span class="fas fa-circle me-2" style="color:'+o.color+'"></span>\n      '+o.date.format("MMM DD")+' : '+o.value+'\n    </h6>';
+              i += '<h6 class="fs-9 text-body-tertiary '+(t>0?"mb-0":"")+'"><span class="fas fa-circle me-2" style="color:'+o.color+'"></span>\n'+o.yLabelName+' :  '+currencyFormatter(o.value)+'원\n    </h6>';
           }
           )),
-          '<div class="ms-1">\n              '+i+'\n            </div>'
+          '<div class="ms-1">\n'+i+'\n</div>'
       }
       ;
       if (a) {
@@ -358,7 +436,7 @@
               },
               xAxis: [{
                   type: "category",
-                  data: e(new Date("5/1/2022"), new Date("5/7/2022"), 864e5),
+                  data: tmpDate,
                   show: !0,
                   boundaryGap: !1,
                   axisLine: {
@@ -371,12 +449,12 @@
                       show: !1
                   },
                   axisLabel: {
-                      formatter: o => window.dayjs(o).format("DD MMM"),
+                      formatter: o => o.substr(4,2)+'-'+o.substr(6,2),
                       showMinLabel: !0,
                       showMaxLabel: !1,
                       color: o("secondary-color"),
                       align: "left",
-                      interval: 5,
+                      interval: 0,
                       fontFamily: "Nunito Sans",
                       fontWeight: 600,
                       fontSize: 12.8
@@ -385,9 +463,9 @@
                   type: "category",
                   position: "bottom",
                   show: !0,
-                  data: e(new Date("5/1/2022"), new Date("5/7/2022"), 864e5),
+                  data: tmpDate,
                   axisLabel: {
-                      formatter: o => window.dayjs(o).format("DD MMM"),
+                      formatter: o => o.substr(4,2)+'-'+o.substr(6,2),
                       interval: 130,
                       showMaxLabel: !0,
                       showMinLabel: !1,
@@ -413,42 +491,7 @@
                   type: "value",
                   boundaryGap: !1
               },
-              series: [{
-                  type: "line",
-                  data: [150, 100, 300, 200, 250, 180, 250],
-                  showSymbol: !1,
-                  symbol: "circle",
-                  lineStyle: {
-                      width: 2,
-                      color: o("secondary-bg")
-                  },
-                  emphasis: {
-                      lineStyle: {
-                          color: o("secondary-bg")
-                      }
-                  },
-                  zlevel: 2
-              }, {
-                  type: "line",
-                  data: [200, 150, 250, 100, 500, 400, 600],
-                  lineStyle: {
-                      width: 2,
-                      color: o("primary")
-                  },
-                  showSymbol: !1,
-                  symbol: "circle",
-                  zlevel: 2
-              }, {
-                  type: "line",
-                  data: [100, 100, 400, 300, 100, 100, 500],
-                  lineStyle: {
-                      width: 2,
-                      color: o("info-dark")
-                  },
-                  showSymbol: !1,
-                  symbol: "circle",
-                  zlevel: 2
-              }],
+              series: data,
               grid: {
                   left: 0,
                   right: 0,
@@ -458,7 +501,7 @@
           })));
       }
   }
-  ;*/
+  ;
 </script>
 <body class="index-page">
 
@@ -521,10 +564,10 @@
                     <div class="card-body">
                       <div class="d-flex justify-content-between">
                         <div>
-                          <h5 class="mb-1">준비중<span class="badge badge-phoenix badge-phoenix-warning rounded-pill fs-9 ms-2"> <span class="badge-label">+26.5%</span></span></h5>
-                          <h6 class="text-body-tertiary">Last 7 days</h6>
+                          <h5 class="mb-1">주정산서별 수익현황(콜,기타,선지급수수료)<span class="badge badge-phoenix badge-phoenix-warning rounded-pill fs-9 ms-2"> <span class="badge-label"></span></span></h5>
+                          <h6 class="text-body-tertiary">Last 7 times</h6>
                         </div>
-                        <h4>0</h4>
+<!--                         <h4>0</h4> -->
                       </div>
                       <div class="pb-0 pt-4">
                         <div class="echarts-new-customers" style="height: 180px; width: 100%; user-select: none; -webkit-tap-highlight-color: rgba(0, 0, 0, 0); position: relative;" _echarts_instance_="ec_1758602219820">
@@ -534,18 +577,18 @@
                         	</div>
                         	<div class="" style="position: absolute; display: block; border-style: solid; white-space: nowrap; box-shadow: rgba(0, 0, 0, 0.2) 1px 2px 10px; background-color: rgb(239, 242, 246); border-width: 1px; border-radius: 4px; color: rgb(20, 24, 36); font: 14px / 21px &quot;Microsoft YaHei&quot;; padding: 10px; top: 0px; left: 0px; transform: translate3d(158px, 70px, 0px); border-color: rgb(203, 208, 221); z-index: 1000; pointer-events: none; visibility: hidden; opacity: 0;">
 	                        	<div class="ms-1">
-		              				<h6 class="fs-9 text-body-tertiary false">
-			              				<svg class="svg-inline--fa fa-circle me-2" style="color: #5470c6;" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="circle" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" data-fa-i2svg="">
-			              					<path fill="currentColor" d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512z"></path>
-			              				</svg><!-- <span class="fas fa-circle me-2" style="color:#5470c6"></span> Font Awesome fontawesome.com -->
-										May 04 : 200
-									</h6>
-									<h6 class="fs-9 text-body-tertiary mb-0">
-										<svg class="svg-inline--fa fa-circle me-2" style="color: #91cc75;" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="circle" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" data-fa-i2svg="">
-											<path fill="currentColor" d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512z"></path>
-										</svg><!-- <span class="fas fa-circle me-2" style="color:#91cc75"></span> Font Awesome fontawesome.com -->
-										Apr 04 : 100
-									</h6>
+<!-- 		              				<h6 class="fs-9 text-body-tertiary false"> -->
+<!-- 			              				<svg class="svg-inline--fa fa-circle me-2" style="color: #5470c6;" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="circle" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" data-fa-i2svg=""> -->
+<!-- 			              					<path fill="currentColor" d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512z"></path> -->
+<!-- 			              				</svg><span class="fas fa-circle me-2" style="color:#5470c6"></span> Font Awesome fontawesome.com -->
+<!-- 										May 04 : 200 -->
+<!-- 									</h6> -->
+<!-- 									<h6 class="fs-9 text-body-tertiary mb-0"> -->
+<!-- 										<svg class="svg-inline--fa fa-circle me-2" style="color: #91cc75;" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="circle" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" data-fa-i2svg=""> -->
+<!-- 											<path fill="currentColor" d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512z"></path> -->
+<!-- 										</svg><span class="fas fa-circle me-2" style="color:#91cc75"></span> Font Awesome fontawesome.com -->
+<!-- 										Apr 04 : 100 -->
+<!-- 									</h6> -->
 	            				</div>
             				</div>
             			</div>

@@ -31,5 +31,6 @@ public class StsVO extends Sch implements Serializable {
 	private BigDecimal costCCoop;
 	private BigDecimal costPOper;
 	private BigDecimal costPSale;
+	private BigDecimal cost;
 
 }

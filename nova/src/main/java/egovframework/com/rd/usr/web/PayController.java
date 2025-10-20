@@ -455,6 +455,8 @@ public class PayController {
         if(!Util.isUsr()) {
         	return "egovframework/com/cmm/error/accessDenied";
         }
+
+        model.addAttribute("etcVO", etcVO);
         return "egovframework/usr/pay/pay0005";
 	}
 
@@ -493,6 +495,7 @@ public class PayController {
         Map<String, Object> map =  new HashMap<String, Object>();
 
         map.put("list", list);
+        map.put("cnt", memService.selectEtcListCnt(etcVO));
         map.put("resultCode", "success");
         return ResponseEntity.ok(map);
 	}
