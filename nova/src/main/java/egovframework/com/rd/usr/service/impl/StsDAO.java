@@ -81,6 +81,15 @@ public class StsDAO extends EgovComAbstractDAO {
 	public List<StsVO> selectCooperatorProfitStsList(StsVO vo) throws Exception {
 		return selectList("stsDAO.selectCooperatorProfitStsList", vo);
 	}
+	/**
+	 * 주정산별 협력사별 배달건수현황
+	 * @param vo
+	 * @return
+	 * @throws Exception
+	 */
+	public List<StsVO> selectCooperatorDeliveryCntStsList(StsVO vo) throws Exception {
+		return selectList("stsDAO.selectCooperatorDeliveryCntStsList", vo);
+	}
 }
 
 

@@ -11,7 +11,7 @@
 
 
 
-<script type="text/javascript"	src="<c:url value='/js/echarts.min.js' />"></script>
+<script type="text/javascript"	src="<c:url value='/js/echarts.min.js?v=0.1' />"></script>
     <script type="text/javascript"	src="<c:url value='/js/lodash.min.js' />"></script>
     <script type="text/javascript"	src="<c:url value='/js/phoenix.js' />"></script>
     <script type="text/javascript"	src="<c:url value='/js/anchor.min.js' />"></script>
@@ -36,7 +36,7 @@
 	document.addEventListener('DOMContentLoaded', function() {
 		loadNotice();
 		loadCooperatorList();
-		loadCooperatorProfitList();
+		loadCooperatorEtcStsList();
 // 		newCustomersChartsInit();
 
 	});
@@ -222,7 +222,7 @@
 	}
 
 
-	function loadCooperatorProfitList(){
+	function loadCooperatorEtcStsList(){
 		const params = new URLSearchParams();
 
 		// 로딩 시작
@@ -239,7 +239,12 @@
 
         		var data = [];
         		var date = [];
+
+        		var dataDeliveryCnt = [];
+        		var dateDeliveryCnt = [];
         		var idxColor = 0;
+
+        		//주정산서별 수익현황 그래프
         		for(var i = 0 ; i < response.data.profitList.length ; i++){
         			var oneData = response.data.profitList[i];
         			//data.push({value: response.data.list[i].rdcnt, name:response.data.list[i].cooperatorNm});
@@ -247,7 +252,7 @@
         			var bFindDate = false;
         			for (var j = 0 ; j < data.length; j++){
         				if(data[j].cooperatorId == oneData.cooperatorId){
-        					profitArr = data[j].data;
+        					var profitArr = data[j].data;
         					profitArr.push(oneData.cost);
         					data[j].data = profitArr;
         					bFindData = true;
@@ -283,9 +288,55 @@
         				date.push(oneData.day);
         			}
         		}
-
-
         		newCustomersChartsInit(data, date);
+
+
+
+        		//주정산서별 배달건수현황 그래프
+        		for(var i = 0 ; i < response.data.DeliveryCntList.length ; i++){
+        			var oneData = response.data.DeliveryCntList[i];
+        			//data.push({value: response.data.list[i].rdcnt, name:response.data.list[i].cooperatorNm});
+        			var bFindData = false;
+        			var bFindDate = false;
+        			for (var j = 0 ; j < dataDeliveryCnt.length; j++){
+        				if(dataDeliveryCnt[j].cooperatorId == oneData.cooperatorId){
+        					var profitArr = dataDeliveryCnt[j].data;
+        					profitArr.push(oneData.cnt);
+        					dataDeliveryCnt[j].data = profitArr;
+        					bFindData = true;
+        				}
+        			}
+        			if(!bFindData){
+    					dataDeliveryCnt.push({cooperatorId: oneData.cooperatorId
+    						, yLabelName: oneData.cooperatorNm
+    						, type:"line"
+    						, data: [oneData.cnt]
+	                        , showSymbol: !1
+	                        , symbol: "circle"
+	                        , lineStyle: {
+	                             width: 2,
+	                             color: window.phoenix.utils.getColor(colorArray[(idxColor++)%colorArray.length])
+	                        }
+	                        , emphasis: {
+	                             lineStyle: {
+	                                 color: window.phoenix.utils.getColor(colorArray[(idxColor++)%colorArray.length])
+	                             }
+	                        }
+	                        , zlevel: 2}
+    					);
+        			}
+
+        			for (var j = 0 ; j < dateDeliveryCnt.length; j++){
+        				if(dateDeliveryCnt[j] == oneData.day){
+        					bFindDate = true;
+        				}
+        			}
+
+        			if(!bFindDate){
+        				dateDeliveryCnt.push(oneData.day);
+        			}
+        		}
+        		newDeliveryChartsInit(dataDeliveryCnt, dateDeliveryCnt);
         	}
 
 
@@ -331,6 +382,8 @@
     }
     ;
 
+
+    //협력사별 라이더수 그래프
     const {echarts: echarts} = window
     , topCouponsChartInit = (data, allCnt) => {
       const {getData: t, getColor: e} = window.phoenix.utils
@@ -502,6 +555,114 @@ const newCustomersChartsInit = (data, tmpDate) => {
       }
   }
   ;
+  const newDeliveryChartsInit = (data, tmpDate) => {
+      const {getColor: o, getData: t} = window.phoenix.utils
+        , a = document.querySelector(".echart-total-orders")
+        , i = o => {
+          const  a = o.map(( (o, a) => ({
+              value: o.value,
+              yLabelName:o.yLabelName,
+              color: o.color
+          })));
+          let i = "";
+
+          a.sort((a, b) => -(a.value - b.value));
+          return a.forEach(( (o, t) => {
+              i += '<h6 class="fs-9 text-body-tertiary '+(t>0?"mb-0":"")+'"><span class="fas fa-circle me-2" style="color:'+o.color+'"></span>\n'+o.yLabelName+' :  '+currencyFormatter(o.value)+'건\n    </h6>';
+          }
+          )),
+          '<div class="ms-1">\n'+i+'\n</div>'
+      }
+      ;
+      if (a) {
+          const r = t(a, "echarts")
+            , s = window.echarts.init(a);
+          echartSetOption(s, r, ( () => ({
+              tooltip: {
+                  trigger: "axis",
+                  padding: 10,
+                  backgroundColor: o("body-highlight-bg"),
+                  borderColor: o("border-color"),
+                  textStyle: {
+                      color: o("light-text-emphasis")
+                  },
+                  borderWidth: 1,
+                  transitionDuration: 0,
+                  axisPointer: {
+                      type: "none"
+                  },
+                  formatter: i,
+                  extraCssText: "z-index: 1000"
+              },
+              xAxis: [{
+                  type: "category",
+                  data: tmpDate,
+                  show: !0,
+                  boundaryGap: !1,
+                  axisLine: {
+                      show: !0,
+                      lineStyle: {
+                          color: o("secondary-bg")
+                      }
+                  },
+                  axisTick: {
+                      show: !1
+                  },
+                  axisLabel: {
+                      formatter: o => o.substr(4,2)+'-'+o.substr(6,2),
+                      showMinLabel: !0,
+                      showMaxLabel: !1,
+                      color: o("secondary-color"),
+                      align: "left",
+                      interval: 0,
+                      fontFamily: "Nunito Sans",
+                      fontWeight: 600,
+                      fontSize: 12.8
+                  }
+              }, {
+                  type: "category",
+                  position: "bottom",
+                  show: !0,
+                  data: tmpDate,
+                  axisLabel: {
+                      formatter: o => o.substr(4,2)+'-'+o.substr(6,2),
+                      interval: 130,
+                      showMaxLabel: !0,
+                      showMinLabel: !1,
+                      color: o("secondary-color"),
+                      align: "right",
+                      fontFamily: "Nunito Sans",
+                      fontWeight: 600,
+                      fontSize: 12.8
+                  },
+                  axisLine: {
+                      show: !1
+                  },
+                  axisTick: {
+                      show: !1
+                  },
+                  splitLine: {
+                      show: !1
+                  },
+                  boundaryGap: !1
+              }],
+              yAxis: {
+                  show: !1,
+                  type: "value",
+                  boundaryGap: !1
+              },
+              series: data,
+              grid: {
+                  left: 0,
+                  right: 0,
+                  top: 5,
+                  bottom: 20
+              }
+          })));
+      }
+  }
+  ;
+
 </script>
 <body class="index-page">
 
@@ -603,31 +764,47 @@ const newCustomersChartsInit = (data, tmpDate) => {
                     <div class="card-body">
                       <div class="d-flex justify-content-between">
                         <div>
-                          <h5 class="mb-1">준비중<span class="badge badge-phoenix badge-phoenix-warning rounded-pill fs-9 ms-2"><span class="badge-label">-6.8%</span></span></h5>
-                          <h6 class="text-body-tertiary">Last 7 days</h6>
+                          <h5 class="mb-1">주정산서별 배달건수현황<span class="badge badge-phoenix badge-phoenix-warning rounded-pill fs-9 ms-2"><span class="badge-label"></span></span></h5>
+                          <h6 class="text-body-tertiary">Last 7 times</h6>
                         </div>
-                        <h4>0</h4>
+                        <h4></h4>
                       </div>
-                      <div class="d-flex justify-content-center px-4 py-6">
-                        <div class="echart-total-orders" style="height: 85px; width: 115px; user-select: none; -webkit-tap-highlight-color: rgba(0, 0, 0, 0); position: relative;" _echarts_instance_="ec_1758602219825">
-                        	<div style="position: relative; width: 115px; height: 85px; padding: 0px; margin: 0px; border-width: 0px;">
-                        		<canvas data-zr-dom-id="zr_0" width="115" height="85" style="position: absolute; left: 0px; top: 0px; width: 115px; height: 85px; user-select: none; -webkit-tap-highlight-color: rgba(0, 0, 0, 0); padding: 0px; margin: 0px; border-width: 0px;"></canvas>
+                      <div class="pb-0 pt-4">
+                          <div class="echart-total-orders" style="height: 180px; width: 100%; user-select: none; -webkit-tap-highlight-color: rgba(0, 0, 0, 0); position: relative;" _echarts_instance_="ec_1758602219820">
+                        	<div style="position: relative; width: 323px; height: 180px; padding: 0px; margin: 0px; border-width: 0px; cursor: default;">
+                        		<canvas data-zr-dom-id="zr_0" width="323" height="180" style="position: absolute; left: 0px; top: 0px; width: 323px; height: 180px; user-select: none; -webkit-tap-highlight-color: rgba(0, 0, 0, 0); padding: 0px; margin: 0px; border-width: 0px;"></canvas>
+                        		<canvas data-zr-dom-id="zr_2" width="323" height="180" style="position: absolute; left: 0px; top: 0px; width: 323px; height: 180px; user-select: none; -webkit-tap-highlight-color: rgba(0, 0, 0, 0); padding: 0px; margin: 0px; border-width: 0px;"></canvas>
                         	</div>
-                        	<div class=""></div>
-                        </div>
+                        	<div class="" style="position: absolute; display: block; border-style: solid; white-space: nowrap; box-shadow: rgba(0, 0, 0, 0.2) 1px 2px 10px; background-color: rgb(239, 242, 246); border-width: 1px; border-radius: 4px; color: rgb(20, 24, 36); font: 14px / 21px &quot;Microsoft YaHei&quot;; padding: 10px; top: 0px; left: 0px; transform: translate3d(158px, 70px, 0px); border-color: rgb(203, 208, 221); z-index: 1000; pointer-events: none; visibility: hidden; opacity: 0;">
+	                        	<div class="ms-1">
+<!-- 		              				<h6 class="fs-9 text-body-tertiary false"> -->
+<!-- 			              				<svg class="svg-inline--fa fa-circle me-2" style="color: #5470c6;" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="circle" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" data-fa-i2svg=""> -->
+<!-- 			              					<path fill="currentColor" d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512z"></path> -->
+<!-- 			              				</svg><span class="fas fa-circle me-2" style="color:#5470c6"></span> Font Awesome fontawesome.com -->
+<!-- 										May 04 : 200 -->
+<!-- 									</h6> -->
+<!-- 									<h6 class="fs-9 text-body-tertiary mb-0"> -->
+<!-- 										<svg class="svg-inline--fa fa-circle me-2" style="color: #91cc75;" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="circle" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" data-fa-i2svg=""> -->
+<!-- 											<path fill="currentColor" d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512z"></path> -->
+<!-- 										</svg><span class="fas fa-circle me-2" style="color:#91cc75"></span> Font Awesome fontawesome.com -->
+<!-- 										Apr 04 : 100 -->
+<!-- 									</h6> -->
+	            				</div>
+            				</div>
+            			</div>
                       </div>
-                      <div class="mt-2">
-                        <div class="d-flex align-items-center mb-2">
-                          <div class="bullet-item bg-primary me-2"></div>
-                          <h6 class="text-body fw-semibold flex-1 mb-0">Completed</h6>
-                          <h6 class="text-body fw-semibold mb-0">52%</h6>
-                        </div>
-                        <div class="d-flex align-items-center">
-                          <div class="bullet-item bg-primary-subtle me-2"></div>
-                          <h6 class="text-body fw-semibold flex-1 mb-0">Pending payment</h6>
-                          <h6 class="text-body fw-semibold mb-0">48%</h6>
-                        </div>
-                      </div>
+<!--                       <div class="mt-2"> -->
+<!--                         <div class="d-flex align-items-center mb-2"> -->
+<!--                           <div class="bullet-item bg-primary me-2"></div> -->
+<!--                           <h6 class="text-body fw-semibold flex-1 mb-0">Completed</h6> -->
+<!--                           <h6 class="text-body fw-semibold mb-0">52%</h6> -->
+<!--                         </div> -->
+<!--                         <div class="d-flex align-items-center"> -->
+<!--                           <div class="bullet-item bg-primary-subtle me-2"></div> -->
+<!--                           <h6 class="text-body fw-semibold flex-1 mb-0">Pending payment</h6> -->
+<!--                           <h6 class="text-body fw-semibold mb-0">48%</h6> -->
+<!--                         </div> -->
+<!--                       </div> -->
                     </div>
                   </div>
                 </div>
@@ -647,18 +824,18 @@ const newCustomersChartsInit = (data, tmpDate) => {
                       <div class="d-flex justify-content-center pt-3 flex-1">
                         <div class="echarts-paying-customer-chart" style="height: 100%; width: 100%; user-select: none; -webkit-tap-highlight-color: rgba(0, 0, 0, 0); position: relative;" _echarts_instance_="ec_1758602219824"><div style="position: relative; width: 323px; height: 144px; padding: 0px; margin: 0px; border-width: 0px; cursor: default;"><canvas data-zr-dom-id="zr_0" width="323" height="144" style="position: absolute; left: 0px; top: 0px; width: 323px; height: 144px; user-select: none; -webkit-tap-highlight-color: rgba(0, 0, 0, 0); padding: 0px; margin: 0px; border-width: 0px;"></canvas></div><div class=""></div></div>
                       </div>
-                      <div class="mt-3">
-                        <div class="d-flex align-items-center mb-2">
-                          <div class="bullet-item bg-primary me-2"></div>
-                          <h6 class="text-body fw-semibold flex-1 mb-0">Paying customer</h6>
-                          <h6 class="text-body fw-semibold mb-0">30%</h6>
-                        </div>
-                        <div class="d-flex align-items-center">
-                          <div class="bullet-item bg-primary-subtle me-2"></div>
-                          <h6 class="text-body fw-semibold flex-1 mb-0">Non-paying customer</h6>
-                          <h6 class="text-body fw-semibold mb-0">70%</h6>
-                        </div>
-                      </div>
+<!--                       <div class="mt-3"> -->
+<!--                         <div class="d-flex align-items-center mb-2"> -->
+<!--                           <div class="bullet-item bg-primary me-2"></div> -->
+<!--                           <h6 class="text-body fw-semibold flex-1 mb-0">Paying customer</h6> -->
+<!--                           <h6 class="text-body fw-semibold mb-0">30%</h6> -->
+<!--                         </div> -->
+<!--                         <div class="d-flex align-items-center"> -->
+<!--                           <div class="bullet-item bg-primary-subtle me-2"></div> -->
+<!--                           <h6 class="text-body fw-semibold flex-1 mb-0">Non-paying customer</h6> -->
+<!--                           <h6 class="text-body fw-semibold mb-0">70%</h6> -->
+<!--                         </div> -->
+<!--                       </div> -->
                     </div>
                   </div>
                 </div>

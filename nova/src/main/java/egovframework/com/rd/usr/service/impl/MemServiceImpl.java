@@ -3,7 +3,9 @@ package egovframework.com.rd.usr.service.impl;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.annotation.Resource;
 
@@ -1406,5 +1408,17 @@ public class MemServiceImpl extends EgovAbstractServiceImpl implements MemServic
         	returnVo = vo;
         }
         return returnVo;
+	}
+	/**
+	 * 관리자 리스트 조회(권한별)
+	 * @param vo
+	 * @return
+	 * @throws Exception
+	 */
+	public Map<String, Object> selectEmplyrList(CooperatorVO vo) throws Exception {
+		List<CooperatorVO> result = memDAO.selectEmplyrList(vo);
+    	Map<String, Object> map = new HashMap<String, Object>();
+    	map.put("resultList", result);
+    	return map;
 	}
 }

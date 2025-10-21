@@ -50,6 +50,7 @@
   --phoenix-danger-rgb: 250, 59, 29;
   --phoenix-light-rgb: 239, 242, 246;
   --phoenix-dark-rgb: 20, 24, 36;
+  --phoenix-purple-rgb: 111, 66, 193;
   --phoenix-primary-text-emphasis: #003cc7;
   --phoenix-secondary-text-emphasis: #525b75;
   --phoenix-success-text-emphasis: #1c6c09;
@@ -12507,7 +12508,10 @@ textarea.form-control-lg {
   --phoenix-bg-opacity: 1;
   background-color: rgba(var(--phoenix-primary-lighter-rgb), var(--phoenix-bg-opacity)) !important;
 }
-
+.bg-purple {
+  --phoenix-bg-opacity: 1;
+  background-color: rgba(var(--phoenix-purple-rgb), var(--phoenix-bg-opacity)) !important;
+}
 .bg-primary-light {
   --phoenix-bg-opacity: 1;
   background-color: rgba(var(--phoenix-primary-light-rgb), var(--phoenix-bg-opacity)) !important;

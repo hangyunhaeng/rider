@@ -26,7 +26,8 @@
 // 			, valueGetter:(params) => { return params.data.deliveryCnt > 0 || params.data.deliveryCnt =='합계' ? params.data.deliveryCnt: ''}
 // 			, cellClass: 'ag-cell-right'
 // 		},
-		{ headerName: "출금일", field: "deliveryDay", minWidth: 120},
+		{ headerName: "영업사원", field: "emplyrNm", minWidth: 80},
+		{ headerName: "일자", field: "deliveryDay", minWidth: 120},
 // 		{ headerName: "배달비", field: "deliveryCost", minWidth: 120
 // 			, valueGetter:(params) => { return params.data.deliveryCnt > 0 ? currencyFormatter(params.data.deliveryCost): ''}
 // 			, cellClass: 'ag-cell-right'
@@ -39,7 +40,7 @@
 		{ headerName: "협력사명", field: "cooperatorNm", minWidth: 140},
 		{ headerName: "라이더ID", field: "mberId", minWidth: 140},
 		{ headerName: "라이더명", field: "mberNm", minWidth: 140},
-		{ headerName: "배달건수", field: "deliveryCnt", minWidth: 140, cellClass: 'ag-cell-right'},
+		{ headerName: "배달건수", field: "deliveryCnt", minWidth: 140, cellClass: 'ag-cell-right', valueGetter:(params) => { return currencyFormatter(params.data.deliveryCnt)}},
 		{ headerName: "구분", field: "gubun", minWidth: 140, hide:true},
 		{ headerName: "구분", field: "gubunNm", minWidth: 140},
 		{ headerName: "금액", field: "cost", minWidth: 80
@@ -220,6 +221,10 @@
 		searchFromDate.setDate(towWeekAgo.getFullYear()+"-"+(towWeekAgo.getMonth()+1)+"-"+towWeekAgo.getDate());
 		searchToDate.setDate(today.getFullYear()+"-"+(today.getMonth()+1)+"-"+today.getDate());
 
+		//영업사원 리스트
+		var salesList = JSON.parse('${salesList}');
+		populateSelectOptions('searchSalesId', salesList.resultList, '', {opt : "all"});
+
 		loadCooperatorList();
 		//그리드 설정
 		setGrid();
@@ -267,6 +272,7 @@
 		params.append('searchNm', $('#searchNm').val().trim());
 		params.append('searchRegistrationSn', $('#searchRegistrationSn').val().trim());
 		params.append('searchGubun', $('#searchGubun').val());
+		params.append('searchSalesId', $('#searchSalesId').val());
 
 		// 로딩 시작
         $('.loading-wrap--js').show();
@@ -284,7 +290,8 @@
 
 	        	if (response.data.list.length == 0) {
 	        		grid.setGridOption('rowData',[]);  	// 데이터가 없는 경우 빈 배열 설정
-					var sum = [{NO:"합계"
+					var sum = [{emplyrNm:"합계"
+						, deliveryCnt : 0
 						, cost: 0
 						}
 					];
@@ -293,7 +300,8 @@
 	            } else {
 					var lst = response.data.list;	//정상데이터
 
-					var sum = [{NO:"합계"
+					var sum = [{emplyrNm:"합계"
+						, deliveryCnt: response.data.list.reduce((acc, num) => Number(acc, 10) + Number(num.deliveryCnt, 10), 0)
 						, cost: response.data.list.reduce((acc, num) => Number(acc, 10) + Number(num.cost, 10), 0)
 						}
 					];
@@ -334,7 +342,7 @@
 				overlayLoadingTemplate: '<span class="ag-overlay-loading-center">로딩 중</span>',
 				overlayNoRowsTemplate: '<span class="ag-overlay-loading-center">데이터가 없습니다</span>',
 				pinnedBottomRowData: [
-					{NO:"합계", cost: 0}
+					{emplyrNm:"합계", deliveryCnt: 0, cost: 0}
 		        ],
 				onCellClicked : function (event) { //onSelectionChanged  :row가 바뀌었을때 발생하는 이벤트인데 잘 안됨.
 			    	selcetRow(event);
@@ -642,13 +650,17 @@
 					</tr>
 					<tr>
 						<th>구분</th>
-						<td colspan="3">
+						<td>
 							<select id="searchGubun" name='searchGubun' style='width: 100%'>
 								<option value="all">전체</option>
 								<option value="C">콜수수료</option>
 								<option value="D">선지급수수료</option>
 								<option value="P">프로그램료</option>
 							</select>
+						</td>
+						<th>영업사원</th>
+						<td>
+							<select id="searchSalesId" name='searchSalesId' style='width: 100%'></select>
 						</td>
 					</tr>
 				</table>

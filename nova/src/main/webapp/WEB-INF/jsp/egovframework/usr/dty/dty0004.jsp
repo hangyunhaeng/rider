@@ -35,7 +35,7 @@
 		{ headerName: "배달수단", field: "deliveryMethod", minWidth: 90},
 		{ headerName: "가게번호", field: "shopSn", minWidth: 90},
 		{ headerName: "가게이름", field: "shopNm", minWidth: 200, cellClass: 'ag-cell-left'},
-		{ headerName: "상품가격", field: "goodsPrice", minWidth: 90},
+		{ headerName: "상품가격", field: "goodsPrice", minWidth: 90, cellClass: 'ag-cell-right', valueGetter:(params) => { return currencyFormatter(params.data.goodsPrice)}},
 		{ headerName: "픽업 주소", field: "pickupAddr", minWidth: 200, cellClass: 'ag-cell-left'},
 		{ headerName: "전달지 주소", field: "destinationAddr", minWidth: 200, cellClass: 'ag-cell-left'},
 		{ headerName: "주문시간", field: "orderDt", minWidth: 150},
@@ -43,17 +43,17 @@
 		{ headerName: "가게도착", field: "shopComeinDt", minWidth: 150},
 		{ headerName: "픽업완료", field: "pickupFinistDt", minWidth: 150},
 		{ headerName: "전달완료", field: "deliveryFinistDt", minWidth: 150},
-		{ headerName: "거리", field: "distance", minWidth: 80},
+		{ headerName: "거리", field: "distance", minWidth: 80, cellClass: 'ag-cell-right', valueGetter:(params) => { return currencyFormatter(params.data.distance)}},
 		{ headerName: "추가배달사유", field: "addDeliveryReason", minWidth: 200},
 		{ headerName: "추가배달상세내용", field: "addDeliveryDesc", minWidth: 200},
 		{ headerName: "픽업지 법정동 ", field: "pickupLawDong", minWidth: 90},
-		{ headerName: "기본단가", field: "basicPrice", minWidth: 90},
-		{ headerName: "기상할증", field: "weatherPrimage", minWidth: 90},
-		{ headerName: "추가할증", field: "addPrimage", minWidth: 90},
-		{ headerName: "피크할증 등 ", field: "peakPrimageEtc", minWidth: 90},
-		{ headerName: "지역할증", field: "areaPrimage", minWidth: 90},
-		{ headerName: "대량할증 ", field: "amountPrimage", minWidth: 90},
-		{ headerName: "배달처리비", field: "deliveryPrice", minWidth: 90},
+		{ headerName: "기본단가", field: "basicPrice", minWidth: 120, cellClass: 'ag-cell-right', valueGetter:(params) => { return currencyFormatter(params.data.basicPrice)}},
+		{ headerName: "기상할증", field: "weatherPrimage", minWidth: 90, cellClass: 'ag-cell-right', valueGetter:(params) => { return currencyFormatter(params.data.weatherPrimage)}},
+		{ headerName: "추가할증", field: "addPrimage", minWidth: 90, cellClass: 'ag-cell-right', valueGetter:(params) => { return currencyFormatter(params.data.addPrimage)}},
+		{ headerName: "피크할증 등 ", field: "peakPrimageEtc", minWidth: 90, cellClass: 'ag-cell-right', valueGetter:(params) => { return currencyFormatter(params.data.peakPrimageEtc)}},
+		{ headerName: "지역할증", field: "areaPrimage", minWidth: 90, cellClass: 'ag-cell-right', valueGetter:(params) => { return currencyFormatter(params.data.areaPrimage)}},
+		{ headerName: "대량할증 ", field: "amountPrimage", minWidth: 90, cellClass: 'ag-cell-right', valueGetter:(params) => { return currencyFormatter(params.data.amountPrimage)}},
+		{ headerName: "배달처리비", field: "deliveryPrice", minWidth: 120, cellClass: 'ag-cell-right', valueGetter:(params) => { return currencyFormatter(params.data.deliveryPrice)}},
 		{ headerName: "라이더귀책여부", field: "riderCauseYn", minWidth: 90},
 		{ headerName: "추가할증사유", field: "addPrimageDesc", minWidth: 90}
 	];
@@ -147,9 +147,40 @@
 
 	        	if (response.data.list.length == 0) {
 	        		grid.setGridOption('rowData',[]);  	// 데이터가 없는 경우 빈 배열 설정
+
+					var sum = [{cooperatorId:"합계"
+						, goodsPrice: 0
+						, distance: 0
+						, basicPrice: 0
+						, weatherPrimage: 0
+						, addPrimage: 0
+						, peakPrimageEtc: 0
+						, areaPrimage: 0
+						, amountPrimage: 0
+						, deliveryPrice: 0
+						}
+					];
+					grid.setGridOption('pinnedBottomRowData', sum);
+
 	        		grid.showNoRowsOverlay();  			// 데이터가 없는 경우
 	            } else {
 					var lst = response.data.list;	//정상데이터
+
+
+					var sum = [{cooperatorId:"합계"
+						, goodsPrice: response.data.list.reduce((acc, num) => Number(acc, 10) + Number(num.goodsPrice, 10), 0)
+						, distance: response.data.list.reduce((acc, num) => Number(acc, 10) + Number(num.distance, 10), 0)
+						, basicPrice: response.data.list.reduce((acc, num) => Number(acc, 10) + Number(num.basicPrice, 10), 0)
+						, weatherPrimage: response.data.list.reduce((acc, num) => Number(acc, 10) + Number(num.weatherPrimage, 10), 0)
+						, addPrimage: response.data.list.reduce((acc, num) => Number(acc, 10) + Number(num.addPrimage, 10), 0)
+						, peakPrimageEtc: response.data.list.reduce((acc, num) => Number(acc, 10) + Number(num.peakPrimageEtc, 10), 0)
+						, areaPrimage: response.data.list.reduce((acc, num) => Number(acc, 10) + Number(num.areaPrimage, 10), 0)
+						, amountPrimage: response.data.list.reduce((acc, num) => Number(acc, 10) + Number(num.amountPrimage, 10), 0)
+						, deliveryPrice: response.data.list.reduce((acc, num) => Number(acc, 10) + Number(num.deliveryPrice, 10), 0)
+						}
+					];
+					grid.setGridOption('pinnedBottomRowData', sum);	//합계데이터는 정상데이터만 포함한다
+
 	                grid.setGridOption('rowData', lst);
 	            }
 			}
@@ -183,7 +214,25 @@
                 },
                 rowClassRules: {'ag-cell-err ': (params) => { return params.data.err === true; }},
 				overlayLoadingTemplate: '<span class="ag-overlay-loading-center">로딩 중</span>',
-				overlayNoRowsTemplate: '<span class="ag-overlay-loading-center">데이터가 없습니다</span>'
+				overlayNoRowsTemplate: '<span class="ag-overlay-loading-center">데이터가 없습니다</span>',
+				pinnedBottomRowData: [
+					{cooperatorId:"합계"
+						, goodsPrice: 0
+						, distance: 0
+						, basicPrice: 0
+						, weatherPrimage: 0
+						, addPrimage: 0
+						, peakPrimageEtc: 0
+						, areaPrimage: 0
+						, amountPrimage: 0
+						, deliveryPrice: 0}
+		        ],
+                getRowStyle: (params) => {
+					if (params.node.rowPinned === 'bottom') {
+						return { 'background-color': 'lightblue' };
+					}
+					return null;
+				}
             };
         const gridDiv = document.querySelector('#myGrid');
         grid = agGrid.createGrid(gridDiv, gridOptions);

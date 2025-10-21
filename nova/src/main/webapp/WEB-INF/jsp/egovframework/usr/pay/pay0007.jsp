@@ -13,12 +13,12 @@
 
 
 	var pageInit = true;
-	var pagePerCnt = 15;
+// 	var pagePerCnt = 15;
 	let gridOptions="";
 	var grid="";
 	let data;
 	var columnDefs= [
-		{ headerName: "NO", field: "rn", minWidth: 70 },
+		{ headerName: "NO", field: "rn", minWidth: 70, valueGetter:(params) => { return params.node.rowIndex + 1}},
 		{ headerName: "fix", field: "fix", minWidth: 120, hide:true},
 		{ headerName: "kkoId", field: "kkoId", minWidth: 120, hide:true},
 		{ headerName: "upKkoId", field: "upKkoId", minWidth: 120, hide:true},
@@ -75,26 +75,26 @@
 		searchToDate.setDate(today.getFullYear()+"-"+(today.getMonth()+1)+"-"+today.getDate());
 
 		//페이징설정
-		paging.createPaging('#paging', 1, pagePerCnt, doSearch);
+// 		paging.createPaging('#paging', 1, pagePerCnt, doSearch);
 
 		//그리드 설정
 		setGrid();
 
 
-		doSearch((${kkoVO.schIdx}==0)?1: ${kkoVO.schIdx}, paging.objectCnt);
+		doSearch();
 	});
 
 
 
 	//내역 조회
-	function doSearch(schIdx, schPagePerCnt){
+	function doSearch(){
 
 		const params = new URLSearchParams();
 		params.append('searchFromDate', getOnlyNumber($('#searchFromDate').val()));
 		params.append('searchToDate', getOnlyNumber($('#searchToDate').val()));
 		params.append('searchGubun', $('#searchGubun').val());
-		params.append("schIdx", schIdx);
-		params.append("schPagePerCnt", schPagePerCnt);
+// 		params.append("schIdx", schIdx);
+// 		params.append("schPagePerCnt", schPagePerCnt);
 
 	    if(!limit2Week($('#searchFromDate').val(), $('#searchToDate').val())){
 	    	return;
@@ -112,7 +112,7 @@
 
 			if(response.data.resultCode == "success"){
 
-	            document.getElementById('TT_CNT0').textContent = currencyFormatter(response.data.cnt);
+	            document.getElementById('TT_CNT0').textContent = currencyFormatter(response.data.list.length);
 
 	        	if (response.data.list.length == 0) {
 	        		grid.setGridOption('rowData',[]);  	// 데이터가 없는 경우 빈 배열 설정
@@ -121,7 +121,7 @@
 					var lst = response.data.list;	//정상데이터
 	                grid.setGridOption('rowData', lst);
 	            }
-	        	paging.setPageing(schIdx, response.data.cnt);
+// 	        	paging.setPageing(schIdx, response.data.cnt);
 			}
 
         })
@@ -228,7 +228,7 @@
 			<div id="loadingOverlay" style="display: none;">Loading...</div>
 			<div  class="ib_product">
 				<div id="myGrid" class="ag-theme-alpine" style="height: 550px; width: 100%;"></div>
-				<div id="paging" class="d-flex align-items-center justify-content-center mt-3"></div>
+<!-- 				<div id="paging" class="d-flex align-items-center justify-content-center mt-3"></div> -->
 			</div>
 			</div>
 

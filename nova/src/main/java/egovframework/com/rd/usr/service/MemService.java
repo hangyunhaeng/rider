@@ -1,6 +1,7 @@
 package egovframework.com.rd.usr.service;
 
 import java.util.List;
+import java.util.Map;
 
 import egovframework.com.cmm.LoginVO;
 import egovframework.com.rd.usr.service.vo.CooperatorFeeVO;
@@ -243,4 +244,11 @@ public interface MemService {
 	 * @throws Exception
 	 */
 	public CooperatorVO saveAdminUsr(List<CooperatorVO> list, LoginVO user) throws Exception ;
+	/**
+	 * 관리자 리스트 조회(권한별)
+	 * @param vo
+	 * @return
+	 * @throws Exception
+	 */
+	public Map<String, Object> selectEmplyrList(CooperatorVO vo) throws Exception ;
 }

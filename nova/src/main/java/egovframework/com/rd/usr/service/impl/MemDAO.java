@@ -516,5 +516,14 @@ public class MemDAO extends EgovComAbstractDAO {
 	public List<CooperatorVO> selectAdminUsrList(CooperatorVO vo) throws Exception {
 		return selectList("memDAO.selectAdminUsrList", vo);
 	}
+	/**
+	 * 관리자 리스트 조회(권한별)
+	 * @param vo
+	 * @return
+	 * @throws Exception
+	 */
+	public List<CooperatorVO> selectEmplyrList(CooperatorVO vo) throws Exception {
+		return selectList("memDAO.selectEmplyrList", vo);
+	}
 }
 

@@ -782,4 +782,11 @@
 		/* AND a.EMPLYR_STTUS_CODE = 'P' /*P:사용 D:미사용*/
 		AND b.AUTHOR_CODE ='ROLE_ADMIN'
 	</select>
+
+	<select id="selectEmplyrList" parameterType="egovframework.com.rd.usr.service.vo.CooperatorVO" resultType="egovframework.com.rd.usr.service.vo.CooperatorVO">
+		SELECT b.EMPLYR_ID AS seleceKey, USER_NM AS selectValue
+		FROM COMTNEMPLYRSCRTYESTBS a
+		LEFT JOIN COMTNEMPLYRINFO b ON a.SCRTY_DTRMN_TRGET_ID = b.ESNTL_ID
+		WHERE AUTHOR_CODE = #{schAuthorCode}
+	</select>
 </mapper>

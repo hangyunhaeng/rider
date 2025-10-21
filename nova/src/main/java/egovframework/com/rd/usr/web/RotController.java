@@ -149,6 +149,7 @@ public class RotController {
         stsVO.setSchId(user.getId());
 
         map.put("profitList", stsService.selectCooperatorProfitStsList(stsVO));
+        map.put("DeliveryCntList", stsService.selectCooperatorDeliveryCntStsList(stsVO));
         map.put("resultCode", "success");
         return ResponseEntity.ok(map);
 	}

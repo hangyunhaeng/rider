@@ -38,7 +38,7 @@
     <link href="<c:url value='/css/phoenix/simplebar.min.css' />" rel="stylesheet">
     <link rel="stylesheet" href="<c:url value='/css/phoenix/line.css' />">
     <link href="<c:url value='/css/phoenix/theme-rtl.min.css' />" type="text/css" rel="stylesheet" id="style-rtl" disabled="true">
-    <link href="<c:url value='/css/phoenix/theme.min.css' />" type="text/css" rel="stylesheet" id="style-default">
+    <link href="<c:url value='/css/phoenix/theme.min.css?v=0.1' />" type="text/css" rel="stylesheet" id="style-default">
     <link href="<c:url value='/css/phoenix/user-rtl.min.css' />" type="text/css" rel="stylesheet" id="user-style-rtl" disabled="true">
     <link href="<c:url value='/css/phoenix/user.min.css' />" type="text/css" rel="stylesheet" id="user-style-default">
 

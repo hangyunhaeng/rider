@@ -29,6 +29,7 @@ import egovframework.com.rd.usr.service.MemService;
 import egovframework.com.rd.usr.service.PayService;
 import egovframework.com.rd.usr.service.RotService;
 import egovframework.com.rd.usr.service.vo.CooperatorPayVO;
+import egovframework.com.rd.usr.service.vo.CooperatorVO;
 import egovframework.com.rd.usr.service.vo.DoszDSResultVO;
 import egovframework.com.rd.usr.service.vo.DoszTransferVO;
 import egovframework.com.rd.usr.service.vo.EtcVO;
@@ -766,9 +767,8 @@ public class PayController {
         //return value
         Map<String, Object> map =  new HashMap<String, Object>();
 
-        List<KkoVO> list = payService.selectKkoList(kkoVO);
-        map.put("cnt", payService.selectKkoListCnt(kkoVO));
-        map.put("list", list);
+//        map.put("cnt", payService.selectKkoListCnt(kkoVO));
+        map.put("list", payService.selectKkoList(kkoVO));
         map.put("resultCode", "success");
         return ResponseEntity.ok(map);
 	}
@@ -954,7 +954,6 @@ public class PayController {
     public String pay0009(@ModelAttribute("ProfitVO") ProfitVO profitVO, HttpServletRequest request,ModelMap model) throws Exception {
 
     	//로그인 체크
-        LoginVO user = (LoginVO)EgovUserDetailsHelper.getAuthenticatedUser();
         Boolean isAuthenticated = EgovUserDetailsHelper.isAuthenticated();
 
         if(!isAuthenticated) {
@@ -964,6 +963,11 @@ public class PayController {
         if(!Util.isUsr()) {
         	return "egovframework/com/cmm/error/accessDenied";
         }
+
+        CooperatorVO cooperatorVO = new CooperatorVO();
+        cooperatorVO.setSchAuthorCode("ROLE_SALES");
+	    String salesListJson = new ObjectMapper().writeValueAsString(memService.selectEmplyrList(cooperatorVO));// taxInvInfo를 JSON으로 변환하여 뷰에 전달
+		model.addAttribute("salesList", salesListJson);
         return "egovframework/usr/pay/pay0009";
 	}
 

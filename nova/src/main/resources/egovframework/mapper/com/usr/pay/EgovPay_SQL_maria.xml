@@ -391,11 +391,12 @@
 
 		SELECT a.SALFIT_ID, a.PROFIT_ID, a.COOPERATOR_ID, a.MBER_ID, a.GUBUN, a.COST, a.DELIVERY_CNT, a.DELIVERY_DAY, a.DYP_ID, a.WKP_ID, a.FEE_ID, a.RIDER_FEE_ID
 		, DATE_FORMAT(a.CREAT_DT, '%Y%m%d') AS CREAT_DT, a.CREAT_ID
-		, b.MBER_NM, c.COOPERATOR_NM
+		, b.MBER_NM, c.COOPERATOR_NM, a.EMPLYR_ID, d.USER_NM AS EMPLYR_NM
 		, case when a.gubun = 'C' then '콜수수료' when a.gubun ='E' then '기타수수료' when a.gubun ='D' then '선지급수수료' when a.gubun ='P' then '프로그램료' ELSE '' END GUBUN_NM
 		FROM RD_SALES_PROFIT a
 		LEFT JOIN COMTNGNRLMBER b ON a.mber_id = b.mber_id
 		LEFT JOIN RD_COOPERATOR c ON a.cooperator_id = c.COOPERATOR_ID
+		LEFT JOIN COMTNEMPLYRINFO d ON a.EMPLYR_ID = d.EMPLYR_ID
 		where 1=1
 			AND a.USE_AT ='Y'
 
@@ -421,6 +422,9 @@
 				SELECT COOPERATOR_ID FROM RD_COOPERATOR_SALES
 				WHERE EMPLYR_ID = #{searchId} AND USE_AT ='Y'
 			)
+			</if>
+			<if test='searchSalesId != null and searchSalesId != "all"'>
+			AND a.EMPLYR_ID = #{searchSalesId}
 			</if>
 	</select>
 
