@@ -601,10 +601,14 @@ let paging = {
     	return false;
 	}
 
-	function limit2Week(start, end){
+	function limit2Week(start, end, exclus =[{}], id =''){
 		if(nullToString(start) == '' ||  nullToString(end) == ''){
 			alert("검색기간은 필수 조회 조건입니다.");
 			return false;
+		}
+
+		if (exclus.some(item => item.cd === id)) {
+			return true;
 		}
 		var startDate = new Date(start);
 		var endDate = new Date(end);

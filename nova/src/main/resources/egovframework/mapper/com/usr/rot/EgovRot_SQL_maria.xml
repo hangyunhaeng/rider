@@ -203,5 +203,10 @@
 			LEFT JOIN RD_RIDER_FEE c ON b.COOPERATOR_ID = c.COOPERATOR_ID  AND a.MBER_ID = c.MBER_ID AND  c.use_at ='Y'
 			WHERE a.MBER_ID = #{mberId} /*AND b.COOPERATOR_ID = #{searchCooperatorId}*/
 	</select>
+	<select id="selectExclusList" parameterType="egovframework.com.rd.usr.service.vo.CdVO" resultType="egovframework.com.rd.usr.service.vo.CdVO">
+		SELECT CD
+		FROM RD_CD
+		WHERE CD_GROUP ='EXCLUS' AND USE_AT ='Y'
+	</select>
 
 </mapper>

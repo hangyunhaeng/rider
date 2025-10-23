@@ -213,6 +213,10 @@ public class EgovWebApplicationInitializer implements WebApplicationInitializer 
 		//-------------------------------------------------------------
 		servletContext.addListener(new org.springframework.web.context.request.RequestContextListener());
 
+//		URL url = this.getClass().getResource("/egovframework/ehcache/ehcache-default.xml");
+//		CacheManager cacheManager = CacheManager.newInstance(url); //CacheManager.create();
+//		Cache cache = cacheManager.getCache("cvplCmmCd");
+
 		LOGGER.debug("EgovWebApplicationInitializer END-============================================");
 
 	}

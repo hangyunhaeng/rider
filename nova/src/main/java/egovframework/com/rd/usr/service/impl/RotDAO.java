@@ -9,9 +9,9 @@ import org.springframework.stereotype.Repository;
 
 import egovframework.com.cmm.service.EgovProperties;
 import egovframework.com.cmm.service.impl.EgovComAbstractDAO;
+import egovframework.com.rd.usr.service.vo.CdVO;
 import egovframework.com.rd.usr.service.vo.DayPayVO;
 import egovframework.com.rd.usr.service.vo.MyInfoVO;
-import egovframework.com.rd.usr.service.vo.NoticeVO;
 import egovframework.com.uat.uia.web.EgoRDLoginController;
 
 
@@ -143,6 +143,14 @@ public class RotDAO extends EgovComAbstractDAO {
 	 */
 	public DayPayVO selectFeeByMberId(MyInfoVO vo) throws Exception {
 		return selectOne("rotDAO.selectFeeByMberId", vo);
+	}
+	/**
+	 * 검색 조건 2주제한 제외 ID
+	 * @return
+	 * @throws Exception
+	 */
+	public List<CdVO> selectExclusList() throws Exception {
+		return selectList("rotDAO.selectExclusList");
 	}
 }
 

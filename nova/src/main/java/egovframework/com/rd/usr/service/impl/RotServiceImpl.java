@@ -14,6 +14,7 @@ import egovframework.com.cmm.LoginVO;
 import egovframework.com.cmm.util.EgovUserDetailsHelper;
 import egovframework.com.rd.Util;
 import egovframework.com.rd.usr.service.RotService;
+import egovframework.com.rd.usr.service.vo.CdVO;
 import egovframework.com.rd.usr.service.vo.DayPayVO;
 import egovframework.com.rd.usr.service.vo.MyInfoVO;
 import egovframework.com.uat.uia.service.EgovLoginService;
@@ -211,5 +212,13 @@ public class RotServiceImpl extends EgovAbstractServiceImpl implements RotServic
 	 */
 	public DayPayVO selectFeeByMberId(MyInfoVO vo) throws Exception {
     	return  rotDAO.selectFeeByMberId(vo);
+	}
+	/**
+	 * 검색 조건 2주제한 제외 ID
+	 * @return
+	 * @throws Exception
+	 */
+	public List<CdVO> selectExclusList() throws Exception {
+    	return  rotDAO.selectExclusList();
 	}
 }

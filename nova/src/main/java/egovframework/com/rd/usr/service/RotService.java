@@ -4,6 +4,7 @@ package egovframework.com.rd.usr.service;
 import java.util.List;
 import java.util.Map;
 
+import egovframework.com.rd.usr.service.vo.CdVO;
 import egovframework.com.rd.usr.service.vo.DayPayVO;
 import egovframework.com.rd.usr.service.vo.MyInfoVO;
 
@@ -75,4 +76,10 @@ public interface RotService {
 	 * @throws Exception
 	 */
 	public DayPayVO selectFeeByMberId(MyInfoVO vo) throws Exception ;
+	/**
+	 * 검색 조건 2주제한 제외 ID
+	 * @return
+	 * @throws Exception
+	 */
+	public List<CdVO> selectExclusList() throws Exception ;
 }

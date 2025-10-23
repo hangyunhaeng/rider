@@ -37,6 +37,8 @@ import egovframework.com.rd.usr.service.vo.HistoryVO;
 import egovframework.com.rd.usr.service.vo.KkoVO;
 import egovframework.com.rd.usr.service.vo.MyInfoVO;
 import egovframework.com.rd.usr.service.vo.ProfitVO;
+import net.sf.ehcache.Ehcache;
+import net.sf.ehcache.Element;
 
 /**
  * 게시판
@@ -64,6 +66,8 @@ public class PayController {
     private RotService rotService;
     @Resource(name = "DtyService")
     private DtyService dtyService;
+    @Resource(name="ehcache")
+    Ehcache gCache ;
 
 
 
@@ -81,7 +85,6 @@ public class PayController {
     public String pay0001(@ModelAttribute("HistoryVO") HistoryVO historyVO, HttpServletRequest request,ModelMap model) throws Exception {
 
     	//로그인 체크
-        LoginVO user = (LoginVO)EgovUserDetailsHelper.getAuthenticatedUser();
         Boolean isAuthenticated = EgovUserDetailsHelper.isAuthenticated();
 
         if(!isAuthenticated) {
@@ -144,7 +147,6 @@ public class PayController {
     public String pay0002(HttpServletRequest request,ModelMap model) throws Exception {
 
     	//로그인 체크
-        LoginVO user = (LoginVO)EgovUserDetailsHelper.getAuthenticatedUser();
         Boolean isAuthenticated = EgovUserDetailsHelper.isAuthenticated();
 
         if(!isAuthenticated) {
@@ -170,7 +172,6 @@ public class PayController {
 	public ResponseEntity<?> pay0002_0001(@ModelAttribute("DoszDSResultVO") DoszDSResultVO doszDSResultVO, HttpServletRequest request, SessionVO sessionVO, ModelMap model, SessionStatus status) throws Exception{
 
     	//로그인 체크
-        LoginVO user = (LoginVO)EgovUserDetailsHelper.getAuthenticatedUser();
         Boolean isAuthenticated = EgovUserDetailsHelper.isAuthenticated();
 
         if(!isAuthenticated) {
@@ -205,7 +206,6 @@ public class PayController {
     public String pay0003(@ModelAttribute("ProfitVO") ProfitVO profitVO, HttpServletRequest request,ModelMap model) throws Exception {
 
     	//로그인 체크
-        LoginVO user = (LoginVO)EgovUserDetailsHelper.getAuthenticatedUser();
         Boolean isAuthenticated = EgovUserDetailsHelper.isAuthenticated();
 
         if(!isAuthenticated) {
@@ -215,6 +215,11 @@ public class PayController {
         if(!Util.isUsr()) {
         	return "egovframework/com/cmm/error/accessDenied";
         }
+
+        Ehcache cache = gCache.getCacheManager().getCache("commCd");
+        if(cache.get("exclus") == null) cache.put(new Element("exclus", rotService.selectExclusList()));
+		model.addAttribute("exclus", new ObjectMapper().writeValueAsString(cache.get("exclus").getObjectValue()));
+
         return "egovframework/usr/pay/pay0003";
 	}
 
@@ -267,7 +272,6 @@ public class PayController {
     public String pay0004(@ModelAttribute("ProfitVO") ProfitVO profitVO, HttpServletRequest request,ModelMap model) throws Exception {
 
     	//로그인 체크
-        LoginVO user = (LoginVO)EgovUserDetailsHelper.getAuthenticatedUser();
         Boolean isAuthenticated = EgovUserDetailsHelper.isAuthenticated();
 
         if(!isAuthenticated) {
@@ -446,7 +450,6 @@ public class PayController {
     public String pay0005(@ModelAttribute("EtcVO") EtcVO etcVO, HttpServletRequest request,ModelMap model) throws Exception {
 
     	//로그인 체크
-        LoginVO user = (LoginVO)EgovUserDetailsHelper.getAuthenticatedUser();
         Boolean isAuthenticated = EgovUserDetailsHelper.isAuthenticated();
 
         if(!isAuthenticated) {
@@ -720,7 +723,6 @@ public class PayController {
     public String pay0007(@ModelAttribute("KkoVO") KkoVO kkoVO, HttpServletRequest request,ModelMap model) throws Exception {
 
     	//로그인 체크
-        LoginVO user = (LoginVO)EgovUserDetailsHelper.getAuthenticatedUser();
         Boolean isAuthenticated = EgovUserDetailsHelper.isAuthenticated();
 
         if(!isAuthenticated) {
