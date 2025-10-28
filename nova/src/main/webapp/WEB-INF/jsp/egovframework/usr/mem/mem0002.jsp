@@ -375,7 +375,7 @@
 				alert("저장할 항목이 없습니다");
 				return;
 			}
-				debugger;
+// 				debugger;
 
 			for(var i = 0 ; i < updateItem.length ; i++){
 				var one = updateItem[i];
@@ -450,7 +450,7 @@
 				alert("저장할 항목이 없습니다");
 				return;
 			}
-			debugger;
+// 			debugger;
 			for(var i = 0 ; i < updateItem.length ; i++){
 				if(updateItem[i].paybackDay == null || updateItem[i].paybackDay == 0){
 					alert("상황기간을 입력해주세요");
@@ -698,7 +698,7 @@
 		}
 	}
 	function changeCost(params){
-		debugger;
+// 		debugger;
 		const colId = params.column.getId();
 		if(colId == 'paybackDay' || colId == 'paybackCost'){
 // 			const gridIdx = params.node.rowIndex;

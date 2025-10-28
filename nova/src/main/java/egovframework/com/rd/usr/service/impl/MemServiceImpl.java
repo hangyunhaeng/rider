@@ -642,12 +642,12 @@ public class MemServiceImpl extends EgovAbstractServiceImpl implements MemServic
 
 
 		//0. 카카오 발송 정보 저장
-		String pass = Util.getRandomKey(5);
+		String pass = Util.getRandomKey(4);
 		KkoVO kkoOne = new KkoVO();
 		kkoOne.setMberId(userOne.getMberId());
 		kkoOne.setMbtlnum(Util.getOnlyNumber(userOne.getMbtlnum()));
 		kkoOne.setParam0(userOne.getMberNm());
-		kkoOne.setParam1("Daon"+pass);
+		kkoOne.setParam1("daon"+pass);
 		kkoOne.setTemplateCode(EgovProperties.getProperty("Globals.passRiderInitAlert"));
 		kkoList.add(kkoOne);
 
@@ -656,7 +656,7 @@ public class MemServiceImpl extends EgovAbstractServiceImpl implements MemServic
 		MberManageVO mberManageVO = new MberManageVO();
 
 	    mberManageVO.setUniqId(userOne.getUniqId());
-        mberManageVO.setPassword(EgovFileScrty.encryptPassword("Daon"+pass+"!", EgovStringUtil.isNullToString(userOne.getMberId())));
+        mberManageVO.setPassword(EgovFileScrty.encryptPassword("daon"+pass, EgovStringUtil.isNullToString(userOne.getMberId())));
         mberManageVO.setMberConfirmAt("N");
         mberManageService.updatePasswordSelf(mberManageVO);
 

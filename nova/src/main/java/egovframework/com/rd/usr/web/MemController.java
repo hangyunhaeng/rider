@@ -82,7 +82,7 @@ public class MemController {
     public String mem0001(HttpServletRequest request,ModelMap model) throws Exception {
 
     	//로그인 체크
-        LoginVO user = (LoginVO)EgovUserDetailsHelper.getAuthenticatedUser();
+//        LoginVO user = (LoginVO)EgovUserDetailsHelper.getAuthenticatedUser();
         Boolean isAuthenticated = EgovUserDetailsHelper.isAuthenticated();
 
         if(!isAuthenticated) {
@@ -243,7 +243,7 @@ public class MemController {
     public ResponseEntity<?> mem0001_0004(@ModelAttribute("cooperatorVO")CooperatorVO cooperatorVO, HttpServletRequest request,ModelMap model) throws Exception {
 
     	//로그인 체크
-        LoginVO user = (LoginVO)EgovUserDetailsHelper.getAuthenticatedUser();
+//        LoginVO user = (LoginVO)EgovUserDetailsHelper.getAuthenticatedUser();
         Boolean isAuthenticated = EgovUserDetailsHelper.isAuthenticated();
 
         if(!isAuthenticated) {
@@ -272,7 +272,7 @@ public class MemController {
     public ResponseEntity<?> mem0001_0005(@ModelAttribute("cooperatorVO")CooperatorVO cooperatorVO, HttpServletRequest request,ModelMap model) throws Exception {
 
     	//로그인 체크
-        LoginVO user = (LoginVO)EgovUserDetailsHelper.getAuthenticatedUser();
+//        LoginVO user = (LoginVO)EgovUserDetailsHelper.getAuthenticatedUser();
         Boolean isAuthenticated = EgovUserDetailsHelper.isAuthenticated();
 
         if(!isAuthenticated) {
@@ -408,7 +408,7 @@ public class MemController {
     public ResponseEntity<?> mem0002_0003(@ModelAttribute("cooperatorVO")CooperatorVO cooperatorVO, HttpServletRequest request,ModelMap model) throws Exception {
 
     	//로그인 체크
-        LoginVO user = (LoginVO)EgovUserDetailsHelper.getAuthenticatedUser();
+//        LoginVO user = (LoginVO)EgovUserDetailsHelper.getAuthenticatedUser();
         Boolean isAuthenticated = EgovUserDetailsHelper.isAuthenticated();
 
         if(!isAuthenticated) {
@@ -443,7 +443,7 @@ public class MemController {
     public ResponseEntity<?> mem0002_0004(@ModelAttribute("etcVO")EtcVO etcVO, HttpServletRequest request,ModelMap model) throws Exception {
 
     	//로그인 체크
-        LoginVO user = (LoginVO)EgovUserDetailsHelper.getAuthenticatedUser();
+//        LoginVO user = (LoginVO)EgovUserDetailsHelper.getAuthenticatedUser();
         Boolean isAuthenticated = EgovUserDetailsHelper.isAuthenticated();
 
         if(!isAuthenticated) {
@@ -473,7 +473,7 @@ public class MemController {
     public ResponseEntity<?> mem0002_0005(HttpServletRequest request,ModelMap model, @RequestBody List<EtcVO> list) throws Exception {
 
     	//로그인 체크
-        LoginVO user = (LoginVO)EgovUserDetailsHelper.getAuthenticatedUser();
+//        LoginVO user = (LoginVO)EgovUserDetailsHelper.getAuthenticatedUser();
         Boolean isAuthenticated = EgovUserDetailsHelper.isAuthenticated();
 
         if(!isAuthenticated) {
@@ -509,7 +509,7 @@ public class MemController {
     public ResponseEntity<?> mem0002_0006(HttpServletRequest request,ModelMap model, @RequestBody List<EtcVO> list) throws Exception {
 
     	//로그인 체크
-        LoginVO user = (LoginVO)EgovUserDetailsHelper.getAuthenticatedUser();
+//        LoginVO user = (LoginVO)EgovUserDetailsHelper.getAuthenticatedUser();
         Boolean isAuthenticated = EgovUserDetailsHelper.isAuthenticated();
 
         if(!isAuthenticated) {
@@ -546,7 +546,7 @@ public class MemController {
     public ResponseEntity<?> mem0002_0007(HttpServletRequest request,ModelMap model, @RequestBody List<EtcVO> list) throws Exception {
 
     	//로그인 체크
-        LoginVO user = (LoginVO)EgovUserDetailsHelper.getAuthenticatedUser();
+//        LoginVO user = (LoginVO)EgovUserDetailsHelper.getAuthenticatedUser();
         Boolean isAuthenticated = EgovUserDetailsHelper.isAuthenticated();
 
         if(!isAuthenticated) {
@@ -584,7 +584,7 @@ public class MemController {
     public ResponseEntity<?> mem0002_0008(@ModelAttribute("cooperatorVO")CooperatorVO cooperatorVO, HttpServletRequest request,ModelMap model) throws Exception {
 
     	//로그인 체크
-        LoginVO user = (LoginVO)EgovUserDetailsHelper.getAuthenticatedUser();
+//        LoginVO user = (LoginVO)EgovUserDetailsHelper.getAuthenticatedUser();
         Boolean isAuthenticated = EgovUserDetailsHelper.isAuthenticated();
 
         if(!isAuthenticated) {
@@ -622,7 +622,7 @@ public class MemController {
     public ResponseEntity<?> mem0002_0009(@ModelAttribute("cooperatorVO")CooperatorVO cooperatorVO, HttpServletRequest request,ModelMap model) throws Exception {
 
     	//로그인 체크
-        LoginVO user = (LoginVO)EgovUserDetailsHelper.getAuthenticatedUser();
+//        LoginVO user = (LoginVO)EgovUserDetailsHelper.getAuthenticatedUser();
         Boolean isAuthenticated = EgovUserDetailsHelper.isAuthenticated();
 
         if(!isAuthenticated) {
@@ -769,7 +769,7 @@ public class MemController {
     public String mem0003(HttpServletRequest request,ModelMap model) throws Exception {
 
     	//로그인 체크
-        LoginVO user = (LoginVO)EgovUserDetailsHelper.getAuthenticatedUser();
+//        LoginVO user = (LoginVO)EgovUserDetailsHelper.getAuthenticatedUser();
         Boolean isAuthenticated = EgovUserDetailsHelper.isAuthenticated();
 
         if(!isAuthenticated) {
@@ -861,7 +861,7 @@ public class MemController {
     public ResponseEntity<?> mem0003_0003(@ModelAttribute("cooperatorVO")CooperatorVO cooperatorVO, HttpServletRequest request,ModelMap model) throws Exception {
 
     	//로그인 체크
-        LoginVO user = (LoginVO)EgovUserDetailsHelper.getAuthenticatedUser();
+//        LoginVO user = (LoginVO)EgovUserDetailsHelper.getAuthenticatedUser();
         Boolean isAuthenticated = EgovUserDetailsHelper.isAuthenticated();
 
         if(!isAuthenticated) {
@@ -1101,7 +1101,7 @@ public class MemController {
     public String mem0005(@ModelAttribute("MyInfoVO") MyInfoVO myInfoVO, HttpServletRequest request,ModelMap model) throws Exception {
 
     	//로그인 체크
-        LoginVO user = (LoginVO)EgovUserDetailsHelper.getAuthenticatedUser();
+//        LoginVO user = (LoginVO)EgovUserDetailsHelper.getAuthenticatedUser();
         Boolean isAuthenticated = EgovUserDetailsHelper.isAuthenticated();
 
         if(!isAuthenticated) {
@@ -1205,7 +1205,7 @@ public class MemController {
     public ResponseEntity<?> mem0005_0003(@ModelAttribute("cooperatorVO")CooperatorVO cooperatorVO, HttpServletRequest request,ModelMap model) throws Exception {
 
     	//로그인 체크
-        LoginVO user = (LoginVO)EgovUserDetailsHelper.getAuthenticatedUser();
+//        LoginVO user = (LoginVO)EgovUserDetailsHelper.getAuthenticatedUser();
         Boolean isAuthenticated = EgovUserDetailsHelper.isAuthenticated();
 
         if(!isAuthenticated) {

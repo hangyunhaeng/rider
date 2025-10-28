@@ -254,7 +254,7 @@
 			return ;
 		}
 
-	    if(!limit2Week($('#searchFromDate').val(), $('#searchToDate').val(), JSON.parse('${exclus}'), '${loginVO.id}')){
+	    if(!limit2Week($('#searchFromDate').val(), $('#searchToDate').val())){//, JSON.parse('${exclus}'), '${loginVO.id}')){
 	    	return;
 	    }
 

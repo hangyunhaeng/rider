@@ -67,7 +67,7 @@ public class Util {
 	 * @return
 	 */
 	public static boolean isUsr(HttpSession session) {
-		LoginVO user = (LoginVO)EgovUserDetailsHelper.getAuthenticatedUser();
+//		LoginVO user = (LoginVO)EgovUserDetailsHelper.getAuthenticatedUser();
 		if("USR".equals(session.getAttribute("memberGubun"))) {
 			return true;
 		}
@@ -353,7 +353,7 @@ public class Util {
 
     public static String getRandomKey(int len) {
     	SecureRandom random = new SecureRandom();
-    	String charar = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+";
+    	String charar = "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789!@#$%^&*()_+";
     	StringBuilder sb = new StringBuilder(len);
     	for (int i = 0; i < len; i++) {
     	    int randomIndex = random.nextInt(charar.length());
