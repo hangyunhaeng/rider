@@ -983,6 +983,7 @@
 								WHEN e.SAP_ID IS NOT NULL then '4'
 								ELSE '' END AS GUBUN -- AS 구분
 						, a.TRAN_DAY AS TRAN_DAY -- AS 출금일
+						, case when a.status='200' then '성공' when a.STATUS= '999' then '처리중' when a.STATUS= '400' AND a.error_code='VTIM' then '처리중' when a.STATUS= '400' AND a.error_code='0011' then '처리중'  ELSE '실패' end AS status_nm
 						, a.TR_AFTER_BAC
 						, NVL(a.SEND_TM, DATE_FORMAT(a.CREAT_DT, '%H%i%s')) AS SEND_TM-- AS 출금시간
 						, a.DRW_ACCOUNT_CNTN -- AS 수취인

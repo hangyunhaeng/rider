@@ -20,13 +20,14 @@
 		{ headerName: "NO", field: "no", minWidth: 70, valueGetter:(params) => { return params.node.rowIndex + 1} },
 		{ headerName: "구분", field: "gubunNm", minWidth: 120},
 		{ headerName: "협력사아이디", field: "cooperatorId", minWidth: 120},
-		{ headerName: "성명", field: "nm", minWidth: 120},
+		{ headerName: "성명", field: "nm", minWidth: 90},
 		{ headerName: "출금일", field: "tranDay", minWidth: 100, valueGetter:(params) => { return getStringDate(params.data.tranDay)}},
-		{ headerName: "출금시", field: "sendTm", minWidth: 140},
-		{ headerName: "수취인", field: "drwAccountCntn", minWidth: 140},
-		{ headerName: "수취은행", field: "rvBankNm", minWidth: 140},
+		{ headerName: "출금시", field: "sendTm", minWidth: 100},
+		{ headerName: "출금상태", field: "statusNm", minWidth: 90},
+		{ headerName: "수취인", field: "drwAccountCntn", minWidth: 90},
+		{ headerName: "수취은행", field: "rvBankNm", minWidth: 100},
 		{ headerName: "수취계좌", field: "rvAccount", minWidth: 140},
-		{ headerName: "금액", field: "sendPrice", minWidth: 140
+		{ headerName: "금액", field: "sendPrice", minWidth: 90
 			, cellClass : "ag-cell-right"
 			, valueGetter:(params) => { return currencyFormatter(params.data.sendPrice);}
 		},
@@ -192,7 +193,7 @@
         const sum = [];
         grid.forEachNode((node) => {
             rows.push([node.data.gubunNm, node.data.cooperatorId, node.data.nm, getStringDate(node.data.tranDay)
-            	, node.data.sendTm, node.data.drwAccountCntn, node.data.rvBankNm, node.data.rvAccount
+            	, node.data.sendTm, node.data.statusNm, node.data.drwAccountCntn, node.data.rvBankNm, node.data.rvAccount
             	, node.data.errorMessage
             	, (node.data.sendPrice)
             	, node.data.trAfterBac
@@ -207,7 +208,7 @@
 
 
         // 첫 번째 행을 추가하여 헤더를 포함
-        rows.unshift(['구분', '협력사아이디', '성명', '출금일', '출금시', '수취인', '수취은행', '수취계좌'
+        rows.unshift(['구분', '협력사아이디', '성명', '출금일', '출금시', '출금상태', '수취인', '수취은행', '수취계좌'
         	, '오류메세지', '금액', '잔액', '이체수수료', '선지급수수료']);
 
 
@@ -222,9 +223,9 @@
                 const cell_ref = XLSX.utils.encode_cell(cell_address);
 
                 if (!ws[cell_ref]) continue;
-                if(cell_address.c == 9 && cell_address.r != 0)ws[cell_ref].t = 'n';  // 셀 형식을 숫자로 설정(금액)
                 if(cell_address.c == 10 && cell_address.r != 0)ws[cell_ref].t = 'n';  // 셀 형식을 숫자로 설정(금액)
-                if(cell_address.c == 8)ws[cell_ref].t = 's';  // 셀 형식을 텍스트로 설정(수취계좌)
+                if(cell_address.c == 11 && cell_address.r != 0)ws[cell_ref].t = 'n';  // 셀 형식을 숫자로 설정(금액)
+                if(cell_address.c == 9)ws[cell_ref].t = 's';  // 셀 형식을 텍스트로 설정(수취계좌)
             }
         }
 
