@@ -274,6 +274,9 @@
 			<if test='errorMessage != null and errorMessage != ""'>
 			, ERROR_MESSAGE = #{errorMessage}
 			</if>
+			<if test='trAfterBac != null and trAfterBac != ""'>
+			, TR_AFTER_BAC = #{trAfterBac}
+			</if>
 			, LAST_UPDT_PNTTM = SYSDATE()
 			, LAST_UPDUSR_ID = #{lastUpdusrId}
 
@@ -957,5 +960,70 @@
 		WHERE 1 = 1
 			AND a.COOPERATOR_ID = #{cooperatorId} AND b.mber_id = #{mberId}
 			AND (a.ACCOUNTS_ST_DT BETWEEN #{searchFromDate} AND #{searchToDate} or a.ACCOUNTS_ED_DT BETWEEN #{searchFromDate} AND #{searchToDate})
+	</select>
+
+	<select id="selectAllPayList" parameterType="egovframework.com.rd.usr.service.vo.HistoryVO" resultType="egovframework.com.rd.usr.service.vo.HistoryVO">
+		SELECT *
+		FROM (
+				SELECT case when sub_tab.gubun = '1' then '라이더선지급'
+							when sub_tab.gubun = '2' then '라이더확정지급'
+							when sub_tab.gubun = '3' then '협력사출금'
+							when sub_tab.gubun = '4' then '영업사원출금'
+							ELSE '' END AS GUBUN_NM
+					, sub_tab.*
+					, case when sub_tab.gubun = '1' then a.MBER_NM
+							when sub_tab.gubun = '2' then a.MBER_NM
+							when sub_tab.gubun = '3' then c.COOPERATOR_NM
+							when sub_tab.gubun = '4' then b.USER_NM
+							ELSE '' END AS NM
+					FROM (
+						SELECT CASE WHEN b.DYP_ID IS NOT NULL then '1'
+								WHEN d.WKP_ID IS NOT NULL then '2'
+								WHEN c.COP_ID IS NOT NULL  then '3'
+								WHEN e.SAP_ID IS NOT NULL then '4'
+								ELSE '' END AS GUBUN -- AS 구분
+						, a.TRAN_DAY AS TRAN_DAY -- AS 출금일
+						, a.TR_AFTER_BAC
+						, NVL(a.SEND_TM, DATE_FORMAT(a.CREAT_DT, '%H%i%s')) AS SEND_TM-- AS 출금시간
+						, a.DRW_ACCOUNT_CNTN -- AS 수취인
+						, f.CD_NM AS RV_BANK_NM -- AS 수취은행
+						, a.RV_ACCOUNT-- AS 입금계좌번호
+						, a.AMOUNT AS SEND_PRICE -- AS 거래금액
+						, a.ERROR_MESSAGE
+						, a.STATUS_CD
+						, IF(b.DAY_FEE IS NULL, c.DAY_FEE, b.DAY_FEE ) AS DAY_FEE -- AS 선지급수수료
+						, IF(b.DYP_ID IS NULL, if(c.COP_ID IS NULL, IF(e.SAP_ID IS NULL, d.FEE, e.SEND_FEE),c.SEND_FEE), b.SEND_FEE ) AS SEND_FEE -- AS 이체수수수료
+						, IF(b.DYP_ID IS NULL, if(c.COP_ID IS NULL, IF(e.SAP_ID IS NULL, d.cooperator_id, ''),c.cooperator_id), b.cooperator_id ) AS COOPERATOR_ID
+						, IF(b.DYP_ID IS NULL, if(c.COP_ID IS NULL, IF(e.SAP_ID IS NULL, d.mber_id, e.EMPLYR_ID),''), b.mber_id ) AS MBER_ID
+
+						 FROM RD_TRANSFER a
+						LEFT JOIN RD_DAY_PAY b ON a.TRAN_DAY = b.TRAN_DAY AND a.TELEGRAM_NO = b.TELEGRAM_NO
+						LEFT JOIN RD_COOPERATOR_PAY c ON a.TRAN_DAY = c.TRAN_DAY AND a.TELEGRAM_NO = c.TELEGRAM_NO
+						LEFT JOIN RD_WEEK_PAY d ON a.TRAN_DAY = d.TRAN_DAY AND a.TELEGRAM_NO = d.TELEGRAM_NO
+						LEFT JOIN RD_SALES_PAY e ON a.TRAN_DAY = e.TRAN_DAY AND a.TELEGRAM_NO = e.TELEGRAM_NO
+						LEFT JOIN RD_CD f ON a.RV_BANK_CODE = f.CD AND CD_GROUP ='BANK_CD'
+						WHERE 1 = 1
+							AND a.TRAN_DAY BETWEEN #{searchFromDate} AND #{searchToDate}
+						<if test='searchGubun == "success"'>
+							AND a.STATUS_CD = '0000'
+						</if>
+						<if test='searchGubun == "fail"'>
+							AND (a.STATUS_CD != '0000' OR a.STATUS_CD is null)
+						</if>
+					) sub_tab
+					LEFT JOIN COMTNGNRLMBER a ON sub_tab.MBER_ID = a.MBER_ID
+					LEFT JOIN COMTNEMPLYRINFO b ON sub_tab.MBER_ID = b.EMPLYR_ID
+					LEFT JOIN RD_COOPERATOR c ON sub_tab.COOPERATOR_ID = c.COOPERATOR_ID
+					WHERE 1=1
+					<if test='searchCooperatorId != null and searchCooperatorId != "all"'>
+						AND sub_tab.cooperator_id = #{searchCooperatorId}
+					</if>
+			)tab
+			where 1=1
+			<if test="searchNm != null and searchNm != ''">
+				AND tab.nm = #{searchNm}
+			</if>
+			ORDER BY tab.TRAN_DAY DESC, tab.SEND_TM DESC
+
 	</select>
 </mapper>

@@ -1,6 +1,7 @@
 package egovframework.com.rd.usr.service.vo;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -45,6 +46,7 @@ public class DoszTransferVO implements Serializable {
 //	private String tr_tm;
 	//전문API사용여부
 	private String res_all_yn;
+	private BigDecimal trAfterBac;
 
 
 	private String creatId;

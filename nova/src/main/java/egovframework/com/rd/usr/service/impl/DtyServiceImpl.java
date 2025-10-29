@@ -2061,7 +2061,9 @@ public class DtyServiceImpl extends EgovAbstractServiceImpl implements DtyServic
 		        vo.setSendDt(jsonObj.get("send_dt").toString());
 		        vo.setSendTm(jsonObj.get("send_tm").toString());
 		        vo.setNatvTrNo(jsonObj.get("natv_tr_no").toString());
-
+		        try {
+		        	vo.setTrAfterBac( new BigDecimal(jsonObj.get("tr_after_sign").toString()+jsonObj.get("tr_after_bac").toString()));
+		        }catch(Exception e) {};
 	        } else {
 		        vo.setErrorCode(jsonObj.get("error_code").toString());
 		        vo.setErrorMessage(jsonObj.get("error_message").toString());

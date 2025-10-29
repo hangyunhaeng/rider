@@ -455,6 +455,16 @@ public class PayDAO extends EgovComAbstractDAO {
 	public List<WeekRiderInfoVO> selectWeekPayByMberId(WeekPayVO vo) throws Exception {
 		return selectList("payDAO.selectWeekPayByMberId", vo);
 	}
+
+	/**
+	 * 모든 출금 내역 리스트
+	 * @param vo
+	 * @return
+	 * @throws Exception
+	 */
+	public List<HistoryVO> selectAllPayList(HistoryVO vo) throws Exception {
+		return selectList("payDAO.selectAllPayList", vo);
+	}
 }
 
 

@@ -530,4 +530,13 @@ public class PayServiceImpl extends EgovAbstractServiceImpl implements PayServic
 	public List<WeekRiderInfoVO> selectWeekPayByMberId(WeekPayVO vo) throws Exception {
 		return payDAO.selectWeekPayByMberId(vo);
 	}
+	/**
+	 * 모든 출금 내역 리스트
+	 * @param vo
+	 * @return
+	 * @throws Exception
+	 */
+	public List<HistoryVO> selectAllPayList(HistoryVO vo) throws Exception {
+		return payDAO.selectAllPayList(vo);
+	}
 }

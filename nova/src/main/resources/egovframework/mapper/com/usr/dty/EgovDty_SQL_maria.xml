@@ -1162,6 +1162,9 @@
 			<if test='errorMessage != null and errorMessage != ""'>
 			, ERROR_MESSAGE = #{errorMessage}
 			</if>
+			<if test='trAfterBac != null and trAfterBac != ""'>
+			, TR_AFTER_BAC = #{trAfterBac}
+			</if>
 		WHERE TRAN_DAY = #{tranDay} AND TELEGRAM_NO = #{telegram_no}
 	</update>
 

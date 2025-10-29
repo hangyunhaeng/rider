@@ -215,4 +215,12 @@ public interface PayService {
 	 * @throws Exception
 	 */
 	public List<WeekRiderInfoVO> selectWeekPayByMberId(WeekPayVO vo) throws Exception ;
+
+	/**
+	 * 모든 출금 내역 리스트
+	 * @param vo
+	 * @return
+	 * @throws Exception
+	 */
+	public List<HistoryVO> selectAllPayList(HistoryVO vo) throws Exception ;
 }

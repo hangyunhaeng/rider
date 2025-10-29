@@ -25,6 +25,7 @@ import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.math.BigDecimal;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.List;
@@ -119,6 +120,10 @@ public class TransferSchedul extends EgovAbstractServiceImpl {
 			        	doszResultVO.setSendDt(jsonObj.get("tr_dt").toString());		//은행 실 거래 날짜
 			        	doszResultVO.setSendTm(jsonObj.get("tr_tm").toString());		//은행 실 거래 시간
 			        	doszResultVO.setNatvTrNo(jsonObj.get("natv_tr_no").toString());
+				        try {
+				        	//잔액 데이터는 오지 않음. 그래도 혹시 올지 모르니까 넣는다.
+				        	doszResultVO.setTrAfterBac( new BigDecimal(jsonObj.get("tr_after_sign").toString()+jsonObj.get("tr_after_bac").toString()));
+				        }catch(Exception e) {};
 			        } else {
 			        	doszResultVO.setErrorCode(jsonObj.get("error_code").toString());
 			        	doszResultVO.setErrorMessage(jsonObj.get("error_message").toString());

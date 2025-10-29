@@ -1011,4 +1011,68 @@ public class PayController {
         map.put("resultCode", "success");
         return ResponseEntity.ok(map);
 	}
+
+
+	/**
+	 * 출금내역 조회 페이지
+	 * @param request
+	 * @param model
+	 * @return
+	 * @throws Exception
+	 */
+    @RequestMapping("/usr/pay0010.do")
+    public String pay0010(@ModelAttribute("ProfitVO") ProfitVO profitVO, HttpServletRequest request,ModelMap model) throws Exception {
+
+    	//로그인 체크
+        Boolean isAuthenticated = EgovUserDetailsHelper.isAuthenticated();
+
+        if(!isAuthenticated) {
+        	return "egovframework/com/cmm/error/accessDenied";
+        }
+
+        if(!Util.isUsr()) {
+        	return "egovframework/com/cmm/error/accessDenied";
+        }
+
+        return "egovframework/usr/pay/pay0010";
+	}
+
+
+	/**
+	 * 출금내역 리스트 가져오기
+	 * @param request
+	 * @param sessionVO
+	 * @param model
+	 * @param status
+	 * @return
+	 * @throws Exception
+	 */
+	@RequestMapping("/usr/pay0010_0001.do")
+	public ResponseEntity<?> pay0010_0001(@ModelAttribute("HistoryVO") HistoryVO historyVO, HttpServletRequest request, SessionVO sessionVO, ModelMap model, SessionStatus status) throws Exception{
+
+    	//로그인 체크
+        LoginVO user = (LoginVO)EgovUserDetailsHelper.getAuthenticatedUser();
+        Boolean isAuthenticated = EgovUserDetailsHelper.isAuthenticated();
+
+        if(!isAuthenticated) {
+        	return ResponseEntity.status(401).body("Unauthorized");
+        }
+
+        if(!Util.isUsr()) {
+        	return ResponseEntity.status(401).body("Unauthorized");
+        }
+
+        //총판 or 협력사
+        historyVO.setSchAuthorCode(user.getAuthorCode());
+        historyVO.setSchIhidNum(user.getIhidNum());
+        historyVO.setSearchId(user.getId());
+
+        List<HistoryVO> list = payService.selectAllPayList(historyVO);
+        //return value
+        Map<String, Object> map =  new HashMap<String, Object>();
+
+        map.put("list", list);
+        map.put("resultCode", "success");
+        return ResponseEntity.ok(map);
+	}
 }

@@ -1,6 +1,7 @@
 package egovframework.com.rd.usr.service.vo;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -28,6 +29,7 @@ public class HistoryVO extends Sch implements Serializable {
 	private String tranDay;
 	private String rvBankNm;
 	private String rvAccount;
+	private String trAfterBac;
 	private String status;
 	private String statusNm;
 	private String sendDt;
@@ -50,5 +52,12 @@ public class HistoryVO extends Sch implements Serializable {
 	private String fileDate;
 	private String errorCode;
 	private String errorMessage;
+	private String drwAccountCntn;
+	private int amount;
+	private int dayFee;
+	private int sendFee;
+	private String nm;
+	private String gubunNm;
+
 }
 

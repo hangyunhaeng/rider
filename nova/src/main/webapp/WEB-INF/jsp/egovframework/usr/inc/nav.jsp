@@ -49,6 +49,9 @@
   	} else if(filename.indexOf('pay0008.do') == 0) {
 	  	$('.withdraw').addClass('active');
 	  	$('.pay0008').addClass('active');
+  	} else if(filename.indexOf('pay0010.do') == 0) {
+	  	$('.withdraw').addClass('active');
+	  	$('.pay0010').addClass('active');
   	} else if(filename.indexOf('dty0006.do') == 0) {
 	  	$('.pay').addClass('active');
 	  	$('.dty0006').addClass('active');
@@ -144,6 +147,7 @@ System.out.println("==================================");
 						  <li class="administrator cooperator" style="display:none;"><a href="${pageContext.request.contextPath}/usr/pay0001.do" class="pay0001">라이더 출금내역<br></a></li>
 						  <li class="administrator cooperator" style="display:none;"><a href="${pageContext.request.contextPath}/usr/pay0006.do" class="pay0006">협력사 출금내역<br></a></li>
 						  <li class="administrator salesman" style="display:none;"><a href="${pageContext.request.contextPath}/usr/pay0008.do" class="pay0008">영업사원 출금내역<br></a></li>
+						  <li class="administrator" style="display:none;"><a href="${pageContext.request.contextPath}/usr/pay0010.do" class="pay0010">출금내역<br></a></li>
 			            </ul>
 		            </li>
 		            <li class="dropdown administrator cooperator" style="display:none;"><a href="" onclick="javascript:return false;" class="search"><span>정보조회</span> <i class="bi bi-chevron-down toggle-dropdown"></i></a>
