@@ -247,6 +247,8 @@ public class Util {
 	        	variablesObject.put("금액", kkoVo.getParam2());
 	        } else if(EgovProperties.getProperty("Globals.inqAlert").equals(templateCode)) {
 	        	variablesObject.put("성명", kkoVo.getParam0());
+	        	variablesObject.put("제목", kkoVo.getParam1());
+	        	variablesObject.put("내용", kkoVo.getParam2());
 	        } else if(EgovProperties.getProperty("Globals.inqReqAlert").equals(templateCode)) {
 	        	variablesObject.put("성명", kkoVo.getParam0());
 	        	variablesObject.put("제목", kkoVo.getParam1());
@@ -309,8 +311,10 @@ public class Util {
 	        		+ "라이더뱅크 > 대여,리스 현황 메뉴에서 확인 하신 후에 승인해 주시기 바랍니다.\r\n\n"
 	        		+ "미승인시 출금 기능이 제한 됩니다.");
         } else if(EgovProperties.getProperty("Globals.inqAlert").equals(templateCode)) {
-	        jsonKakaoMessage.put("body", "[라이더뱅크 안내]\r\n\n"
-	        		+ "#{성명}님 1:1문의에 대한 답변이 등록되었습니다.");
+	        jsonKakaoMessage.put("body", "[라이더뱅크 안내]\r\n\n\n"
+	        		+ "#{성명}님 1:1문의에 대한 답변이 등록되었습니다.\r\n\n"
+	        		+ "- #{제목}\r\n\n"
+	        		+ "#{내용}");
         } else if(EgovProperties.getProperty("Globals.inqReqAlert").equals(templateCode)) {
         	jsonKakaoMessage.put("body", "[라이더뱅크 1:1문의 등록]\r\n\n\n"
         			+ "#{성명}님이 문의 등록하였습니다.\r\n"

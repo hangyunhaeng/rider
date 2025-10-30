@@ -151,6 +151,8 @@ public class InqServiceImpl extends EgovAbstractServiceImpl implements InqServic
 				kkoOne.setMberId(upVo.getCreatId());
 				kkoOne.setMbtlnum(Util.getOnlyNumber(upVo.getMbtlnum()));
 				kkoOne.setParam0(upVo.getCreatNm());
+				kkoOne.setParam1(vo.getTitle());
+				kkoOne.setParam2(vo.getLongtxt());
 				kkoOne.setTemplateCode(EgovProperties.getProperty("Globals.inqAlert"));
 				kkoList.add(kkoOne);
 
