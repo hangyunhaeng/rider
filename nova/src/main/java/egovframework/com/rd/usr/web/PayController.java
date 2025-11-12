@@ -37,8 +37,8 @@ import egovframework.com.rd.usr.service.vo.HistoryVO;
 import egovframework.com.rd.usr.service.vo.KkoVO;
 import egovframework.com.rd.usr.service.vo.MyInfoVO;
 import egovframework.com.rd.usr.service.vo.ProfitVO;
-//import net.sf.ehcache.Ehcache;
-//import net.sf.ehcache.Element;
+import net.sf.ehcache.Ehcache;
+import net.sf.ehcache.Element;
 
 /**
  * 게시판
@@ -66,8 +66,8 @@ public class PayController {
     private RotService rotService;
     @Resource(name = "DtyService")
     private DtyService dtyService;
-//    @Resource(name="ehcache")
-//    Ehcache gCache ;
+    @Resource(name="ehcache")
+    Ehcache gCache ;
 
 
 
@@ -216,9 +216,9 @@ public class PayController {
         	return "egovframework/com/cmm/error/accessDenied";
         }
 
-//        Ehcache cache = gCache.getCacheManager().getCache("commCd");
-//        if(cache.get("exclus") == null) cache.put(new Element("exclus", rotService.selectExclusList()));
-//		model.addAttribute("exclus", new ObjectMapper().writeValueAsString(cache.get("exclus").getObjectValue()));
+        Ehcache cache = gCache.getCacheManager().getCache("commCd");
+        if(cache.get("exclus") == null) cache.put(new Element("exclus", rotService.selectExclusList()));
+		model.addAttribute("exclus", new ObjectMapper().writeValueAsString(cache.get("exclus").getObjectValue()));
 
         return "egovframework/usr/pay/pay0003";
 	}

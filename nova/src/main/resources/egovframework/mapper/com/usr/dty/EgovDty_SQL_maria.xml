@@ -777,10 +777,7 @@
 			JOIN COMTNFILE sub_b ON sub_a.ATCH_FILE_ID = sub_b.ATCH_FILE_ID
 			LEFT JOIN COMTNGNRLMBER sub_c ON sub_a.MBER_ID = sub_c.MBER_ID
 			WHERE a.COOPERATOR_ID = sub_a.COOPERATOR_ID AND a.mber_id = sub_a.mber_id
-			AND sub_a.RUN_DE BETWEEN #{searchFromDate} AND #{searchToDate}
-			<if test="searchNm != null and searchNm != ''">
-			AND sub_c.MBER_NM like '%' #{searchNm} '%'
-			</if>
+			AND sub_a.RUN_DE = #{day}
 			) AS TOTAL_CNT
 		, (SELECT MAX(ETC_NOT_ID) from RD_ETC_NOT sub_a where a.ETC_ID = sub_a.ETC_ID AND sub_a.DAY = #{day} AND sub_a.USE_AT = 'Y') AS ETC_NOT_ID
 		FROM RD_ETC a

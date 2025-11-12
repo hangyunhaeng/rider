@@ -11,7 +11,7 @@
 
 
 
-<script type="text/javascript"	src="<c:url value='/js/echarts.min.js?v=0.1' />"></script>
+<script type="text/javascript"	src="<c:url value='/js/echarts.min.js?v=0.2' />"></script>
     <script type="text/javascript"	src="<c:url value='/js/lodash.min.js' />"></script>
     <script type="text/javascript"	src="<c:url value='/js/phoenix.js' />"></script>
     <script type="text/javascript"	src="<c:url value='/js/anchor.min.js' />"></script>
@@ -242,6 +242,9 @@
 
         		var dataDeliveryCnt = [];
         		var dateDeliveryCnt = [];
+
+        		var dataPay = [];
+        		var datePay = [];
         		var idxColor = 0;
 
         		//주정산서별 수익현황 그래프
@@ -295,7 +298,6 @@
         		//주정산서별 배달건수현황 그래프
         		for(var i = 0 ; i < response.data.DeliveryCntList.length ; i++){
         			var oneData = response.data.DeliveryCntList[i];
-        			//data.push({value: response.data.list[i].rdcnt, name:response.data.list[i].cooperatorNm});
         			var bFindData = false;
         			var bFindDate = false;
         			for (var j = 0 ; j < dataDeliveryCnt.length; j++){
@@ -337,6 +339,58 @@
         			}
         		}
         		newDeliveryChartsInit(dataDeliveryCnt, dateDeliveryCnt);
+
+
+
+        		//라이더 지급금액
+        		for(var i = 0 ; i < response.data.payList.length ; i++){
+        			var oneData = response.data.payList[i];
+        			var bFindData = false;
+        			var bFindDate = false;
+        			for (var j = 0 ; j < dataPay.length; j++){
+        				if(dataPay[j].cooperatorId == oneData.cooperatorId){
+        					var costArr = dataPay[j].data;
+        					var cntArr = dataPay[j].addValue;
+        					costArr.push(oneData.cost);
+        					cntArr.push(oneData.cnt);
+        					dataPay[j].data = costArr;
+        					dataPay[j].addValue = cntArr;
+        					bFindData = true;
+        				}
+        			}
+        			if(!bFindData){
+    					dataPay.push({cooperatorId: oneData.cooperatorId
+    						, yLabelName: oneData.cooperatorNm
+    						, type:"line"
+    						, data: [oneData.cost]
+    						, addValue: [oneData.cnt]
+	                        , showSymbol: !1
+	                        , symbol: "circle"
+	                        , lineStyle: {
+	                             width: 2,
+	                             color: window.phoenix.utils.getColor(colorArray[(idxColor++)%colorArray.length])
+	                        }
+	                        , emphasis: {
+	                             lineStyle: {
+	                                 color: window.phoenix.utils.getColor(colorArray[(idxColor++)%colorArray.length])
+	                             }
+	                        }
+	                        , zlevel: 2}
+    					);
+        			}
+
+        			for (var j = 0 ; j < datePay.length; j++){
+        				if(datePay[j] == oneData.day){
+        					bFindDate = true;
+        				}
+        			}
+
+        			if(!bFindDate){
+        				datePay.push(oneData.day);
+        			}
+        		}
+        		debugger;
+        		payChartsInit(dataPay, datePay);
         	}
 
 
@@ -663,6 +717,116 @@ const newCustomersChartsInit = (data, tmpDate) => {
   }
   ;
 
+
+
+  const payChartsInit = (data, tmpDate) => {
+      const {getColor: o, getData: t} = window.phoenix.utils
+        , a = document.querySelector(".echarts-paying-customer-chart")
+        , i = o => {
+          const  a = o.map(( (o, a) => ({
+              value: o.value,
+              yLabelName:o.yLabelName,
+              addValue: o.addValue,
+              color: o.color
+          })));
+          let i = "";
+
+          a.sort((a, b) => -(a.value - b.value));
+          return a.forEach(( (o, t) => {
+              i += '<h6 class="fs-9 text-body-tertiary '+(t>0?"mb-0":"")+'"><span class="fas fa-circle me-2" style="color:'+o.color+'"></span>\n'+o.yLabelName+' :  '+currencyFormatter(o.value)+'원 [ '+currencyFormatter(o.addValue)+'건]\n    </h6>';
+          }
+          )),
+          '<div class="ms-1">\n'+i+'\n</div>'
+      }
+      ;
+      if (a) {
+          const r = t(a, "echarts")
+            , s = window.echarts.init(a);
+          echartSetOption(s, r, ( () => ({
+              tooltip: {
+                  trigger: "axis",
+                  padding: 10,
+                  backgroundColor: o("body-highlight-bg"),
+                  borderColor: o("border-color"),
+                  textStyle: {
+                      color: o("light-text-emphasis")
+                  },
+                  borderWidth: 1,
+                  transitionDuration: 0,
+                  axisPointer: {
+                      type: "none"
+                  },
+                  formatter: i,
+                  extraCssText: "z-index: 1000"
+              },
+              xAxis: [{
+                  type: "category",
+                  data: tmpDate,
+                  show: !0,
+                  boundaryGap: !1,
+                  axisLine: {
+                      show: !0,
+                      lineStyle: {
+                          color: o("secondary-bg")
+                      }
+                  },
+                  axisTick: {
+                      show: !1
+                  },
+                  axisLabel: {
+                      formatter: o => o.substr(4,2)+'-'+o.substr(6,2),
+                      showMinLabel: !0,
+                      showMaxLabel: !1,
+                      color: o("secondary-color"),
+                      align: "left",
+                      interval: 0,
+                      fontFamily: "Nunito Sans",
+                      fontWeight: 600,
+                      fontSize: 12.8
+                  }
+              }, {
+                  type: "category",
+                  position: "bottom",
+                  show: !0,
+                  data: tmpDate,
+                  axisLabel: {
+                      formatter: o => o.substr(4,2)+'-'+o.substr(6,2),
+                      interval: 130,
+                      showMaxLabel: !0,
+                      showMinLabel: !1,
+                      color: o("secondary-color"),
+                      align: "right",
+                      fontFamily: "Nunito Sans",
+                      fontWeight: 600,
+                      fontSize: 12.8
+                  },
+                  axisLine: {
+                      show: !1
+                  },
+                  axisTick: {
+                      show: !1
+                  },
+                  splitLine: {
+                      show: !1
+                  },
+                  boundaryGap: !1
+              }],
+              yAxis: {
+                  show: !1,
+                  type: "value",
+                  boundaryGap: !1
+              },
+              series: data,
+              grid: {
+                  left: 0,
+                  right: 0,
+                  top: 5,
+                  bottom: 20
+              }
+          })));
+      }
+  }
+  ;
 </script>
 <body class="index-page">
 
@@ -817,7 +981,7 @@ const newCustomersChartsInit = (data, tmpDate) => {
                     <div class="card-body d-flex flex-column">
                       <div class="d-flex justify-content-between">
                         <div>
-                          <h5 class="mb-2">준비중</h5>
+                          <h5 class="mb-2">라이더 출금 현황(선지급, 확정지급)</h5>
                           <h6 class="text-body-tertiary">Last 7 days</h6>
                         </div>
                       </div>

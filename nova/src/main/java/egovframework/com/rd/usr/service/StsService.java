@@ -51,4 +51,11 @@ public interface StsService {
 	 * @throws Exception
 	 */
 	public List<StsVO> selectCooperatorDeliveryCntStsList(StsVO vo) throws Exception ;
+	/**
+	 * 라이더 출금내역 현황(최근7일)
+	 * @param vo
+	 * @return
+	 * @throws Exception
+	 */
+	public List<StsVO> selectSts0004(StsVO vo) throws Exception ;
 }

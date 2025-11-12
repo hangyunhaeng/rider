@@ -63,7 +63,6 @@ public class RotController {
     public String rot0001(HttpServletRequest request,ModelMap model) throws Exception {
 
     	//로그인 체크
-        LoginVO user = (LoginVO)EgovUserDetailsHelper.getAuthenticatedUser();
         Boolean isAuthenticated = EgovUserDetailsHelper.isAuthenticated();
 
         if(!isAuthenticated) {
@@ -150,6 +149,7 @@ public class RotController {
 
         map.put("profitList", stsService.selectCooperatorProfitStsList(stsVO));
         map.put("DeliveryCntList", stsService.selectCooperatorDeliveryCntStsList(stsVO));
+        map.put("payList", stsService.selectSts0004(stsVO));
         map.put("resultCode", "success");
         return ResponseEntity.ok(map);
 	}
