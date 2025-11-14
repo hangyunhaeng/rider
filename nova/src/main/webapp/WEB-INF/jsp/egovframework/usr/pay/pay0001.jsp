@@ -111,7 +111,7 @@
 
 	//내역 조회
 	function doSearch(){
-	    if(!limit2Week($('#searchFromDate').val(), $('#searchToDate').val())){
+	    if(!limit2Week($('#searchFromDate').val(), $('#searchToDate').val(), JSON.parse('${exclus}'), '${loginVO.id}')){
 	    	return;
 	    }
 

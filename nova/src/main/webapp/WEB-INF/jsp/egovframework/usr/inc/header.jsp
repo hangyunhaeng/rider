@@ -48,7 +48,7 @@
 <script src="<c:url value='/calender/ko.js' />"></script>
 <script src="<c:url value='/calender/index.js' />"></script>
 
-<script type="text/javascript"	src="<c:url value='/js/admin/util.js?v=0.2' />"></script>
+<script type="text/javascript"	src="<c:url value='/js/admin/util.js?v=0.3' />"></script>
 
 
 <!-- keiti용 소스 -->

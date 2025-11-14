@@ -13,17 +13,18 @@ import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import egovframework.com.cmm.LoginVO;
 import egovframework.com.cmm.service.EgovProperties;
 import egovframework.com.cmm.util.EgovUserDetailsHelper;
 import egovframework.com.rd.Util;
+import egovframework.com.rd.usr.service.RotService;
 import egovframework.com.rd.usr.service.StsService;
 import egovframework.com.rd.usr.service.vo.BalanceVO;
 import egovframework.com.rd.usr.service.vo.StsVO;
+import net.sf.ehcache.Ehcache;
+import net.sf.ehcache.Element;
 
 /**
  * 게시판
@@ -44,8 +45,11 @@ public class StsController {
 
     @Resource(name = "StsService")
     private StsService stsService;
+    @Resource(name = "RotService")
+    private RotService rotService;
+    @Resource(name="ehcache")
+    Ehcache gCache ;
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(DtyController.class);
 
 	/**
 	 * 잔액 검증 페이지
@@ -58,7 +62,6 @@ public class StsController {
     public String sts0001(@ModelAttribute("BalanceVO") BalanceVO balanceVO, HttpServletRequest request,ModelMap model) throws Exception {
 
     	//로그인 체크
-        LoginVO user = (LoginVO)EgovUserDetailsHelper.getAuthenticatedUser();
         Boolean isAuthenticated = EgovUserDetailsHelper.isAuthenticated();
 
         if(!isAuthenticated) {
@@ -73,6 +76,12 @@ public class StsController {
         	model.addAttribute("riderUrl", "https://"+EgovProperties.getProperty("Globals.gnrDomain"));
         else
         	model.addAttribute("riderUrl", "http://"+EgovProperties.getProperty("Globals.gnrDevDomain"));
+
+        //검색조건 2주제한 해제 id
+        Ehcache cache = gCache.getCacheManager().getCache("commCd");
+        if(cache.get("exclus") == null) cache.put(new Element("exclus", rotService.selectExclusList()));
+		model.addAttribute("exclus", new ObjectMapper().writeValueAsString(cache.get("exclus").getObjectValue()));
+
         return "egovframework/usr/sts/sts0001";
 	}
 
@@ -122,7 +131,6 @@ public class StsController {
     public String sts0002(@ModelAttribute("StsVO") StsVO stsVO, HttpServletRequest request,ModelMap model) throws Exception {
 
     	//로그인 체크
-        LoginVO user = (LoginVO)EgovUserDetailsHelper.getAuthenticatedUser();
         Boolean isAuthenticated = EgovUserDetailsHelper.isAuthenticated();
 
         if(!isAuthenticated) {
@@ -133,6 +141,12 @@ public class StsController {
         	return "egovframework/com/cmm/error/accessDenied";
         }
         model.addAttribute("stsVO", stsVO);
+
+        //검색조건 2주제한 해제 id
+        Ehcache cache = gCache.getCacheManager().getCache("commCd");
+        if(cache.get("exclus") == null) cache.put(new Element("exclus", rotService.selectExclusList()));
+		model.addAttribute("exclus", new ObjectMapper().writeValueAsString(cache.get("exclus").getObjectValue()));
+
         return "egovframework/usr/sts/sts0002";
 	}
 
@@ -183,7 +197,6 @@ public class StsController {
     public String sts0003(@ModelAttribute("StsVO") StsVO stsVO, HttpServletRequest request,ModelMap model) throws Exception {
 
     	//로그인 체크
-        LoginVO user = (LoginVO)EgovUserDetailsHelper.getAuthenticatedUser();
         Boolean isAuthenticated = EgovUserDetailsHelper.isAuthenticated();
 
         if(!isAuthenticated) {
@@ -194,6 +207,13 @@ public class StsController {
         	return "egovframework/com/cmm/error/accessDenied";
         }
         model.addAttribute("stsVO", stsVO);
+
+
+        //검색조건 2주제한 해제 id
+        Ehcache cache = gCache.getCacheManager().getCache("commCd");
+        if(cache.get("exclus") == null) cache.put(new Element("exclus", rotService.selectExclusList()));
+		model.addAttribute("exclus", new ObjectMapper().writeValueAsString(cache.get("exclus").getObjectValue()));
+
         return "egovframework/usr/sts/sts0003";
 	}
 

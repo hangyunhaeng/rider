@@ -26,6 +26,9 @@ import org.springframework.web.bind.support.SessionStatus;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 import org.springmodules.validation.commons.DefaultBeanValidator;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import org.slf4j.Logger;
 
 import egovframework.com.cmm.LoginVO;
@@ -38,11 +41,14 @@ import egovframework.com.cmm.util.EgovUserDetailsHelper;
 import egovframework.com.rd.Util;
 import egovframework.com.rd.usr.service.DtyService;
 import egovframework.com.rd.usr.service.ExcelAsyncService;
+import egovframework.com.rd.usr.service.RotService;
 import egovframework.com.rd.usr.service.vo.DeliveryErrorVO;
 import egovframework.com.rd.usr.service.vo.DeliveryInfoVO;
 import egovframework.com.rd.usr.service.vo.WeekInfoVO;
 import egovframework.com.rd.usr.service.vo.WeekRiderInfoVO;
 import egovframework.com.utl.fcc.service.EgovStringUtil;
+import net.sf.ehcache.Ehcache;
+import net.sf.ehcache.Element;
 
 /**
  * 엑셀 업로드 테스트
@@ -77,6 +83,10 @@ public class DtyController {
 
     @Resource(name = "ExcelAsyncService")
     private ExcelAsyncService excelAsyncService;
+    @Resource(name = "RotService")
+    private RotService rotService;
+    @Resource(name="ehcache")
+    Ehcache gCache ;
 
     @SuppressWarnings("unused")
 	@Autowired
@@ -128,7 +138,6 @@ public class DtyController {
     @RequestMapping("/usr/dty0001.do")
     public String dty0001(@ModelAttribute("DeliveryInfoVO") DeliveryInfoVO deliveryInfoVO, HttpServletRequest request,ModelMap model) throws Exception {
     	//로그인 체크
-        LoginVO user = (LoginVO)EgovUserDetailsHelper.getAuthenticatedUser();
         Boolean isAuthenticated = EgovUserDetailsHelper.isAuthenticated();
 
         if(!isAuthenticated) {
@@ -526,7 +535,6 @@ public class DtyController {
     public String dty0002(@ModelAttribute("DeliveryInfoVO") DeliveryInfoVO deliveryInfoVO, HttpServletRequest request,ModelMap model) throws Exception {
 
     	//로그인 체크
-        LoginVO user = (LoginVO)EgovUserDetailsHelper.getAuthenticatedUser();
         Boolean isAuthenticated = EgovUserDetailsHelper.isAuthenticated();
 
         if(!isAuthenticated) {
@@ -676,7 +684,6 @@ public class DtyController {
 
 
     	//로그인 체크
-        LoginVO user = (LoginVO)EgovUserDetailsHelper.getAuthenticatedUser();
         Boolean isAuthenticated = EgovUserDetailsHelper.isAuthenticated();
 
         if(!isAuthenticated) {
@@ -771,7 +778,6 @@ public class DtyController {
     @RequestMapping("/usr/dty0003.do")
     public String dty0003(HttpServletRequest request,ModelMap model) throws Exception {
     	//로그인 체크
-        LoginVO user = (LoginVO)EgovUserDetailsHelper.getAuthenticatedUser();
         Boolean isAuthenticated = EgovUserDetailsHelper.isAuthenticated();
 
         if(!isAuthenticated) {
@@ -925,7 +931,6 @@ public class DtyController {
     @RequestMapping("/usr/dty0004.do")
     public String dty0004(HttpServletRequest request,ModelMap model) throws Exception {
     	//로그인 체크
-        LoginVO user = (LoginVO)EgovUserDetailsHelper.getAuthenticatedUser();
         Boolean isAuthenticated = EgovUserDetailsHelper.isAuthenticated();
 
         if(!isAuthenticated) {
@@ -935,6 +940,11 @@ public class DtyController {
         if(!Util.isUsr()) {
         	return "egovframework/com/cmm/error/accessDenied";
         }
+
+        //검색조건 2주제한 해제 id
+        Ehcache cache = gCache.getCacheManager().getCache("commCd");
+        if(cache.get("exclus") == null) cache.put(new Element("exclus", rotService.selectExclusList()));
+		model.addAttribute("exclus", new ObjectMapper().writeValueAsString(cache.get("exclus").getObjectValue()));
 
         return "egovframework/usr/dty/dty0004";
     }
@@ -986,7 +996,6 @@ public class DtyController {
     @RequestMapping("/usr/dty0005.do")
     public String dty0005(HttpServletRequest request,ModelMap model) throws Exception {
     	//로그인 체크
-        LoginVO user = (LoginVO)EgovUserDetailsHelper.getAuthenticatedUser();
         Boolean isAuthenticated = EgovUserDetailsHelper.isAuthenticated();
 
         if(!isAuthenticated) {
@@ -1216,7 +1225,6 @@ public class DtyController {
     public String dty0006(@ModelAttribute("DeliveryInfoVO") DeliveryInfoVO deliveryInfoVO, HttpServletRequest request,ModelMap model) throws Exception {
 
     	//로그인 체크
-        LoginVO user = (LoginVO)EgovUserDetailsHelper.getAuthenticatedUser();
         Boolean isAuthenticated = EgovUserDetailsHelper.isAuthenticated();
 
         if(!isAuthenticated) {

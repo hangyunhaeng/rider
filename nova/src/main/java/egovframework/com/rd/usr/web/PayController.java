@@ -16,9 +16,6 @@ import org.springframework.web.bind.support.SessionStatus;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import egovframework.com.cmm.LoginVO;
 import egovframework.com.cmm.SessionVO;
 import egovframework.com.cmm.service.EgovProperties;
@@ -72,8 +69,6 @@ public class PayController {
 
 
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(DtyController.class);
-
 	/**
 	 * 입출금내역 페이지
 	 * @param request
@@ -94,6 +89,12 @@ public class PayController {
         if(!Util.isUsr()) {
         	return "egovframework/com/cmm/error/accessDenied";
         }
+
+        //검색조건 2주제한 해제 id
+        Ehcache cache = gCache.getCacheManager().getCache("commCd");
+        if(cache.get("exclus") == null) cache.put(new Element("exclus", rotService.selectExclusList()));
+		model.addAttribute("exclus", new ObjectMapper().writeValueAsString(cache.get("exclus").getObjectValue()));
+
         return "egovframework/usr/pay/pay0001";
 	}
 
@@ -156,6 +157,12 @@ public class PayController {
         if(!Util.isUsr()) {
         	return "egovframework/com/cmm/error/accessDenied";
         }
+
+        //검색조건 2주제한 해제 id
+        Ehcache cache = gCache.getCacheManager().getCache("commCd");
+        if(cache.get("exclus") == null) cache.put(new Element("exclus", rotService.selectExclusList()));
+		model.addAttribute("exclus", new ObjectMapper().writeValueAsString(cache.get("exclus").getObjectValue()));
+
         return "egovframework/usr/pay/pay0002";
 	}
 
@@ -216,6 +223,7 @@ public class PayController {
         	return "egovframework/com/cmm/error/accessDenied";
         }
 
+        //검색조건 2주제한 해제 id
         Ehcache cache = gCache.getCacheManager().getCache("commCd");
         if(cache.get("exclus") == null) cache.put(new Element("exclus", rotService.selectExclusList()));
 		model.addAttribute("exclus", new ObjectMapper().writeValueAsString(cache.get("exclus").getObjectValue()));
@@ -281,6 +289,11 @@ public class PayController {
         if(!Util.isUsr()) {
         	return "egovframework/com/cmm/error/accessDenied";
         }
+
+        //검색조건 2주제한 해제 id
+        Ehcache cache = gCache.getCacheManager().getCache("commCd");
+        if(cache.get("exclus") == null) cache.put(new Element("exclus", rotService.selectExclusList()));
+		model.addAttribute("exclus", new ObjectMapper().writeValueAsString(cache.get("exclus").getObjectValue()));
         model.addAttribute("notMberId", EgovProperties.getProperty("Globals.cooperatorId"));
         return "egovframework/usr/pay/pay0004";
 	}
@@ -583,6 +596,13 @@ public class PayController {
 		model.addAttribute("ablePriceList", ablePriceListJson);
 
 		model.addAttribute("myInfoVO", rotService.selectMyInfo(myInfoVO));
+
+
+        //검색조건 2주제한 해제 id
+        Ehcache cache = gCache.getCacheManager().getCache("commCd");
+        if(cache.get("exclus") == null) cache.put(new Element("exclus", rotService.selectExclusList()));
+		model.addAttribute("exclus", new ObjectMapper().writeValueAsString(cache.get("exclus").getObjectValue()));
+
         return "egovframework/usr/pay/pay0006";
 	}
 
@@ -733,6 +753,13 @@ public class PayController {
         	return "egovframework/com/cmm/error/accessDenied";
         }
         model.addAttribute("kkoVO", kkoVO);
+
+
+        //검색조건 2주제한 해제 id
+        Ehcache cache = gCache.getCacheManager().getCache("commCd");
+        if(cache.get("exclus") == null) cache.put(new Element("exclus", rotService.selectExclusList()));
+		model.addAttribute("exclus", new ObjectMapper().writeValueAsString(cache.get("exclus").getObjectValue()));
+
         return "egovframework/usr/pay/pay0007";
 	}
 
@@ -819,6 +846,13 @@ public class PayController {
 		model.addAttribute("ablePrice", ablePriceJson);
 
 		model.addAttribute("myInfoVO", rotService.selectMyInfo(myInfoVO));
+
+
+        //검색조건 2주제한 해제 id
+        Ehcache cache = gCache.getCacheManager().getCache("commCd");
+        if(cache.get("exclus") == null) cache.put(new Element("exclus", rotService.selectExclusList()));
+		model.addAttribute("exclus", new ObjectMapper().writeValueAsString(cache.get("exclus").getObjectValue()));
+
         return "egovframework/usr/pay/pay0008";
 	}
 
@@ -970,6 +1004,13 @@ public class PayController {
         cooperatorVO.setSchAuthorCode("ROLE_SALES");
 	    String salesListJson = new ObjectMapper().writeValueAsString(memService.selectEmplyrList(cooperatorVO));// taxInvInfo를 JSON으로 변환하여 뷰에 전달
 		model.addAttribute("salesList", salesListJson);
+
+
+        //검색조건 2주제한 해제 id
+        Ehcache cache = gCache.getCacheManager().getCache("commCd");
+        if(cache.get("exclus") == null) cache.put(new Element("exclus", rotService.selectExclusList()));
+		model.addAttribute("exclus", new ObjectMapper().writeValueAsString(cache.get("exclus").getObjectValue()));
+
         return "egovframework/usr/pay/pay0009";
 	}
 
@@ -1033,6 +1074,11 @@ public class PayController {
         if(!Util.isUsr()) {
         	return "egovframework/com/cmm/error/accessDenied";
         }
+
+        //검색조건 2주제한 해제 id
+        Ehcache cache = gCache.getCacheManager().getCache("commCd");
+        if(cache.get("exclus") == null) cache.put(new Element("exclus", rotService.selectExclusList()));
+		model.addAttribute("exclus", new ObjectMapper().writeValueAsString(cache.get("exclus").getObjectValue()));
 
         return "egovframework/usr/pay/pay0010";
 	}

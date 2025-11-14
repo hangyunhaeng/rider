@@ -121,9 +121,10 @@
 		params.append('searchFromDate', getOnlyNumber($('#searchFromDate').val()));
 		params.append('searchToDate', getOnlyNumber($('#searchToDate').val()));
 
-// 	    if(!limit2Week($('#searchFromDate').val(), $('#searchToDate').val())){
-// 	    	return;
-// 	    }
+		debugger
+	    if(!limit1Month($('#searchFromDate').val(), $('#searchToDate').val(), JSON.parse('${exclus}'), '${loginVO.id}')){
+	    	return;
+	    }
 
 		// 로딩 시작
         $('.loading-wrap--js').show();

@@ -88,7 +88,7 @@
 		params.append('searchToDate', getOnlyNumber($('#searchToDate').val()));
 		params.append('searchGubun', $('#searchGubun').val());
 
-	    if(!limit2Week($('#searchFromDate').val(), $('#searchToDate').val())){
+	    if(!limit2Week($('#searchFromDate').val(), $('#searchToDate').val(), JSON.parse('${exclus}'), '${loginVO.id}')){
 	    	return;
 	    }
 

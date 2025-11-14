@@ -104,7 +104,7 @@
 		params.append('searchFromDate', getOnlyNumber($('#searchFromDate').val()));
 		params.append('searchToDate', getOnlyNumber($('#searchToDate').val()));
 
-	    if(!limit2Week($('#searchFromDate').val(), $('#searchToDate').val())){
+	    if(!limit2Week($('#searchFromDate').val(), $('#searchToDate').val(), JSON.parse('${exclus}'), '${loginVO.id}')){
 	    	return;
 	    }
 
