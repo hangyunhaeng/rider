@@ -314,7 +314,11 @@
 			) a
 			LEFT JOIN RD_COOPERATOR b ON b.USE_AT ='Y'
 			LEFT JOIN RD_DAY_PAY c ON c.IO_GUBUN ='2' AND c.USE_AT ='Y' AND a.DAY = c.DAY AND ETC_ID IS NULL AND b.COOPERATOR_ID = c.COOPERATOR_ID AND WEEK_YN = 'N'
-
+			where 1 = 1
+				<if test="schAuthorCode == 'ROLE_USER'">
+				/* 협력사 조건 */
+				AND b.REGISTRATION_SN = #{schIhidNum} AND b.use_at ='Y'
+				</if>
 			UNION ALL
 
 			SELECT a.DAY , b.COOPERATOR_ID, b.COOPERATOR_NM, c.SEND_PRICE, c.WKP_ID AS U_KEY
@@ -335,6 +339,11 @@
 			) a
 			LEFT JOIN RD_COOPERATOR b ON b.USE_AT ='Y'
 			LEFT JOIN RD_WEEK_PAY c ON c.IO_GUBUN ='2' AND c.USE_AT ='Y' AND a.DAY = c.TRAN_DAY AND ETC_ID IS NULL AND b.COOPERATOR_ID = c.COOPERATOR_ID
+			where 1 = 1
+				<if test="schAuthorCode == 'ROLE_USER'">
+				/* 협력사 조건 */
+				AND b.REGISTRATION_SN = #{schIhidNum} AND b.use_at ='Y'
+				</if>
 		) tab
 		GROUP BY tab.DAY, tab.COOPERATOR_ID
 		ORDER BY tab.DAY
