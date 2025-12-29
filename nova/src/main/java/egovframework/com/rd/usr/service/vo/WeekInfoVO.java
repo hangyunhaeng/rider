@@ -103,6 +103,6 @@ public class WeekInfoVO extends Sch implements Serializable {
 	/** 배포용 운영비 */
 	private BigDecimal operatingCostAdd;
 
-	private String tail;
+	private String tail; 
 
 }
