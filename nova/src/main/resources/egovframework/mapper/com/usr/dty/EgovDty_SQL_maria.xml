@@ -627,7 +627,7 @@
 				JOIN COMTNFILE d ON a.ATCH_FILE_ID = d.ATCH_FILE_ID
 
 			WHERE 1=1
-				AND b.FIX_DAY is null
+				-- AND b.FIX_DAY is null -- 확정, 확정 취소에서 동시에 쓰기 위해 해당 조건 삭제
 				AND d.USE_AT ='Y'
 				AND d.ATCH_FILE_ID = #{searchAtchFileId}
 <!-- 				AND (a.ACCOUNTS_ST_DT BETWEEN #{searchFromDate} AND #{searchToDate} or a.ACCOUNTS_ED_DT BETWEEN #{searchFromDate} AND #{searchToDate}) -->
@@ -1702,7 +1702,8 @@
 		JOIN COMTNFILE b ON a.ATCH_FILE_ID = b.ATCH_FILE_ID
 		LEFT JOIN RD_COOPERATOR c ON a.COOPERATOR_ID = c.COOPERATOR_ID
 		WHERE 1=1
-			AND b.USE_AT ='Y'
+			AND b.USE_AT = 'Y'
+			AND a.USE_AT = 'Y'
 			AND a.ATCH_FILE_ID = #{searchAtchFileId}
 			<if test="schAuthorCode == 'ROLE_USER'">
 			/* 협력사 조건 *//* COOPERATOR_ID로 조건을 만든건 ★정산 파일을 올릴때 권한이 있는 협력사ID 데이터만 올릴수 있음!!★ - 나머지는 오류 처리할꺼임  */
@@ -1722,11 +1723,13 @@
 			,b.OPERATING_COST,b.ACCOUNTS_COST,b.INCOME_TAX,b.RESIDENCE_TAX,b.WITHHOLDING_TAX,b.GIVE_PAY,b.CREAT_DT,b.CREAT_ID
 			,b.OPERATING_COST_ADD
 		FROM RD_WEEK_INFO_OUT a
-		LEFT JOIN RD_WEEK_RIDER_INFO_OUT b on a.week_id = b.week_id
+		LEFT JOIN RD_WEEK_RIDER_INFO_OUT b on a.WEEK_ID = b.WEEK_ID
 		LEFT JOIN COMTNGNRLMBER c ON b.MBER_ID = c.MBER_ID
 		JOIN COMTNFILE d ON a.ATCH_FILE_ID = d.ATCH_FILE_ID
 		WHERE 1 = 1
 			AND d.USE_AT = 'Y'
+			AND a.USE_AT = 'Y'
+			AND b.USE_AT = 'Y'
 			AND a.ATCH_FILE_ID = #{searchAtchFileId}
 			<if test="schAuthorCode == 'ROLE_USER'">
 			/* 협력사 조건 *//* COOPERATOR_ID로 조건을 만든건 ★정산 파일을 올릴때 권한이 있는 협력사ID 데이터만 올릴수 있음!!★ - 나머지는 오류 처리할꺼임  */
@@ -1737,5 +1740,280 @@
 			</if>
 			order by b.WEEK_ID asc, LPAD(b.NO, 4,0) ASC
 	</select>
+
+	<select id="selectTail" resultType="java.lang.String">
+	SELECT LPAD(CAST(RAND() * 99 AS INT), 2 ,0)
+	</select>
+	<update id="deleteWeekInfoOut" parameterType="egovframework.com.rd.usr.service.vo.WeekInfoVO">
+		UPDATE RD_WEEK_INFO_OUT
+		SET USE_AT = 'N', LAST_UPDT_PNTTM = SYSDATE(), LAST_UPDUSR_ID = #{lastUpdusrId}
+			, WEEK_ID = CONCAT(WEEK_ID, '_', #{tail})
+		WHERE ATCH_FILE_ID = #{searchAtchFileId}
+			AND USE_AT = 'Y'
+	</update>
+	<update id="deleteWeekRiderInfoOut" parameterType="egovframework.com.rd.usr.service.vo.WeekInfoVO">
+		UPDATE RD_WEEK_RIDER_INFO_OUT
+		SET USE_AT = 'N', LAST_UPDT_PNTTM = SYSDATE(), LAST_UPDUSR_ID = #{lastUpdusrId}
+			, WEEK_ID = CONCAT(WEEK_ID, '_', #{tail})
+		WHERE WEEK_ID IN (
+			SELECT WEEK_ID FROM RD_WEEK_INFO
+			WHERE ATCH_FILE_ID = #{searchAtchFileId}
+			)
+			AND USE_AT = 'Y'
+	</update>
+
+	<select id="selectSumCooperatorProfitByAtchFileId" parameterType="egovframework.com.rd.usr.service.vo.WeekInfoVO" resultType="egovframework.com.rd.usr.service.vo.WeekInfoVO">
+		SELECT NVL(SUM(COST),0) AS COST_SUM, COOPERATOR_ID
+		FROM RD_COOPERATOR_PROFIT
+		WHERE GUBUN IN ('B', 'O', 'M', 'S', 'R')
+			AND WEEK_ID in (
+				SELECT WEEK_ID FROM RD_WEEK_INFO
+				WHERE ATCH_FILE_ID = #{searchAtchFileId}
+			)
+			AND USE_AT = 'Y'
+		GROUP BY COOPERATOR_ID
+
+	</select>
+	<update id="deleteCooperatorProfitGubunByAtchFileId" parameterType="egovframework.com.rd.usr.service.vo.WeekInfoVO">
+		UPDATE RD_COOPERATOR_PROFIT
+		SET USE_AT = 'N', LAST_UPDT_PNTTM = SYSDATE(), LAST_UPDUSR_ID = #{lastUpdusrId}
+		WHERE GUBUN IN ('B', 'O', 'M', 'S', 'R')
+			AND WEEK_ID in (
+				SELECT WEEK_ID FROM RD_WEEK_INFO
+				WHERE ATCH_FILE_ID = #{searchAtchFileId}
+			)
+			AND USE_AT = 'Y'
+	</update>
+	<update id="deleteWeekRiderInfoOutRiderByAtchFileId" parameterType="egovframework.com.rd.usr.service.vo.WeekInfoVO">
+		UPDATE RD_WEEK_RIDER_INFO_OUT_RIDER
+		SET USE_AT = 'N', LAST_UPDT_PNTTM = SYSDATE(), LAST_UPDUSR_ID = #{lastUpdusrId}
+			, WEEK_ID = CONCAT(WEEK_ID, '_', #{tail})
+		WHERE 1 = 1
+			AND WEEK_ID in (
+				SELECT WEEK_ID FROM RD_WEEK_INFO
+				WHERE ATCH_FILE_ID = #{searchAtchFileId}
+			)
+			AND USE_AT = 'Y'
+	</update>
+	<update id="deleteWeekInfoOutRiderByAtchFileId" parameterType="egovframework.com.rd.usr.service.vo.WeekInfoVO">
+		UPDATE RD_WEEK_INFO_OUT_RIDER
+		SET USE_AT = 'N', LAST_UPDT_PNTTM = SYSDATE(), LAST_UPDUSR_ID = #{lastUpdusrId}
+			, WEEK_ID = CONCAT(WEEK_ID, '_', #{tail})
+		WHERE 1 = 1
+			AND WEEK_ID in (
+				SELECT WEEK_ID FROM RD_WEEK_INFO
+				WHERE ATCH_FILE_ID = #{searchAtchFileId}
+			)
+			AND USE_AT = 'Y'
+	</update>
+	<update id="deleteWeekPayByAtchFileId" parameterType="egovframework.com.rd.usr.service.vo.WeekInfoVO">
+		UPDATE RD_WEEK_PAY
+		SET USE_AT = 'N', LAST_UPDT_PNTTM = SYSDATE(), LAST_UPDUSR_ID = #{lastUpdusrId}
+		WHERE ATCH_FILE_ID = #{searchAtchFileId}
+			AND USE_AT = 'Y'
+	</update>
+	<select id="selectWeekPayByAtchFileIdList" parameterType="egovframework.com.rd.usr.service.vo.WeekInfoVO" resultType="egovframework.com.rd.usr.service.vo.WeekPayVO">
+		SELECT COOPERATOR_ID, a.MBER_ID, ABLE_PRICE, b.ESNTL_ID
+		FROM RD_WEEK_PAY a, COMTNGNRLMBER b
+		WHERE a.MBER_ID = b.MBER_ID
+			AND ATCH_FILE_ID = #{searchAtchFileId} AND USE_AT ='Y' AND DW_GUBUN = 'WEK' AND IO_GUBUN ='1'
+	</select>
+
+	<update id="deleteDayPay2WeekPayByAtchFileId" parameterType="egovframework.com.rd.usr.service.vo.WeekInfoVO">
+		UPDATE RD_WEEK_PAY
+		SET USE_AT = 'N', LAST_UPDT_PNTTM = SYSDATE(), LAST_UPDUSR_ID = #{lastUpdusrId}
+		WHERE USE_AT ='Y'
+			AND DYP_ID IN (
+				SELECT DYP_ID FROM RD_DAY_PAY
+				WHERE IO_GUBUN = '2' AND WEEK_YN ='Y' AND USE_AT ='Y'  AND WEK_ATCH_FILE_ID = #{searchAtchFileId}
+					AND WEEK_ID IN (
+						SELECT WEEK_ID FROM RD_WEEK_INFO WHERE ATCH_FILE_ID = #{searchAtchFileId}
+					)
+			)
+	</update>
+
+	<update id="unFixDayPayByAtchFileId" parameterType="egovframework.com.rd.usr.service.vo.WeekInfoVO">
+		UPDATE RD_DAY_PAY
+		SET WEEK_YN ='N'
+		, WEK_ATCH_FILE_ID = NULL
+		, WEEK_ID = null
+		, LAST_UPDT_PNTTM = SYSDATE()
+		, LAST_UPDUSR_ID = #{lastUpdusrId}
+		WHERE USE_AT ='Y'
+			AND DYP_ID IN (
+				SELECT DYP_ID FROM RD_DAY_PAY
+				WHERE IO_GUBUN = '2' AND WEEK_YN ='Y' and USE_AT ='Y' AND WEK_ATCH_FILE_ID = #{searchAtchFileId}
+					AND WEEK_ID IN (
+						SELECT WEEK_ID FROM RD_WEEK_INFO WHERE ATCH_FILE_ID = #{searchAtchFileId}
+					)
+			)
+	</update>
+
+	<update id="updateFixDayBalance2ByAtchFileId" parameterType="egovframework.com.rd.usr.service.vo.WeekInfoVO">
+		UPDATE RD_BALANCE a, (
+				SELECT a.COOPERATOR_ID, d.ESNTL_ID, SUM(able_price) AS able_price
+				FROM RD_DAY_PAY a
+				LEFT JOIN COMTNGNRLMBER d ON a.mber_id = d.mber_id
+				WHERE a.IO_GUBUN = '1' AND a.WEEK_YN ='Y' AND a.USE_AT ='Y'
+				AND WEK_ATCH_FILE_ID = #{searchAtchFileId}
+				AND WEEK_ID IN (
+						SELECT WEEK_ID FROM RD_WEEK_INFO WHERE ATCH_FILE_ID = #{searchAtchFileId}
+					)
+				GROUP BY a.COOPERATOR_ID, d.ESNTL_ID
+
+		)b
+		SET a.BALANCE0 = a.BALANCE0 + b.able_price
+		, a.LAST_UPDT_PNTTM = SYSDATE()
+		, a.LAST_UPDUSR_ID = #{lastUpdusrId}
+		WHERE a.COOPERATOR_ID = b.COOPERATOR_ID
+		AND a.ESNTL_ID = b.ESNTL_ID
+	</update>
+	<update id="unFixDayPay2ByAtchFileId" parameterType="egovframework.com.rd.usr.service.vo.WeekInfoVO">
+		UPDATE RD_DAY_PAY
+		SET WEEK_YN ='N'
+		, WEK_ATCH_FILE_ID = NULL
+		, WEEK_ID = null
+		, LAST_UPDT_PNTTM = SYSDATE()
+		, LAST_UPDUSR_ID = #{lastUpdusrId}
+		WHERE USE_AT ='Y'
+			AND DYP_ID IN (
+				SELECT DYP_ID FROM RD_DAY_PAY
+				WHERE IO_GUBUN = '1' AND WEEK_YN ='Y' and USE_AT ='Y' AND WEK_ATCH_FILE_ID = #{searchAtchFileId}
+					AND WEEK_ID IN (
+						SELECT WEEK_ID FROM RD_WEEK_INFO WHERE ATCH_FILE_ID = #{searchAtchFileId}
+					)
+			)
+	</update>
+	<update id="updateUnFixDayBalance2" parameterType="egovframework.com.rd.usr.service.vo.WeekInfoVO">
+		UPDATE RD_BALANCE a, (
+			SELECT a.COOPERATOR_ID, d.ESNTL_ID, SUM(DAY_FEE+SEND_FEE+SEND_PRICE) ABLE_PRICE, SUM(SEND_FEE+SEND_PRICE) ABLE_PRICE_DAY
+			FROM RD_DAY_PAY a
+			LEFT JOIN COMTNGNRLMBER d ON a.MBER_ID = d.MBER_ID
+			WHERE a.USE_AT ='Y'
+				AND DYP_ID IN (
+					SELECT DYP_ID FROM RD_DAY_PAY
+					WHERE IO_GUBUN = '2' AND WEEK_YN ='Y' and USE_AT ='Y' AND WEK_ATCH_FILE_ID = #{searchAtchFileId}
+						AND WEEK_ID IN (
+							SELECT WEEK_ID FROM RD_WEEK_INFO WHERE ATCH_FILE_ID = #{searchAtchFileId}
+						)
+				)
+			GROUP BY a.COOPERATOR_ID, d.ESNTL_ID
+		)b
+		SET a.BALANCE0 = a.BALANCE0 - b.ABLE_PRICE_DAY
+		, a.BALANCE1 = a.BALANCE1 + b.able_price
+		, a.LAST_UPDT_PNTTM = SYSDATE()
+		, a.LAST_UPDUSR_ID = #{lastUpdusrId}
+		WHERE a.COOPERATOR_ID = b.COOPERATOR_ID
+	</update>
+	<update id="updateUnFixCooperatorPayConfirm" parameterType="egovframework.com.rd.usr.service.vo.WeekInfoVO">
+		UPDATE  RD_COOPERATOR_PAY
+		SET WEEK_YN ='N', WEEK_ID = NULL, LAST_UPDT_PNTTM = SYSDATE(), LAST_UPDUSR_ID = #{lastUpdusrId}
+		WHERE WEEK_ID IN (
+				SELECT WEEK_ID FROM RD_WEEK_INFO WHERE ATCH_FILE_ID = #{searchAtchFileId}
+			)
+	</update>
+
+	<select id="selectUnFixDayFixCooperator" parameterType="egovframework.com.rd.usr.service.vo.WeekInfoVO" resultType="egovframework.com.rd.usr.service.vo.MyInfoVO">
+		SELECT COOPERATOR_ID, SUM(ABLE_PRICE) AS COOP_ABLE_PRICE, SUM(DAY_ABLE_PRICE) AS DAY_MINUS
+		FROM (
+				SELECT COOPERATOR_ID, NVL(SUM(COST), 0) as ABLE_PRICE, 0 AS DAY_ABLE_PRICE
+
+					FROM RD_COOPERATOR_PROFIT
+					WHERE WEEK_ID IN (
+						SELECT WEEK_ID FROM rd_week_info WHERE ATCH_FILE_ID = #{searchAtchFileId}
+						)
+						AND USE_AT = 'Y' AND WEEK_YN = 'Y'
+						AND GUBUN IN ('C', 'E', 'D', 'P')
+						GROUP BY COOPERATOR_ID
+
+				UNION all
+
+				SELECT a.COOPERATOR_ID, 0 AS ABLE_PRICE , NVL(SUM(SEND_PRICE+SEND_FEE+DAY_FEE),0) as DAY_ABLE_PRICE
+				FROM RD_WEEK_INFO a
+				LEFT JOIN RD_COOPERATOR_PAY b ON a.COOPERATOR_ID = b.COOPERATOR_ID AND a.WEEK_ID = b.WEEK_ID AND USE_AT ='Y' AND WEEK_YN ='Y'
+				WHERE a.ATCH_FILE_ID = #{searchAtchFileId}
+				GROUP BY COOPERATOR_ID
+		) tab
+		GROUP BY COOPERATOR_ID
+	</select>
+	<update id="deleteProfitByAtchFileId" parameterType="egovframework.com.rd.usr.service.vo.WeekInfoVO">
+		UPDATE RD_PROFIT
+		SET USE_AT = 'N', LAST_UPDT_PNTTM = SYSDATE(), LAST_UPDUSR_ID = #{lastUpdusrId}
+		WHERE GUBUN in ('P', 'C') AND DYP_ID IS null
+		AND (COOPERATOR_ID, DELIVERY_DAY) IN (
+			SELECT COOPERATOR_ID,ACCOUNTS_ED_DT FROM RD_WEEK_INFO WHERE ATCH_FILE_ID = #{searchAtchFileId}
+		)
+		and USE_AT ='Y'
+	</update>
+	<update id="deleteCooperatorProfitByAtchFileId" parameterType="egovframework.com.rd.usr.service.vo.WeekInfoVO">
+		UPDATE RD_COOPERATOR_PROFIT
+		SET USE_AT ='N', LAST_UPDT_PNTTM = SYSDATE(), LAST_UPDUSR_ID = #{lastUpdusrId}
+		WHERE GUBUN in ('P', 'C') AND DYP_ID IS null
+		AND (COOPERATOR_ID, DELIVERY_DAY) IN (
+			SELECT COOPERATOR_ID,ACCOUNTS_ED_DT FROM RD_WEEK_INFO WHERE ATCH_FILE_ID = #{searchAtchFileId}
+		)
+		and USE_AT ='Y'
+	</update>
+
+	<update id="deleteSalesProfitByAtchFileId" parameterType="egovframework.com.rd.usr.service.vo.WeekInfoVO">
+		UPDATE RD_SALES_PROFIT
+		SET USE_AT ='N', LAST_UPDT_PNTTM = SYSDATE(), LAST_UPDUSR_ID = #{lastUpdusrId}
+		WHERE GUBUN in ('P', 'C') AND DYP_ID IS null
+		AND (COOPERATOR_ID, DELIVERY_DAY) IN (
+			SELECT COOPERATOR_ID,ACCOUNTS_ED_DT FROM RD_WEEK_INFO WHERE ATCH_FILE_ID = #{searchAtchFileId}
+		)
+		and USE_AT ='Y'
+	</update>
+
+	<select id="selectMinusCooperatorProfit" parameterType="egovframework.com.rd.usr.service.vo.WeekInfoVO" resultType="egovframework.com.rd.usr.service.vo.WeekPayVO">
+		SELECT COOPERATOR_ID, NVL(SUM(COST), 0) AS SUM_COST FROM RD_COOPERATOR_PROFIT
+		WHERE GUBUN in ('P', 'C') AND DYP_ID IS null
+		AND (COOPERATOR_ID, DELIVERY_DAY) IN (
+			SELECT COOPERATOR_ID, ACCOUNTS_ED_DT FROM RD_WEEK_INFO WHERE ATCH_FILE_ID = #{searchAtchFileId}
+		)
+		AND USE_AT ='Y'
+		GROUP BY COOPERATOR_ID
+	</select>
+
+	<select id="selectMinusSalesProfit" parameterType="egovframework.com.rd.usr.service.vo.WeekInfoVO" resultType="egovframework.com.rd.usr.service.vo.WeekPayVO">
+		SELECT b.EMPLYR_ID, b.ESNTL_ID AS SALES_ESNTL_ID, NVL(SUM(COST), 0) AS SUM_COST FROM RD_SALES_PROFIT a
+		LEFT JOIN COMTNEMPLYRINFO b ON a.EMPLYR_ID = b.EMPLYR_ID
+		WHERE GUBUN in ('P', 'C') AND DYP_ID IS null
+		AND (COOPERATOR_ID, DELIVERY_DAY) IN (
+			SELECT COOPERATOR_ID, ACCOUNTS_ED_DT FROM RD_WEEK_INFO WHERE ATCH_FILE_ID = #{searchAtchFileId}
+		)
+		AND USE_AT ='Y'
+		GROUP BY COOPERATOR_ID
+	</select>
+
+	<update id="updateUnFixWeekRiderInfo" parameterType="egovframework.com.rd.usr.service.vo.WeekInfoVO">
+		UPDATE RD_WEEK_RIDER_INFO
+		SET FIX_DAY = NULL
+		WHERE FIX_DAY is NOT null
+		AND WEEK_ID IN (
+			SELECT WEEK_ID FROM RD_WEEK_INFO WHERE ATCH_FILE_ID = #{searchAtchFileId}
+		)
+	</update>
+
+	<update id="updateUnFixWeekInfo" parameterType="egovframework.com.rd.usr.service.vo.WeekInfoVO">
+		UPDATE RD_WEEK_INFO
+		SET FIX_DAY = NULL
+		WHERE FIX_DAY is NOT null
+		AND ATCH_FILE_ID = #{searchAtchFileId}
+	</update>
+
+	<update id="updateUnFixCooperatorProfitConfirm" parameterType="egovframework.com.rd.usr.service.vo.WeekInfoVO">
+		UPDATE RD_COOPERATOR_PROFIT
+		SET WEEK_YN ='N'
+		, WEEK_ID =  null
+		, LAST_UPDT_PNTTM = SYSDATE()
+		, LAST_UPDUSR_ID = #{lastUpdusrId}
+		WHERE gubun IN ('C', 'E,' 'D')
+			AND WEEK_ID IN (
+				SELECT WEEK_ID FROM RD_WEEK_INFO WHERE ATCH_FILE_ID = #{searchAtchFileId}
+			)
+			AND WEEK_YN ='Y'
+			AND USE_AT ='Y'
+	</update>
 
 </mapper>

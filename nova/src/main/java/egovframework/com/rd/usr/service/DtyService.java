@@ -286,6 +286,15 @@ public interface DtyService {
 	 * @throws Exception
 	 */
 	public void fixWeek(WeekInfoVO weekInfoVO) throws Exception ;
+
+	/**
+	 * 주정산 확정 취소
+	 * @param vo
+	 * @return
+	 * @throws Exception
+	 */
+	public void cancleFixWeek(WeekInfoVO vo) throws Exception ;
+
 	/**
 	 * 잔액 조정
 	 * @param CoopId
@@ -337,4 +346,5 @@ public interface DtyService {
 	 * @throws Exception
 	 */
 	public int errorTransfer(DoszTransferVO vo) throws Exception ;
+
 }

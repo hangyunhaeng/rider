@@ -1,5 +1,6 @@
 package egovframework.com.rd.usr.service.impl;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -851,6 +852,222 @@ public class DtyDAO extends EgovComAbstractDAO {
 	 */
 	public int errorTransfer(DoszTransferVO vo) throws Exception {
 		return update("dtyDAO.errorTransfer", vo);
+	}
+	/**
+	 * 주차별 정산내역 협력사 배포용 삭제
+	 * @param weekInfoVO
+	 * @return
+	 * @throws Exception
+	 */
+	public int deleteWeekInfoOut(WeekInfoVO weekInfoVO) throws Exception {
+		return update("dtyDAO.deleteWeekInfoOut", weekInfoVO);
+	}
+
+	/**
+	 * 주차별 정산내역 협력사 배포용(을지) 삭제
+	 * @param weekInfoVO
+	 * @return
+	 * @throws Exception
+	 */
+	public int deleteWeekRiderInfoOut(WeekInfoVO weekInfoVO) throws Exception {
+		return update("dtyDAO.deleteWeekRiderInfoOut", weekInfoVO);
+	}
+
+	/**
+	 * 협력사의 삭제할 수익 조회(부가세:B, 원천세:O, 관리비:M, 사업주부담고용보험료:S, 사업주부담산재보험료:R)
+	 * @param weekInfoVO
+	 * @return
+	 * @throws Exception
+	 */
+	public WeekInfoVO selectSumCooperatorProfitByAtchFileId(WeekInfoVO weekInfoVO) throws Exception {
+		return selectOne("dtyDAO.selectSumCooperatorProfitByAtchFileId", weekInfoVO);
+	}
+
+	/**
+	 * 협력사 수익 삭제(부가세:B, 원천세:O, 관리비:M, 사업주부담고용보험료:S, 사업주부담산재보험료:R)
+	 * @param weekInfoVO
+	 * @return
+	 * @throws Exception
+	 */
+	public int deleteCooperatorProfitGubunByAtchFileId(WeekInfoVO weekInfoVO) throws Exception {
+		return update("dtyDAO.deleteCooperatorProfitGubunByAtchFileId", weekInfoVO);
+	}
+	/**
+	 * 주차별 라이더 정산내역 라이더 배포용(을지)
+	 * @param weekInfoVO
+	 * @return
+	 * @throws Exception
+	 */
+	public int deleteWeekRiderInfoOutRiderByAtchFileId(WeekInfoVO weekInfoVO) throws Exception {
+		return update("dtyDAO.deleteWeekRiderInfoOutRiderByAtchFileId", weekInfoVO);
+	}
+	/**
+	 * 주차별 정산내역 라이더 배포용 삭제(갑지)
+	 * @param weekInfoVO
+	 * @return
+	 * @throws Exception
+	 */
+	public int deleteWeekInfoOutRiderByAtchFileId(WeekInfoVO weekInfoVO) throws Exception {
+		return update("dtyDAO.deleteWeekInfoOutRiderByAtchFileId", weekInfoVO);
+	}
+	/**
+	 * 라이더 주정산 입금 내역 삭제
+	 * @param weekInfoVO
+	 * @return
+	 * @throws Exception
+	 */
+	public int deleteWeekPayByAtchFileId(WeekInfoVO weekInfoVO) throws Exception {
+		return update("dtyDAO.deleteWeekPayByAtchFileId", weekInfoVO);
+	}
+	/**
+	 * 삭제 대상인 라이더 주정산 입금내역 조회
+	 * @param weekInfoVO
+	 * @return
+	 * @throws Exception
+	 */
+	public List<WeekPayVO> selectWeekPayByAtchFileIdList(WeekInfoVO weekInfoVO) throws Exception {
+		return selectList("dtyDAO.selectWeekPayByAtchFileIdList", weekInfoVO);
+	}
+	/**
+	 * 라이더 선정산 출금(리스포함)을 주정산으로 이동(확정)했던 이력 삭제
+	 * @param weekInfoVO
+	 * @return
+	 * @throws Exception
+	 */
+	public int deleteDayPay2WeekPayByAtchFileId(WeekInfoVO weekInfoVO) throws Exception {
+		return update("dtyDAO.deleteDayPay2WeekPayByAtchFileId", weekInfoVO);
+	}
+	/**
+	 * 라이더 선출금(리스포함) 이력 확정 취소
+	 * @param weekInfoVO
+	 * @return
+	 * @throws Exception
+	 */
+	public int unFixDayPayByAtchFileId(WeekInfoVO weekInfoVO) throws Exception {
+		return update("dtyDAO.unFixDayPayByAtchFileId", weekInfoVO);
+	}
+
+	/**
+	 * 라이더 일정산 입금 이력 확정 취소용 잔액 조정
+	 * @param weekInfoVO
+	 * @return
+	 * @throws Exception
+	 */
+	public int updateFixDayBalance2ByAtchFileId(WeekInfoVO weekInfoVO) throws Exception {
+		return update("dtyDAO.updateFixDayBalance2ByAtchFileId", weekInfoVO);
+	}
+
+	/**
+	 * 라이더 일정산 입금 이력 확정 취소
+	 * @param weekInfoVO
+	 * @return
+	 * @throws Exception
+	 */
+	public int unFixDayPay2ByAtchFileId(WeekInfoVO weekInfoVO) throws Exception {
+		return update("dtyDAO.unFixDayPay2ByAtchFileId", weekInfoVO);
+	}
+	/**
+	 * 라이더 잔액 조정(선출금, 기타리스 만큼 주금액에서 +, 일금액에서 -)
+	 * @param weekInfoVO
+	 * @return
+	 * @throws Exception
+	 */
+	public int updateUnFixDayBalance2(WeekInfoVO weekInfoVO) throws Exception {
+		return update("dtyDAO.updateUnFixDayBalance2", weekInfoVO);
+	}
+	/**
+	 * 협력사 출금이력(RD_COOPERATOR_PAY) 정산 완료 취소
+	 * @param weekInfoVO
+	 * @return
+	 * @throws Exception
+	 */
+	public int updateUnFixCooperatorPayConfirm(WeekInfoVO weekInfoVO) throws Exception {
+		return update("dtyDAO.updateUnFixDayBalance2", weekInfoVO);
+	}
+	/**
+	 * 협력사 잔액 조정(선지급 +)
+	 * @param weekInfoVO
+	 * @return
+	 * @throws Exception
+	 */
+	public MyInfoVO selectUnFixDayFixCooperator(WeekInfoVO weekInfoVO) throws Exception {
+		return selectOne("dtyDAO.selectUnFixDayFixCooperator", weekInfoVO);
+	}
+	/**
+	 * 수익등록 취소 - 운영사
+	 * @param weekInfoVO
+	 * @return
+	 * @throws Exception
+	 */
+	public int deleteProfitByAtchFileId(WeekInfoVO weekInfoVO) throws Exception {
+		return update("dtyDAO.deleteProfitByAtchFileId", weekInfoVO);
+	}
+	/**
+	 * 수익등록 취소 - 협력사
+	 * @param weekInfoVO
+	 * @return
+	 * @throws Exception
+	 */
+	public int deleteCooperatorProfitByAtchFileId(WeekInfoVO weekInfoVO) throws Exception {
+		return update("dtyDAO.deleteCooperatorProfitByAtchFileId", weekInfoVO);
+	}
+	/**
+	 * 수익등록 취소 - 영업사원
+	 * @param weekInfoVO
+	 * @return
+	 * @throws Exception
+	 */
+	public int deleteSalesProfitByAtchFileId(WeekInfoVO weekInfoVO) throws Exception {
+		return update("dtyDAO.deleteSalesProfitByAtchFileId", weekInfoVO);
+	}
+	/**
+	 * 협력사 잔액 조정할 금액 조회
+	 * @param weekInfoVO
+	 * @return
+	 * @throws Exception
+	 */
+	public WeekPayVO selectMinusCooperatorProfit(WeekInfoVO weekInfoVO) throws Exception {
+		return selectOne("dtyDAO.selectMinusCooperatorProfit", weekInfoVO);
+	}
+	/**
+	 * 영업사원 잔액 조정할 금액 조회
+	 * @param weekInfoVO
+	 * @return
+	 * @throws Exception
+	 */
+	public WeekPayVO selectMinusSalesProfit(WeekInfoVO weekInfoVO) throws Exception {
+		return selectOne("dtyDAO.selectMinusSalesProfit", weekInfoVO);
+	}
+	/**
+	 * 을지 확정 취소
+	 * @param weekInfoVO
+	 * @return
+	 * @throws Exception
+	 */
+	public int updateUnFixWeekRiderInfo(WeekInfoVO weekInfoVO) throws Exception {
+		return update("dtyDAO.updateUnFixWeekRiderInfo", weekInfoVO);
+	}
+
+	/**
+	 * 갑지 확정 취소
+	 * @param weekInfoVO
+	 * @return
+	 * @throws Exception
+	 */
+	public int updateUnFixWeekInfo(WeekInfoVO weekInfoVO) throws Exception {
+		return update("dtyDAO.updateUnFixWeekInfo", weekInfoVO);
+	}
+	/**
+	 * 협력사 입금이력(RD_COOPERATOR_PROFIT) 정산 완료 취소(C, E, D)
+	 * @param weekInfoVO
+	 * @return
+	 * @throws Exception
+	 */
+	public int updateUnFixCooperatorProfitConfirm(WeekInfoVO weekInfoVO) throws Exception {
+		return update("dtyDAO.updateUnFixCooperatorProfitConfirm", weekInfoVO);
+	}
+	public String selectTail() throws Exception {
+		return selectOne("dtyDAO.selectTail");
 	}
 }
 

@@ -3311,9 +3311,110 @@ public class DtyServiceImpl extends EgovAbstractServiceImpl implements DtyServic
         // 확정일자 세팅 : RD_WEEK_INFO 의 확정일자 세팅(하위 RD_WEEK_RIDER_INFO가 모두 Fix_day가 설정 시)
         dtyDAO.updateFixWeekInfo(weekInfoVO);
 
+	}
 
+
+	/**
+	 * 주정산 확정 취소
+	 * @return
+	 * @throws Exception
+	 */
+	public void cancleFixWeek(WeekInfoVO weekInfoVO) throws Exception {
+		LoginVO user = (LoginVO)EgovUserDetailsHelper.getAuthenticatedUser();
+
+		if(!"ROLE_ADMIN".equals(user.getAuthorCode())) {	//총판만이 협력사 등록이 가능
+			throw new IllegalArgumentException("운영사만 확정취소 할 수 있습니다.") ;
+		}
+
+
+        //0. 확정 취소 대상 사용자를 모두 select for update 로 rock
+        BalanceVO balanceVO = new BalanceVO();
+        balanceVO.setSearchAtchFileId(weekInfoVO.getSearchAtchFileId());
+        List<BalanceVO> balanceList = dtyDAO.selectForUPdateBalanceWeekByParam(balanceVO);
+
+
+		weekInfoVO.setLastUpdusrId(user.getId());
+		weekInfoVO.setTail(dtyDAO.selectTail());		//week_id를 변환하는 용도
+
+		//1.협력사 주정산 조회 삭제
+		dtyDAO.deleteWeekRiderInfoOut(weekInfoVO);
+		dtyDAO.deleteWeekInfoOut(weekInfoVO);
+
+		//2.협력사 수익삭제 및 잔액 조정
+		WeekInfoVO minusCoopratorProfit = dtyDAO.selectSumCooperatorProfitByAtchFileId(weekInfoVO);
+		setBalance(minusCoopratorProfit.getCooperatorId(), EgovProperties.getProperty("Globals.cooperatorId"), EgovProperties.getProperty("Globals.cooperatorId"), user.getId(), new BigDecimal(0), minusCoopratorProfit.getCostSum().multiply(new BigDecimal(-1)));
+
+		//2.협력사 수익 삭제(부가세:B, 원천세:O, 관리비:M, 사업주부담고용보험료:S, 사업주부담산재보험료:R)
+		dtyDAO.deleteCooperatorProfitGubunByAtchFileId(weekInfoVO);
+
+
+
+		//3.라이더 주정산 조회 삭제
+		dtyDAO.deleteWeekRiderInfoOutRiderByAtchFileId(weekInfoVO);
+		dtyDAO.deleteWeekInfoOutRiderByAtchFileId(weekInfoVO);
+
+		//4.라이더 주정산 입금 내역 삭제 및 잔액 조정
+		List<WeekPayVO> weekPayList = dtyDAO.selectWeekPayByAtchFileIdList(weekInfoVO);
+		for(int i = 0; i < weekPayList.size() ; i++) {
+			WeekPayVO weekPay = weekPayList.get(i);
+			setBalance(weekPay.getCooperatorId(), weekPay.getEsntlId(), weekPay.getMberId(), user.getId(), new BigDecimal(0), weekPay.getAblePrice().multiply(new BigDecimal(-1)));
+		}
+		dtyDAO.deleteWeekPayByAtchFileId(weekInfoVO);
+
+
+
+
+
+		//라이더 잔액 조정(선출금, 기타리스 만큼 주금액에서 +, 일금액에서 -)
+		dtyDAO.updateUnFixDayBalance2(weekInfoVO);
+		//라이더 선정산 출금(리스포함)을 주정산으로 이동(확정)했던 이력 삭제
+		dtyDAO.deleteDayPay2WeekPayByAtchFileId(weekInfoVO);
+		//라이더 선출금(리스포함) 이력 확정 취소
+		dtyDAO.unFixDayPayByAtchFileId(weekInfoVO);
+
+
+		//협력사 잔액 조정(선지급 +, 확정금액-)
+		MyInfoVO coopAble = dtyDAO.selectUnFixDayFixCooperator(weekInfoVO);
+		setBalance(coopAble.getCooperatorId(), EgovProperties.getProperty("Globals.cooperatorId"), EgovProperties.getProperty("Globals.cooperatorId"), user.getId(), new BigDecimal(coopAble.getCoopAblePrice()), new BigDecimal(coopAble.getCoopAblePrice()*-1).add(coopAble.getDayMinus()));
+		//협력사 입금이력(RD_COOPERATOR_PROFIT) 정산 완료 취소(C, E, D, P)
+		dtyDAO.updateUnFixCooperatorProfitConfirm(weekInfoVO);
+		//협력사 출금이력(RD_COOPERATOR_PAY) 정산 완료 취소
+		dtyDAO.updateUnFixCooperatorPayConfirm(weekInfoVO);
+
+
+
+		//라이더 잔액 조정(일금액을 확정 취소 대상만큼 증가)
+		dtyDAO.updateFixDayBalance2ByAtchFileId(weekInfoVO);
+		//일정산 입금이력을 정산 완료 취소
+		dtyDAO.unFixDayPay2ByAtchFileId(weekInfoVO);
+
+
+
+		//수익 등록 취소(콜수수료,프로그램료)
+		dtyDAO.deleteProfitByAtchFileId(weekInfoVO);
+
+//		WeekPayVO minusCoop = dtyDAO.selectMinusCooperatorProfit(weekInfoVO);
+		//협력사 잔액 조정 - selectUnFixDayFixCooperator에서 이미 조정되었기에 삭제함
+//		setBalance(minusCoop.getCooperatorId(), EgovProperties.getProperty("Globals.cooperatorId"), EgovProperties.getProperty("Globals.cooperatorId"), user.getId(), new BigDecimal(0), minusCoop.getSumCost().multiply(new BigDecimal(-1)));
+		//협력사 수익등록 취소(콜수수료,프로그램료)
+		dtyDAO.deleteCooperatorProfitByAtchFileId(weekInfoVO);
+
+
+		//영업사원 잔액 조정
+		WeekPayVO minusSales = dtyDAO.selectMinusSalesProfit(weekInfoVO);
+		setBalance(EgovProperties.getProperty("Globals.cooperatorId"), minusSales.getSalesEsntlId(), minusSales.getEmplyrId(), user.getId(), new BigDecimal(0), minusSales.getSumCost().multiply(new BigDecimal(-1)));
+		//수익 등록 취소(영업사원 프로그램료)
+		dtyDAO.deleteSalesProfitByAtchFileId(weekInfoVO);
+
+
+
+        // 확정일자 삭제 : RD_WEEK_INFO 의 확정일자 세팅(하위 RD_WEEK_RIDER_INFO가 모두 Fix_day가 설정 시)
+        dtyDAO.updateUnFixWeekRiderInfo(weekInfoVO);
+        // 확정일자 삭제 : RD_WEEK_RIDER_INFO
+        dtyDAO.updateUnFixWeekInfo(weekInfoVO);
 
 	}
+
 
 	/**
 	 * 잔액 조정
@@ -3445,4 +3546,5 @@ public class DtyServiceImpl extends EgovAbstractServiceImpl implements DtyServic
 	public int errorTransfer(DoszTransferVO vo) throws Exception {
 		return dtyDAO.errorTransfer(vo);
 	}
+
 }

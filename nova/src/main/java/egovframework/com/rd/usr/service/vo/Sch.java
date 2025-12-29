@@ -1,6 +1,7 @@
 package egovframework.com.rd.usr.service.vo;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -71,5 +72,6 @@ public class Sch implements Serializable {
 
 
 	private String cooperatorMberId;		//협력사 mberId
+	private BigDecimal costSum;			//합산금액
 
 }
