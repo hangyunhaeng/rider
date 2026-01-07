@@ -28,11 +28,12 @@
 			, cellRenderer:(params) => { return '<div onclick="clickDeleteWeek(\''+params.data.atchFileId+'\')">삭제</div>';}
 		},
 		{ headerName: "확정취소", field: "cancleFixWeek", minWidth: 80, cellClass: 'tdul'
-			, cellRenderer:(params) => { return '<div onclick="clickcancleFixWeek(\''+params.data.atchFileId+'\')">확정취소</div>';}
+			, cellRenderer:(params) => { return params.data.unFixAble == '0' ? '<div onclick="clickcancleFixWeek(\''+params.data.atchFileId+'\')">확정취소</div>' : '';}
 		},
 		{ headerName: "등록일", field: "creatDt", minWidth: 90, valueGetter:(params) => { return getStringDate(params.node.data.creatDt)} },
 		{ headerName: "atchFileId", field: "atchFileId", minWidth: 90, hide:true},
-		{ headerName: "weekId", field: "weekId", minWidth: 90, hide:true}
+		{ headerName: "weekId", field: "weekId", minWidth: 90, hide:true},
+		{ headerName: "unFixAble", field: "unFixAble", minWidth: 90, hide:true},
 	];
 
 	var columnDefs1= [

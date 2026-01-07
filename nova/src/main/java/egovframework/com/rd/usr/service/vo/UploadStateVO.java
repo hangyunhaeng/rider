@@ -28,4 +28,5 @@ public class UploadStateVO extends Sch implements Serializable {
 	private String cnt;
 	private String creatDt;
 	private String erorrMsg;
+	private String unFixAble;
 }

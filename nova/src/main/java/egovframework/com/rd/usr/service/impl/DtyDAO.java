@@ -982,7 +982,7 @@ public class DtyDAO extends EgovComAbstractDAO {
 	 * @throws Exception
 	 */
 	public int updateUnFixCooperatorPayConfirm(WeekInfoVO weekInfoVO) throws Exception {
-		return update("dtyDAO.updateUnFixDayBalance2", weekInfoVO);
+		return update("dtyDAO.updateUnFixCooperatorPayConfirm", weekInfoVO);
 	}
 	/**
 	 * 협력사 잔액 조정(선지급 +)
@@ -1068,6 +1068,16 @@ public class DtyDAO extends EgovComAbstractDAO {
 	}
 	public String selectTail() throws Exception {
 		return selectOne("dtyDAO.selectTail");
+	}
+
+	/**
+	 * 업로드일이 당일 일 경우에 1 return
+	 * @param weekInfoVO
+	 * @return
+	 * @throws Exception
+	 */
+	public String selectUnFixDay(WeekInfoVO weekInfoVO) throws Exception {
+		return selectOne("dtyDAO.selectUnFixDay", weekInfoVO);
 	}
 }
 

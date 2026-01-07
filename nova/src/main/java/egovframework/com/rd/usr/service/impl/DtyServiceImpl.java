@@ -3322,8 +3322,16 @@ public class DtyServiceImpl extends EgovAbstractServiceImpl implements DtyServic
 	public void cancleFixWeek(WeekInfoVO weekInfoVO) throws Exception {
 		LoginVO user = (LoginVO)EgovUserDetailsHelper.getAuthenticatedUser();
 
-		if(!"ROLE_ADMIN".equals(user.getAuthorCode())) {	//총판만이 협력사 등록이 가능
+		if(!"ROLE_ADMIN".equals(user.getAuthorCode())) {	//총판만이 확정 취소 가능
 			throw new IllegalArgumentException("운영사만 확정취소 할 수 있습니다.") ;
+		}
+
+		if("1".equals(dtyDAO.selectUnFixDay(weekInfoVO))) {
+			throw new IllegalArgumentException("당일 확정건만 취소 확정 취소 가능합니다") ;
+		}
+
+		if("2".equals(dtyDAO.selectUnFixDay(weekInfoVO))) {
+			throw new IllegalArgumentException("이미 확정 취소 되었습니다.") ;
 		}
 
 
@@ -3393,19 +3401,22 @@ public class DtyServiceImpl extends EgovAbstractServiceImpl implements DtyServic
 		//수익 등록 취소(콜수수료,프로그램료)
 		dtyDAO.deleteProfitByAtchFileId(weekInfoVO);
 
-//		WeekPayVO minusCoop = dtyDAO.selectMinusCooperatorProfit(weekInfoVO);
-		//협력사 잔액 조정 - selectUnFixDayFixCooperator에서 이미 조정되었기에 삭제함
-//		setBalance(minusCoop.getCooperatorId(), EgovProperties.getProperty("Globals.cooperatorId"), EgovProperties.getProperty("Globals.cooperatorId"), user.getId(), new BigDecimal(0), minusCoop.getSumCost().multiply(new BigDecimal(-1)));
+		WeekPayVO minusCoop = dtyDAO.selectMinusCooperatorProfit(weekInfoVO);
+		if(minusCoop != null) {
+			// 협력사 잔액 조정 - selectUnFixDayFixCooperator에서 이미 조정되었기에 삭제함?? 조정이 왜 안되었지?? TODO
+			setBalance(minusCoop.getCooperatorId(), EgovProperties.getProperty("Globals.cooperatorId"), EgovProperties.getProperty("Globals.cooperatorId"), user.getId(), minusCoop.getSumCost().multiply(new BigDecimal(-1)),new BigDecimal(0));
+		}
 		//협력사 수익등록 취소(콜수수료,프로그램료)
 		dtyDAO.deleteCooperatorProfitByAtchFileId(weekInfoVO);
 
 
 		//영업사원 잔액 조정
 		WeekPayVO minusSales = dtyDAO.selectMinusSalesProfit(weekInfoVO);
-		setBalance(EgovProperties.getProperty("Globals.cooperatorId"), minusSales.getSalesEsntlId(), minusSales.getEmplyrId(), user.getId(), new BigDecimal(0), minusSales.getSumCost().multiply(new BigDecimal(-1)));
-		//수익 등록 취소(영업사원 프로그램료)
-		dtyDAO.deleteSalesProfitByAtchFileId(weekInfoVO);
-
+		if(minusSales != null) {
+			setBalance(EgovProperties.getProperty("Globals.cooperatorId"), minusSales.getSalesEsntlId(), minusSales.getEmplyrId(), user.getId(), new BigDecimal(0), minusSales.getSumCost().multiply(new BigDecimal(-1)));
+			//수익 등록 취소(영업사원 프로그램료)
+			dtyDAO.deleteSalesProfitByAtchFileId(weekInfoVO);
+		}
 
 
         // 확정일자 삭제 : RD_WEEK_INFO 의 확정일자 세팅(하위 RD_WEEK_RIDER_INFO가 모두 Fix_day가 설정 시)

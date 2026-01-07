@@ -955,13 +955,14 @@
 			LEFT JOIN RD_DAY_PAY d ON b.WEEK_ID = d.WEEK_ID AND d.IO_GUBUN = '2' AND c.MBER_ID = d.MBER_ID AND d.week_YN ='Y'
 			WHERE b.COOPERATOR_ID = #{cooperatorId} AND c.mber_id = #{mberId}
 			AND (b.ACCOUNTS_ST_DT BETWEEN #{searchFromDate} AND #{searchToDate} or b.ACCOUNTS_ED_DT BETWEEN #{searchFromDate} AND #{searchToDate})
-
+			AND b.USE_AT ='Y' AND c.USE_AT ='Y'
 
 			GROUP BY b.WEEK_ID
 		)c ON a.WEEK_ID = c.WEEK_ID
 		WHERE 1 = 1
 			AND a.COOPERATOR_ID = #{cooperatorId} AND b.mber_id = #{mberId}
 			AND (a.ACCOUNTS_ST_DT BETWEEN #{searchFromDate} AND #{searchToDate} or a.ACCOUNTS_ED_DT BETWEEN #{searchFromDate} AND #{searchToDate})
+			AND a.USE_AT ='Y' AND b.USE_AT ='Y'
 	</select>
 
 	<select id="selectAllPayList" parameterType="egovframework.com.rd.usr.service.vo.HistoryVO" resultType="egovframework.com.rd.usr.service.vo.HistoryVO">

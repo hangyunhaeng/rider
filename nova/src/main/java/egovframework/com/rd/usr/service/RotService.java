@@ -40,6 +40,13 @@ public interface RotService {
 	 * @throws Exception
 	 */
 	public void saveBankByEsntlId(MyInfoVO vo) throws Exception ;
+	/**
+	 * 사용자의 계좌정보 삭제
+	 * @param vo
+	 * @return
+	 * @throws Exception
+	 */
+	public void removeBankByEsntlId(MyInfoVO vo) throws Exception ;
 
 	/**
 	 * 비밀번호변경

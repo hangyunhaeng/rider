@@ -237,6 +237,7 @@
 			AND (c.ACCOUNTS_ST_DT BETWEEN CONCAT(#{searchDate}, '01') AND CONCAT(#{searchDate}, '31') OR c.ACCOUNTS_ED_DT BETWEEN CONCAT(#{searchDate}, '01') AND CONCAT(#{searchDate}, '31'))
 			AND
 				a.USE_AT = 'Y'
+			and d.USE_AT = 'Y'
 			<if test="schAuthorCode == 'ROLE_USER'">
 			/* 협력사 조건 */
 			AND c.COOPERATOR_ID IN (

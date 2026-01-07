@@ -518,6 +518,50 @@ public class EgovRotController {
         return ResponseEntity.ok(map);
 	}
 
+
+	/**
+	 * 마이페이지 - 계좌정보저장
+	 * @param request
+	 * @param model
+	 * @return
+	 * @throws Exception
+	 */
+    @RequestMapping("/gnr/rot0002_0005.do")
+    public ResponseEntity<?> rot0002_0005(@ModelAttribute("MyInfoVO") MyInfoVO myInfoVO, HttpServletRequest request,ModelMap model) throws Exception {
+
+    	//로그인 체크
+        LoginVO user = (LoginVO)EgovUserDetailsHelper.getAuthenticatedUser();
+        Boolean isAuthenticated = EgovUserDetailsHelper.isAuthenticated();
+
+        if(!isAuthenticated) {
+        	return ResponseEntity.status(401).body("Unauthorized");
+        }
+
+        if(!Util.isGnr()) {
+        	return ResponseEntity.status(401).body("Unauthorized");
+        }
+        //return value
+        Map<String, Object> map =  new HashMap<String, Object>();
+
+        //라이더 권한
+        myInfoVO.setSchAuthorCode(user.getAuthorCode());
+        myInfoVO.setSchId(user.getId());
+        myInfoVO.setMberId(user.getId());
+
+
+        try{
+
+        	rotService.removeBankByEsntlId(myInfoVO);
+        	map.put("resultCode", "success");
+	    } catch (Exception e) {
+			map.put("resultCode", "fail");
+			map.put("resultMsg", e.getMessage());
+			return ResponseEntity.ok(map);
+		}
+
+        return ResponseEntity.ok(map);
+	}
+
 	/**
 	 * 출금페이지
 	 * @param request

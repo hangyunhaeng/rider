@@ -15,7 +15,7 @@
 	var goActStep2;
 	//onLoad
 	document.addEventListener('DOMContentLoaded', function() {
-		debugger;
+
 		$('#strMbtlnum').html(addHyphenToPhoneNumber("${myInfoVO.mbtlnum}"));
 		$('#mbtlnum').val(addHyphenToPhoneNumber("${myInfoVO.mbtlnum}"));
 		$('#strRegistrationSn').html(addHyphenToregistrationSn("${myInfoVO.registrationSn}"));
@@ -66,7 +66,7 @@
 		if(!validEmail(document.getElementById('mberEmailAdres'))){
 			return;
 		}
-	debugger;
+
 		if(confirm("저장하시겠습니까?")){
 			if(${doNice} != true){
 				saveInfo();
@@ -250,6 +250,44 @@
 		        });
 		}
 	}
+
+	function 계좌정보삭제(){
+		if('${myInfoVO.accountNum}' == '' ){
+			alert('저장된 계좌정보가 없습니다.\n삭제를 취소합니다');
+			return;
+		}
+
+
+	    const params = new URLSearchParams();
+
+		// 로딩 시작
+        $('.loading-wrap--js').show();
+	    axios.post('${pageContext.request.contextPath}/gnr/rot0002_0005.do', params)	//얘금주명 조회
+	        .then(response => {
+	        	// 로딩 종료
+	            $('.loading-wrap--js').hide();
+
+	            if(chkLogOut(response.data)){
+	            	return;
+	            }
+
+				if(response.data.resultCode == "success"){
+					goMyInfo();
+				} else {
+					if(response.data.resultMsg != '' && response.data.resultMsg != null)
+						alert(response.data.resultMsg);
+					else alert("기본정보 저장에 실패하였습니다");
+					return ;
+				}
+	        })
+	        .catch(error => {
+	        	// 로딩 종료
+	            $('.loading-wrap--js').hide();
+	            console.error('Error fetching data:', error);
+	        });
+
+	}
+
 
 	function pass(){
 			// 로딩 시작
@@ -561,6 +599,7 @@
 	                <div class="col-auto">
 	                </div>
 	                <div class="d-flex col-auto">
+	                	<button class="btn btn-primary mb-2 mb-sm-0 mx-1 fs-9" type="submit" onclick="계좌정보삭제()">계좌삭제</button>
 	                	<button class="btn btn-primary mb-2 mb-sm-0 mx-1 fs-9" type="submit" onclick="계좌정보저장()">계좌정보저장</button>
 	                </div>
                 </div>
