@@ -291,6 +291,7 @@
                     , MBER_CONFIRM_AT 	AS mberConfirmAt
             FROM    COMTNGNRLMBER
             WHERE   MBER_ID = #{mberId}
+			   AND mber_sttus = 'P'
 
     </select>
 

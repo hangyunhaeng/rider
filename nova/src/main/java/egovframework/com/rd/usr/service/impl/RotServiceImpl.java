@@ -91,6 +91,39 @@ public class RotServiceImpl extends EgovAbstractServiceImpl implements RotServic
 
 		return rotDAO.updateMyInfoByMberId(vo);
 	}
+
+	/**
+	 * 회원탈퇴
+	 * @param vo
+	 * @return
+	 * @throws Exception
+	 */
+	public int ExitMyInfoByMberId(MyInfoVO vo) throws Exception {
+
+		if(!"GNR".equals(vo.getSchUserSe())) {
+			throw new IllegalArgumentException("라이더만 탈퇴 가능합니다") ;
+		}
+
+		if(Util.isEmpty(vo.getPassword())) {
+			throw new IllegalArgumentException("기존 비밀번호가 입력되지 않았습니다") ;
+		}
+
+		LoginVO user = (LoginVO)EgovUserDetailsHelper.getAuthenticatedUser();
+
+		LoginVO loginVO = new LoginVO();
+		loginVO.setPassword(vo.getPassword());
+		loginVO.setId(user.getId());
+		loginVO.setUserSe(user.getUserSe());
+		LoginVO reLoginVO = loginService.actionLogin(loginVO);
+		if(Util.isEmpty(reLoginVO.getId())) {
+			throw new IllegalArgumentException("기존 비밀번호가 틀려 탈퇴에 실패하였습니다") ;
+		}
+		//회원탈퇴
+		vo.setMberSttus("D");
+
+		return rotDAO.extiMyInfoByMberId(vo);
+	}
+
 	/**
 	 * 코드조회
 	 * @param vo

@@ -72,6 +72,15 @@ public class RotDAO extends EgovComAbstractDAO {
 		return update("rotDAO.updateMyInfoByMberId", vo);
 	}
 	/**
+	 * 회워탈퇴
+	 * @param vo
+	 * @return
+	 * @throws Exception
+	 */
+	public int extiMyInfoByMberId(MyInfoVO vo) throws Exception {
+		return update("rotDAO.extiMyInfoByMberId", vo);
+	}
+	/**
 	 * 코드조회
 	 * @param vo
 	 * @return

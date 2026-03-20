@@ -84,6 +84,12 @@
 			WHERE EMPLYR_ID = #{mberId}
 		</if>
 	</update>
+
+	<update id="extiMyInfoByMberId" parameterType="egovframework.com.rd.usr.service.vo.MyInfoVO">
+		UPDATE COMTNGNRLMBER
+		SET MBER_STTUS = #{mberSttus}
+		WHERE mber_id = #{mberId}
+	</update>
 	<select id="selectCodeList" parameterType="egovframework.com.rd.usr.service.vo.MyInfoVO" resultType="egovframework.com.rd.usr.service.vo.MyInfoVO">
 
 		 SELECT cd AS SELECE_KEY, cd_nm AS SELECT_VALUE

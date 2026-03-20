@@ -107,6 +107,53 @@
 		}
 	}
 
+	function 회원탈퇴(){
+		if ($("#exitPw").val() == "") {
+	        alert("기존 비밀번호를 입력하세요");
+	        $("#exitPw").focus();
+	        return;
+	    }
+
+
+		if(confirm("회원 탈퇴하시겠습니까?")){
+
+		    const params = new URLSearchParams();
+		    params.append("password", $('#exitPw').val());
+
+			// 로딩 시작
+	        $('.loading-wrap--js').show();
+		    axios.post('${pageContext.request.contextPath}/gnr/rot0002_0006.do', params)
+		        .then(response => {
+		        	// 로딩 종료
+		            $('.loading-wrap--js').hide();
+
+		            if(chkLogOut(response.data)){
+		            	return;
+		            }
+
+					if(response.data.resultCode == "success"){
+
+						$('#myForm').attr("action", "${pageContext.request.contextPath}/uat/uia/actionLogout.do");
+						$('#myForm').submit();
+
+
+					} else {
+						if(response.data.resultMsg != '' && response.data.resultMsg != null)
+							alert(response.data.resultMsg);
+						else alert("회원탈퇴 저장에 실패하였습니다");
+						return ;
+					}
+		        })
+		        .catch(error => {
+		        	// 로딩 종료
+		            $('.loading-wrap--js').hide();
+		            console.error('Error fetching data:', error);
+		        });
+
+		}
+
+	}
+
 
 	function saveInfo(){
 
@@ -422,7 +469,8 @@
                       <h3 class="text-body-emphasis">기본정보</h3>
                     </div>
                        <div class="col-auto d-flex">
-                       	<button class="btn btn-primary mb-2 mb-sm-0 mx-1 fs-9" type="submit" onclick="$('.collapseExample1').collapse('hide');" data-bs-toggle="collapse" data-bs-target=".collapseExample0" aria-expanded="false">변경</button>
+                       	<button class="btn btn-primary mb-2 mb-sm-0 mx-1 fs-9" type="submit" onclick="$('.collapseExample0').collapse('hide');$('.collapseExample1').collapse('hide');" data-bs-toggle="collapse" data-bs-target=".collapseExit" aria-expanded="false">탈퇴</button>
+                       	<button class="btn btn-primary mb-2 mb-sm-0 mx-1 fs-9" type="submit" onclick="$('.collapseExit').collapse('hide');$('.collapseExample1').collapse('hide');" data-bs-toggle="collapse" data-bs-target=".collapseExample0" aria-expanded="false">변경</button>
                        </div>
                   </div>
                 </div>
@@ -542,6 +590,29 @@
 
 
 
+
+			<div class="mb-3 collapse collapseExit">
+			    <div class="d-flex row justify-content-between align-items-center">
+	                <div class="col-auto">
+	                </div>
+	                <div class="d-flex col-auto">
+	                	<button class="btn btn-primary mb-0 mb-sm-0 mx-1 fs-9 mt-2" type="submit" onclick="회원탈퇴()">회원탈퇴</button>
+	                </div>
+                </div>
+				<div class="d-flex hover-actions-trigger py-2 border-translucent  position-relative">
+					<div class="col-12">
+						<div class="form-floating">
+						<input class="form-control" id="exitPw" type="password" placeholder="기존 비밀번호"><label for="floatingInputZipcode">기존 비밀번호<em style="color:red;"> 회원 탈퇴 시 입력</em></label>
+						</div>
+					</div>
+				</div>
+
+			</div>
+
+
+
+
+
               <div class="card mb-3">
                 <div class="card-header border-bottom-0 pb-0">
                   <div class="row justify-content-between align-items-center mb-2">
@@ -549,7 +620,7 @@
                       <h3 class="text-body-emphasis">계좌정보</h3>
                     </div>
                        <div class="col-auto d-flex">
-                       	<button class="btn btn-primary mb-2 mb-sm-0 mx-1 fs-9" onclick="$('.collapseExample0').collapse('hide');" type="submit" data-bs-toggle="collapse" data-bs-target=".collapseExample1" aria-expanded="false">변경</button>
+                       	<button class="btn btn-primary mb-2 mb-sm-0 mx-1 fs-9" onclick="$('.collapseExit').collapse('hide');$('.collapseExample0').collapse('hide');" type="submit" data-bs-toggle="collapse" data-bs-target=".collapseExample1" aria-expanded="false">변경</button>
                        </div>
                   </div>
                 </div>

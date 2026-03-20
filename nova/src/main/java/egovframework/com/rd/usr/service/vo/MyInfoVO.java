@@ -64,4 +64,7 @@ public class MyInfoVO extends Sch implements Serializable {
 	private String gubun;
 	private String authorCode;
 	private String authorCodeNm;
+
+	//회원상태 p: 정상 , D: 탈퇴
+	private String mberSttus;
 }

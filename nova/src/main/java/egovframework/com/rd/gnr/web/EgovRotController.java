@@ -7,6 +7,7 @@ import java.util.Map;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
@@ -554,6 +555,52 @@ public class EgovRotController {
         	rotService.removeBankByEsntlId(myInfoVO);
         	map.put("resultCode", "success");
 	    } catch (Exception e) {
+			map.put("resultCode", "fail");
+			map.put("resultMsg", e.getMessage());
+			return ResponseEntity.ok(map);
+		}
+
+        return ResponseEntity.ok(map);
+	}
+
+
+	/**
+	 * 마이페이지 - 회원 탈퇴
+	 * @param request
+	 * @param model
+	 * @return
+	 * @throws Exception
+	 */
+    @RequestMapping("/gnr/rot0002_0006.do")
+    public ResponseEntity<?> rot0002_0006(@ModelAttribute("MyInfoVO") MyInfoVO myInfoVO, HttpServletRequest request,ModelMap model) throws Exception {
+
+    	//로그인 체크
+        LoginVO user = (LoginVO)EgovUserDetailsHelper.getAuthenticatedUser();
+        Boolean isAuthenticated = EgovUserDetailsHelper.isAuthenticated();
+
+        if(!isAuthenticated) {
+        	return ResponseEntity.status(401).body("Unauthorized");
+        }
+
+        if(!Util.isGnr()) {
+        	return ResponseEntity.status(401).body("Unauthorized");
+        }
+        //return value
+        Map<String, Object> map =  new HashMap<String, Object>();
+
+        //라이더 권한
+        myInfoVO.setSchAuthorCode(user.getAuthorCode());
+        myInfoVO.setSchId(user.getId());
+        myInfoVO.setMberId(user.getId());
+
+        myInfoVO.setSchUserSe(user.getUserSe());
+        myInfoVO.setMberId(user.getId());
+
+        try{
+
+        	rotService.ExitMyInfoByMberId(myInfoVO);
+        	map.put("resultCode", "success");
+        } catch (Exception e) {
 			map.put("resultCode", "fail");
 			map.put("resultMsg", e.getMessage());
 			return ResponseEntity.ok(map);

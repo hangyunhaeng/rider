@@ -26,6 +26,14 @@ public interface RotService {
 	 * @throws Exception
 	 */
 	public int updateMyInfoByMberId(MyInfoVO vo) throws Exception ;
+
+	/**
+	 * 회원탈퇴
+	 * @param vo
+	 * @return
+	 * @throws Exception
+	 */
+	public int ExitMyInfoByMberId(MyInfoVO vo) throws Exception ;
 	/**
 	 * 코드조회
 	 * @param vo
